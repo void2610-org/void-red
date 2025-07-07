@@ -10,11 +10,11 @@ using VContainer;
 public class EvolutionManager
 {
     private readonly StatsTracker _statsTracker;
-    private readonly UIPresenter _uIPresenter;
+    private readonly UIPresenter _uiPresenter;
     
-    public EvolutionManager(StatsTracker statsTracker, UIPresenter uIPresenter)
+    public EvolutionManager(StatsTracker statsTracker, UIPresenter uiPresenter)
     {
-        _uIPresenter = uIPresenter;
+        _uiPresenter = uiPresenter;
         _statsTracker = statsTracker;
     }
     
@@ -96,12 +96,12 @@ public class EvolutionManager
         
         foreach (var (original, evolved) in evolvedCards)
         {
-           await _uIPresenter.ShowAnnouncement($"{original.CardName} が {evolved.CardName} に進化しました！", 2f);
+           await _uiPresenter.ShowAnnouncement($"{original.CardName} が {evolved.CardName} に進化しました！", 2f);
            await UniTask.Delay(200);
         }
         foreach (var (original, degraded) in degradedCards)
         {
-            await _uIPresenter.ShowAnnouncement($"{original.CardName} が {degraded.CardName} に劣化しました...", 2f);
+            await _uiPresenter.ShowAnnouncement($"{original.CardName} が {degraded.CardName} に劣化しました...", 2f);
             await UniTask.Delay(200);
         }
     }

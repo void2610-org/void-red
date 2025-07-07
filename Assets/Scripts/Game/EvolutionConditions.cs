@@ -13,12 +13,12 @@ public abstract class EvolutionConditionBase
     public abstract bool IsSatisfied(CardStats cardStats, PlayerStats playerStats);
     
     /// <summary>
-    /// 条件の説明文を取得
+    /// 条件の説明文を取得(エディタ表示用)
     /// </summary>
     public abstract string GetDescription();
     
     /// <summary>
-    /// エディタ表示用の条件タイプ名
+    /// エディタ表示用の条件タイプ名(エディタ表示用)
     /// </summary>
     public abstract string GetConditionTypeName();
 }
@@ -33,7 +33,7 @@ public class PlayStyleWinCondition : EvolutionConditionBase
     public PlayStyle requiredPlayStyle = PlayStyle.Impulse;
     
     [Header("必要勝利数")]
-    public RandomRangeValue requiredCount = new(3);
+    public RandomRangeValue requiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
@@ -58,7 +58,7 @@ public class PlayStyleLoseCondition : EvolutionConditionBase
     public PlayStyle requiredPlayStyle = PlayStyle.Impulse;
     
     [Header("必要敗北数")]
-    public RandomRangeValue requiredCount = new(3);
+    public RandomRangeValue requiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
@@ -80,7 +80,7 @@ public class PlayStyleLoseCondition : EvolutionConditionBase
 public class TotalWinCondition : EvolutionConditionBase
 {
     [Header("必要勝利数")]
-    public RandomRangeValue requiredCount = new(5);
+    public RandomRangeValue requiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
@@ -102,7 +102,7 @@ public class TotalWinCondition : EvolutionConditionBase
 public class CollapseCountCondition : EvolutionConditionBase
 {
     [Header("必要崩壊数")]
-    public RandomRangeValue requiredCount = new(2);
+    public RandomRangeValue requiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
@@ -124,7 +124,7 @@ public class CollapseCountCondition : EvolutionConditionBase
 public class ConsecutiveWinCondition : EvolutionConditionBase
 {
     [Header("必要連続勝利数")]
-    public RandomRangeValue requiredCount = new(3);
+    public RandomRangeValue requiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
@@ -146,7 +146,7 @@ public class ConsecutiveWinCondition : EvolutionConditionBase
 public class TotalUseCondition : EvolutionConditionBase
 {
     [Header("必要使用回数")]
-    public RandomRangeValue requiredCount = new(10);
+    public RandomRangeValue requiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {

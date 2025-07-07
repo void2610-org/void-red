@@ -534,11 +534,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c7ec37107be404ca704fcb1a60842f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxLogLines: 100
+  maxLogLines: 60
   fontSize: 20
   textColor: {r: 1, g: 1, b: 1, a: 1}
   displayPosition: {x: 10, y: 50}
-  autoDeleteInterval: 20
+  autoDeleteInterval: 10
   showWarnings: 1
   showErrors: 1
   showLogs: 1
