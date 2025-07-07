@@ -15,6 +15,8 @@ public class GameManager: IStartable
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
+    private readonly StatsTracker _statsTracker;
+    private readonly EvolutionManager _evolutionManager;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private PlayerMove _playerMove;
@@ -29,13 +31,17 @@ public class GameManager: IStartable
         ThemeService themeService,
         UIPresenter uiPresenter,
         Player player,
-        Enemy enemy)
+        Enemy enemy,
+        StatsTracker statsTracker,
+        EvolutionManager evolutionManager)
     {
         _cardPoolService = cardPoolService;
         _themeService = themeService;
         _uiPresenter = uiPresenter;
         _player = player;
         _enemy = enemy;
+        _statsTracker = statsTracker;
+        _evolutionManager = evolutionManager;
     }
     
     public void Start()
@@ -297,16 +303,54 @@ public class GameManager: IStartable
             await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
         }
         
-        // 使用したカードをプレイ（崩壊判定を含む）
+        // ゲーム結果を統計に記録（進化チェック前に実行）
+        var playerWon = playerScore > npcScore;
+        _statsTracker.RecordGameResult(playerWon, _playerMove, _npcMove, playerCollapse, npcCollapse);
+        
+        // 使用したカードをプレイ
         if (playerCollapse)
+        {
             _player.CollapseSelectedCard();
+        }
         else
-            _player.PlaySelectedCard(false);
+        {
+            // プレイヤーカードを手札から削除（デッキに戻さない）
+            var playerCard = _player.RemoveSelectedCard();
+            if (playerCard)
+            {
+                // 即時進化チェック
+                var playerCardAfterEvolution = _evolutionManager.CheckCardEvolution(playerCard);
+                // 進化結果をアナウンス
+                if (playerCardAfterEvolution != playerCard)
+                {
+                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！", 2f);
+                }
+                // 進化後のカードをデッキに戻す
+                _player.ReturnCardToDeck(playerCardAfterEvolution);
+            }
+        }
             
         if (npcCollapse)
+        {
             _enemy.CollapseSelectedCard();
+        }
         else
-            _enemy.PlaySelectedCard(false);
+        {
+            // NPCカードを手札から削除（デッキに戻さない）
+            var npcCard = _enemy.RemoveSelectedCard();
+            if (npcCard)
+            {
+                // 即時進化チェック
+                var npcCardAfterEvolution = _evolutionManager.CheckCardEvolution(npcCard);
+                // 進化結果をアナウンス
+                if (npcCardAfterEvolution != npcCard)
+                {
+                    await _uiPresenter.ShowAnnouncement($"NPCの {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化しました！", 2f);
+                }
+                // 進化後のカードをデッキに戻す
+                _enemy.ReturnCardToDeck(npcCardAfterEvolution);
+            }
+        }
         
         // カード使用後の処理完了を待つ
         await UniTask.Delay(1000);
@@ -322,6 +366,9 @@ public class GameManager: IStartable
         _player.DrawCard(3);
         await UniTask.Delay(500);
         _enemy.DrawCard(3);
+        
+        // デッキ全体の進化・劣化チェック（即時進化済みカード以外が対象）
+        // await _evolutionManager.ProcessEvolutions(_player.DeckModel);
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
