@@ -18,14 +18,31 @@ MonoBehaviour:
   image: {fileID: 7997582342637487317, guid: 061f3dd17d35f4669bf0bcb0ced3c1b0, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
-  evolutionConditions:
-  - conditionType: 1
-    requiredPlayStyle: 2
-    requiredCount: 2
+  evolutionConditionGroups:
+  - conditions:
+    - rid: 8005200165294309476
   evolutionTarget: {fileID: 11400000, guid: 340062878b38c4d26abf33d3bf2cc4d3, type: 2}
   isTransformationTarget: 0
-  degradationConditions:
-  - conditionType: 0
-    requiredPlayStyle: 0
-    requiredCount: 3
+  degradationConditionGroups:
+  - conditions:
+    - rid: 8005200165294309477
   degradationTarget: {fileID: 11400000, guid: 73cde9b6853394361a93499ee00e9474, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 8005200165294309476
+      type: {class: PlayStyleWinCondition, ns: , asm: Assembly-CSharp}
+      data:
+        requiredPlayStyle: 2
+        useRandomRange: 0
+        fixedCount: 2
+        minCount: 1
+        maxCount: 5
+    - rid: 8005200165294309477
+      type: {class: PlayStyleLoseCondition, ns: , asm: Assembly-CSharp}
+      data:
+        requiredPlayStyle: 0
+        useRandomRange: 0
+        fixedCount: 3
+        minCount: 1
+        maxCount: 5

@@ -65,81 +65,45 @@ public class PlayerStats
     }
     
     /// <summary>
-    /// 進化条件をチェック
-    /// </summary>
-    /// <param name="cardData">チェック対象のカード</param>
-    /// <param name="condition">進化条件</param>
-    /// <returns>条件を満たしているかどうか</returns>
-    public bool CheckEvolutionCondition(CardData cardData, EvolutionCondition condition)
-    {
-        if (!cardData || condition == null) return false;
-        
-        var cardStats = GetCardStats(cardData.CardId);
-        
-        return condition.ConditionType switch
-        {
-            EvolutionConditionType.PlayStyleWin => 
-                cardStats.GetPlayStyleWins(condition.RequiredPlayStyle) >= condition.RequiredCount,
-            EvolutionConditionType.PlayStyleLose => 
-                cardStats.GetPlayStyleLosses(condition.RequiredPlayStyle) >= condition.RequiredCount,
-            EvolutionConditionType.TotalWin => 
-                cardStats.TotalWin >= condition.RequiredCount,
-            EvolutionConditionType.CollapseCount => 
-                cardStats.CollapseCount >= condition.RequiredCount,
-            EvolutionConditionType.ConsecutiveWin => 
-                cardStats.MaxConsecutiveWin >= condition.RequiredCount,
-            EvolutionConditionType.TotalUse => 
-                cardStats.TotalUse >= condition.RequiredCount,
-            _ => false
-        };
-    }
-    
-    /// <summary>
     /// 全ての進化条件をチェック
     /// </summary>
     /// <param name="cardData">チェック対象のカード</param>
-    /// <returns>全ての条件を満たしているかどうか</returns>
+    /// <returns>いずれかのグループの条件を全て満たしているかどうか</returns>
     public bool CheckAllEvolutionConditions(CardData cardData)
     {
         if (!cardData || !cardData.CanEvolve) return false;
         
-        foreach (var condition in cardData.EvolutionConditions)
+        var cardStats = GetCardStats(cardData.CardId);
+        
+        // いずれかのグループの条件を全て満たしていればOK（OR条件）
+        foreach (var group in cardData.EvolutionConditionGroups)
         {
-            if (!CheckEvolutionCondition(cardData, condition))
-                return false;
+            if (group.IsSatisfied(cardStats, this))
+                return true;
         }
         
-        return true;
-    }
-    
-    /// <summary>
-    /// 劣化条件をチェック（進化条件と同じロジック）
-    /// </summary>
-    /// <param name="cardData">チェック対象のカード</param>
-    /// <param name="condition">劣化条件</param>
-    /// <returns>条件を満たしているかどうか</returns>
-    public bool CheckDegradationCondition(CardData cardData, EvolutionCondition condition)
-    {
-        // 進化条件と同じロジックを使用
-        return CheckEvolutionCondition(cardData, condition);
+        return false;
     }
     
     /// <summary>
     /// 全ての劣化条件をチェック
     /// </summary>
     /// <param name="cardData">チェック対象のカード</param>
-    /// <returns>全ての条件を満たしているかどうか</returns>
+    /// <returns>いずれかのグループの条件を全て満たしているかどうか</returns>
     public bool CheckAllDegradationConditions(CardData cardData)
     {
         if (!cardData || !cardData.CanDegrade) return false;
         
-        foreach (var condition in cardData.DegradationConditions)
+        var cardStats = GetCardStats(cardData.CardId);
+        
+        // いずれかのグループの条件を全て満たしていればOK（OR条件）
+        foreach (var group in cardData.DegradationConditionGroups)
         {
-            if (!CheckDegradationCondition(cardData, condition))
-                return false;
+            if (group.IsSatisfied(cardStats, this))
+                return true;
         }
         
-        return true;
+        return false;
     }
     
     /// <summary>

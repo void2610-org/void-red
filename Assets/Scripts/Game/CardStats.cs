@@ -1,41 +1,6 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-
-/// <summary>
-/// 進化条件のタイプを表すenum
-/// </summary>
-public enum EvolutionConditionType
-{
-    /// <summary>特定プレイスタイルでの勝利回数</summary>
-    PlayStyleWin,
-    /// <summary>特定プレイスタイルでの敗北回数</summary>
-    PlayStyleLose,
-    /// <summary>総勝利回数</summary>
-    TotalWin,
-    /// <summary>崩壊回数</summary>
-    CollapseCount,
-    /// <summary>連続勝利回数</summary>
-    ConsecutiveWin,
-    /// <summary>総使用回数</summary>
-    TotalUse
-}
-
-/// <summary>
-/// カードの進化条件を定義するクラス
-/// </summary>
-[Serializable]
-public class EvolutionCondition
-{
-    [Header("進化条件")]
-    [SerializeField] private EvolutionConditionType conditionType;
-    [SerializeField] private PlayStyle requiredPlayStyle = PlayStyle.Impulse; // PlayStyleWin/PlayStyleLoseの場合のみ使用
-    [SerializeField] private int requiredCount;
-    
-    public EvolutionConditionType ConditionType => conditionType;
-    public PlayStyle RequiredPlayStyle => requiredPlayStyle;
-    public int RequiredCount => requiredCount;
-}
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カード毎の統計データ
@@ -51,9 +16,9 @@ public class CardStats
     [SerializeField] private int maxConsecutiveWin;
     
     // プレイスタイル別勝利回数（拡張性のため辞書で管理）
-    [SerializeField] private Void2610.UnityTemplate.SerializableDictionary<PlayStyle, int> playStyleWins = new();
+    [SerializeField] private SerializableDictionary<PlayStyle, int> playStyleWins = new();
     // プレイスタイル別敗北回数
-    [SerializeField] private Void2610.UnityTemplate.SerializableDictionary<PlayStyle, int> playStyleLosses = new();
+    [SerializeField] private SerializableDictionary<PlayStyle, int> playStyleLosses = new();
     
     public int TotalUse => totalUse;
     public int TotalWin => totalWin;
@@ -64,12 +29,12 @@ public class CardStats
     
     public int GetPlayStyleWins(PlayStyle playStyle)
     {
-        return playStyleWins.GetValueOrDefault(playStyle, 0);
+        return playStyleWins.TryGetValue(playStyle, out var wins) ? wins : 0;
     }
     
     public int GetPlayStyleLosses(PlayStyle playStyle)
     {
-        return playStyleLosses.GetValueOrDefault(playStyle, 0);
+        return playStyleLosses.TryGetValue(playStyle, out var losses) ? losses : 0;
     }
     
     /// <summary>
@@ -91,7 +56,8 @@ public class CardStats
             maxConsecutiveWin = currentConsecutiveWin;
         
         // プレイスタイル別勝利回数を更新
-        playStyleWins.TryAdd(playStyle, 0);
+        if (!playStyleWins.ContainsKey(playStyle))
+            playStyleWins[playStyle] = 0;
         playStyleWins[playStyle]++;
     }
     
@@ -104,7 +70,8 @@ public class CardStats
         currentConsecutiveWin = 0;
         
         // プレイスタイル別敗北回数を更新
-        playStyleLosses.TryAdd(playStyle, 0);
+        if (!playStyleLosses.ContainsKey(playStyle))
+            playStyleLosses[playStyle] = 0;
         playStyleLosses[playStyle]++;
     }
     

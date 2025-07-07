@@ -16,14 +16,14 @@ public class CardData : ScriptableObject
     [SerializeField] private int collapseThreshold = 3;
     
     [Header("進化システム")]
-    [SerializeField] private List<EvolutionCondition> evolutionConditions = new List<EvolutionCondition>();
+    [SerializeField] private List<EvolutionConditionGroup> evolutionConditionGroups = new List<EvolutionConditionGroup>();
     [SerializeField] private CardData evolutionTarget;
     
     [Header("カードタイプ")]
     [SerializeField] private bool isTransformationTarget = false; // 進化・劣化先のカードかどうか（初期デッキには含まない）
     
     [Header("劣化システム")]
-    [SerializeField] private List<EvolutionCondition> degradationConditions = new List<EvolutionCondition>();
+    [SerializeField] private List<EvolutionConditionGroup> degradationConditionGroups = new List<EvolutionConditionGroup>();
     [SerializeField] private CardData degradationTarget;
     
     public string CardId => cardId;
@@ -33,20 +33,20 @@ public class CardData : ScriptableObject
     public float ScoreMultiplier => scoreMultiplier;
     public int CollapseThreshold => collapseThreshold;
     
-    public List<EvolutionCondition> EvolutionConditions => evolutionConditions;
+    public List<EvolutionConditionGroup> EvolutionConditionGroups => evolutionConditionGroups;
     public CardData EvolutionTarget => evolutionTarget;
     public bool IsTransformationTarget => isTransformationTarget;
     
-    public List<EvolutionCondition> DegradationConditions => degradationConditions;
+    public List<EvolutionConditionGroup> DegradationConditionGroups => degradationConditionGroups;
     public CardData DegradationTarget => degradationTarget;
     
     /// <summary>
     /// 進化可能かどうかを判定
     /// </summary>
-    public bool CanEvolve => evolutionTarget && evolutionConditions.Count > 0;
+    public bool CanEvolve => evolutionTarget && evolutionConditionGroups.Count > 0;
     
     /// <summary>
     /// 劣化可能かどうかを判定
     /// </summary>
-    public bool CanDegrade => degradationTarget && degradationConditions.Count > 0;
+    public bool CanDegrade => degradationTarget && degradationConditionGroups.Count > 0;
 }
