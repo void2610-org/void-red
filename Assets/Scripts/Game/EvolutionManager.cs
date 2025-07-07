@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using VContainer;
 
 /// <summary>
@@ -78,6 +77,28 @@ public class EvolutionManager
         }
         
         return degradedCards;
+    }
+    
+    /// <summary>
+    /// 単一カードの進化チェック（即時進化用）
+    /// </summary>
+    /// <param name="card">チェックするカード</param>
+    /// <returns>進化先カード（進化しない場合は元のカード）</returns>
+    public CardData CheckCardEvolution(CardData card)
+    {
+        if (_statsTracker.CanCardEvolve(card))
+        {
+            return card.EvolutionTarget;
+        }
+        
+        // 進化しない場合は劣化チェック
+        if (_statsTracker.CanCardDegrade(card))
+        {
+            return card.DegradationTarget;
+        }
+        
+        // 変化なしの場合は元のカードを返す
+        return card;
     }
     
     /// <summary>

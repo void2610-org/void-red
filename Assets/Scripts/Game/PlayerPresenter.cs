@@ -183,6 +183,32 @@ public abstract class PlayerPresenter : IDisposable
     }
     
     /// <summary>
+    /// 選択されたカードを手札から削除（デッキに戻さない）
+    /// </summary>
+    /// <returns>削除されたカードデータ</returns>
+    public CardData RemoveSelectedCard()
+    {
+        var selectedCard = SelectedCard.CurrentValue;
+        if (!selectedCard) return null;
+        
+        // 手札から削除
+        if (_handModel.TryRemoveCard(selectedCard))
+            return selectedCard;
+        
+        return null;
+    }
+    
+    /// <summary>
+    /// 指定したカードをデッキに戻す
+    /// </summary>
+    /// <param name="card">戻すカード</param>
+    public void ReturnCardToDeck(CardData card)
+    {
+        if (card)
+            _deckModel?.ReturnCard(card);
+    }
+    
+    /// <summary>
     /// 指定したカードをプレイ
     /// </summary>
     /// <param name="card">プレイするカード</param>
