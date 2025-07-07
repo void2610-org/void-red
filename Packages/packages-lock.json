@@ -50,6 +50,13 @@
       "dependencies": {},
       "hash": "f789083c31250c83082da9b29be0c976152d699b"
     },
+    "com.mackysoft.serializereference-extensions": {
+      "version": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f938fc5d9a9ef46a1669289450d38e17cb39567c"
+    },
     "com.marijnzwemmer.unity-toolbar-extender": {
       "version": "https://github.com/marijnz/unity-toolbar-extender.git",
       "depth": 0,
