@@ -43,17 +43,40 @@ public class CardPoolService
     }
     
     /// <summary>
-    /// 複数のランダムなカードを取得（重複あり）
+    /// 複数のランダムなカードを取得（重複なし）
     /// </summary>
     /// <param name="count">取得するカード数</param>
-    /// <returns>ランダムなカードのリスト</returns>
+    /// <returns>ランダムなカードのリスト（重複なし）</returns>
     public List<CardData> GetRandomCards(int count)
     {
         if (count <= 0) return new List<CardData>();
-        if (_availableCards.Count == 0)
+        if (_availableCards.Count == 0) return new List<CardData>();
+        
+        // 要求数が利用可能カード数を超える場合は、利用可能な分だけ返す
+        var actualCount = Mathf.Min(count, _availableCards.Count);
+        
+        // シャッフルしてから先頭から取得（重複なし）
+        var shuffledCards = new List<CardData>(_availableCards);
+        for (int i = 0; i < shuffledCards.Count; i++)
         {
-            return new List<CardData>();
+            var temp = shuffledCards[i];
+            var randomIndex = Random.Range(i, shuffledCards.Count);
+            shuffledCards[i] = shuffledCards[randomIndex];
+            shuffledCards[randomIndex] = temp;
         }
+        
+        return shuffledCards.Take(actualCount).ToList();
+    }
+    
+    /// <summary>
+    /// 複数のランダムなカードを取得（重複あり）
+    /// </summary>
+    /// <param name="count">取得するカード数</param>
+    /// <returns>ランダムなカードのリスト（重複あり）</returns>
+    public List<CardData> GetRandomCardsWithDuplicates(int count)
+    {
+        if (count <= 0) return new List<CardData>();
+        if (_availableCards.Count == 0) return new List<CardData>();
         
         var result = new List<CardData>();
         for (var i = 0; i < count; i++)
