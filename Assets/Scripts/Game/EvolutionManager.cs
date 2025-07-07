@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 
@@ -9,9 +10,11 @@ using VContainer;
 public class EvolutionManager
 {
     private readonly StatsTracker _statsTracker;
+    private readonly UIPresenter _uIPresenter;
     
-    public EvolutionManager(StatsTracker statsTracker)
+    public EvolutionManager(StatsTracker statsTracker, UIPresenter uIPresenter)
     {
+        _uIPresenter = uIPresenter;
         _statsTracker = statsTracker;
     }
     
@@ -82,40 +85,24 @@ public class EvolutionManager
     /// </summary>
     /// <param name="deckModel">デッキモデル</param>
     /// <returns>進化または劣化が発生したかどうか</returns>
-    public bool ProcessEvolutions(DeckModel deckModel)
+    public async UniTask ProcessEvolutions(DeckModel deckModel)
     {
         // まず進化をチェック（進化優先）
         var evolvedCards = CheckAndEvolveCards(deckModel);
-        
         // 進化しなかったカードのみ劣化をチェック
         var degradedCards = new List<(CardData, CardData)>();
         if (evolvedCards.Count == 0)
-        {
             degradedCards = CheckAndDegradeCards(deckModel);
-        }
         
-        // 結果を通知
-        if (evolvedCards.Count > 0)
+        foreach (var (original, evolved) in evolvedCards)
         {
-            // 進化通知（演出は後で実装）
-            foreach (var (original, evolved) in evolvedCards)
-            {
-                Debug.Log($"🎉 {original.CardName} が {evolved.CardName} に進化しました！");
-            }
-            
-            return true;
+           await _uIPresenter.ShowAnnouncement($"{original.CardName} が {evolved.CardName} に進化しました！", 2f);
+           await UniTask.Delay(200);
         }
-        if (degradedCards.Count > 0)
+        foreach (var (original, degraded) in degradedCards)
         {
-            // 劣化通知（演出は後で実装）
-            foreach (var (original, degraded) in degradedCards)
-            {
-                Debug.Log($"💔 {original.CardName} が {degraded.CardName} に劣化しました...");
-            }
-            
-            return true;
+            await _uIPresenter.ShowAnnouncement($"{original.CardName} が {degraded.CardName} に劣化しました...", 2f);
+            await UniTask.Delay(200);
         }
-        
-        return false;
     }
 }

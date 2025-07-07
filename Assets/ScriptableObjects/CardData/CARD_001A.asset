@@ -34,15 +34,17 @@ MonoBehaviour:
       type: {class: PlayStyleLoseCondition, ns: , asm: Assembly-CSharp}
       data:
         requiredPlayStyle: 1
-        useRandomRange: 0
-        fixedCount: 2
-        minCount: 1
-        maxCount: 5
+        requiredCount:
+          useRandomRange: 0
+          fixedValue: 2
+          minValue: 1
+          maxValue: 5
     - rid: 8005200165294309475
       type: {class: PlayStyleWinCondition, ns: , asm: Assembly-CSharp}
       data:
         requiredPlayStyle: 0
-        useRandomRange: 0
-        fixedCount: 3
-        minCount: 1
-        maxCount: 5
+        requiredCount:
+          useRandomRange: 0
+          fixedValue: 3
+          minValue: 1
+          maxValue: 5

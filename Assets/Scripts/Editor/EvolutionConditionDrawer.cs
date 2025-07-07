@@ -36,32 +36,6 @@ public static class EvolutionConditionDrawer
         "総使用回数",
         "勝率"
     };
-    
-    /// <summary>
-    /// 条件追加ボタンを描画
-    /// </summary>
-    public static void DrawAddConditionButton(SerializedProperty listProperty, string label = "条件を追加")
-    {
-        if (GUILayout.Button(label))
-        {
-            var menu = new GenericMenu();
-            
-            for (int i = 0; i < ConditionTypes.Length; i++)
-            {
-                var type = ConditionTypes[i];
-                var typeName = ConditionTypeNames[i];
-                menu.AddItem(new GUIContent(typeName), false, () =>
-                {
-                    listProperty.arraySize++;
-                    var element = listProperty.GetArrayElementAtIndex(listProperty.arraySize - 1);
-                    element.managedReferenceValue = Activator.CreateInstance(type);
-                    listProperty.serializedObject.ApplyModifiedProperties();
-                });
-            }
-            
-            menu.ShowAsContext();
-        }
-    }
 }
 
 /// <summary>
@@ -70,15 +44,15 @@ public static class EvolutionConditionDrawer
 [CustomEditor(typeof(CardData))]
 public class CardDataEditor : Editor
 {
-    private SerializedProperty evolutionConditionGroups;
-    private SerializedProperty degradationConditionGroups;
-    private bool showEvolutionConditions = true;
-    private bool showDegradationConditions = true;
+    private SerializedProperty _evolutionConditionGroups;
+    private SerializedProperty _degradationConditionGroups;
+    private bool _showEvolutionConditions = true;
+    private bool _showDegradationConditions = true;
     
     private void OnEnable()
     {
-        evolutionConditionGroups = serializedObject.FindProperty("evolutionConditionGroups");
-        degradationConditionGroups = serializedObject.FindProperty("degradationConditionGroups");
+        _evolutionConditionGroups = serializedObject.FindProperty("evolutionConditionGroups");
+        _degradationConditionGroups = serializedObject.FindProperty("degradationConditionGroups");
     }
     
     public override void OnInspectorGUI()
@@ -91,29 +65,29 @@ public class CardDataEditor : Editor
         EditorGUILayout.Space();
         
         // 進化条件
-        showEvolutionConditions = EditorGUILayout.Foldout(showEvolutionConditions, "進化条件", true);
-        if (showEvolutionConditions)
+        _showEvolutionConditions = EditorGUILayout.Foldout(_showEvolutionConditions, "進化条件", true);
+        if (_showEvolutionConditions)
         {
             EditorGUI.indentLevel++;
-            DrawConditionGroupsList(evolutionConditionGroups, "進化");
+            DrawConditionGroupsList(_evolutionConditionGroups, "進化");
             EditorGUI.indentLevel--;
         }
         
         EditorGUILayout.Space();
         
         // 劣化条件
-        showDegradationConditions = EditorGUILayout.Foldout(showDegradationConditions, "劣化条件", true);
-        if (showDegradationConditions)
+        _showDegradationConditions = EditorGUILayout.Foldout(_showDegradationConditions, "劣化条件", true);
+        if (_showDegradationConditions)
         {
             EditorGUI.indentLevel++;
-            DrawConditionGroupsList(degradationConditionGroups, "劣化");
+            DrawConditionGroupsList(_degradationConditionGroups, "劣化");
             EditorGUI.indentLevel--;
         }
         
         serializedObject.ApplyModifiedProperties();
     }
     
-    private void DrawConditionGroupsList(SerializedProperty groupsProperty, string conditionType)
+    private static void DrawConditionGroupsList(SerializedProperty groupsProperty, string conditionType)
     {
         EditorGUILayout.LabelField($"{conditionType}条件グループ（いずれか1つのグループを満たせば{conditionType}）", EditorStyles.boldLabel);
         
@@ -158,7 +132,7 @@ public class CardDataEditor : Editor
                 // 条件変更ボタン
                 if (GUILayout.Button("変更", GUILayout.Width(50)))
                 {
-                    this.ShowConditionTypeMenu(conditionElement);
+                    ShowConditionTypeMenu(conditionElement);
                 }
                 
                 // 条件削除ボタン
@@ -173,7 +147,7 @@ public class CardDataEditor : Editor
                 // 条件の詳細を描画
                 if (condition != null)
                 {
-                    this.DrawConditionDetails(conditionElement, condition);
+                    DrawConditionDetails(conditionElement, condition);
                     
                     // 説明文を表示
                     EditorGUILayout.HelpBox($"説明: {condition.GetDescription()}", MessageType.Info);
@@ -192,7 +166,7 @@ public class CardDataEditor : Editor
             {
                 conditionsProperty.arraySize++;
                 var newElement = conditionsProperty.GetArrayElementAtIndex(conditionsProperty.arraySize - 1);
-                this.ShowConditionTypeMenu(newElement);
+                ShowConditionTypeMenu(newElement);
             }
             
             EditorGUI.indentLevel--;
@@ -208,7 +182,7 @@ public class CardDataEditor : Editor
             var newConditions = newGroup.FindPropertyRelative("conditions");
             newConditions.arraySize = 1;
             var newElement = newConditions.GetArrayElementAtIndex(0);
-            this.ShowConditionTypeMenu(newElement);
+            ShowConditionTypeMenu(newElement);
         }
     }
     
@@ -216,11 +190,11 @@ public class CardDataEditor : Editor
     /// <summary>
     /// 条件タイプ選択メニューを表示
     /// </summary>
-    private void ShowConditionTypeMenu(SerializedProperty conditionElement)
+    private static void ShowConditionTypeMenu(SerializedProperty conditionElement)
     {
         var menu = new GenericMenu();
         
-        for (int i = 0; i < EvolutionConditionDrawer.ConditionTypes.Length; i++)
+        for (var i = 0; i < EvolutionConditionDrawer.ConditionTypes.Length; i++)
         {
             var type = EvolutionConditionDrawer.ConditionTypes[i];
             var typeName = EvolutionConditionDrawer.ConditionTypeNames[i];
@@ -237,7 +211,7 @@ public class CardDataEditor : Editor
     /// <summary>
     /// 条件の詳細を描画（再帰的に呼び出すため分離）
     /// </summary>
-    private void DrawConditionDetails(SerializedProperty element, EvolutionConditionBase condition)
+    private static void DrawConditionDetails(SerializedProperty element, EvolutionConditionBase condition)
     {
         EditorGUI.indentLevel++;
         

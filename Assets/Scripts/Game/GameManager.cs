@@ -334,11 +334,7 @@ public class GameManager: IStartable
         _statsTracker.RecordGameResult(playerWon, _playerMove, _npcMove, playerCollapse, npcCollapse);
         
         // 進化・劣化チェック
-        var hasEvolution = _evolutionManager.ProcessEvolutions(_player.DeckModel);
-        if (hasEvolution)
-        {
-            await _uiPresenter.ShowAnnouncement("カードが変化しました！", 2.0f);
-        }
+        await _evolutionManager.ProcessEvolutions(_player.DeckModel);
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
