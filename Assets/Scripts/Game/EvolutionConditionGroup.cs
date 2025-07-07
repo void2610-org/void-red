@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using MackySoft.SerializeReferenceExtensions;
 
 /// <summary>
 /// 進化条件グループ（グループ内の条件は全てAND条件）
@@ -9,7 +10,7 @@ using UnityEngine;
 public class EvolutionConditionGroup
 {
     [Header("条件リスト（全て満たす必要がある）")]
-    [SerializeReference]
+    [SerializeReference, SubclassSelector]
     public List<EvolutionConditionBase> conditions = new();
     
     /// <summary>
