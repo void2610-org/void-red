@@ -16,6 +16,7 @@ public abstract class PlayerPresenter : IDisposable
     public static int MaxMentalPower => PlayerModel.MaxMentalPower;
     public int HandCount => _handModel.Count;
     public int MaxHandSize => _handModel.MaxHandSize;
+    public DeckModel DeckModel => _deckModel;
     
     // プライベートフィールド
     private readonly PlayerModel _playerModel;
@@ -179,6 +180,32 @@ public abstract class PlayerPresenter : IDisposable
         }
         
         return true;
+    }
+    
+    /// <summary>
+    /// 選択されたカードを手札から削除（デッキに戻さない）
+    /// </summary>
+    /// <returns>削除されたカードデータ</returns>
+    public CardData RemoveSelectedCard()
+    {
+        var selectedCard = SelectedCard.CurrentValue;
+        if (!selectedCard) return null;
+        
+        // 手札から削除
+        if (_handModel.TryRemoveCard(selectedCard))
+            return selectedCard;
+        
+        return null;
+    }
+    
+    /// <summary>
+    /// 指定したカードをデッキに戻す
+    /// </summary>
+    /// <param name="card">戻すカード</param>
+    public void ReturnCardToDeck(CardData card)
+    {
+        if (card)
+            _deckModel?.ReturnCard(card);
     }
     
     /// <summary>

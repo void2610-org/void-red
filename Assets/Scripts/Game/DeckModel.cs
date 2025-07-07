@@ -10,7 +10,18 @@ public class DeckModel
     public int Count => _deck.Count;
     public bool IsEmpty => _deck.Count == 0;
     
-    private readonly List<CardData> _deck = new();
+    /// <summary>
+    /// 山札（ドロー可能なカード）
+    /// </summary>
+    public List<CardData> DrawPile => new (_deck);
+    
+    /// <summary>
+    /// デッキ全体（手札含む概念的な全カード）
+    /// </summary>
+    public List<CardData> AllCards => new (_allCards);
+    
+    private readonly List<CardData> _deck = new();           // 山札
+    private readonly List<CardData> _allCards = new();       // デッキ全体
     
     /// <summary>
     /// コンストラクタ
@@ -20,7 +31,8 @@ public class DeckModel
     {
         if (initialCards is { Count: > 0 })
         {
-            _deck.AddRange(initialCards);
+            _allCards.AddRange(initialCards);  // デッキ全体に追加
+            _deck.AddRange(initialCards);      // 山札に追加
             Shuffle();
         }
     }
@@ -32,9 +44,11 @@ public class DeckModel
     public void InitializeDeck(List<CardData> cardDataList)
     {
         _deck.Clear();
+        _allCards.Clear();
         if (cardDataList is { Count: > 0 })
         {
-            _deck.AddRange(cardDataList);
+            _allCards.AddRange(cardDataList);  // デッキ全体に追加
+            _deck.AddRange(cardDataList);      // 山札に追加
             Shuffle();
         }
     }
@@ -45,6 +59,7 @@ public class DeckModel
     public void Clear()
     {
         _deck.Clear();
+        _allCards.Clear();
     }
     
     /// <summary>
@@ -106,7 +121,7 @@ public class DeckModel
     /// </summary>
     public void Shuffle()
     {
-        for (int i = 0; i < _deck.Count; i++)
+        for (var i = 0; i < _deck.Count; i++)
         {
             var temp = _deck[i];
             var randomIndex = Random.Range(i, _deck.Count);
@@ -116,11 +131,28 @@ public class DeckModel
     }
     
     /// <summary>
-    /// デッキの内容を取得（読み取り専用）
+    /// 山札の内容を取得（読み取り専用）
     /// </summary>
-    /// <returns>デッキのカードリスト（コピー）</returns>
+    /// <returns>山札のカードリスト（コピー）</returns>
     public List<CardData> GetDeckContents()
     {
         return new List<CardData>(_deck);
+    }
+    
+    /// <summary>
+    /// 指定したインデックスのカードを別のカードで置き換える（デッキ全体基準）
+    /// </summary>
+    /// <param name="index">置き換えるカードのインデックス（AllCards基準）</param>
+    /// <param name="newCard">新しいカード</param>
+    public void ReplaceCard(int index, CardData newCard)
+    {
+        if (index < 0 || index >= _allCards.Count || !newCard) return;
+        
+        var oldCard = _allCards[index];
+        _allCards[index] = newCard;
+        
+        // 山札内にも同じカードがあれば置き換える
+        var deckIndex = _deck.FindIndex(card => card == oldCard);
+        if (deckIndex >= 0) _deck[deckIndex] = newCard;
     }
 }
