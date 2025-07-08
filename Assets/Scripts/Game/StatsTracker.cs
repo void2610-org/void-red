@@ -8,6 +8,7 @@ using Void2610.UnityTemplate;
 public class StatsTracker
 {
     private PlayerStats _playerStats;
+    private readonly string _ownerId;
     
     /// <summary>
     /// 現在の統計データ
@@ -15,27 +16,28 @@ public class StatsTracker
     public PlayerStats PlayerStats => _playerStats ??= new PlayerStats();
     
     /// <summary>
-    /// ゲーム結果を記録
+    /// 統計トラッカーのオーナーID（プレイヤー/敵の識別用）
     /// </summary>
-    /// <param name="playerWon">プレイヤーが勝利したかどうか</param>
-    /// <param name="playerMove">プレイヤーの手</param>
-    /// <param name="npcMove">NPCの手</param>
-    /// <param name="playerCollapsed">プレイヤーのカードが崩壊したかどうか</param>
-    /// <param name="npcCollapsed">NPCのカードが崩壊したかどうか</param>
-    public void RecordGameResult(bool playerWon, PlayerMove playerMove, PlayerMove npcMove, bool playerCollapsed, bool npcCollapsed)
+    public string OwnerId => _ownerId;
+    
+    public StatsTracker(string ownerId = "Player")
     {
-        if (!playerMove?.SelectedCard) return;
+        _ownerId = ownerId;
+    }
+    
+    /// <summary>
+    /// ゲーム結果を記録（オーナーに応じてプレイヤーまたは敵の統計を記録）
+    /// </summary>
+    /// <param name="ownerMove">このトラッカーのオーナーの手</param>
+    /// <param name="opponentMove">相手の手</param>
+    /// <param name="ownerWon">このトラッカーのオーナーが勝利したかどうか</param>
+    /// <param name="ownerCollapsed">このトラッカーのオーナーのカードが崩壊したかどうか</param>
+    public void RecordGameResult(PlayerMove ownerMove, PlayerMove opponentMove, bool ownerWon, bool ownerCollapsed)
+    {
+        if (!ownerMove?.SelectedCard) return;
         
         // 統計データを更新
-        PlayerStats.RecordGameResult(playerWon, playerMove, playerCollapsed);
-        
-        // デバッグログ
-        Debug.Log($"ゲーム結果記録: {(playerWon ? "勝利" : "敗北")}, " +
-                 $"カード: {playerMove.SelectedCard.CardName}, " +
-                 $"プレイスタイル: {playerMove.PlayStyle.ToJapaneseString()}, " +
-                 $"崩壊: {(playerCollapsed ? "あり" : "なし")}");
-        
-        Debug.Log($"現在の統計: {PlayerStats.GetStatsString()}");
+        PlayerStats.RecordGameResult(ownerWon, ownerMove, ownerCollapsed);
     }
     
     /// <summary>
@@ -70,11 +72,32 @@ public class StatsTracker
     }
     
     /// <summary>
+    /// 単一カードの進化チェック（即時進化用）
+    /// </summary>
+    /// <param name="card">チェックするカード</param>
+    /// <returns>進化先カード（進化しない場合は元のカード）</returns>
+    public CardData CheckCardEvolution(CardData card)
+    {
+        if (CanCardEvolve(card))
+        {
+            return card.EvolutionTarget;
+        }
+        
+        // 進化しない場合は劣化チェック
+        if (CanCardDegrade(card))
+        {
+            return card.DegradationTarget;
+        }
+        
+        // 変化なしの場合は元のカードを返す
+        return card;
+    }
+    
+    /// <summary>
     /// 統計データをリセット（デバッグ用）
     /// </summary>
     public void ResetStats()
     {
         _playerStats = new PlayerStats();
-        Debug.Log("統計データをリセットしました");
     }
 }
