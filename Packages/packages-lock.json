@@ -18,7 +18,7 @@
       "dependencies": {
         "com.unity.ugui": "1.0.0"
       },
-      "hash": "ec57c2a994addfc0ed4e3389aeae94d782c253c3"
+      "hash": "16be53e14523e0af6dbba849a196b93f7b7c9e0e"
     },
     "com.coffee.unmask": {
       "version": "https://github.com/mob-sakai/UnmaskForUGUI.git",
@@ -49,13 +49,6 @@
       "source": "git",
       "dependencies": {},
       "hash": "f789083c31250c83082da9b29be0c976152d699b"
-    },
-    "com.mackysoft.serializereference-extensions": {
-      "version": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "f938fc5d9a9ef46a1669289450d38e17cb39567c"
     },
     "com.marijnzwemmer.unity-toolbar-extender": {
       "version": "https://github.com/marijnz/unity-toolbar-extender.git",
@@ -396,7 +389,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "8d2b153809f91ca95b6d1b1579f4964473d094c1"
+      "hash": "e477ae0a2a9326cc72764ff507ebb4ddd00fa928"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

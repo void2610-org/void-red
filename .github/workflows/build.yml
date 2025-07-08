@@ -50,125 +50,37 @@ jobs:
             Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-
             Library-${{ runner.os }}-
 
-      - name: Force Git package resolution 📦
+      - name: Verify Assets-based SerializeReferenceExtensions 📦
         run: |
-          # Gitパッケージの強制解決
-          echo "🔄 Forcing Git package resolution..."
+          echo "🔍 Verifying Assets-based SerializeReferenceExtensions..."
           
-          # Git設定
-          echo "⚙️  Setting up Git configuration..."
-          git config --global --add safe.directory '*'
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Actions"
+          # Assets配置の確認
+          echo "📁 Checking Assets/Plugins directory:"
+          ls -la Assets/Plugins/ || echo "❌ No Plugins directory"
           
-          # 現在のディレクトリ構造を確認
-          echo "📁 Current directory structure:"
-          ls -la
-          echo "📁 Packages directory:"
-          ls -la Packages/
-          
-          # packages-lock.jsonの状態を確認
-          if [ -f "Packages/packages-lock.json" ]; then
-            echo "📄 Found packages-lock.json, checking contents..."
-            grep -A 5 -B 5 "serializereference-extensions" Packages/packages-lock.json || echo "❌ SerializeReferenceExtensions not found in lock file"
-            rm Packages/packages-lock.json
-            echo "🗑️  Removed packages-lock.json to force re-resolution"
-          else
-            echo "❌ No packages-lock.json found"
-          fi
-          
-          # Libraryフォルダの状態を確認
-          echo "📁 Library directory status:"
-          ls -la Library/ || echo "❌ No Library directory found"
-          
-          # PackageCacheをクリア
-          if [ -d "Library/PackageCache" ]; then
-            echo "🧹 Clearing PackageCache..."
-            rm -rf Library/PackageCache
-            echo "✅ Cleared PackageCache"
-          else
-            echo "❌ No PackageCache found"
-          fi
-          
-          # manifestファイルの内容を確認
-          echo "📄 Current manifest.json contents:"
-          cat Packages/manifest.json
-          
-          # Unity起動前に手動でGitパッケージを事前解決
-          echo "🔧 Pre-resolving Git packages manually..."
-          
-          # SerializeReferenceExtensionsを手動でクローン
-          mkdir -p Library/PackageCache
-          cd Library/PackageCache
-          
-          echo "📦 Cloning SerializeReferenceExtensions..."
-          git clone https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git temp-sre
-          
-          echo "📁 Checking cloned repository structure..."
-          ls -la temp-sre/
-          ls -la temp-sre/Assets/ || echo "❌ No Assets directory"
-          ls -la temp-sre/Assets/MackySoft/ || echo "❌ No MackySoft directory"
-          
-          if [ -d "temp-sre/Assets/MackySoft/MackySoft.SerializeReferenceExtensions" ]; then
-            echo "✅ Found SerializeReferenceExtensions in cloned repo"
-            mv temp-sre/Assets/MackySoft/MackySoft.SerializeReferenceExtensions com.mackysoft.serializereference-extensions
-            rm -rf temp-sre
-            echo "✅ Manually resolved SerializeReferenceExtensions"
+          if [ -d "Assets/Plugins/MackySoft.SerializeReferenceExtensions" ]; then
+            echo "✅ SerializeReferenceExtensions found in Assets"
+            echo "📁 Runtime directory:"
+            ls -la Assets/Plugins/MackySoft.SerializeReferenceExtensions/Runtime/
+            echo "📁 Editor directory:"
+            ls -la Assets/Plugins/MackySoft.SerializeReferenceExtensions/Editor/
             
-            # 配置されたパッケージの内容を確認
-            echo "📁 Manually resolved package contents:"
-            ls -la com.mackysoft.serializereference-extensions/
-            ls -la com.mackysoft.serializereference-extensions/Runtime/ || echo "❌ No Runtime directory"
-            
+            # 重要なファイルの存在確認
+            if [ -f "Assets/Plugins/MackySoft.SerializeReferenceExtensions/Runtime/SubclassSelectorAttribute.cs" ]; then
+              echo "✅ SubclassSelectorAttribute.cs found"
+            else
+              echo "❌ SubclassSelectorAttribute.cs NOT found"
+            fi
           else
-            echo "❌ SerializeReferenceExtensions not found in expected location"
-            echo "🔍 Available directories in temp-sre:"
-            find temp-sre -name "*SerializeReference*" -type d
-            rm -rf temp-sre
+            echo "❌ SerializeReferenceExtensions NOT found in Assets"
           fi
           
-          cd ../..
-          
-          # 最終的なPackageCacheの状態を確認
-          echo "📁 Final PackageCache state:"
-          ls -la Library/PackageCache/ || echo "❌ No PackageCache created"
-          
-          # manifestファイルを触ってUnityにパッケージ変更を通知
-          touch Packages/manifest.json
-          echo "✅ Touched manifest.json to notify Unity of changes"
-
-      - name: Pre-build package verification 🔍
-        run: |
-          echo "🔍 Pre-build verification..."
-          
-          # Unity起動前の最終チェック
-          echo "📁 Final directory structure before Unity build:"
-          ls -la
-          
-          echo "📁 Packages directory contents:"
-          ls -la Packages/
-          
-          echo "📁 Library/PackageCache contents:"
-          ls -la Library/PackageCache/ || echo "❌ No PackageCache"
-          
-          # SerializeReferenceExtensionsパッケージの確認
-          if [ -d "Library/PackageCache/com.mackysoft.serializereference-extensions" ]; then
-            echo "✅ SerializeReferenceExtensions found in PackageCache"
-            echo "📄 Package contents:"
-            find Library/PackageCache/com.mackysoft.serializereference-extensions -name "*.cs" | head -10
+          # manifest.jsonの確認（Gitパッケージが削除されているか）
+          echo "📄 Checking manifest.json (should not contain serializereference-extensions):"
+          if grep -q "serializereference-extensions" Packages/manifest.json; then
+            echo "❌ Git package reference still exists in manifest.json"
           else
-            echo "❌ SerializeReferenceExtensions NOT found in PackageCache"
-          fi
-          
-          # manifest.jsonの最終確認
-          echo "📄 Final manifest.json:"
-          cat Packages/manifest.json
-          
-          # packages-lock.jsonの生成を確認
-          if [ -f "Packages/packages-lock.json" ]; then
-            echo "📄 packages-lock.json exists (generated by cache or other process)"
-          else
-            echo "❌ No packages-lock.json found - Unity will need to resolve packages"
+            echo "✅ Git package reference removed from manifest.json"
           fi
 
       - name: Build project 🏗️
@@ -183,42 +95,6 @@ jobs:
           allowDirtyBuild: true
           buildsPath:     CIBuilds
           buildName:      build
-          # より詳細なログを有効化
-          customParameters: "-logFile - -verbose"
-        continue-on-error: true
-
-      - name: Post-build analysis 📊
-        if: always()
-        run: |
-          echo "📊 Post-build analysis..."
-          
-          # ビルド後のPackageCacheの状態確認
-          echo "📁 Post-build PackageCache state:"
-          ls -la Library/PackageCache/ || echo "❌ No PackageCache found"
-          
-          # SerializeReferenceExtensionsの状態確認
-          if [ -d "Library/PackageCache" ]; then
-            echo "🔍 Searching for SerializeReferenceExtensions in PackageCache:"
-            find Library/PackageCache -name "*serializereference*" -type d || echo "❌ No SerializeReferenceExtensions directories found"
-            find Library/PackageCache -name "*mackysoft*" -type d || echo "❌ No MackySoft directories found"
-            
-            echo "🔍 All packages in PackageCache:"
-            ls -la Library/PackageCache/ | grep -E "(mackysoft|serializereference)" || echo "❌ No matching packages found"
-          fi
-          
-          # packages-lock.jsonの最終状態確認
-          if [ -f "Packages/packages-lock.json" ]; then
-            echo "📄 Final packages-lock.json contents (SerializeReferenceExtensions section):"
-            grep -A 10 -B 2 "serializereference-extensions" Packages/packages-lock.json || echo "❌ SerializeReferenceExtensions not found in lock file"
-          fi
-          
-          # ビルドエラーの詳細な分析
-          echo "🔍 Analyzing build errors..."
-          if [ -f "CIBuilds/WebGL/build/build.log" ]; then
-            echo "📄 Build log analysis:"
-            grep -n -A 5 -B 5 "MackySoft" CIBuilds/WebGL/build/build.log || echo "❌ No MackySoft references in build log"
-            grep -n -A 5 -B 5 "SerializeReference" CIBuilds/WebGL/build/build.log || echo "❌ No SerializeReference references in build log"
-          fi
 
       - name: Prepare artifact for deployment 🎯
         run: |
