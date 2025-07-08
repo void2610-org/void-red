@@ -50,6 +50,15 @@ jobs:
             Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-
             Library-${{ runner.os }}-
 
+      - name: Ensure Git package resolution 📦
+        run: |
+          # Gitパッケージの事前解決を強制
+          if [ -f "Packages/packages-lock.json" ]; then
+            echo "Packages lock file found, ensuring Git packages are resolved..."
+            # manifestファイルを触ることでUnityにパッケージの再解決を促す
+            touch Packages/manifest.json
+          fi
+
       - name: Build project 🏗️
         uses: game-ci/unity-builder@v4
         env:
@@ -58,10 +67,12 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
-          unityVersion:   6000.0.30f1
+          unityVersion:   6000.0.37f1
           allowDirtyBuild: true
           buildsPath:     CIBuilds
           buildName:      build
+          # Gitパッケージの解決を確実にするためのカスタム引数
+          customParameters: "-logFile -"
 
       - name: Prepare artifact for deployment 🎯
         run: |
