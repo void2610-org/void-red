@@ -15,11 +15,14 @@ MonoBehaviour:
   cardId: CARD_002C
   cardName: "\u6298\u308C\u305F\u9375"
   attribute: 3
-  image: {fileID: 8768680081999629299, guid: 2b714129fed5f4551b0d25ddd4e0a7ed, type: 3}
+  image: {fileID: -2334906216958503221, guid: 8b41d6387cef54777a02b6a21b64e921, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
-  evolutionConditions: []
+  evolutionConditionGroups: []
   evolutionTarget: {fileID: 0}
   isTransformationTarget: 1
-  degradationConditions: []
+  degradationConditionGroups: []
   degradationTarget: {fileID: 0}
+  references:
+    version: 2
+    RefIds: []
