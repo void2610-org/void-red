@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using MackySoft.SerializeReferenceExtensions;
 
 /// <summary>
 /// 進化条件グループ（グループ内の条件は全てAND条件）
