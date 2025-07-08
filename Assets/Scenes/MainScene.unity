@@ -500,8 +500,9 @@ GameObject:
   m_Component:
   - component: {fileID: 285805540}
   - component: {fileID: 285805541}
+  - component: {fileID: 285805542}
   m_Layer: 0
-  m_Name: DebugLogDisplay
+  m_Name: Debug
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -542,6 +543,20 @@ MonoBehaviour:
   showWarnings: 1
   showErrors: 1
   showLogs: 1
+--- !u!114 &285805542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285805539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1cef07666c8c4bf5ac49769a9da4e10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableFastMode: 1
+  timeScale: 5
 --- !u!1 &293733584
 GameObject:
   m_ObjectHideFlags: 0
