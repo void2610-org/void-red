@@ -28,23 +28,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nuget-
           
-    - name: Install ReSharper Command Line Tools
+    - name: Install ReSharper Command Line Tools with Unity support
       run: |
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         
-    - name: Setup Unity project and inspect
+    - name: Create Unity project file for ReSharper
       run: |
-        # C#スクリプトファイルを検索
-        CS_FILES=$(find Assets -name "*.cs" -not -path "*/Library/*" -not -path "*/Temp/*" | head -10)
-        
-        if [ -z "$CS_FILES" ]; then
-          echo "No C# script files found in Assets folder"
-          exit 1
-        fi
-        
-        echo "Found C# script files:"
-        echo "$CS_FILES"
-        
         # .editorconfigファイルの確認
         if [ -f .editorconfig ]; then
           echo "✅ Found .editorconfig file for formatting rules"
@@ -52,27 +41,31 @@ jobs:
           echo "⚠️ No .editorconfig file found"
         fi
         
-        # UnityプロジェクトのC#スクリプトを一つずつ検査
-        echo "Running ReSharper inspection on Unity C# scripts..."
-        
-        # 一時的なプロジェクトファイルを作成
-        cat > TempUnityProject.csproj << 'PROJEOF'
+        # Unity向けの簡単なプロジェクトファイルを作成
+        cat > Assembly-CSharp.csproj << 'PROJEOF'
         <Project Sdk="Microsoft.NET.Sdk">
           <PropertyGroup>
-            <TargetFramework>net6.0</TargetFramework>
-            <LangVersion>latest</LangVersion>
+            <TargetFramework>netstandard2.1</TargetFramework>
+            <LangVersion>9.0</LangVersion>
+            <Nullable>disable</Nullable>
+            <DefineConstants>UNITY_2022_3_OR_NEWER;UNITY_2022_3;UNITY_2022;UNITY_5_3_OR_NEWER;UNITY_5_3;UNITY_5;UNITY_64;UNITY_EDITOR;UNITY_EDITOR_LINUX;UNITY_STANDALONE_LINUX;UNITY_STANDALONE;ENABLE_AUDIO;ENABLE_CACHING</DefineConstants>
           </PropertyGroup>
           <ItemGroup>
-            <Compile Include="Assets/**/*.cs" Exclude="Assets/**/Library/**;Assets/**/Temp/**;Assets/**/Packages/**;Assets/**/PackageCache/**" />
+            <Compile Include="Assets/Scripts/**/*.cs" />
+          </ItemGroup>
+          <ItemGroup>
+            <PackageReference Include="Unity.Collections" Version="1.2.4" />
+            <PackageReference Include="Unity.Mathematics" Version="1.2.6" />
           </ItemGroup>
         </Project>
         PROJEOF
         
         # ReSharper Code Inspection実行
-        jb inspectcode TempUnityProject.csproj \
+        jb inspectcode Assembly-CSharp.csproj \
           --output=inspectcode-results.xml \
           --format=xml \
           --severity=WARNING \
+          --no-build \
           --exclude="**/*.Generated.cs;**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
           --verbosity=WARN || echo "Some issues found, continuing..."
           
