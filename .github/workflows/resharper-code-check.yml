@@ -46,12 +46,39 @@ jobs:
         
         # ファイルが存在する場合のみ実行
         if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # 元のプロジェクトファイルを使用し、プロジェクトファイル自体のみ除外
+          # 複数のアプローチを試行
+          echo "Attempting cleanupcode with different configurations..."
+          
+          # 試行1: 除外パターンなしで実行
+          echo "Try 1: No exclude patterns"
+          echo "Project file check:"
+          head -10 Assembly-CSharp.csproj
+          echo "Compile entries:"
+          grep "Compile Include" Assembly-CSharp.csproj | head -5
+          
+          jb cleanupcode Assembly-CSharp.csproj \
+            --profile="Built-in: Reformat Code" \
+            --no-build \
+            --properties:Configuration=Debug \
+            --verbosity=VERBOSE 2>&1 | head -30
+          
+          # 試行2: Unity固有ファイルのみ除外
+          echo "Try 2: Unity-specific excludes only"
+          jb cleanupcode Assembly-CSharp.csproj \
+            --exclude="**/*.meta;**/*.asset;**/*.prefab;**/*.unity;**/*.shader" \
+            --profile="Built-in: Reformat Code" \
+            --no-build \
+            --properties:Configuration=Debug \
+            --verbosity=INFO 2>&1 | head -20
+          
+          # 試行3: 元の除外パターンで実行（参考用）
+          echo "Try 3: Original exclude patterns"
           jb cleanupcode Assembly-CSharp.csproj \
             --exclude="**/*.csproj;**/*.xml;**/*.txt;**/*.md;**/*.json" \
             --profile="Built-in: Reformat Code" \
             --no-build \
-            --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
+            --properties:Configuration=Debug \
+            --verbosity=INFO 2>&1 | head -20 || echo "cleanupcode failed but continuing..."
         else
           echo "Required files not found, skipping cleanup"
         fi
