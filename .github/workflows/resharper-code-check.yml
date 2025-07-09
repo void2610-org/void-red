@@ -96,7 +96,7 @@ jobs:
         
         # SerializeFieldを除外した実際の命名規則違反をカウント
         if [ -f "resharper-inspection-report.xml" ]; then
-          ALL_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"' || echo "")
+          ALL_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"' || true)
           if [ -n "$ALL_VIOLATIONS" ]; then
             # SerializeFieldフィールドと特定の略語を除外するための関数
             filter_serialize_field_violations() {
@@ -141,12 +141,19 @@ jobs:
             }
             
             FILTERED_VIOLATIONS=$(filter_serialize_field_violations "$ALL_VIOLATIONS")
+            
+            # 改行を確実に除去して数値を取得
             if [ -n "$FILTERED_VIOLATIONS" ]; then
-              ACTUAL_VIOLATIONS=$(echo "$FILTERED_VIOLATIONS" | grep -c "InconsistentNaming" || echo "0")
+              ACTUAL_VIOLATIONS=$(printf "%s\n" "$FILTERED_VIOLATIONS" | grep -c "InconsistentNaming" || echo "0")
             else
               ACTUAL_VIOLATIONS=0
             fi
-            TOTAL_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | wc -l | tr -d ' ')
+            
+            TOTAL_VIOLATIONS=$(printf "%s\n" "$ALL_VIOLATIONS" | grep -c . || echo "0")
+            
+            # 数値を明示的に整数として扱う
+            TOTAL_VIOLATIONS=$((TOTAL_VIOLATIONS + 0))
+            ACTUAL_VIOLATIONS=$((ACTUAL_VIOLATIONS + 0))
             SERIALIZED_VIOLATIONS=$((TOTAL_VIOLATIONS - ACTUAL_VIOLATIONS))
             
             echo "命名規則違反: $TOTAL_VIOLATIONS 件 (SerializeField除外後: $ACTUAL_VIOLATIONS 件)"
@@ -160,6 +167,7 @@ jobs:
               echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
             fi
           else
+            echo "命名規則違反: 0 件"
             echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
           fi
         else
