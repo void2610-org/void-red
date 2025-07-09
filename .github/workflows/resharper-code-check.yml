@@ -120,17 +120,18 @@ jobs:
         echo "  - メインゲームコードのみ対象（サンプル除外）"
         echo "  - Unity プロジェクト最適化"
         
-        # ReSharper コードフォーマット設定ファイルを作成（より詳細な設定）
-        echo "📝 ReSharper設定ファイルを作成中..."
+        # ReSharper コードフォーマット設定ファイルを作成（既存スタイル維持）
+        echo "📝 ReSharper設定ファイルを作成中（既存スタイル維持）..."
         echo '<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">' > .DotSettings
+        echo '  <!-- 基本的なスペース設定のみ -->' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_COMMA/@EntryValue">True</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_BINARY_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_COMMA/@EntryValue">False</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_ASSIGNMENT/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_SINGLELINE_ACCESSORHOLDER/@EntryValue">True</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_EQUALITY_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_LOGICAL_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_RETURN_STATEMENT/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <!-- using文とコメントの変更を無効化 -->' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_USER_LINEBREAKS/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeInspection/CodeCleanup/SilentCleanupProfile/FormatDocument/@EntryValue">False</s:Boolean>' >> .DotSettings
         echo '</wpf:ResourceDictionary>' >> .DotSettings
         
         # ReSharper cleanupcode で利用可能なプロファイルを確認
@@ -143,17 +144,17 @@ jobs:
         echo "対象ファイル（ScoreCalculator.cs）の現在の状態:"
         head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
         
-        # ReSharper cleanupcode の実行（ビルドをスキップして実行）
+        # ReSharper cleanupcode の実行（軽微なフォーマットのみ）
         echo ""
-        echo "⚡ ReSharper cleanupcode を実行中..."
+        echo "⚡ ReSharper cleanupcode を実行中（軽微なフォーマットのみ）..."
         jb cleanupcode void-red-analysis.sln \
-          --verbosity=VERBOSE \
+          --verbosity=INFO \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
           --settings=.DotSettings \
-          --profile="Built-in: Full Cleanup" \
+          --profile="Built-in: Reformat Code" \
           --no-build \
           --properties:Configuration=Debug \
-          2>&1 | head -200
+          2>&1 | head -100
         
         echo ""
         echo "🔄 フォーマット結果の詳細確認..."
