@@ -47,54 +47,25 @@ jobs:
         dotnet tool install -g JetBrains.ReSharper.GlobalTools --version 2025.1.4
         echo "PATH=$PATH:$HOME/.dotnet/tools" >> $GITHUB_ENV
         
-    - name: Run ReSharper Code Format Check
+    - name: Run ReSharper CleanupCode (Auto-fix)
       run: |
-        echo "Running ReSharper code format check..."
-        # フォーマット関連の警告のみをチェック（命名規則と不要なusing文のみ）
-        jb inspectcode void-red.sln \
-          --output=inspectcode-results.xml \
-          --format=xml \
-          --severity=WARNING \
-          --no-build \
+        echo "Running ReSharper cleanup to auto-fix formatting issues..."
+        jb cleanupcode void-red.sln \
           --settings=void-red.sln.DotSettings \
           --exclude="**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**;**/Unity.**;**/Microsoft.**;**/System.**" \
-          --verbosity=ERROR || echo "Inspectcode completed with warnings"
+          --verbosity=ERROR || echo "Cleanup completed"
           
-    - name: Check formatting results
+    - name: Check for code changes after cleanup
       run: |
-        if [ -f inspectcode-results.xml ]; then
-          # XMLファイルの内容を表示してデバッグ
-          echo "=== Inspection Results XML ==="
-          head -20 inspectcode-results.xml
-          echo "=== End of XML Preview ==="
-          
-          # 問題の総数をカウント
-          TOTAL_ISSUES=$(grep -c '<Issue' inspectcode-results.xml || echo "0")
-          echo "Found $TOTAL_ISSUES total issues"
-          
-          # 特定のフォーマット問題をカウント
-          NAMING_ISSUES=$(grep -c "InconsistentNaming" inspectcode-results.xml || echo "0")
-          USING_ISSUES=$(grep -c "RedundantUsingDirective" inspectcode-results.xml || echo "0")
-          
-          echo "Breakdown:"
-          echo "- Naming convention violations: $NAMING_ISSUES"
-          echo "- Redundant using directives: $USING_ISSUES"
-          
-          # 実際のフォーマット問題の数
-          FORMAT_ISSUES=$((NAMING_ISSUES + USING_ISSUES))
-          
-          if [ "$FORMAT_ISSUES" -gt 0 ]; then
-            echo "::warning::Found $FORMAT_ISSUES code format issues"
-            echo ""
-            echo "Run 'jb cleanupcode void-red.sln --include=\"InconsistentNaming;RedundantUsingDirective\"' locally to auto-fix these issues."
-            
-            # フォーマット問題があったらビルドを失敗させる
-            echo "::error::Code formatting issues detected. Please fix them before merging."
-            exit 1
-          else
-            echo "✅ Code format check passed - No formatting issues found"
-          fi
+        echo "Checking if code was modified by cleanup..."
+        if git diff --exit-code; then
+          echo "✅ No formatting issues found - Code is already properly formatted"
         else
-          echo "::error::Inspection results file not found"
+          echo "::error::Code formatting issues detected and auto-fixed. Please review and commit the changes."
+          echo ""
+          echo "Changes made by ReSharper cleanup:"
+          git diff --name-only
+          echo ""
+          echo "Run 'jb cleanupcode void-red.sln' locally to apply these fixes."
           exit 1
         fi
