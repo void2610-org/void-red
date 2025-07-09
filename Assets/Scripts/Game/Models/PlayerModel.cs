@@ -30,9 +30,6 @@ public class PlayerModel : IDisposable
     
     // === 精神力関連メソッド ===
     
-    // テスト用の命名規則違反
-    private int currentLevel = 1;
-    private bool isActive = true;
     
     /// <summary>
     /// 精神力を消費
