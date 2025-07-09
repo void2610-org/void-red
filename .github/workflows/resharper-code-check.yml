@@ -46,38 +46,33 @@ jobs:
         
         # ファイルが存在する場合のみ実行
         if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # 個別ファイルアプローチ（プロジェクトコンテキストを使用）
-          echo "=== Processing individual C# files with project context ==="
+          # プロジェクト全体をフォーマットして個別ファイルの変更を確認
+          echo "=== Processing Assembly-CSharp project for specific files ==="
+          
+          # 最初の10ファイルの状態を保存
+          echo "Saving initial state of files..."
           find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
-            echo "Processing: $file"
-            echo "  Checking file content before cleanup:"
-            head -15 "$file" | sed 's/^/    /'
-            
-            set +e  # exit codeを無視
-            result=$(jb cleanupcode Assembly-CSharp.csproj \
-              --include="$file" \
-              --profile="Built-in: Reformat Code" \
-              --no-build \
-              --verbosity=VERBOSE \
-              --properties:Configuration=Debug 2>&1)
-            exit_code=$?
-            set -e  # exit codeチェックを再開
-            
-            echo "  ReSharper output:"
-            echo "$result" | sed 's/^/    /'
-            echo "  Exit code: $exit_code"
-            
-            if echo "$result" | grep -q "No items were found to cleanup"; then
-              echo "✓ $file - No formatting changes needed"
-            elif echo "$result" | grep -q "Failed to run cleanup"; then
-              echo "✗ $file - Failed to process"
-            elif [ $exit_code -eq 3 ]; then
-              echo "✓ $file - Formatted successfully (exit code 3)"
-            elif [ $exit_code -eq 0 ]; then
-              echo "✓ $file - Processed successfully"
+            cp "$file" "$file.before"
+          done
+          
+          # プロジェクト全体をフォーマット
+          echo "Running ReSharper cleanup on entire project..."
+          jb cleanupcode Assembly-CSharp.csproj \
+            --profile="Built-in: Reformat Code" \
+            --no-build \
+            --properties:Configuration=Debug || echo "Cleanup completed with exit code: $?"
+          
+          # 最初の10ファイルの変更を確認
+          echo "=== Checking changes in individual files ==="
+          find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
+            if diff -q "$file.before" "$file" > /dev/null 2>&1; then
+              echo "✓ $file - No formatting changes"
             else
-              echo "? $file - Unknown result (exit code: $exit_code)"
+              echo "✓ $file - Formatted (changes detected)"
+              echo "  Sample changes:"
+              diff -u "$file.before" "$file" | head -20 | sed 's/^/    /'
             fi
+            rm -f "$file.before"
           done
           
           # プロジェクトファイルの変更を元に戻す
