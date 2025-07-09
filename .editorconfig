@@ -4147,6 +4147,28 @@ dotnet_naming_style.underscore_camel_case.required_prefix = _
 resharper_check_namespace_highlighting = none
 dotnet_diagnostic.ide0130.severity = none
 
+# ReSharperのフォーマット設定（Unity開発に合わせて調整）
+resharper_keep_existing_attribute_arrangement = true
+resharper_place_attribute_on_same_line = false
+resharper_place_field_attribute_on_same_line = false
+resharper_place_property_attribute_on_same_line = false
+resharper_place_method_attribute_on_same_line = false
+resharper_place_accessorholder_attribute_on_same_line = false
+resharper_place_accessor_attribute_on_same_line = false
+resharper_place_type_attribute_on_same_line = false
+
+# 空行の設定
+resharper_blank_lines_around_field = 0
+resharper_blank_lines_around_property = 0
+resharper_blank_lines_around_auto_property = 0
+resharper_blank_lines_around_invocable = 1
+resharper_blank_lines_around_single_line_invocable = 0
+
+# インデントとスペースの設定
+resharper_space_around_assignment_op = true
+resharper_space_around_equality_op = true
+resharper_space_around_relational_op = true
+
 # 一般的な略語を許可（UI, NPC, TMP等）
 resharper_acronyms_list = UI|NPC|TMP|TMPro|AI|ID|OK|iOS|OS|PC|PS|VR|AR|XR|SDK|API|HTTP|HTTPS|URL|URI|XML|JSON|SQL|CSV|PDF|PNG|JPG|JPEG|GIF|RGB|RGBA|HSV|FPS|LOD|GPU|CPU|RAM|ROM|UUID|GUID|ASCII|UTF|GUI|HUD|SFX|BGM|SE|2D|3D|UV|SDK
 
