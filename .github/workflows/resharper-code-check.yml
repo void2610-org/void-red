@@ -59,101 +59,16 @@ jobs:
     - name: Check inspection results
       run: |
         if [ -f inspectcode-results.xml ]; then
-          # XMLファイルから警告やエラーの数を抽出
           ISSUES=$(grep -c '<Issue' inspectcode-results.xml || echo "0")
           echo "Found $ISSUES code quality issues"
           
           if [ "$ISSUES" -gt 0 ]; then
-            echo "::warning::Found $ISSUES code quality issues"
-            
-            # 主要な問題を表示
-            echo "## Code Quality Issues:" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            
-            # XMLから問題の詳細を抽出して表示
-            python3 -c "
-import xml.etree.ElementTree as ET
-import sys
-import os
-
-try:
-    tree = ET.parse('inspectcode-results.xml')
-    root = tree.getroot()
-    
-    issues_found = False
-    for issue in root.findall('.//Issue'):
-        issues_found = True
-        type_id = issue.get('TypeId', 'Unknown')
-        file_path = issue.get('File', 'Unknown')
-        line = issue.get('Line', 'Unknown')
-        severity = issue.get('Severity', 'Unknown')
-        message = issue.get('Message', 'No message')
-        
-        # GitHub Actionsのサマリーに追加
-        summary_line = f'**{severity}**: {type_id} in {file_path}:{line}'
-        print(summary_line)
-        
-        # GitHub Actionsのアノテーションとして出力
-        if severity in ['ERROR', 'WARNING']:
-            annotation_type = 'error' if severity == 'ERROR' else 'warning'
-            print(f'::{\annotation_type} file={file_path},line={line}::{type_id}: {message}')
-    
-    if not issues_found:
-        print('No issues found!')
-        
-except Exception as e:
-    print(f'Error parsing results: {e}')
-    sys.exit(1)
-            " >> $GITHUB_STEP_SUMMARY
-            
-            # エラーレベルの問題があった場合はfailさせる
-            ERROR_COUNT=$(grep -c 'Severity=\"ERROR\"' inspectcode-results.xml || echo "0")
-            if [ "$ERROR_COUNT" -gt 0 ]; then
-              echo "::error::Found $ERROR_COUNT error-level issues"
-              exit 1
-            fi
-          else
-            echo "✅ No code quality issues found!" >> $GITHUB_STEP_SUMMARY
+            echo "::error::Code quality check failed: Found $ISSUES issues"
+            exit 1
           fi
+          
+          echo "✅ Code quality check passed"
         else
           echo "::error::Inspection results file not found"
           exit 1
         fi
-        
-    - name: Upload inspection results
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: resharper-inspection-results
-        path: inspectcode-results.xml
-        retention-days: 30
-        
-    - name: Comment PR with results
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          
-          if (fs.existsSync('inspectcode-results.xml')) {
-            const xml = fs.readFileSync('inspectcode-results.xml', 'utf8');
-            const issueCount = (xml.match(/<Issue/g) || []).length;
-            
-            let comment = `## ReSharper Code Quality Check Results\n\n`;
-            
-            if (issueCount === 0) {
-              comment += `✅ **No code quality issues found!**\n\n`;
-              comment += `Great job! Your code follows the project's coding standards.`;
-            } else {
-              comment += `⚠️ **Found ${issueCount} code quality issue(s)**\n\n`;
-              comment += `Please review the [inspection results](${context.payload.pull_request.html_url}/checks) and fix the issues.\n\n`;
-              comment += `The detailed results have been uploaded as an artifact.`;
-            }
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-          }
