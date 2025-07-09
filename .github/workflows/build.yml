@@ -11,9 +11,14 @@ permissions:
   pages: write       # GitHub Pages ブランチへの書き込み権限
 
 jobs:
+  code-quality:
+    name: Code Quality Check 🔍
+    uses: ./.github/workflows/resharper-code-check.yml
+    
   build:
     name: Build my project 🏗️
     runs-on: ubuntu-latest
+    needs: code-quality
     steps:
       - name: Free up disk space 🧹
         run: |
