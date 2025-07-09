@@ -18,6 +18,15 @@ public class PlayerModel : IDisposable
     // プライベートフィールド
     private readonly ReactiveProperty<int> _mentalPower = new();
     
+    // 命名規則違反テスト用（通常のプライベートフィールド）
+    private bool isTestingMode = false;
+    private string CurrentPlayerName = "TestPlayer";  // PascalCase違反
+    private int MaxScore = 1000;  // PascalCase違反
+    
+    // 命名規則違反テスト用（パブリックフィールド）
+    public string playerName = "DefaultPlayer";  // camelCase違反（PascalCaseであるべき）
+    public int currentLevel = 1;  // camelCase違反（PascalCaseであるべき）
+    
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -35,7 +44,11 @@ public class PlayerModel : IDisposable
     /// <returns>消費に成功したかどうか</returns>
     public bool TryConsumeMentalPower(int amount)
     {
-        if (_mentalPower.Value < amount) return false;
+        // 命名規則違反テスト用（ローカル変数）
+        var CurrentValue = _mentalPower.Value;  // PascalCase違反
+        var IsEnoughPower = CurrentValue >= amount;  // PascalCase違反
+        
+        if (!IsEnoughPower) return false;
         _mentalPower.Value -= amount;
         return true;
     }
