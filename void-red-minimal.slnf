@@ -1,8 +1,0 @@
-{
-  "solution": {
-    "path": "void-red.sln",
-    "projects": [
-      "Assembly-CSharp.csproj"
-    ]
-  }
-}
