@@ -33,20 +33,19 @@ if [ -f "resharper-inspection-report.xml" ]; then
       
       while IFS= read -r line; do
         if [[ -n "$line" ]]; then
-          # ファイルパスと行番号を抽出
-          local file=$(echo "$line" | sed 's/.*File="\([^"]*\)".*/\1/' | sed 's/\\\\/\//g')
-          local line_num=$(echo "$line" | sed 's/.*Line="\([^"]*\)".*/\1/')
-          
-          # WindowsパスをUnixパスに変換
-          local unix_file=$(echo "$file" | sed 's/Assets\\Scripts/Assets\/Scripts/g' | sed 's/\\\\/\//g')
+          # ファイルパスと行番号を抽出（より確実な方法）
+          local file=$(echo "$line" | grep -o 'File="[^"]*"' | sed 's/File="//;s/"//' | tr '\\' '/')
+          local line_num=$(echo "$line" | grep -o 'Line="[^"]*"' | sed 's/Line="//;s/"//')
           
           # 該当行にSerializeFieldがあるかチェック
-          if [[ -f "$unix_file" ]]; then
-            # 該当行とその前後の行をチェック（SerializeFieldは通常フィールドの直前の行にある）
-            local has_serialize_field=$(sed -n "$((line_num-2)),$((line_num+2))p" "$unix_file" 2>/dev/null | grep -q "SerializeField"; echo $?)
-            if [[ $has_serialize_field -ne 0 ]]; then
+          if [[ -f "$file" ]]; then
+            # 該当行とその前後2行をチェック
+            local context=$(sed -n "$((line_num-2)),$((line_num+2))p" "$file" 2>/dev/null | grep -i "serializefield" || echo "")
+            if [[ -z "$context" ]]; then
               # SerializeFieldが見つからない場合のみ追加
               filtered_violations="$filtered_violations$line"$'\n'
+            else
+              echo "  → SerializeField detected at $file:$line_num (excluded)"
             fi
           else
             # ファイルが見つからない場合は保持
