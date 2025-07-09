@@ -30,459 +30,107 @@ jobs:
           
     - name: Install ReSharper Command Line Tools
       run: |
-        # ホームディレクトリに移動してインストール（プロジェクトファイルの干渉を避ける）
         cd $HOME
-        
-        # ReSharper Command Line Tools をグローバルツールとしてインストール
-        echo "🔧 ReSharper Command Line Tools をインストール中..."
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
-        
-        # インストール確認とパス設定
-        echo "🔍 インストールされたツールの確認:"
-        dotnet tool list -g | grep -i resharper || echo "ReSharper not found in global tools"
-        
-        # PATHに ~/.dotnet/tools を追加
         echo "PATH=$HOME/.dotnet/tools:$PATH" >> $GITHUB_ENV
-        
-        # jb コマンドの存在確認
-        which jb || echo "⚠️ jb command not found in PATH"
-        ls -la $HOME/.dotnet/tools/jb* || echo "⚠️ jb executable not found in ~/.dotnet/tools"
-        
-    - name: Verify ReSharper installation
-      run: |
-        # PATH を再読み込みして ReSharper コマンドをテスト
-        export PATH="$HOME/.dotnet/tools:$PATH"
-        echo "🧪 ReSharper コマンドのテスト:"
-        
-        # jb コマンドの確認
-        if command -v jb >/dev/null 2>&1; then
-          echo "✅ jb command found"
-          jb --help | head -5 || echo "jb --help failed"
-        else
-          echo "❌ jb command not found"
-          echo "利用可能なコマンド:"
-          ls -la $HOME/.dotnet/tools/ || echo "Tools directory not found"
-          exit 1
-        fi
-        
-        # inspectcode コマンドの確認  
-        if jb inspectcode --help >/dev/null 2>&1; then
-          echo "✅ jb inspectcode command working"
-        else
-          echo "❌ jb inspectcode command not working"
-          exit 1
-        fi
-        
-    - name: Verify Unity project files
-      run: |
-        echo "📁 プロジェクトファイルの確認:"
-        echo "ソリューションファイル:"
-        ls -la *.sln 2>/dev/null || echo "  ソリューションファイルが見つかりません"
-        echo "プロジェクトファイル:"
-        ls -la Assembly-CSharp*.csproj 2>/dev/null || echo "  Assembly-CSharp プロジェクトが見つかりません"
-        
-        # 全ての .csproj ファイルを確認（デバッグ用）
-        echo "🔍 全ての .csproj ファイルを確認:"
-        find . -name "*.csproj" -type f | head -20
-        
-        # メインプロジェクトファイルの存在確認
-        if [ -f "Assembly-CSharp.csproj" ]; then
-          echo "✅ Unity メインプロジェクトファイルが見つかりました: Assembly-CSharp.csproj"
-        else
-          echo "❌ Assembly-CSharp.csproj が見つかりません。"
-          exit 1
-        fi
-        
-        # ReSharper解析用のクリーンなソリューションファイルを確認
-        if [ -f "void-red-analysis.sln" ]; then
-          echo "✅ ReSharper解析用ソリューションファイルが見つかりました: void-red-analysis.sln"
-          echo "ファイル内容の確認:"
-          head -3 void-red-analysis.sln
-        else
-          echo "❌ void-red-analysis.sln が見つかりません。"
-          exit 1
-        fi
-        
-    - name: Prepare for formatting
-      run: |
-        echo "🔧 ReSharper フォーマット準備中..."
-        echo "💡 Unity プロジェクトのコードフォーマットを実行します"
-        
-        # Unity が生成する可能性のある余分な .csproj ファイルを削除
-        echo "🧹 Unity生成の余分な .csproj ファイルを削除中..."
-        find . -name "*.csproj" -not -name "Assembly-CSharp.csproj" -not -name "Assembly-CSharp-Editor.csproj" -delete || true
-        
-        # 残った .csproj ファイルを確認
-        echo "📋 残った .csproj ファイル:"
-        find . -name "*.csproj" -type f
       
     - name: Run ReSharper Code Cleanup (Format)
       run: |
-        # PATH を確実に設定
         export PATH="$HOME/.dotnet/tools:$PATH"
         
-        echo "🎨 ReSharper コードフォーマットを開始します..."
-        echo "使用するソリューション: void-red-analysis.sln"
-        
-        # フォーマット前の状態を記録
-        echo "📸 フォーマット前の状態を保存..."
-        git add -A
-        git diff --cached --name-only > format-target-files.txt
-        git reset
-        
-        echo "📋 ReSharper フォーマットオプション（.editorconfigベース）:"
-        echo "  - 既存の.editorconfigファイルを使用"
-        echo "  - プロジェクト標準のコードスタイルを適用"
-        echo "  - Scripts以下のC#ファイルのみ対象"
-        echo "  - Unity プロジェクト最適化"
-        
-        # 既存の.editorconfigファイルを確認・表示
-        echo "📝 既存の.editorconfigファイルを使用中..."
-        echo "🔍 .editorconfigの主要設定を確認:"
-        echo "C#フォーマット設定:"
-        grep -E "(csharp_space_|csharp_preserve_)" .editorconfig | head -10 | sed 's/^/  /' || echo "  設定ファイルが見つかりません"
-        
-        echo ""
-        echo "✅ プロジェクトの既存.editorconfigファイルを使用します"
-        echo "   - csharp_space_after_comma = true"
-        echo "   - csharp_space_around_binary_operators = before_and_after"
-        echo "   - csharp_preserve_single_line_blocks = true"
-        echo "   - 既存のコードスタイルを完全に維持"
-        
-        # ReSharper cleanupcode で利用可能なプロファイルを確認
-        echo "🔍 利用可能なプロファイルを確認中..."
-        jb cleanupcode --help | grep -A 20 -B 5 "profile" || true
-        
-        # デバッグ情報の表示
-        echo ""
-        echo "🔬 デバッグ情報:"
-        echo "対象ファイル（ScoreCalculator.cs）の現在の状態:"
-        head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
-        
-        # ReSharper cleanupcode の実行（.editorconfigベース、Scripts以下全ファイル）
-        echo ""
-        echo "⚡ ReSharper cleanupcode を実行中（.editorconfigベース、Scripts以下全ファイル）..."
-        echo "実行前のファイル状態（15-17行目）:"
-        sed -n '15,17p' Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
-        
-        # .editorconfigファイルの存在確認
-        ls -la .editorconfig
-        
-        # ReSharperのcleanupcode実行（実際のファイル変更を強制）
-        echo "📋 .editorconfigファイルの主要設定:"
-        grep -E "(csharp_space_after_comma|csharp_space_around_binary_operators)" .editorconfig
-        
-        echo ""
-        echo "⚡ ReSharper cleanupcode 実行中..."
-        
-        # まず特定のファイルで直接実行してテスト
-        echo "🧪 単一ファイルでのテスト実行:"
-        jb cleanupcode Assets/Scripts/Game/Logic/ScoreCalculator.cs \
-          --verbosity=VERBOSE \
-          --profile="Built-in: Reformat Code" \
-          --no-build \
-          2>&1 | head -50
-        
-        echo ""
-        echo "🔄 単一ファイルテスト後の状態:"
-        sed -n '15,17p' Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
-        
-        echo ""
-        echo "📁 プロジェクトファイルでの実行:"
         jb cleanupcode Assembly-CSharp.csproj \
-          --verbosity=VERBOSE \
           --include="Assets/Scripts/**/*.cs" \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
           --profile="Built-in: Reformat Code" \
           --no-build \
-          --properties:Configuration=Debug \
-          2>&1 | head -150
-        
-        echo ""
-        echo "実行後のファイル状態（15-17行目）:"
-        sed -n '15,17p' Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
-        
-        echo ""
-        echo "🔄 フォーマット結果の詳細確認..."
-        echo "現在のGit状態:"
-        git status --porcelain || true
-        
-        echo ""
-        echo "対象ファイル（ScoreCalculator.cs）のフォーマット後の状態:"
-        head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
-        
-        echo ""
-        echo "🔍 フォーマット差分の詳細確認:"
-        git diff Assets/Scripts/Game/Logic/ScoreCalculator.cs | head -50 || echo "差分なし"
-        
-        echo ""
-        echo "🧪 期待されるフォーマット結果（.editorconfigベース）:"
-        echo "  ✅ 修正される: .editorconfigに基づくスペース設定"
-        echo "    - csharp_space_after_comma = true"
-        echo "    - csharp_space_around_binary_operators = before_and_after"
-        echo "    - csharp_space_before_comma = false"
-        echo "  ❌ 変更されない: 改行、インデント、ブロック構造"
-        echo "    - csharp_preserve_single_line_blocks = true"
-        echo "    - 既存のコードスタイルを維持"
-        echo "  📁 対象: Assets/Scripts/**/*.cs のみ"
-        echo "  🎯 目標: .editorconfigに基づく標準的なフォーマット適用"
-          
-        echo "✅ ReSharper コードフォーマットが完了しました"
+          --properties:Configuration=Debug
           
     - name: Check format changes
       run: |
-        echo "🔍 フォーマット結果の差分を確認中..."
-        
-        # Git 設定
-        git config user.name "ReSharper Code Format Bot"
-        git config user.email "noreply@github.com"
-        
-        # フォーマット後の変更を確認
-        if git diff --quiet && git diff --cached --quiet; then
-          echo "✅ フォーマット変更はありませんでした"
+        if git diff --quiet; then
           echo "FORMAT_CHANGES=false" >> $GITHUB_ENV
         else
-          echo "🎨 フォーマット変更が検出されました"
           echo "FORMAT_CHANGES=true" >> $GITHUB_ENV
-          
-          # 変更されたファイルの一覧を表示
-          echo "📁 変更されたファイル:"
-          git diff --name-only | head -20
-          
-          # 変更の概要を表示
-          echo ""
-          echo "📊 変更の統計:"
-          git diff --stat | tail -1
-          
-          # 主要な変更内容をプレビュー
-          echo ""
-          echo "🔍 主要な変更内容 (最初の20行):"
-          git diff --unified=1 | head -20 | sed 's/^/  /'
-        fi
-        
-    - name: Format summary
-      run: |
-        echo "## 🎨 ReSharper コードフォーマット結果"
-        echo ""
-        
-        if [ "$FORMAT_CHANGES" = "true" ]; then
-          echo "### ✅ フォーマット完了"
-          echo "- 💫 コードスタイルが統一されました"
-          echo "- 📝 自動で整形・最適化されました"
-          echo "- 🔧 ReSharper 標準プロファイルを適用"
-          echo ""
-          echo "### 📁 変更されたファイル:"
-          git diff --name-only | sed 's/^/- /' | head -20
-          echo ""
-          echo "### 📊 変更統計:"
-          git diff --stat | tail -1
-        else
-          echo "### ✅ フォーマット確認完了"
-          echo "- コードスタイルは既に統一されています"
-          echo "- 追加の変更は必要ありませんでした"
+          echo "変更されたファイル:"
+          git diff --name-only
         fi
         
     - name: Check format compliance
       run: |
-        echo "📋 コードフォーマット準拠チェック結果:"
-        echo ""
-        
         if [ "$FORMAT_CHANGES" = "true" ]; then
-          echo "❌ コードフォーマットが準拠していません"
-          echo ""
-          echo "### 🔍 検出された問題:"
-          echo "- コードスタイルが統一されていません"
-          echo "- ReSharper 標準フォーマットとの差分があります"
-          echo "- 手動でフォーマット適用が必要です"
-          echo ""
-          echo "### 📁 影響を受けるファイル:"
-          git diff --name-only | sed 's/^/  - /' | head -20
-          echo ""
-          echo "### 🔧 修正方法:"
-          echo "1. ReSharper を使用してコードをフォーマット"
-          echo "2. IDE の自動フォーマット機能を使用"
-          echo "3. 手動でコードスタイルを調整"
-          echo ""
-          echo "### 📊 変更統計:"
-          git diff --stat | tail -1
-          echo ""
+          echo "❌ コードフォーマット違反があります"
           echo "FORMAT_CHECK_FAILED=true" >> $GITHUB_ENV
         else
-          echo "✅ コードフォーマットが準拠しています"
-          echo ""
-          echo "### ✅ 確認完了:"
-          echo "- コードスタイルが統一されています"
-          echo "- ReSharper 標準フォーマットに準拠しています"
-          echo "- 追加のフォーマット作業は不要です"
+          echo "✅ コードフォーマットOK"
           echo "FORMAT_CHECK_FAILED=false" >> $GITHUB_ENV
         fi
         
     - name: Run ReSharper Code Inspection (Naming Rules)
       run: |
-        # PATH を確実に設定
         export PATH="$HOME/.dotnet/tools:$PATH"
         
-        echo "🔍 ReSharper 命名規則チェックを開始します..."
-        echo ""
-        
-        # inspectcode を実行して命名規則違反のみをチェック（プロジェクトコードのみ対象）
         jb inspectcode Assembly-CSharp.csproj \
           --output=resharper-inspection-report.xml \
           --format=xml \
           --include="Assets/Scripts/**/*.cs" \
-          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**;**/package.json;**/*.xml;**/*.shader;**/*.hlsl;**/*.cginc;**/*.txt;**/*.json" \
+          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
           --severity=WARNING \
           --no-build \
           --disable-settings-layers=GlobalAll \
-          --properties:Configuration=Debug \
-          --caches-home=/tmp/resharper-cache \
-          --toolset=17.0 \
-          --extensions=ConstraintViolation \
-          2>/dev/null || true
+          --properties:Configuration=Debug 2>/dev/null || true
         
-        echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
-        
-        # XML レポートが存在する場合は内容を確認
+        # SerializeFieldを除外した実際の命名規則違反をカウント
         if [ -f "resharper-inspection-report.xml" ]; then
-          echo "📄 検査レポートが生成されました"
-          
-          # XMLレポートの基本情報を表示
-          echo "📋 レポート概要:"
-          echo "  ファイルサイズ: $(wc -c < resharper-inspection-report.xml) bytes"
-          echo "  問題の総数: $(grep -c '<Issue' resharper-inspection-report.xml || echo '0')"
-          echo "  命名規則違反（全体）: $(grep -c 'InconsistentNaming' resharper-inspection-report.xml || echo '0')"
-          echo "  プロジェクト内の命名規則違反: $(grep 'InconsistentNaming' resharper-inspection-report.xml | grep -c 'File="Assets\\Scripts.*\.cs"' || echo '0')"
-          echo "  対象: Assets/Scripts/**/*.cs のみ"
-          echo ""
-          
-          # 分析対象ファイルの確認
-          echo "🔍 分析対象ファイルの確認:"
-          echo "  C#ファイル数: $(find Assets/Scripts -name '*.cs' -type f | wc -l)"
-          echo "  除外された問題: Unity依存関係、パッケージファイル、シェーダー等"
-          echo "  📝 Note: ReSharperは全ファイルを分析しますが、結果をプロジェクトコードのみにフィルタリングしています"
-          echo ""
-          
-          # 命名規則違反を抽出（InconsistentNaming）
-          if grep -q "InconsistentNaming" resharper-inspection-report.xml; then
-            echo "❌ 命名規則違反が検出されました:"
-            echo ""
-            
-            # XMLから命名規則違反を詳細に抽出（Assets/Scripts以下のC#ファイルのみ）
-            echo "🔍 詳細な違反内容（Assets/Scripts以下のC#ファイルのみ）:"
-            
-            # 全ての命名規則違反を抽出
-            ALL_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"')
-            
-            # SerializeFieldフィールドの違反を除外するための分析
-            echo "📋 違反の分類:"
-            
-            # 通常のプライベートフィールド違反（SerializeField除外）
-            NON_SERIALIZED_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | grep -v 'SerializeField' | wc -l)
-            echo "  - 通常のプライベートフィールド違反: $NON_SERIALIZED_VIOLATIONS 件"
-            
-            # SerializeFieldフィールドの違反
-            SERIALIZED_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | grep 'SerializeField' | wc -l)
-            echo "  - SerializeFieldフィールド違反: $SERIALIZED_VIOLATIONS 件 (Unity慣習により除外)"
-            
-            # 実際に修正すべき違反のみを表示
-            echo ""
-            echo "🔧 修正すべき違反（SerializeFieldフィールドを除外）:"
-            echo "$ALL_VIOLATIONS" | \
-              grep -v 'SerializeField' | \
-              sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/\1:\2 → \3/' | \
-              head -20 | while read line; do
-                echo "  $line"
-              done
-            
-            # 実際の命名規則違反数を正確にカウント（SerializeField除外）
-            ACTUAL_NAMING_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | grep -v 'SerializeField' | wc -l)
+          ALL_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"' || echo "")
+          if [ -n "$ALL_VIOLATIONS" ]; then
+            ACTUAL_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | grep -v 'SerializeField' | wc -l)
             TOTAL_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | wc -l)
-            echo ""
-            echo "📊 命名規則違反統計:"
-            echo "  - 全体: $TOTAL_VIOLATIONS 件"
-            echo "  - 修正すべき違反: $ACTUAL_NAMING_VIOLATIONS 件（SerializeFieldフィールドを除外）"
-            echo "  - Unity慣習による除外: $SERIALIZED_VIOLATIONS 件"
+            SERIALIZED_VIOLATIONS=$((TOTAL_VIOLATIONS - ACTUAL_VIOLATIONS))
             
-            # XMLサンプルを表示（デバッグ用）
-            echo ""
-            echo "📋 XMLサンプル（最初の5つの命名規則違反）:"
-            grep -A 1 -B 1 'InconsistentNaming' resharper-inspection-report.xml | head -15 | sed 's/^/  /'
+            echo "命名規則違反: $TOTAL_VIOLATIONS 件 (SerializeField除外後: $ACTUAL_VIOLATIONS 件)"
             
-            # 実際に修正すべき違反があるかどうかを判定（SerializeFieldフィールドを除外）
-            if [ $ACTUAL_NAMING_VIOLATIONS -gt 0 ]; then
+            if [ $ACTUAL_VIOLATIONS -gt 0 ]; then
+              echo "修正すべき違反:"
+              echo "$ALL_VIOLATIONS" | grep -v 'SerializeField' | \
+                sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/\1:\2 → \3/' | head -10
               echo "NAMING_ISSUES_FOUND=true" >> $GITHUB_ENV
             else
               echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
             fi
           else
-            echo "✅ 命名規則違反は見つかりませんでした"
+            echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
           fi
         else
-          echo "⚠️ 検査レポートが生成されませんでした"
+          echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
         fi
         
     - name: Check naming compliance
       run: |
-        echo ""
-        echo "📋 命名規則準拠チェック結果:"
-        echo ""
-        
         if [ "$NAMING_ISSUES_FOUND" = "true" ]; then
-          echo "❌ 命名規則に違反があります"
-          echo ""
-          echo "### 🔍 検出された問題:"
-          echo "- C# の命名規則に従っていない識別子があります"
-          echo "- 通常のプライベートフィールドに _プレフィックスが不足しています"
-          echo "- [SerializeField]フィールドはUnity慣習により除外されています"
-          echo ""
-          echo "### 🔧 修正方法:"
-          echo "- 通常のプライベートフィールド: _camelCase (例: _playerName)"
-          echo "- ローカル変数: camelCase (例: playerScore)"
-          echo "- [SerializeField]フィールド: camelCase (Unity慣習により変更不要)"
-          echo ""
+          echo "❌ 命名規則違反があります"
           echo "NAMING_CHECK_FAILED=true" >> $GITHUB_ENV
         else
-          echo "✅ 命名規則に準拠しています"
-          echo ""
-          echo "### ✅ 確認完了:"
-          echo "- すべての識別子が C# 命名規則に従っています"
-          echo "- [SerializeField]フィールドはUnity慣習により適正です"
-          echo "- 追加の修正作業は不要です"
+          echo "✅ 命名規則OK"
           echo "NAMING_CHECK_FAILED=false" >> $GITHUB_ENV
         fi
         
     - name: Final check result
       run: |
-        echo ""
-        echo "========================================="
-        echo "📊 最終チェック結果"
-        echo "========================================="
-        echo ""
-        
         FAILED_CHECKS=0
         
         if [ "$FORMAT_CHECK_FAILED" = "true" ]; then
-          echo "❌ フォーマットチェック: 不合格"
+          echo "❌ フォーマットチェック失敗"
           FAILED_CHECKS=$((FAILED_CHECKS + 1))
-        else
-          echo "✅ フォーマットチェック: 合格"
         fi
         
         if [ "$NAMING_CHECK_FAILED" = "true" ]; then
-          echo "❌ 命名規則チェック: 不合格"
+          echo "❌ 命名規則チェック失敗"
           FAILED_CHECKS=$((FAILED_CHECKS + 1))
-        else
-          echo "✅ 命名規則チェック: 合格"
         fi
         
-        echo ""
         if [ $FAILED_CHECKS -gt 0 ]; then
-          echo "❌ CI チェックに失敗しました ($FAILED_CHECKS 項目)"
-          echo ""
-          echo "上記のエラーを修正してから再度プッシュしてください。"
+          echo "CI失敗: $FAILED_CHECKS 項目"
           exit 1
         else
-          echo "✅ すべてのチェックに合格しました！"
-          echo ""
-          echo "コードはフォーマットと命名規則の両方に準拠しています。"
+          echo "✅ すべてのチェック合格"
         fi
