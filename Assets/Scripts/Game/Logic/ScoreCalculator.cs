@@ -15,8 +15,8 @@ public static class ScoreCalculator
     /// <param name="theme">テーマデータ</param>
     /// <returns>計算されたスコア</returns>
     // テスト用の命名規則違反
-    private static float test_multiplier = 1.5f;
-    private const int max_score = 100;
+    private static float testMultiplier = 1.5f;  // 違反：_testMultiplierであるべき
+    public static float PublicMultiplier = 2.0f;  // 違反ではない：PascalCaseが正しい
     
     public static float CalculateScore(PlayerMove move,ThemeData theme)
     {
@@ -30,6 +30,6 @@ public static class ScoreCalculator
         
         // スコア = 属性倍率 × 精神ベット × カード固有の倍率 × プレイスタイル倍率
         var finalScore = attributeMultiplier*move.MentalBet*move.SelectedCard.ScoreMultiplier*playStyleMultiplier;
-        return finalScore * test_multiplier;
+        return finalScore * testMultiplier;
     }
 }
