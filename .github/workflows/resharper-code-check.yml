@@ -50,11 +50,19 @@ jobs:
           echo "=== Processing individual C# files with project context ==="
           find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
             echo "Processing: $file"
-            jb cleanupcode Assembly-CSharp.csproj \
+            result=$(jb cleanupcode Assembly-CSharp.csproj \
               --include="$file" \
               --profile="Built-in: Reformat Code" \
               --no-build \
-              --properties:Configuration=Debug 2>&1 || echo "Failed to process $file"
+              --properties:Configuration=Debug 2>&1)
+            
+            if echo "$result" | grep -q "No items were found to cleanup"; then
+              echo "✓ $file - No formatting changes needed"
+            elif echo "$result" | grep -q "Failed to run cleanup"; then
+              echo "✗ $file - Failed to process"
+            else
+              echo "✓ $file - Processed successfully"
+            fi
           done
           
           # プロジェクトファイルの変更を元に戻す
