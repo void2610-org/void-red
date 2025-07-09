@@ -50,14 +50,22 @@ jobs:
           echo "=== Processing individual C# files with project context ==="
           find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
             echo "Processing: $file"
+            echo "  Checking file content before cleanup:"
+            head -15 "$file" | sed 's/^/    /'
+            
             set +e  # exit codeを無視
             result=$(jb cleanupcode Assembly-CSharp.csproj \
               --include="$file" \
               --profile="Built-in: Reformat Code" \
               --no-build \
+              --verbosity=VERBOSE \
               --properties:Configuration=Debug 2>&1)
             exit_code=$?
             set -e  # exit codeチェックを再開
+            
+            echo "  ReSharper output:"
+            echo "$result" | sed 's/^/    /'
+            echo "  Exit code: $exit_code"
             
             if echo "$result" | grep -q "No items were found to cleanup"; then
               echo "✓ $file - No formatting changes needed"
