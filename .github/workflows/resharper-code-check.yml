@@ -77,6 +77,13 @@ jobs:
           echo "FORMAT_CHANGES=true" >> $GITHUB_ENV
           echo "変更されたファイル:"
           git diff --name-only
+          echo ""
+          echo "=== 実際の変更内容（最初の2ファイル） ==="
+          git diff --name-only | head -2 | while read -r file; do
+            echo "--- $file の変更内容 ---"
+            git diff "$file" | head -20
+            echo ""
+          done
         fi
         
     - name: Check format compliance
