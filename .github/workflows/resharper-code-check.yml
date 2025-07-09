@@ -342,17 +342,30 @@ jobs:
         if [ -f "resharper-inspection-report.xml" ]; then
           echo "📄 検査レポートが生成されました"
           
+          # XMLレポートの基本情報を表示
+          echo "📋 レポート概要:"
+          echo "  ファイルサイズ: $(wc -c < resharper-inspection-report.xml) bytes"
+          echo "  問題の総数: $(grep -c '<Issue' resharper-inspection-report.xml || echo '0')"
+          echo "  命名規則違反: $(grep -c 'InconsistentNaming' resharper-inspection-report.xml || echo '0')"
+          echo ""
+          
           # 命名規則違反を抽出（InconsistentNaming）
           if grep -q "InconsistentNaming" resharper-inspection-report.xml; then
-            echo ""
             echo "❌ 命名規則違反が検出されました:"
             echo ""
             
-            # XMLから命名規則違反を抽出して表示（簡易版）
-            grep -A 2 -B 2 "InconsistentNaming" resharper-inspection-report.xml | \
-              grep -E "(File=|Message=)" | \
-              sed 's/.*File="\([^"]*\)".*/ファイル: \1/' | \
-              sed 's/.*Message="\([^"]*\)".*/  → \1/' || true
+            # XMLから命名規則違反を詳細に抽出
+            echo "🔍 詳細な違反内容:"
+            grep 'InconsistentNaming' resharper-inspection-report.xml | \
+              sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/\1:\2 → \3/' | \
+              head -20 | while read line; do
+                echo "  $line"
+              done
+            
+            # XMLサンプルを表示（デバッグ用）
+            echo ""
+            echo "📋 XMLサンプル（最初の5つの命名規則違反）:"
+            grep -A 1 -B 1 'InconsistentNaming' resharper-inspection-report.xml | head -15 | sed 's/^/  /'
             
             echo "NAMING_ISSUES_FOUND=true" >> $GITHUB_ENV
           else
