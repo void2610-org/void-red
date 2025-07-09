@@ -19,16 +19,12 @@ public static class ScoreCalculator
         if(move==null||!theme)  return 0f;
         
         // テーマから該当属性の倍率を取得
-        var attributeMultiplier = theme.GetMultiplier(move.SelectedCard.Attribute); // 命名規則修正済み
+        var attributeMultiplier = theme.GetMultiplier(move.SelectedCard.Attribute);
         
         // プレイスタイルによるスコア倍率を取得
         var playStyleMultiplier = move.PlayStyle.GetScoreMultiplier();
         
-        // 命名規則違反テスト用（ローカル変数）
-        var FinalScore = attributeMultiplier*move.MentalBet*move.SelectedCard.ScoreMultiplier*playStyleMultiplier;  // PascalCase違反
-        var IsValidScore = FinalScore > 0;  // PascalCase違反
-        
         // スコア = 属性倍率 × 精神ベット × カード固有の倍率 × プレイスタイル倍率
-        return IsValidScore ? FinalScore : 0f;
+        return attributeMultiplier*move.MentalBet*move.SelectedCard.ScoreMultiplier*playStyleMultiplier;
     }
 }

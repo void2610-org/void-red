@@ -24,13 +24,7 @@ public class RandomRangeValue
         {
             if (!useRandomRange) return fixedValue;
             
-            // 命名規則違反テスト用（ローカル変数）
-            var RandomValue = UnityEngine.Random.Range(minValue, maxValue + 1);  // PascalCase違反
-            var ShouldCacheValue = _cachedValue == null;  // PascalCase違反
-            
-            if (ShouldCacheValue)
-                _cachedValue = RandomValue;
-            
+            _cachedValue ??= UnityEngine.Random.Range(minValue, maxValue + 1);
             return _cachedValue.Value;
         }
     }
