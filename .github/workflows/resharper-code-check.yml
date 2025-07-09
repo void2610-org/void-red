@@ -77,6 +77,10 @@ jobs:
         echo "プロジェクトファイル:"
         ls -la Assembly-CSharp*.csproj 2>/dev/null || echo "  Assembly-CSharp プロジェクトが見つかりません"
         
+        # 全ての .csproj ファイルを確認（デバッグ用）
+        echo "🔍 全ての .csproj ファイルを確認:"
+        find . -name "*.csproj" -type f | head -20
+        
         # メインプロジェクトファイルの存在確認
         if [ -f "Assembly-CSharp.csproj" ]; then
           echo "✅ Unity メインプロジェクトファイルが見つかりました: Assembly-CSharp.csproj"
@@ -99,6 +103,14 @@ jobs:
       run: |
         echo "🔧 ReSharper フォーマット準備中..."
         echo "💡 Unity プロジェクトのコードフォーマットを実行します"
+        
+        # Unity が生成する可能性のある余分な .csproj ファイルを削除
+        echo "🧹 Unity生成の余分な .csproj ファイルを削除中..."
+        find . -name "*.csproj" -not -name "Assembly-CSharp.csproj" -not -name "Assembly-CSharp-Editor.csproj" -delete || true
+        
+        # 残った .csproj ファイルを確認
+        echo "📋 残った .csproj ファイル:"
+        find . -name "*.csproj" -type f
       
     - name: Run ReSharper Code Cleanup (Format)
       run: |
@@ -172,8 +184,8 @@ jobs:
         sed -n '15,17p' Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
         
         echo ""
-        echo "📁 ソリューション全体での実行:"
-        jb cleanupcode void-red-analysis.sln \
+        echo "📁 プロジェクトファイルでの実行:"
+        jb cleanupcode Assembly-CSharp.csproj \
           --verbosity=VERBOSE \
           --include="Assets/Scripts/**/*.cs" \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
