@@ -53,6 +53,11 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+# ReSharper CI - Allow Unity solution and main project files
+!void-red.sln
+!Assembly-CSharp.csproj
+!Assembly-CSharp-Editor.csproj
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta

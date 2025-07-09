@@ -26,12 +26,18 @@ jobs:
         
     - name: Check for Unity solution file
       run: |
+        echo "Checking for Unity solution files..."
+        ls -la *.sln *.csproj || echo "No solution files found"
+        
         if [ -f "void-red.sln" ]; then
           echo "✅ Unity solution file found"
         else
           echo "❌ Unity solution file not found"
-          echo "Available files:"
-          ls -la *.sln || echo "No .sln files found"
+          echo "Please generate Unity solution files using the Export script:"
+          echo "1. In Unity Editor, go to Window -> General -> Console"
+          echo "2. Clear the console and run: Export.VSSolution()"
+          echo "3. Commit the generated .sln and .csproj files to Git"
+          echo "4. Re-run this workflow"
           exit 1
         fi
         
