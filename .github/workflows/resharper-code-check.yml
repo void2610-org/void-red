@@ -32,27 +32,35 @@ jobs:
       run: |
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         
-    - name: Restore NuGet packages
-      run: dotnet restore void-red.sln
-      
-    - name: Verify ReSharper settings file exists
+    - name: Find and inspect C# project files
       run: |
-        if [ -f void-red.sln.DotSettings ]; then
-          echo "✅ Rider設定ファイル (void-red.sln.DotSettings) が見つかりました"
-          echo "設定ファイルの内容:"
-          head -n 10 void-red.sln.DotSettings
-        else
-          echo "❌ Rider設定ファイルが見つかりません"
+        # C#プロジェクトファイルを検索
+        CSPROJ_FILES=$(find . -name "*.csproj" -not -path "./Library/*" -not -path "./Temp/*" | head -5)
+        
+        if [ -z "$CSPROJ_FILES" ]; then
+          echo "No C# project files found"
           exit 1
         fi
         
-    - name: Run ReSharper Code Inspection
-      run: |
-        jb inspectcode void-red.sln \
+        echo "Found C# project files:"
+        echo "$CSPROJ_FILES"
+        
+        # 最初に見つかったプロジェクトファイルを使用
+        MAIN_PROJECT=$(echo "$CSPROJ_FILES" | head -1)
+        echo "Using project file: $MAIN_PROJECT"
+        
+        # .editorconfigファイルの確認
+        if [ -f .editorconfig ]; then
+          echo "✅ Found .editorconfig file for formatting rules"
+        else
+          echo "⚠️ No .editorconfig file found"
+        fi
+        
+        # ReSharper Code Inspection実行 (.editorconfigは自動的に認識される)
+        jb inspectcode "$MAIN_PROJECT" \
           --output=inspectcode-results.xml \
           --format=xml \
           --severity=WARNING \
-          --settings=void-red.sln.DotSettings \
           --exclude="**/*.Generated.cs;**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
           --verbosity=WARN
           
