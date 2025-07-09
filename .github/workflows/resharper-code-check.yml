@@ -325,16 +325,20 @@ jobs:
         echo "🔍 ReSharper 命名規則チェックを開始します..."
         echo ""
         
-        # inspectcode を実行して命名規則違反のみをチェック
+        # inspectcode を実行して命名規則違反のみをチェック（プロジェクトコードのみ対象）
         jb inspectcode Assembly-CSharp.csproj \
           --output=resharper-inspection-report.xml \
           --format=xml \
           --include="Assets/Scripts/**/*.cs" \
-          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
+          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**;**/package.json;**/*.xml;**/*.shader;**/*.hlsl;**/*.cginc;**/*.txt;**/*.json" \
           --severity=WARNING \
           --no-build \
           --disable-settings-layers=GlobalAll \
-          --properties:Configuration=Debug 2>/dev/null || true
+          --properties:Configuration=Debug \
+          --caches-home=/tmp/resharper-cache \
+          --toolset=17.0 \
+          --extensions=ConstraintViolation \
+          2>/dev/null || true
         
         echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
         
@@ -347,6 +351,13 @@ jobs:
           echo "  ファイルサイズ: $(wc -c < resharper-inspection-report.xml) bytes"
           echo "  問題の総数: $(grep -c '<Issue' resharper-inspection-report.xml || echo '0')"
           echo "  命名規則違反: $(grep -c 'InconsistentNaming' resharper-inspection-report.xml || echo '0')"
+          echo "  対象: Assets/Scripts/**/*.cs のみ"
+          echo ""
+          
+          # 分析対象ファイルの確認
+          echo "🔍 分析対象ファイルの確認:"
+          echo "  C#ファイル数: $(find Assets/Scripts -name '*.cs' -type f | wc -l)"
+          echo "  除外された問題: Unity依存関係、パッケージファイル、シェーダー等"
           echo ""
           
           # 命名規則違反を抽出（InconsistentNaming）
