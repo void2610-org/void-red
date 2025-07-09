@@ -46,9 +46,9 @@ jobs:
         
         # ファイルが存在する場合のみ実行
         if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # Unity固有ファイルのみ除外してC#ファイルを処理
+          # Unity固有ファイルとプロジェクトファイルを除外してC#ファイルのみ処理
           jb cleanupcode Assembly-CSharp.csproj \
-            --exclude="**/*.meta;**/*.asset;**/*.prefab;**/*.unity;**/*.shader" \
+            --exclude="**/*.csproj;**/*.meta;**/*.asset;**/*.prefab;**/*.unity;**/*.shader" \
             --profile="Built-in: Reformat Code" \
             --no-build \
             --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
