@@ -4187,3 +4187,25 @@ resharper_csharp_naming_rule.private_static_fields.is_static = true
 
 # 特定のクラス名違反を無視
 dotnet_diagnostic.IDE1006.severity = none
+
+# ReSharperの空行設定を緩和（基本的なフォーマットのみ）
+resharper_blank_lines_around_field = 0
+resharper_blank_lines_around_property = 0
+resharper_blank_lines_around_auto_property = 0
+resharper_blank_lines_around_invocable = 0
+resharper_blank_lines_around_single_line_invocable = 0
+resharper_blank_lines_after_start_comment = 0
+resharper_blank_lines_after_file_header_comment = 0
+resharper_blank_lines_around_namespace = 0
+resharper_blank_lines_around_type = 0
+resharper_blank_lines_around_single_line_type = 0
+resharper_blank_lines_inside_type = 0
+resharper_blank_lines_inside_namespace = 0
+resharper_blank_lines_around_region = 0
+resharper_blank_lines_inside_region = 0
+resharper_blank_lines_before_single_line_comment = 0
+
+# 空行の自動挿入を無効化
+resharper_blank_line_after_file_header = false
+resharper_blank_line_after_pi = false
+resharper_blank_line_after_using_list = false
