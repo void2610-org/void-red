@@ -306,8 +306,7 @@ jobs:
           echo "### 📊 変更統計:"
           git diff --stat | tail -1
           echo ""
-          echo "❌ CI を失敗させます。コードをフォーマットしてから再度プッシュしてください。"
-          exit 1
+          echo "FORMAT_CHECK_FAILED=true" >> $GITHUB_ENV
         else
           echo "✅ コードフォーマットが準拠しています"
           echo ""
@@ -315,6 +314,7 @@ jobs:
           echo "- コードスタイルが統一されています"
           echo "- ReSharper 標準フォーマットに準拠しています"
           echo "- 追加のフォーマット作業は不要です"
+          echo "FORMAT_CHECK_FAILED=false" >> $GITHUB_ENV
         fi
         
     - name: Run ReSharper Code Inspection (Naming Rules)
@@ -379,12 +379,48 @@ jobs:
           echo "- プライベートフィールド: _camelCase (例: _playerName)"
           echo "- ローカル変数: camelCase (例: playerScore)"
           echo ""
-          echo "❌ CI を失敗させます。命名規則に従って修正してから再度プッシュしてください。"
-          exit 1
+          echo "NAMING_CHECK_FAILED=true" >> $GITHUB_ENV
         else
           echo "✅ 命名規則に準拠しています"
           echo ""
           echo "### ✅ 確認完了:"
           echo "- すべての識別子が C# 命名規則に従っています"
           echo "- 追加の修正作業は不要です"
+          echo "NAMING_CHECK_FAILED=false" >> $GITHUB_ENV
+        fi
+        
+    - name: Final check result
+      run: |
+        echo ""
+        echo "========================================="
+        echo "📊 最終チェック結果"
+        echo "========================================="
+        echo ""
+        
+        FAILED_CHECKS=0
+        
+        if [ "$FORMAT_CHECK_FAILED" = "true" ]; then
+          echo "❌ フォーマットチェック: 不合格"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ フォーマットチェック: 合格"
+        fi
+        
+        if [ "$NAMING_CHECK_FAILED" = "true" ]; then
+          echo "❌ 命名規則チェック: 不合格"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ 命名規則チェック: 合格"
+        fi
+        
+        echo ""
+        if [ $FAILED_CHECKS -gt 0 ]; then
+          echo "❌ CI チェックに失敗しました ($FAILED_CHECKS 項目)"
+          echo ""
+          echo "上記のエラーを修正してから再度プッシュしてください。"
+          exit 1
+        else
+          echo "✅ すべてのチェックに合格しました！"
+          echo ""
+          echo "コードはフォーマットと命名規則の両方に準拠しています。"
         fi
