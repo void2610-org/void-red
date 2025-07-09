@@ -173,11 +173,11 @@ public class WinRateCondition : EvolutionConditionBase
     public RandomRangeFloat RequiredWinRate = new(60f);
     
     [Header("最低試合数")]
-    public int minimumGames = 5;
+    public int MinimumGames = 5;
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        if (cardStats.TotalUse < minimumGames) return false;
+        if (cardStats.TotalUse < MinimumGames) return false;
         
         var winRate = cardStats.TotalWin / (float)cardStats.TotalUse * 100f;
         return winRate >= RequiredWinRate.Value;
@@ -185,7 +185,7 @@ public class WinRateCondition : EvolutionConditionBase
     
     public override string GetDescription()
     {
-        return $"勝率{RequiredWinRate.GetDisplayString()}%以上（最低{minimumGames}試合）";
+        return $"勝率{RequiredWinRate.GetDisplayString()}%以上（最低{MinimumGames}試合）";
     }
     
     public override string GetConditionTypeName() => "勝率";
