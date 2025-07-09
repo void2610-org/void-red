@@ -120,23 +120,44 @@ jobs:
         echo "  - メインゲームコードのみ対象（サンプル除外）"
         echo "  - Unity プロジェクト最適化"
         
+        # ReSharper コードフォーマット設定ファイルを作成
+        echo "📝 ReSharper設定ファイルを作成中..."
+        cat > .DotSettings << 'EOF'
+<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_COMMA/@EntryValue">True</s:Boolean>
+  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_BINARY_OPERATOR/@EntryValue">True</s:Boolean>
+  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_COMMA/@EntryValue">False</s:Boolean>
+</wpf:ResourceDictionary>
+EOF
+        
         # ReSharper cleanupcode で利用可能なプロファイルを確認
         echo "🔍 利用可能なプロファイルを確認中..."
-        jb cleanupcode --help | grep -A 10 -B 5 "profile" || true
+        jb cleanupcode --help | grep -A 20 -B 5 "profile" || true
         
-        # ReSharper cleanupcode の実行（フォーマット専用プロファイルを使用）
+        # デバッグ情報の表示
+        echo ""
+        echo "🔬 デバッグ情報:"
+        echo "対象ファイル（ScoreCalculator.cs）の現在の状態:"
+        head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
+        
+        # ReSharper cleanupcode の実行（詳細出力で診断）
+        echo ""
         echo "⚡ ReSharper cleanupcode を実行中..."
         jb cleanupcode void-red-analysis.sln \
-          --verbosity=WARN \
+          --verbosity=INFO \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
-          --profile="Built-in: Reformat Code" \
+          --settings=.DotSettings \
           --properties:Configuration=Debug \
-          2>&1 | grep -E -v "Referenced project.*not found|Unable to resolve reference|Could not resolve this reference|Could not locate the assembly" || true
+          2>&1 | head -100
         
         echo ""
         echo "🔄 フォーマット結果の詳細確認..."
         echo "現在のGit状態:"
         git status --porcelain || true
+        
+        echo ""
+        echo "対象ファイル（ScoreCalculator.cs）のフォーマット後の状態:"
+        head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
           
         echo "✅ ReSharper コードフォーマットが完了しました"
           
