@@ -179,7 +179,7 @@ jobs:
         echo "🧪 単一ファイルでのテスト実行:"
         jb cleanupcode Assets/Scripts/Game/Logic/ScoreCalculator.cs \
           --verbosity=VERBOSE \
-          --profile="Built-in: Full Cleanup" \
+          --profile="Built-in: Reformat Code" \
           --no-build \
           2>&1 | head -50
         
@@ -193,7 +193,7 @@ jobs:
           --verbosity=VERBOSE \
           --include="Assets/Scripts/**/*.cs" \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
-          --profile="Built-in: Full Cleanup" \
+          --profile="Built-in: Reformat Code" \
           --no-build \
           --properties:Configuration=Debug \
           2>&1 | head -150
