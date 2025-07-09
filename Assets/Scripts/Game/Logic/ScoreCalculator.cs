@@ -12,17 +12,17 @@ public static class ScoreCalculator
     /// <param name="move">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
     /// <param name="theme">テーマデータ</param>
     /// <returns>計算されたスコア</returns>
-    public static float CalculateScore(PlayerMove move, ThemeData theme)
+    public static float CalculateScore(PlayerMove move,ThemeData theme)
     {
-        if (move == null || !theme) return 0f;
+        if(move==null||!theme)return 0f;
         
         // テーマから該当属性の倍率を取得
-        var attributeMultiplier = theme.GetMultiplier(move.SelectedCard.Attribute);
+        var attributeMultiplier=theme.GetMultiplier(move.SelectedCard.Attribute);
         
         // プレイスタイルによるスコア倍率を取得
-        var playStyleMultiplier = move.PlayStyle.GetScoreMultiplier();
+        var playStyleMultiplier=move.PlayStyle.GetScoreMultiplier();
         
         // スコア = 属性倍率 × 精神ベット × カード固有の倍率 × プレイスタイル倍率
-        return attributeMultiplier * move.MentalBet * move.SelectedCard.ScoreMultiplier * playStyleMultiplier;
+        return attributeMultiplier*move.MentalBet*move.SelectedCard.ScoreMultiplier*playStyleMultiplier;
     }
 }
