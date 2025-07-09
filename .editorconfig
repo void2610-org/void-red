@@ -4234,6 +4234,33 @@ trim_trailing_whitespace = false
 resharper_formatter_off_tag = @formatter:off
 resharper_formatter_on_tag = @formatter:on
 
+# ReSharperの基本的なフォーマット設定（明示的に有効化）
+resharper_indent_style = space
+resharper_indent_size = 4
+resharper_use_indent_from_vs = false
+resharper_csharp_indent_style = space
+resharper_csharp_indent_size = 4
+resharper_csharp_tab_width = 4
+
+# スペースの設定
+resharper_csharp_space_around_assignment_op = true
+resharper_csharp_space_around_logical_op = true
+resharper_csharp_space_around_equality_op = true
+resharper_csharp_space_around_relational_op = true
+resharper_csharp_space_around_bitwise_op = true
+resharper_csharp_space_around_additive_op = true
+resharper_csharp_space_around_multiplicative_op = true
+resharper_csharp_space_after_keywords_in_control_flow_statements = true
+resharper_csharp_space_before_open_square_brackets = false
+resharper_csharp_space_between_parentheses = none
+
+# ブレースの配置
+resharper_csharp_brace_style = next_line
+resharper_csharp_empty_block_style = together_same_line
+resharper_csharp_indent_nested_for_stmt = true
+resharper_csharp_indent_nested_foreach_stmt = true
+resharper_csharp_indent_nested_while_stmt = true
+
 # ReSharperの空行処理を完全に無効化
 resharper_remove_blank_lines_near_braces_in_code = false
 resharper_remove_blank_lines_near_braces_in_declarations = false
