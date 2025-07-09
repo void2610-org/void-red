@@ -4114,59 +4114,30 @@ tab_width = 4
 # SerializeFieldフィールドはアンダースコア無しの慣習に従う
 [*.cs]
 
-# Unity SerializeField プライベートフィールドの命名規則
-# Unity開発慣習：[SerializeField] private フィールドはアンダースコア無しのcamelCase
-dotnet_naming_rule.unity_serialized_field_rule.severity = error
-dotnet_naming_rule.unity_serialized_field_rule.symbols = unity_serialized_field_symbols
-dotnet_naming_rule.unity_serialized_field_rule.style = camel_case_style
+# SerializeFieldフィールドの命名規則（Unity慣習）
+# ReSharperのUnity拡張機能なしでは unity_serialised_field が機能しないため、
+# 属性ベースの除外を使用
+dotnet_naming_rule.unity_serialized_fields.severity = none
+dotnet_naming_rule.unity_serialized_fields.symbols = unity_serialized_fields
+dotnet_naming_rule.unity_serialized_fields.style = camel_case_style_unity
 
-dotnet_naming_symbols.unity_serialized_field_symbols.applicable_kinds = field
-dotnet_naming_symbols.unity_serialized_field_symbols.applicable_accessibilities = private
-dotnet_naming_symbols.unity_serialized_field_symbols.required_modifiers = 
+dotnet_naming_symbols.unity_serialized_fields.applicable_kinds = field
+dotnet_naming_symbols.unity_serialized_fields.applicable_accessibilities = private
+dotnet_naming_symbols.unity_serialized_fields.required_modifiers = 
 
-dotnet_naming_style.camel_case_style.capitalization = camel_case
+# Unity SerializeFieldのスタイル（アンダースコア無しcamelCase）
+dotnet_naming_style.camel_case_style_unity.capitalization = camel_case
 
-# 通常のプライベートフィールドの命名規則（アンダースコアプレフィックス）
-dotnet_naming_rule.private_fields_rule.severity = error
-dotnet_naming_rule.private_fields_rule.symbols = private_fields_symbols  
-dotnet_naming_rule.private_fields_rule.style = underscore_camel_case_style
+# 通常のプライベートフィールドはアンダースコア付き
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields_underscore
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
 
-dotnet_naming_symbols.private_fields_symbols.applicable_kinds = field
-dotnet_naming_symbols.private_fields_symbols.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields_underscore.applicable_kinds = field
+dotnet_naming_symbols.private_fields_underscore.applicable_accessibilities = private
 
-dotnet_naming_style.underscore_camel_case_style.capitalization = camel_case
-dotnet_naming_style.underscore_camel_case_style.required_prefix = _
-
-# パブリックフィールドの命名規則（PascalCase）
-dotnet_naming_rule.public_fields_rule.severity = error
-dotnet_naming_rule.public_fields_rule.symbols = public_fields_symbols
-dotnet_naming_rule.public_fields_rule.style = pascal_case_style
-
-dotnet_naming_symbols.public_fields_symbols.applicable_kinds = field
-dotnet_naming_symbols.public_fields_symbols.applicable_accessibilities = public
-
-dotnet_naming_style.pascal_case_style.capitalization = pascal_case
-
-# 定数フィールドの命名規則（UPPER_SNAKE_CASE）
-dotnet_naming_rule.constant_fields_rule.severity = error
-dotnet_naming_rule.constant_fields_rule.symbols = constant_fields_symbols
-dotnet_naming_rule.constant_fields_rule.style = upper_snake_case_style
-
-dotnet_naming_symbols.constant_fields_symbols.applicable_kinds = field
-dotnet_naming_symbols.constant_fields_symbols.applicable_accessibilities = private, internal, protected, public
-dotnet_naming_symbols.constant_fields_symbols.required_modifiers = const
-
-dotnet_naming_style.upper_snake_case_style.capitalization = all_upper
-dotnet_naming_style.upper_snake_case_style.word_separator = _
-
-# 静的読み取り専用フィールドの命名規則（UPPER_SNAKE_CASE）
-dotnet_naming_rule.static_readonly_fields_rule.severity = error
-dotnet_naming_rule.static_readonly_fields_rule.symbols = static_readonly_fields_symbols
-dotnet_naming_rule.static_readonly_fields_rule.style = upper_snake_case_style
-
-dotnet_naming_symbols.static_readonly_fields_symbols.applicable_kinds = field
-dotnet_naming_symbols.static_readonly_fields_symbols.applicable_accessibilities = private, internal, protected, public
-dotnet_naming_symbols.static_readonly_fields_symbols.required_modifiers = static, readonly
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
 
 # ReSharperの名前空間チェックを無効化
 # Unity開発では名前空間とファイル位置の対応を厳密に管理しない場合がある
