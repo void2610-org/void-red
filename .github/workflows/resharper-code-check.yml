@@ -52,7 +52,7 @@ jobs:
             echo "Processing: $file"
             jb cleanupcode Assembly-CSharp.csproj \
               --include="$file" \
-              --profile="Built-in: Minimal cleanup" \
+              --profile="Built-in: Reformat Code" \
               --no-build \
               --properties:Configuration=Debug 2>&1 || echo "Failed to process $file"
           done
