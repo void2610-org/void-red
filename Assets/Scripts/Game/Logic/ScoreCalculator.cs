@@ -19,7 +19,7 @@ public static class ScoreCalculator
         if(move==null||!theme)  return 0f;
         
         // テーマから該当属性の倍率を取得
-        var AttributeMultiplier = theme.GetMultiplier(move.SelectedCard.Attribute); // 命名規則違反テスト
+        var AttributeMultiplier = theme.GetMultiplier(move.SelectedCard.Attribute); // 命名規則違反テスト (改善確認用)
         
         // プレイスタイルによるスコア倍率を取得
         var playStyleMultiplier = move.PlayStyle.GetScoreMultiplier();
