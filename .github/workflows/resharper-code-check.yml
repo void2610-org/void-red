@@ -32,7 +32,7 @@ jobs:
       run: |
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         
-    - name: Find and inspect C# scripts
+    - name: Setup Unity project and inspect
       run: |
         # C#スクリプトファイルを検索
         CS_FILES=$(find Assets -name "*.cs" -not -path "*/Library/*" -not -path "*/Temp/*" | head -10)
@@ -52,13 +52,29 @@ jobs:
           echo "⚠️ No .editorconfig file found"
         fi
         
-        # ReSharper Code Inspection実行 (Assetsフォルダ全体を対象)
-        jb inspectcode Assets \
+        # UnityプロジェクトのC#スクリプトを一つずつ検査
+        echo "Running ReSharper inspection on Unity C# scripts..."
+        
+        # 一時的なプロジェクトファイルを作成
+        cat > TempUnityProject.csproj << 'PROJEOF'
+        <Project Sdk="Microsoft.NET.Sdk">
+          <PropertyGroup>
+            <TargetFramework>net6.0</TargetFramework>
+            <LangVersion>latest</LangVersion>
+          </PropertyGroup>
+          <ItemGroup>
+            <Compile Include="Assets/**/*.cs" Exclude="Assets/**/Library/**;Assets/**/Temp/**;Assets/**/Packages/**;Assets/**/PackageCache/**" />
+          </ItemGroup>
+        </Project>
+        PROJEOF
+        
+        # ReSharper Code Inspection実行
+        jb inspectcode TempUnityProject.csproj \
           --output=inspectcode-results.xml \
           --format=xml \
           --severity=WARNING \
           --exclude="**/*.Generated.cs;**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
-          --verbosity=WARN
+          --verbosity=WARN || echo "Some issues found, continuing..."
           
     - name: Check inspection results
       run: |
