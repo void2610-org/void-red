@@ -115,10 +115,9 @@ jobs:
                   fi
                   
                   # UIPresenter, TMPInputFieldCaretFixerなどの特定クラスを除外
-                  if [[ "$line" =~ "UIPresenter.*UiPresenter" ]] || [[ "$line" =~ "TMPInputFieldCaretFixer.*TmpInputFieldCaretFixer" ]]; then
+                  if [[ "$line" =~ "UIPresenter" ]] || [[ "$line" =~ "TMPInputFieldCaretFixer" ]]; then
                     echo "Debug: Excluded known acronym class at $file:$line_num"
-                    continue
-                  fi
+                  else
                   
                   # 該当行にSerializeFieldがあるかチェック
                   if [[ -f "$file" ]]; then
@@ -133,6 +132,7 @@ jobs:
                   else
                     # ファイルが見つからない場合は保持
                     filtered_violations="$filtered_violations$line"$'\n'
+                  fi
                   fi
                 fi
               done <<< "$violations"
