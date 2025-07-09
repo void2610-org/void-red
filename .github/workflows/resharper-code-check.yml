@@ -32,128 +32,96 @@ jobs:
       run: |
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         
+    - name: Verify Unity solution file
+      run: |
+        # 既存のソリューションファイルが存在することを確認
+        if [ -f "void-red.sln" ]; then
+          echo "✅ Unity ソリューションファイルが見つかりました: void-red.sln"
+          echo "ファイル内容の確認:"
+          head -5 void-red.sln
+        else
+          echo "❌ void-red.sln が見つかりません"
+          echo "利用可能なファイル:"
+          ls -la *.sln 2>/dev/null || echo "ソリューションファイルが存在しません"
+          exit 1
+        fi
+        
     - name: Restore NuGet packages
       run: dotnet restore void-red.sln
       
-    - name: Verify ReSharper settings file exists
-      run: |
-        if [ -f void-red.sln.DotSettings ]; then
-          echo "✅ Rider設定ファイル (void-red.sln.DotSettings) が見つかりました"
-          echo "設定ファイルの内容:"
-          head -n 10 void-red.sln.DotSettings
-        else
-          echo "❌ Rider設定ファイルが見つかりません"
-          exit 1
-        fi
-        
     - name: Run ReSharper Code Inspection
       run: |
-        jb inspectcode void-red.sln \
-          --output=inspectcode-results.xml \
-          --format=xml \
-          --severity=WARNING \
-          --settings=void-red.sln.DotSettings \
-          --exclude="**/*.Generated.cs;**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
-          --verbosity=WARN
+        # Unity 専用の extensions を使用して静的解析を実行
+        # 参考: https://zenn.dev/masakura/articles/60e502a275e9c3
+        dotnet jb inspectcode void-red.sln \
+          --output=resharper-report.xml \
+          --format=Xml \
+          --build \
+          --extensions=JetBrains.Unity \
+          --verbosity=WARN \
+          --no-build-cache \
+          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**"
           
-    - name: Check inspection results
-      run: |
-        if [ -f inspectcode-results.xml ]; then
-          # XMLファイルから警告やエラーの数を抽出
-          ISSUES=$(grep -c '<Issue' inspectcode-results.xml || echo "0")
-          echo "Found $ISSUES code quality issues"
-          
-          if [ "$ISSUES" -gt 0 ]; then
-            echo "::warning::Found $ISSUES code quality issues"
-            
-            # 主要な問題を表示
-            echo "## Code Quality Issues:" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            
-            # XMLから問題の詳細を抽出して表示
-            python3 -c "
-import xml.etree.ElementTree as ET
-import sys
-import os
-
-try:
-    tree = ET.parse('inspectcode-results.xml')
-    root = tree.getroot()
-    
-    issues_found = False
-    for issue in root.findall('.//Issue'):
-        issues_found = True
-        type_id = issue.get('TypeId', 'Unknown')
-        file_path = issue.get('File', 'Unknown')
-        line = issue.get('Line', 'Unknown')
-        severity = issue.get('Severity', 'Unknown')
-        message = issue.get('Message', 'No message')
-        
-        # GitHub Actionsのサマリーに追加
-        summary_line = f'**{severity}**: {type_id} in {file_path}:{line}'
-        print(summary_line)
-        
-        # GitHub Actionsのアノテーションとして出力
-        if severity in ['ERROR', 'WARNING']:
-            annotation_type = 'error' if severity == 'ERROR' else 'warning'
-            print(f'::{\annotation_type} file={file_path},line={line}::{type_id}: {message}')
-    
-    if not issues_found:
-        print('No issues found!')
-        
-except Exception as e:
-    print(f'Error parsing results: {e}')
-    sys.exit(1)
-            " >> $GITHUB_STEP_SUMMARY
-            
-            # エラーレベルの問題があった場合はfailさせる
-            ERROR_COUNT=$(grep -c 'Severity=\"ERROR\"' inspectcode-results.xml || echo "0")
-            if [ "$ERROR_COUNT" -gt 0 ]; then
-              echo "::error::Found $ERROR_COUNT error-level issues"
-              exit 1
-            fi
-          else
-            echo "✅ No code quality issues found!" >> $GITHUB_STEP_SUMMARY
-          fi
-        else
-          echo "::error::Inspection results file not found"
-          exit 1
-        fi
-        
     - name: Upload inspection results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: resharper-inspection-results
-        path: inspectcode-results.xml
+        path: resharper-report.xml
         retention-days: 30
         
-    - name: Comment PR with results
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
+    - name: Generate inspection summary
+      run: |
+        # レポートのサマリーを生成
+        echo "## 📊 ReSharper 静的解析結果サマリー"
+        
+        if [ -f "resharper-report.xml" ]; then
+          ERROR_COUNT=$(grep -c 'Severity="ERROR"' resharper-report.xml || echo "0")
+          WARNING_COUNT=$(grep -c 'Severity="WARNING"' resharper-report.xml || echo "0")
+          SUGGESTION_COUNT=$(grep -c 'Severity="SUGGESTION"' resharper-report.xml || echo "0")
           
-          if (fs.existsSync('inspectcode-results.xml')) {
-            const xml = fs.readFileSync('inspectcode-results.xml', 'utf8');
-            const issueCount = (xml.match(/<Issue/g) || []).length;
-            
-            let comment = `## ReSharper Code Quality Check Results\n\n`;
-            
-            if (issueCount === 0) {
-              comment += `✅ **No code quality issues found!**\n\n`;
-              comment += `Great job! Your code follows the project's coding standards.`;
-            } else {
-              comment += `⚠️ **Found ${issueCount} code quality issue(s)**\n\n`;
-              comment += `Please review the [inspection results](${context.payload.pull_request.html_url}/checks) and fix the issues.\n\n`;
-              comment += `The detailed results have been uploaded as an artifact.`;
-            }
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-          }
+          echo "- ❌ エラー: $ERROR_COUNT 件"
+          echo "- ⚠️  警告: $WARNING_COUNT 件"  
+          echo "- 💡 提案: $SUGGESTION_COUNT 件"
+          echo ""
+          
+          # 重大な問題の詳細を表示
+          if [ "$ERROR_COUNT" -gt 0 ]; then
+            echo "### 🚨 エラー詳細 (最初の5件):"
+            grep 'Severity="ERROR"' resharper-report.xml | head -5 | \
+              sed 's/.*Message="\([^"]*\)".*/- \1/' || true
+            echo ""
+          fi
+          
+          if [ "$WARNING_COUNT" -gt 0 ]; then
+            echo "### ⚠️ 警告詳細 (最初の5件):"
+            grep 'Severity="WARNING"' resharper-report.xml | head -5 | \
+              sed 's/.*Message="\([^"]*\)".*/- \1/' || true
+            echo ""
+          fi
+        else
+          echo "❌ レポートファイルが見つかりません"
+        fi
+        
+    - name: Check for inspection violations
+      run: |
+        # XMLレポートを解析して違反があるかチェック
+        if [ ! -f "resharper-report.xml" ]; then
+          echo "❌ ReSharper レポートファイルが見つかりません"
+          exit 1
+        fi
+        
+        ERROR_COUNT=$(grep -c 'Severity="ERROR"' resharper-report.xml || echo "0")
+        WARNING_COUNT=$(grep -c 'Severity="WARNING"' resharper-report.xml || echo "0")
+        
+        if [ "$ERROR_COUNT" -gt 0 ]; then
+          echo "❌ ReSharper found $ERROR_COUNT ERROR level violations"
+          echo "Please check the uploaded artifact for details"
+          exit 1
+        elif [ "$WARNING_COUNT" -gt 0 ]; then
+          echo "⚠️  ReSharper found $WARNING_COUNT WARNING level violations"
+          echo "Please check the uploaded artifact for details"
+          # 警告では CI を失敗させない（必要に応じて exit 1 を追加）
+        else
+          echo "✅ No ReSharper violations found"
+        fi
