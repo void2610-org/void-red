@@ -120,12 +120,17 @@ jobs:
         echo "  - メインゲームコードのみ対象（サンプル除外）"
         echo "  - Unity プロジェクト最適化"
         
-        # ReSharper コードフォーマット設定ファイルを作成
+        # ReSharper コードフォーマット設定ファイルを作成（より詳細な設定）
         echo "📝 ReSharper設定ファイルを作成中..."
         echo '<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">' > .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_COMMA/@EntryValue">True</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_BINARY_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_COMMA/@EntryValue">False</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_ASSIGNMENT/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_SINGLELINE_ACCESSORHOLDER/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_EQUALITY_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_LOGICAL_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_RETURN_STATEMENT/@EntryValue">True</s:Boolean>' >> .DotSettings
         echo '</wpf:ResourceDictionary>' >> .DotSettings
         
         # ReSharper cleanupcode で利用可能なプロファイルを確認
@@ -138,13 +143,14 @@ jobs:
         echo "対象ファイル（ScoreCalculator.cs）の現在の状態:"
         head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
         
-        # ReSharper cleanupcode の実行（詳細出力で診断）
+        # ReSharper cleanupcode の実行（明示的なプロファイル指定）
         echo ""
         echo "⚡ ReSharper cleanupcode を実行中..."
         jb cleanupcode void-red-analysis.sln \
           --verbosity=INFO \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
           --settings=.DotSettings \
+          --profile="Built-in: Full Cleanup" \
           --properties:Configuration=Debug \
           2>&1 | head -100
         
