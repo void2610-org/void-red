@@ -55,11 +55,18 @@ jobs:
             cp "$file" "$file.before"
           done
           
-          # プロジェクト全体をフォーマット（ビルドありで試行）
+          # プロジェクト全体をフォーマット（詳細ログで確認）
           echo "Running ReSharper cleanup on entire project..."
-          jb cleanupcode Assembly-CSharp.csproj \
+          set +e
+          result=$(jb cleanupcode Assembly-CSharp.csproj \
             --profile="Built-in: Reformat Code" \
-            --verbosity=WARN || echo "Cleanup completed with exit code: $?"
+            --verbosity=VERBOSE 2>&1)
+          exit_code=$?
+          set -e
+          
+          echo "ReSharper output:"
+          echo "$result"
+          echo "Exit code: $exit_code"
           
           # 最初の10ファイルの変更を確認
           echo "=== Checking changes in individual files ==="
