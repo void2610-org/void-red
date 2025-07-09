@@ -46,25 +46,19 @@ jobs:
         
         # ファイルが存在する場合のみ実行
         if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # プロジェクトファイルアプローチ（これまでの方法）
-          echo "=== Attempting project-based cleanup ==="
-          jb cleanupcode Assembly-CSharp.csproj \
-            --exclude="**/*.meta;**/*.asset;**/*.prefab;**/*.unity;**/*.shader" \
-            --profile="Built-in: Reformat Code" \
-            --no-build \
-            --properties:Configuration=Debug || echo "Project-based cleanup failed"
+          # 個別ファイルアプローチ（プロジェクトコンテキストを使用）
+          echo "=== Processing individual C# files with project context ==="
+          find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
+            echo "Processing: $file"
+            jb cleanupcode Assembly-CSharp.csproj \
+              --include="$file" \
+              --profile="Built-in: Minimal cleanup" \
+              --no-build \
+              --properties:Configuration=Debug 2>&1 || echo "Failed to process $file"
+          done
           
           # プロジェクトファイルの変更を元に戻す
           git checkout HEAD -- Assembly-CSharp.csproj || echo "Failed to revert project file changes"
-          
-          # 個別ファイルアプローチ（最初の10ファイルのみ）
-          echo "=== Processing first 10 C# files individually ==="
-          find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
-            echo "Processing: $file"
-            jb cleanupcode "$file" \
-              --profile="Built-in: Minimal cleanup" \
-              --no-build 2>/dev/null || echo "Failed to process $file"
-          done
         else
           echo "Required files not found, skipping cleanup"
         fi
