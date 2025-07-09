@@ -122,13 +122,11 @@ jobs:
         
         # ReSharper コードフォーマット設定ファイルを作成
         echo "📝 ReSharper設定ファイルを作成中..."
-        cat > .DotSettings << 'EOF'
-<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_COMMA/@EntryValue">True</s:Boolean>
-  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_BINARY_OPERATOR/@EntryValue">True</s:Boolean>
-  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_COMMA/@EntryValue">False</s:Boolean>
-</wpf:ResourceDictionary>
-EOF
+        echo '<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">' > .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_COMMA/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_BINARY_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
+        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_COMMA/@EntryValue">False</s:Boolean>' >> .DotSettings
+        echo '</wpf:ResourceDictionary>' >> .DotSettings
         
         # ReSharper cleanupcode で利用可能なプロファイルを確認
         echo "🔍 利用可能なプロファイルを確認中..."
