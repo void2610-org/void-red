@@ -206,21 +206,60 @@ jobs:
         echo "  💡 提案: $SUGGESTION_COUNT 件"
         echo "  ℹ️  情報: $INFO_COUNT 件"
         
-        # エラーレベルの詳細表示
+        # 実際の問題（Issues）を取得して表示
+        echo ""
+        echo "🔍 ReSharper レポートの構造分析:"
+        echo "📄 総行数: $(wc -l < resharper-report.xml)"
+        echo "📊 Issues セクション:"
+        grep -c '<Issue ' resharper-report.xml 2>/dev/null || echo "0" | xargs -I {} echo "  実際の問題: {} 件"
+        
+        # エラーレベルの実際の問題を表示
         if [ "$ERROR_COUNT" -gt 0 ]; then
           echo ""
-          echo "🚨 エラーレベルの問題 (最初の5件):"
-          grep 'Severity="ERROR"' resharper-report.xml | head -5 | \
-            sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/  📁 \1:\2 - \3/' || true
+          echo "🚨 エラーレベルの実際の問題:"
+          # <Issue> タグからエラーレベルの問題を抽出
+          grep '<Issue.*Severity="ERROR"' resharper-report.xml | head -5 | while read -r line; do
+            # ファイル名を抽出
+            file=$(echo "$line" | sed -n 's/.*File="\([^"]*\)".*/\1/p')
+            # 行番号を抽出
+            line_num=$(echo "$line" | sed -n 's/.*Line="\([^"]*\)".*/\1/p')
+            # メッセージを抽出
+            message=$(echo "$line" | sed -n 's/.*Message="\([^"]*\)".*/\1/p')
+            # タイプIDを抽出
+            type_id=$(echo "$line" | sed -n 's/.*TypeId="\([^"]*\)".*/\1/p')
+            
+            if [ -n "$file" ] && [ -n "$message" ]; then
+              echo "  📁 ${file##*/}:${line_num} - $message"
+              echo "    🔖 エラータイプ: $type_id"
+            else
+              echo "  🔍 詳細情報の抽出に失敗: $line"
+            fi
+          done || echo "  ℹ️ エラー詳細の抽出でエラーが発生しました"
         fi
         
-        # 警告レベルの詳細表示
+        # 警告レベルの実際の問題を表示（最初の3件）
         if [ "$WARNING_COUNT" -gt 0 ]; then
           echo ""
           echo "⚠️ 警告レベルの問題 (最初の3件):"
-          grep 'Severity="WARNING"' resharper-report.xml | head -3 | \
-            sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/  📁 \1:\2 - \3/' || true
+          grep '<Issue.*Severity="WARNING"' resharper-report.xml | head -3 | while read -r line; do
+            file=$(echo "$line" | sed -n 's/.*File="\([^"]*\)".*/\1/p')
+            line_num=$(echo "$line" | sed -n 's/.*Line="\([^"]*\)".*/\1/p')
+            message=$(echo "$line" | sed -n 's/.*Message="\([^"]*\)".*/\1/p')
+            type_id=$(echo "$line" | sed -n 's/.*TypeId="\([^"]*\)".*/\1/p')
+            
+            if [ -n "$file" ] && [ -n "$message" ]; then
+              echo "  📁 ${file##*/}:${line_num} - $message"
+            else
+              echo "  🔍 $type_id (詳細要確認)"
+            fi
+          done || echo "  ℹ️ 警告詳細の抽出でエラーが発生しました"
         fi
+        
+        # デバッグ用: レポートの一部を表示
+        echo ""
+        echo "🧪 デバッグ情報 (レポート構造確認):"
+        echo "📋 最初の実際の Issue エントリ:"
+        grep '<Issue ' resharper-report.xml | head -2 || echo "  Issue エントリが見つかりません"
         
         echo ""
         echo "📋 CI判定結果:"
