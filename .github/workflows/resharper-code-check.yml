@@ -151,9 +151,22 @@ jobs:
             
             TOTAL_VIOLATIONS=$(printf "%s\n" "$ALL_VIOLATIONS" | grep -c . || echo "0")
             
-            # 数値を明示的に整数として扱う
-            TOTAL_VIOLATIONS=$((TOTAL_VIOLATIONS + 0))
-            ACTUAL_VIOLATIONS=$((ACTUAL_VIOLATIONS + 0))
+            # デバッグ出力
+            echo "Debug: TOTAL_VIOLATIONS='$TOTAL_VIOLATIONS'"
+            echo "Debug: ACTUAL_VIOLATIONS='$ACTUAL_VIOLATIONS'"
+            
+            # 数値を確実に整数に変換
+            TOTAL_VIOLATIONS=${TOTAL_VIOLATIONS:-0}
+            ACTUAL_VIOLATIONS=${ACTUAL_VIOLATIONS:-0}
+            
+            # 改行や空白を除去
+            TOTAL_VIOLATIONS=$(echo "$TOTAL_VIOLATIONS" | tr -d '\n\r\t ')
+            ACTUAL_VIOLATIONS=$(echo "$ACTUAL_VIOLATIONS" | tr -d '\n\r\t ')
+            
+            # 空の場合は0を設定
+            [ -z "$TOTAL_VIOLATIONS" ] && TOTAL_VIOLATIONS=0
+            [ -z "$ACTUAL_VIOLATIONS" ] && ACTUAL_VIOLATIONS=0
+            
             SERIALIZED_VIOLATIONS=$((TOTAL_VIOLATIONS - ACTUAL_VIOLATIONS))
             
             echo "命名規則違反: $TOTAL_VIOLATIONS 件 (SerializeField除外後: $ACTUAL_VIOLATIONS 件)"
