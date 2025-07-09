@@ -98,7 +98,7 @@ jobs:
         if [ -f "resharper-inspection-report.xml" ]; then
           ALL_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"' || echo "")
           if [ -n "$ALL_VIOLATIONS" ]; then
-            # SerializeFieldフィールドを除外するための関数
+            # SerializeFieldフィールドと特定の略語を除外するための関数
             filter_serialize_field_violations() {
               local violations="$1"
               local filtered_violations=""
@@ -112,6 +112,12 @@ jobs:
                   # デバッグ出力（最初の5件のみ）
                   if [[ $(echo "$filtered_violations" | wc -l) -lt 5 ]]; then
                     echo "Debug: Processing $file:$line_num"
+                  fi
+                  
+                  # UIPresenter, TMPInputFieldCaretFixerなどの特定クラスを除外
+                  if [[ "$line" =~ "UIPresenter.*UiPresenter" ]] || [[ "$line" =~ "TMPInputFieldCaretFixer.*TmpInputFieldCaretFixer" ]]; then
+                    echo "Debug: Excluded known acronym class at $file:$line_num"
+                    continue
                   fi
                   
                   # 該当行にSerializeFieldがあるかチェック

@@ -4149,3 +4149,12 @@ dotnet_diagnostic.ide0130.severity = none
 
 # 一般的な略語を許可（UI, NPC, TMP等）
 resharper_acronyms_list = UI|NPC|TMP|TMPro|AI|ID|OK|iOS|OS|PC|PS|VR|AR|XR|SDK|API|HTTP|HTTPS|URL|URI|XML|JSON|SQL|CSV|PDF|PNG|JPG|JPEG|GIF|RGB|RGBA|HSV|FPS|LOD|GPU|CPU|RAM|ROM|UUID|GUID|ASCII|UTF|GUI|HUD|SFX|BGM|SE|2D|3D|UV|SDK
+
+# ReSharper CLT用の略語設定
+resharper_use_acronyms_in_names = true
+resharper_consistent_naming_rule.UI = UI
+resharper_consistent_naming_rule.TMP = TMP
+resharper_consistent_naming_rule.NPC = NPC
+
+# 特定のクラス名違反を無視
+dotnet_diagnostic.IDE1006.severity = none
