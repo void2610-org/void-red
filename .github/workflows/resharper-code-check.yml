@@ -61,31 +61,9 @@ jobs:
           echo "=== Processing first 10 C# files individually ==="
           find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
             echo "Processing: $file"
-            # 空行のインデントを保持してフォーマット
-            cp "$file" "$file.backup"
             jb cleanupcode "$file" \
               --profile="Built-in: Reformat Code" \
               --no-build 2>/dev/null || echo "Failed to process $file"
-            
-            # 空行のインデントのみを復元
-            python3 -c "
-import sys
-with open('$file.backup', 'r') as f1, open('$file', 'r') as f2:
-    original_lines = f1.readlines()
-    formatted_lines = f2.readlines()
-
-result = []
-for i, (orig, fmt) in enumerate(zip(original_lines, formatted_lines)):
-    if orig.strip() == '' and fmt.strip() == '':
-        result.append(orig)  # 空行は元のインデントを保持
-    else:
-        result.append(fmt)   # 非空行はフォーマット後を使用
-
-with open('$file', 'w') as f:
-    f.writelines(result)
-" 2>/dev/null || echo "Python processing failed for $file"
-            
-            rm -f "$file.backup"
           done
         else
           echo "Required files not found, skipping cleanup"
