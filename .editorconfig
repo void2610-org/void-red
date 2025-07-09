@@ -4109,3 +4109,40 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 tab_width = 4
+
+# Unity特有の命名規則設定
+# SerializeFieldフィールドはアンダースコア無しの慣習に従う
+[*.cs]
+
+# Unity SerializeField プライベートフィールドの命名規則
+# Unity開発慣習：[SerializeField] private フィールドはアンダースコア無しのcamelCase
+dotnet_naming_rule.unity_serialized_field_rule.severity = error
+dotnet_naming_rule.unity_serialized_field_rule.symbols = unity_serialized_field_symbols
+dotnet_naming_rule.unity_serialized_field_rule.style = camel_case_style
+
+dotnet_naming_symbols.unity_serialized_field_symbols.applicable_kinds = field
+dotnet_naming_symbols.unity_serialized_field_symbols.applicable_accessibilities = private
+dotnet_naming_symbols.unity_serialized_field_symbols.required_modifiers = 
+
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+
+# 通常のプライベートフィールドの命名規則（アンダースコアプレフィックス）
+dotnet_naming_rule.private_fields_rule.severity = error
+dotnet_naming_rule.private_fields_rule.symbols = private_fields_symbols  
+dotnet_naming_rule.private_fields_rule.style = underscore_camel_case_style
+
+dotnet_naming_symbols.private_fields_symbols.applicable_kinds = field
+dotnet_naming_symbols.private_fields_symbols.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_camel_case_style.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case_style.required_prefix = _
+
+# パブリックフィールドの命名規則（PascalCase）
+dotnet_naming_rule.public_fields_rule.severity = error
+dotnet_naming_rule.public_fields_rule.symbols = public_fields_symbols
+dotnet_naming_rule.public_fields_rule.style = pascal_case_style
+
+dotnet_naming_symbols.public_fields_symbols.applicable_kinds = field
+dotnet_naming_symbols.public_fields_symbols.applicable_accessibilities = public
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
