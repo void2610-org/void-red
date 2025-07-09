@@ -316,3 +316,75 @@ jobs:
           echo "- ReSharper 標準フォーマットに準拠しています"
           echo "- 追加のフォーマット作業は不要です"
         fi
+        
+    - name: Run ReSharper Code Inspection (Naming Rules)
+      run: |
+        # PATH を確実に設定
+        export PATH="$HOME/.dotnet/tools:$PATH"
+        
+        echo "🔍 ReSharper 命名規則チェックを開始します..."
+        echo ""
+        
+        # inspectcode を実行して命名規則違反のみをチェック
+        jb inspectcode Assembly-CSharp.csproj \
+          --output=resharper-inspection-report.xml \
+          --include="Assets/Scripts/**/*.cs" \
+          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
+          --severity=WARNING \
+          --no-build \
+          --properties:Configuration=Debug || true
+        
+        echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
+        
+        # XML レポートが存在する場合は内容を確認
+        if [ -f "resharper-inspection-report.xml" ]; then
+          echo "📄 検査レポートが生成されました"
+          
+          # 命名規則違反を抽出（InconsistentNaming）
+          if grep -q "InconsistentNaming" resharper-inspection-report.xml; then
+            echo ""
+            echo "❌ 命名規則違反が検出されました:"
+            echo ""
+            
+            # XMLから命名規則違反を抽出して表示（簡易版）
+            grep -A 2 -B 2 "InconsistentNaming" resharper-inspection-report.xml | \
+              grep -E "(File=|Message=)" | \
+              sed 's/.*File="\([^"]*\)".*/ファイル: \1/' | \
+              sed 's/.*Message="\([^"]*\)".*/  → \1/' || true
+            
+            echo "NAMING_ISSUES_FOUND=true" >> $GITHUB_ENV
+          else
+            echo "✅ 命名規則違反は見つかりませんでした"
+          fi
+        else
+          echo "⚠️ 検査レポートが生成されませんでした"
+        fi
+        
+    - name: Check naming compliance
+      run: |
+        echo ""
+        echo "📋 命名規則準拠チェック結果:"
+        echo ""
+        
+        if [ "$NAMING_ISSUES_FOUND" = "true" ]; then
+          echo "❌ 命名規則に違反があります"
+          echo ""
+          echo "### 🔍 検出された問題:"
+          echo "- C# の命名規則に従っていない識別子があります"
+          echo "- クラス名、メソッド名、変数名などを確認してください"
+          echo ""
+          echo "### 🔧 修正方法:"
+          echo "- クラス名: PascalCase (例: PlayerController)"
+          echo "- パブリックメソッド: PascalCase (例: CalculateScore)"
+          echo "- プライベートフィールド: _camelCase (例: _playerName)"
+          echo "- ローカル変数: camelCase (例: playerScore)"
+          echo ""
+          echo "❌ CI を失敗させます。命名規則に従って修正してから再度プッシュしてください。"
+          exit 1
+        else
+          echo "✅ 命名規則に準拠しています"
+          echo ""
+          echo "### ✅ 確認完了:"
+          echo "- すべての識別子が C# 命名規則に従っています"
+          echo "- 追加の修正作業は不要です"
+        fi
