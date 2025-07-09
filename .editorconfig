@@ -7,6 +7,17 @@ insert_final_newline = false
 indent_style = space
 indent_size = 4
 
+# ReSharperの空行インデント設定
+resharper_remove_blank_lines_near_braces_in_code = false
+resharper_remove_blank_lines_near_braces_in_declarations = false
+resharper_keep_blank_lines_in_code = 100
+resharper_keep_blank_lines_in_declarations = 100
+resharper_max_blank_lines_between_tags = 100
+resharper_blank_lines_around_razor_sections = 0
+resharper_blank_lines_around_razor_helpers = 0
+resharper_blank_lines_around_page_or_layout_directive = 0
+resharper_blank_lines_around_razor_functions = 0
+
 # Microsoft .NET properties
 csharp_indent_braces = false
 csharp_indent_switch_labels = true
@@ -4209,3 +4220,24 @@ resharper_blank_lines_before_single_line_comment = 0
 resharper_blank_line_after_file_header = false
 resharper_blank_line_after_pi = false
 resharper_blank_line_after_using_list = false
+
+# 空行のインデントを維持
+resharper_indent_type_constraints = false
+resharper_outdent_statement_labels = false
+resharper_outdent_commas = false
+
+# C#ファイル専用の設定
+[*.cs]
+# 空行のインデントを維持するため、末尾の空白を削除しない
+trim_trailing_whitespace = false
+resharper_remove_blank_lines_near_braces_in_code = false
+resharper_remove_blank_lines_near_braces_in_declarations = false
+resharper_keep_blank_lines_in_code = 100
+resharper_keep_blank_lines_in_declarations = 100
+
+# ReSharperの空行インデント削除を無効化
+resharper_place_simple_embedded_statement_on_same_line = false
+resharper_place_simple_case_statement_on_same_line = false
+resharper_empty_block_style = together_same_line
+resharper_simple_embedded_statement_style = line_break
+resharper_simple_case_statement_style = line_break
