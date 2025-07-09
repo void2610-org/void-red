@@ -40,16 +40,15 @@ jobs:
         
         # デバッグ情報
         echo "Current directory: $(pwd)"
-        echo "Assembly-CSharp-Minimal.csproj exists: $(test -f Assembly-CSharp-Minimal.csproj && echo 'YES' || echo 'NO')"
+        echo "Assembly-CSharp.csproj exists: $(test -f Assembly-CSharp.csproj && echo 'YES' || echo 'NO')"
         echo "Assets/Scripts directory exists: $(test -d Assets/Scripts && echo 'YES' || echo 'NO')"
         echo "CS files found: $(find Assets/Scripts -name "*.cs" 2>/dev/null | wc -l)"
         
         # ファイルが存在する場合のみ実行
-        if [ -f "Assembly-CSharp-Minimal.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # C#ファイルのみを含むミニマルプロジェクトファイルを使用
-          # プロジェクトファイル自体は除外
-          jb cleanupcode Assembly-CSharp-Minimal.csproj \
-            --exclude="**/*.csproj" \
+        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # 元のプロジェクトファイルを使用し、プロジェクトファイル自体のみ除外
+          jb cleanupcode Assembly-CSharp.csproj \
+            --exclude="**/*.csproj;**/*.xml;**/*.txt;**/*.md;**/*.json" \
             --profile="Built-in: Reformat Code" \
             --no-build \
             --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
@@ -82,9 +81,9 @@ jobs:
         export PATH="$HOME/.dotnet/tools:$PATH"
         
         # ファイルが存在する場合のみ実行
-        if [ -f "Assembly-CSharp-Minimal.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # C#ファイルのみを含むミニマルプロジェクトファイルを使用
-          jb inspectcode Assembly-CSharp-Minimal.csproj \
+        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # 元のプロジェクトファイルを使用し、不要ファイルを除外
+          jb inspectcode Assembly-CSharp.csproj \
             --output=resharper-inspection-report.xml \
             --format=xml \
             --severity=WARNING \
