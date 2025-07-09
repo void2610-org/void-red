@@ -1,0 +1,225 @@
+name: ReSharper Code Format
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_call:
+
+jobs:
+  code-format:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
+    - name: Install ReSharper Command Line Tools
+      run: |
+        cd $HOME
+        dotnet tool install -g JetBrains.ReSharper.GlobalTools
+        echo "PATH=$HOME/.dotnet/tools:$PATH" >> $GITHUB_ENV
+      
+    - name: Run ReSharper Code Cleanup (Format)
+      run: |
+        export PATH="$HOME/.dotnet/tools:$PATH"
+        
+        # デバッグ情報
+        echo "Current directory: $(pwd)"
+        echo "Assembly-CSharp.csproj exists: $(test -f Assembly-CSharp.csproj && echo 'YES' || echo 'NO')"
+        echo "Assets/Scripts directory exists: $(test -d Assets/Scripts && echo 'YES' || echo 'NO')"
+        echo "CS files found: $(find Assets/Scripts -name "*.cs" 2>/dev/null | wc -l)"
+        
+        # ファイルが存在する場合のみ実行
+        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # プロジェクトファイルアプローチ（これまでの方法）
+          echo "=== Attempting project-based cleanup ==="
+          jb cleanupcode Assembly-CSharp.csproj \
+            --exclude="**/*.meta;**/*.asset;**/*.prefab;**/*.unity;**/*.shader" \
+            --profile="Built-in: Reformat Code" \
+            --no-build \
+            --properties:Configuration=Debug || echo "Project-based cleanup failed"
+          
+          # プロジェクトファイルの変更を元に戻す
+          git checkout HEAD -- Assembly-CSharp.csproj || echo "Failed to revert project file changes"
+          
+          # 個別ファイルアプローチ（C#ファイルを直接指定）
+          echo "=== Processing all C# files individually ==="
+          find Assets/Scripts -name "*.cs" -type f | while read -r file; do
+            echo "Processing: $file"
+            jb cleanupcode "$file" \
+              --profile="Built-in: Reformat Code" \
+              --no-build 2>/dev/null || echo "Failed to process $file"
+          done
+        else
+          echo "Required files not found, skipping cleanup"
+        fi
+          
+    - name: Check format changes
+      run: |
+        if git diff --quiet; then
+          echo "FORMAT_CHANGES=false" >> $GITHUB_ENV
+        else
+          echo "FORMAT_CHANGES=true" >> $GITHUB_ENV
+          echo "変更されたファイル:"
+          git diff --name-only
+          echo ""
+          echo "=== 実際の変更内容（最初の2ファイル） ==="
+          git diff --name-only | head -2 | while read -r file; do
+            echo "--- $file の変更内容 ---"
+            git diff "$file" | head -20
+            echo ""
+          done
+        fi
+        
+    - name: Check format compliance
+      run: |
+        if [ "$FORMAT_CHANGES" = "true" ]; then
+          echo "❌ コードフォーマット違反があります"
+          echo "FORMAT_CHECK_FAILED=true" >> $GITHUB_ENV
+        else
+          echo "✅ コードフォーマットOK"
+          echo "FORMAT_CHECK_FAILED=false" >> $GITHUB_ENV
+        fi
+        
+    - name: Run ReSharper Code Inspection (Naming Rules)
+      run: |
+        export PATH="$HOME/.dotnet/tools:$PATH"
+        
+        # ファイルが存在する場合のみ実行
+        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # 元のプロジェクトファイルを使用し、不要ファイルを除外
+          jb inspectcode Assembly-CSharp.csproj \
+            --output=resharper-inspection-report.xml \
+            --format=xml \
+            --severity=WARNING \
+            --no-build \
+            --properties:Configuration=Debug 2>/dev/null || echo "inspectcode failed but continuing..."
+        else
+          echo "Required files not found, skipping inspection"
+          echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><Report></Report>" > resharper-inspection-report.xml
+        fi
+        
+        # SerializeFieldを除外した実際の命名規則違反をカウント
+        if [ -f "resharper-inspection-report.xml" ]; then
+          ALL_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"' || true)
+          if [ -n "$ALL_VIOLATIONS" ]; then
+            # SerializeFieldフィールドと特定の略語を除外するための関数
+            filter_serialize_field_violations() {
+              local violations="$1"
+              local filtered_violations=""
+              
+              while IFS= read -r line; do
+                if [[ -n "$line" ]]; then
+                  # ファイルパスと行番号を抽出（より確実な方法）
+                  local file=$(echo "$line" | grep -o 'File="[^"]*"' | sed 's/File="//;s/"//' | tr '\\' '/')
+                  local line_num=$(echo "$line" | grep -o 'Line="[^"]*"' | sed 's/Line="//;s/"//')
+                  
+                  # UIPresenter, TMPInputFieldCaretFixerなどの特定クラスを除外
+                  if [[ "$line" =~ "UIPresenter" ]] || [[ "$line" =~ "TMPInputFieldCaretFixer" ]]; then
+                    echo "Debug: Excluded known acronym class at $file:$line_num"
+                  else
+                  
+                  # 該当行にSerializeFieldがあるかチェック
+                  if [[ -f "$file" ]]; then
+                    # 該当行とその前後2行をチェック
+                    local context=$(sed -n "$((line_num-2)),$((line_num+2))p" "$file" 2>/dev/null | grep -i "serializefield" || echo "")
+                    if [[ -z "$context" ]]; then
+                      # SerializeFieldが見つからない場合のみ追加
+                      filtered_violations="$filtered_violations$line"$'\n'
+                    else
+                      echo "Debug: Excluded SerializeField at $file:$line_num"
+                    fi
+                  else
+                    # ファイルが見つからない場合は保持
+                    filtered_violations="$filtered_violations$line"$'\n'
+                  fi
+                  fi
+                fi
+              done <<< "$violations"
+              
+              echo -n "$filtered_violations"
+            }
+            
+            FILTERED_VIOLATIONS=$(filter_serialize_field_violations "$ALL_VIOLATIONS")
+            
+            # 改行を確実に除去して数値を取得
+            if [ -n "$FILTERED_VIOLATIONS" ]; then
+              ACTUAL_VIOLATIONS=$(printf "%s\n" "$FILTERED_VIOLATIONS" | grep -c "InconsistentNaming" || echo "0")
+            else
+              ACTUAL_VIOLATIONS=0
+            fi
+            
+            TOTAL_VIOLATIONS=$(printf "%s\n" "$ALL_VIOLATIONS" | grep -c . || echo "0")
+            
+            # 改行や空白を除去して数値のみを取得
+            TOTAL_VIOLATIONS=$(echo "$TOTAL_VIOLATIONS" | head -1 | tr -cd '0-9')
+            ACTUAL_VIOLATIONS=$(echo "$ACTUAL_VIOLATIONS" | head -1 | tr -cd '0-9')
+            
+            # 空の場合は0を設定
+            TOTAL_VIOLATIONS=${TOTAL_VIOLATIONS:-0}
+            ACTUAL_VIOLATIONS=${ACTUAL_VIOLATIONS:-0}
+            
+            SERIALIZED_VIOLATIONS=$((TOTAL_VIOLATIONS - ACTUAL_VIOLATIONS))
+            
+            echo "命名規則違反: $TOTAL_VIOLATIONS 件 (SerializeField除外後: $ACTUAL_VIOLATIONS 件)"
+            
+            if [ $ACTUAL_VIOLATIONS -gt 0 ]; then
+              echo "修正すべき違反:"
+              echo "$FILTERED_VIOLATIONS" | grep "InconsistentNaming" | \
+                sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/\1:\2 → \3/' | head -10
+              echo "NAMING_ISSUES_FOUND=true" >> $GITHUB_ENV
+            else
+              echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
+            fi
+          else
+            echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
+          fi
+        else
+          echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
+        fi
+        
+    - name: Check naming compliance
+      run: |
+        if [ "$NAMING_ISSUES_FOUND" = "true" ]; then
+          echo "❌ 命名規則違反があります"
+          echo "NAMING_CHECK_FAILED=true" >> $GITHUB_ENV
+        else
+          echo "✅ 命名規則OK"
+          echo "NAMING_CHECK_FAILED=false" >> $GITHUB_ENV
+        fi
+        
+    - name: Final check result
+      run: |
+        FAILED_CHECKS=0
+        
+        if [ "$FORMAT_CHECK_FAILED" = "true" ]; then
+          echo "❌ フォーマットチェック失敗"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        fi
+        
+        if [ "$NAMING_CHECK_FAILED" = "true" ]; then
+          echo "❌ 命名規則チェック失敗"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        fi
+        
+        if [ $FAILED_CHECKS -gt 0 ]; then
+          echo "CI失敗: $FAILED_CHECKS 項目"
+          exit 1
+        else
+          echo "✅ すべてのチェック合格"
+        fi

@@ -30,19 +30,19 @@ public abstract class EvolutionConditionBase
 public class PlayStyleWinCondition : EvolutionConditionBase
 {
     [Header("必要なプレイスタイル")]
-    public PlayStyle requiredPlayStyle = PlayStyle.Impulse;
+    public PlayStyle RequiredPlayStyle = PlayStyle.Impulse;
     
     [Header("必要勝利数")]
-    public RandomRangeValue requiredCount = new(1);
+    public RandomRangeValue RequiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        return cardStats.GetPlayStyleWins(requiredPlayStyle) >= requiredCount.Value;
+        return cardStats.GetPlayStyleWins(RequiredPlayStyle) >= RequiredCount.Value;
     }
     
     public override string GetDescription()
     {
-        return $"{requiredPlayStyle.ToJapaneseString()}で{requiredCount.GetDisplayString()}回勝利";
+        return $"{RequiredPlayStyle.ToJapaneseString()}で{RequiredCount.GetDisplayString()}回勝利";
     }
     
     public override string GetConditionTypeName() => "プレイスタイル勝利";
@@ -55,19 +55,19 @@ public class PlayStyleWinCondition : EvolutionConditionBase
 public class PlayStyleLoseCondition : EvolutionConditionBase
 {
     [Header("必要なプレイスタイル")]
-    public PlayStyle requiredPlayStyle = PlayStyle.Impulse;
+    public PlayStyle RequiredPlayStyle = PlayStyle.Impulse;
     
     [Header("必要敗北数")]
-    public RandomRangeValue requiredCount = new(1);
+    public RandomRangeValue RequiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        return cardStats.GetPlayStyleLosses(requiredPlayStyle) >= requiredCount.Value;
+        return cardStats.GetPlayStyleLosses(RequiredPlayStyle) >= RequiredCount.Value;
     }
     
     public override string GetDescription()
     {
-        return $"{requiredPlayStyle.ToJapaneseString()}で{requiredCount.GetDisplayString()}回敗北";
+        return $"{RequiredPlayStyle.ToJapaneseString()}で{RequiredCount.GetDisplayString()}回敗北";
     }
     
     public override string GetConditionTypeName() => "プレイスタイル敗北";
@@ -80,16 +80,16 @@ public class PlayStyleLoseCondition : EvolutionConditionBase
 public class TotalWinCondition : EvolutionConditionBase
 {
     [Header("必要勝利数")]
-    public RandomRangeValue requiredCount = new(1);
+    public RandomRangeValue RequiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        return cardStats.TotalWin >= requiredCount.Value;
+        return cardStats.TotalWin >= RequiredCount.Value;
     }
     
     public override string GetDescription()
     {
-        return $"総勝利回数{requiredCount.GetDisplayString()}回";
+        return $"総勝利回数{RequiredCount.GetDisplayString()}回";
     }
     
     public override string GetConditionTypeName() => "総勝利数";
@@ -102,16 +102,16 @@ public class TotalWinCondition : EvolutionConditionBase
 public class CollapseCountCondition : EvolutionConditionBase
 {
     [Header("必要崩壊数")]
-    public RandomRangeValue requiredCount = new(1);
+    public RandomRangeValue RequiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        return cardStats.CollapseCount >= requiredCount.Value;
+        return cardStats.CollapseCount >= RequiredCount.Value;
     }
     
     public override string GetDescription()
     {
-        return $"崩壊回数{requiredCount.GetDisplayString()}回";
+        return $"崩壊回数{RequiredCount.GetDisplayString()}回";
     }
     
     public override string GetConditionTypeName() => "崩壊回数";
@@ -124,16 +124,16 @@ public class CollapseCountCondition : EvolutionConditionBase
 public class ConsecutiveWinCondition : EvolutionConditionBase
 {
     [Header("必要連続勝利数")]
-    public RandomRangeValue requiredCount = new(1);
+    public RandomRangeValue RequiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        return cardStats.MaxConsecutiveWin >= requiredCount.Value;
+        return cardStats.MaxConsecutiveWin >= RequiredCount.Value;
     }
     
     public override string GetDescription()
     {
-        return $"連続勝利{requiredCount.GetDisplayString()}回";
+        return $"連続勝利{RequiredCount.GetDisplayString()}回";
     }
     
     public override string GetConditionTypeName() => "連続勝利";
@@ -146,16 +146,16 @@ public class ConsecutiveWinCondition : EvolutionConditionBase
 public class TotalUseCondition : EvolutionConditionBase
 {
     [Header("必要使用回数")]
-    public RandomRangeValue requiredCount = new(1);
+    public RandomRangeValue RequiredCount = new(1);
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        return cardStats.TotalUse >= requiredCount.Value;
+        return cardStats.TotalUse >= RequiredCount.Value;
     }
     
     public override string GetDescription()
     {
-        return $"総使用回数{requiredCount.GetDisplayString()}回";
+        return $"総使用回数{RequiredCount.GetDisplayString()}回";
     }
     
     public override string GetConditionTypeName() => "総使用回数";
@@ -170,22 +170,22 @@ public class TotalUseCondition : EvolutionConditionBase
 public class WinRateCondition : EvolutionConditionBase
 {
     [Header("必要勝率 (%)")]
-    public RandomRangeFloat requiredWinRate = new(60f);
+    public RandomRangeFloat RequiredWinRate = new(60f);
     
     [Header("最低試合数")]
-    public int minimumGames = 5;
+    public int MinimumGames = 5;
     
     public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        if (cardStats.TotalUse < minimumGames) return false;
+        if (cardStats.TotalUse < MinimumGames) return false;
         
         var winRate = cardStats.TotalWin / (float)cardStats.TotalUse * 100f;
-        return winRate >= requiredWinRate.Value;
+        return winRate >= RequiredWinRate.Value;
     }
     
     public override string GetDescription()
     {
-        return $"勝率{requiredWinRate.GetDisplayString()}%以上（最低{minimumGames}試合）";
+        return $"勝率{RequiredWinRate.GetDisplayString()}%以上（最低{MinimumGames}試合）";
     }
     
     public override string GetConditionTypeName() => "勝率";

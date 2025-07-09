@@ -11,9 +11,9 @@ namespace Void2610.UnityTemplate
         [System.Serializable]
         public class SoundData
         {
-            public string name;
-            public AudioClip audioClip;
-            public float volume = 1.0f;
+            public string Name;
+            public AudioClip AudioClip;
+            public float Volume = 1.0f;
         }
 
         [SerializeField] private AudioMixerGroup seMixerGroup;
@@ -59,13 +59,13 @@ namespace Void2610.UnityTemplate
 
         public void PlaySe(string seName, float volume = 1.0f, float pitch = -1.0f)
         {
-            var data = this.soundData.FirstOrDefault(t => t.name == seName);
+            var data = this.soundData.FirstOrDefault(t => t.Name == seName);
             var audioSource = GetUnusedAudioSource();
             if (data == null) return;
             if (!audioSource) return;
 
-            audioSource.clip = data.audioClip;
-            audioSource.volume = data.volume * volume;
+            audioSource.clip = data.AudioClip;
+            audioSource.volume = data.Volume * volume;
             audioSource.pitch = pitch < 0.0f ? Random.Range(0.8f, 1.2f) : pitch;
             audioSource.Play();
         }

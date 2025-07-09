@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// スコア計算を担当する静的クラス
@@ -12,6 +14,7 @@ public static class ScoreCalculator
     /// <param name="move">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
     /// <param name="theme">テーマデータ</param>
     /// <returns>計算されたスコア</returns>
+    
     public static float CalculateScore(PlayerMove move, ThemeData theme)
     {
         if (move == null || !theme) return 0f;

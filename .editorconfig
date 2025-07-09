@@ -564,7 +564,7 @@ resharper_align_linq_query = false
 resharper_align_multiline_array_and_object_initializer = false
 resharper_align_multiline_array_initializer = true
 resharper_align_multiline_binary_patterns = false
-resharper_align_multiline_comments = true
+resharper_align_multiline_comments = false
 resharper_align_multiline_ctor_init = true
 resharper_align_multiline_expression_braces = false
 resharper_align_multiline_implements_list = true
@@ -761,7 +761,7 @@ resharper_indent_break_from_case = true
 resharper_indent_case_from_select = true
 resharper_indent_child_elements = OneIndent
 resharper_indent_class_members_from_access_specifiers = false
-resharper_indent_comment = true
+resharper_indent_comment = false
 resharper_indent_export_declaration_members = true
 resharper_indent_goto_labels = true
 resharper_indent_inside_namespace = true
@@ -964,6 +964,20 @@ resharper_space_after_slate_operator = true
 resharper_space_after_ternary_colon = true
 resharper_space_after_ternary_quest = true
 resharper_space_after_triple_slash = true
+# XMLコメントの内容フォーマットを無効化
+resharper_xmldoc_attribute_indent = none
+resharper_xmldoc_attribute_style = do_not_touch
+resharper_xmldoc_blank_line_after_pi = false
+resharper_xmldoc_linebreak_before_elements = false
+resharper_xmldoc_max_blank_lines_between_tags = 0
+resharper_xmldoc_pi_attribute_style = do_not_touch
+resharper_xmldoc_space_before_self_closing = false
+resharper_xmldoc_wrap_lines = false
+resharper_xmldoc_wrap_tags_and_pi = false
+resharper_xmldoc_wrap_text = false
+# XMLコメントの追加インデントを無効化
+resharper_keep_existing_declaration_block_arrangement = true
+resharper_keep_existing_embedded_arrangement = true
 resharper_space_after_type_parameter_constraint_colon = true
 resharper_space_around_additive_op = true
 resharper_space_around_alias_eq = true
@@ -4095,3 +4109,103 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 tab_width = 4
+
+# Unity特有の命名規則設定
+# SerializeFieldフィールドはアンダースコア無しの慣習に従う
+[*.cs]
+
+# SerializeFieldフィールドの命名規則（Unity慣習）
+# ReSharperのUnity拡張機能なしでは unity_serialised_field が機能しないため、
+# 属性ベースの除外を使用
+dotnet_naming_rule.unity_serialized_fields.severity = none
+dotnet_naming_rule.unity_serialized_fields.symbols = unity_serialized_fields
+dotnet_naming_rule.unity_serialized_fields.style = camel_case_style_unity
+
+dotnet_naming_symbols.unity_serialized_fields.applicable_kinds = field
+dotnet_naming_symbols.unity_serialized_fields.applicable_accessibilities = private
+dotnet_naming_symbols.unity_serialized_fields.required_modifiers = 
+
+# Unity SerializeFieldのスタイル（アンダースコア無しcamelCase）
+dotnet_naming_style.camel_case_style_unity.capitalization = camel_case
+
+# 通常のプライベートフィールドはアンダースコア付き
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields_underscore
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
+
+dotnet_naming_symbols.private_fields_underscore.applicable_kinds = field
+dotnet_naming_symbols.private_fields_underscore.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields_underscore.required_modifiers = 
+dotnet_naming_symbols.private_fields_underscore.resharper_applicable_kinds = field
+dotnet_naming_symbols.private_fields_underscore.resharper_required_modifiers = instance
+
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+# ReSharperの名前空間チェックを無効化
+# Unity開発では名前空間とファイル位置の対応を厳密に管理しない場合がある
+resharper_check_namespace_highlighting = none
+dotnet_diagnostic.ide0130.severity = none
+
+# ReSharperのフォーマット設定（Unity開発に合わせて調整）
+resharper_keep_existing_attribute_arrangement = true
+resharper_place_attribute_on_same_line = false
+resharper_place_field_attribute_on_same_line = false
+resharper_place_property_attribute_on_same_line = false
+resharper_place_method_attribute_on_same_line = false
+resharper_place_accessorholder_attribute_on_same_line = false
+resharper_place_accessor_attribute_on_same_line = false
+resharper_place_type_attribute_on_same_line = false
+
+# 空行の設定
+resharper_blank_lines_around_field = 0
+resharper_blank_lines_around_property = 0
+resharper_blank_lines_around_auto_property = 0
+resharper_blank_lines_around_invocable = 1
+resharper_blank_lines_around_single_line_invocable = 0
+
+# インデントとスペースの設定
+resharper_space_around_assignment_op = true
+resharper_space_around_equality_op = true
+resharper_space_around_relational_op = true
+
+# 一般的な略語を許可（UI, NPC, TMP等）
+resharper_acronyms_list = UI|NPC|TMP|TMPro|AI|ID|OK|iOS|OS|PC|PS|VR|AR|XR|SDK|API|HTTP|HTTPS|URL|URI|XML|JSON|SQL|CSV|PDF|PNG|JPG|JPEG|GIF|RGB|RGBA|HSV|FPS|LOD|GPU|CPU|RAM|ROM|UUID|GUID|ASCII|UTF|GUI|HUD|SFX|BGM|SE|2D|3D|UV|SDK
+
+# ReSharper CLT用の略語設定
+resharper_use_acronyms_in_names = true
+resharper_consistent_naming_rule.UI = UI
+resharper_consistent_naming_rule.TMP = TMP
+resharper_consistent_naming_rule.NPC = NPC
+
+# ReSharper C#専用の命名規則（CLT用）
+resharper_csharp_naming_rule.private_static_fields = _camelCase
+resharper_csharp_naming_rule.private_static_fields.element_kinds = field
+resharper_csharp_naming_rule.private_static_fields.visibility = private
+resharper_csharp_naming_rule.private_static_fields.mutability = mutable
+resharper_csharp_naming_rule.private_static_fields.is_static = true
+
+# 特定のクラス名違反を無視
+dotnet_diagnostic.IDE1006.severity = none
+
+# ReSharperの空行設定を緩和（基本的なフォーマットのみ）
+resharper_blank_lines_around_field = 0
+resharper_blank_lines_around_property = 0
+resharper_blank_lines_around_auto_property = 0
+resharper_blank_lines_around_invocable = 0
+resharper_blank_lines_around_single_line_invocable = 0
+resharper_blank_lines_after_start_comment = 0
+resharper_blank_lines_after_file_header_comment = 0
+resharper_blank_lines_around_namespace = 0
+resharper_blank_lines_around_type = 0
+resharper_blank_lines_around_single_line_type = 0
+resharper_blank_lines_inside_type = 0
+resharper_blank_lines_inside_namespace = 0
+resharper_blank_lines_around_region = 0
+resharper_blank_lines_inside_region = 0
+resharper_blank_lines_before_single_line_comment = 0
+
+# 空行の自動挿入を無効化
+resharper_blank_line_after_file_header = false
+resharper_blank_line_after_pi = false
+resharper_blank_line_after_using_list = false

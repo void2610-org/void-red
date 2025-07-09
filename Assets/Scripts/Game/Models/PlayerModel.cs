@@ -18,6 +18,8 @@ public class PlayerModel : IDisposable
     // プライベートフィールド
     private readonly ReactiveProperty<int> _mentalPower = new();
     
+    // テスト用フィールドは削除
+    
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -27,6 +29,7 @@ public class PlayerModel : IDisposable
     }
     
     // === 精神力関連メソッド ===
+    
     
     /// <summary>
     /// 精神力を消費

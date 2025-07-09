@@ -10,16 +10,16 @@ public class EvolutionConditionGroup
 {
     [Header("条件リスト（全て満たす必要がある）")]
     [SerializeReference, SubclassSelector]
-    public List<EvolutionConditionBase> conditions = new();
+    public List<EvolutionConditionBase> Conditions = new();
     
     /// <summary>
     /// このグループの全ての条件を満たしているかチェック
     /// </summary>
     public bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
     {
-        if (conditions == null || conditions.Count == 0) return true;
+        if (Conditions == null || Conditions.Count == 0) return true;
         
-        foreach (var condition in conditions)
+        foreach (var condition in Conditions)
         {
             if (condition == null || !condition.IsSatisfied(cardStats, playerStats))
                 return false;
@@ -33,13 +33,13 @@ public class EvolutionConditionGroup
     /// </summary>
     public string GetDescription()
     {
-        if (conditions == null || conditions.Count == 0) return "条件なし";
+        if (Conditions == null || Conditions.Count == 0) return "条件なし";
         
-        if (conditions.Count == 1)
-            return conditions[0]?.GetDescription() ?? "不明";
+        if (Conditions.Count == 1)
+            return Conditions[0]?.GetDescription() ?? "不明";
         
         var descriptions = new List<string>();
-        foreach (var condition in conditions)
+        foreach (var condition in Conditions)
         {
             if (condition != null)
                 descriptions.Add(condition.GetDescription());
@@ -51,5 +51,5 @@ public class EvolutionConditionGroup
     /// <summary>
     /// 条件数を取得
     /// </summary>
-    public int ConditionCount => conditions?.Count ?? 0;
+    public int ConditionCount => Conditions?.Count ?? 0;
 }

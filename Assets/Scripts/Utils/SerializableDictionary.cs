@@ -16,18 +16,18 @@ namespace Void2610.UnityTemplate
         [Serializable]
         public class Pair
         {
-            public TKey key = default;
-            public TValue value = default;
+            public TKey Key = default;
+            public TValue Value = default;
 
             public Pair(TKey key, TValue value)
             {
-                this.key = key;
-                this.value = value;
+                this.Key = key;
+                this.Value = value;
             }
         }
 
         [SerializeField]
-        private List<Pair> _serializedList = new List<Pair>();
+        private List<Pair> serializedList = new List<Pair>();
 
         /// <summary>
         /// Unityがオブジェクトをデシリアライズした後に呼ばれる
@@ -37,11 +37,11 @@ namespace Void2610.UnityTemplate
         {
             Clear();
             
-            foreach (var pair in _serializedList)
+            foreach (var pair in serializedList)
             {
-                if (pair.key != null && !ContainsKey(pair.key))
+                if (pair.Key != null && !ContainsKey(pair.Key))
                 {
-                    Add(pair.key, pair.value);
+                    Add(pair.Key, pair.Value);
                 }
             }
         }
@@ -52,11 +52,11 @@ namespace Void2610.UnityTemplate
         /// </summary>
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            _serializedList.Clear();
+            serializedList.Clear();
             
             foreach (var kvp in this)
             {
-                _serializedList.Add(new Pair(kvp.Key, kvp.Value));
+                serializedList.Add(new Pair(kvp.Key, kvp.Value));
             }
         }
     }
