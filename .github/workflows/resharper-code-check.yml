@@ -114,35 +114,23 @@ jobs:
         git diff --cached --name-only > format-target-files.txt
         git reset
         
-        echo "📋 ReSharper フォーマットオプション:"
-        echo "  - コードクリーンアップ（自動整形）"
-        echo "  - 標準C#フォーマット設定"
-        echo "  - メインゲームコードのみ対象（サンプル除外）"
+        echo "📋 ReSharper フォーマットオプション（.editorconfigベース）:"
+        echo "  - 既存の.editorconfigファイルを使用"
+        echo "  - プロジェクト標準のコードスタイルを適用"
+        echo "  - Scripts以下のC#ファイルのみ対象"
         echo "  - Unity プロジェクト最適化"
         
-        # ReSharper コードフォーマット設定ファイルを作成（現在のコードベーススタイル維持）
-        echo "📝 ReSharper設定ファイルを作成中（現在のコードベーススタイル維持）..."
-        echo '<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">' > .DotSettings
-        echo '  <!-- 基本的なスペース設定のみ（既存スタイル保持） -->' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_COMMA/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_BINARY_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_COMMA/@EntryValue">False</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_EQUALITY_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_LOGICAL_OPERATOR/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <!-- 既存の改行・インデントスタイルを完全に維持 -->' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_USER_LINEBREAKS/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SIMPLE_EMBEDDED_STATEMENT_STYLE/@EntryValue">DO_NOT_CHANGE</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LINES/@EntryValue">False</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_SIMPLE_BLOCKS_ON_SINGLE_LINE/@EntryValue">False</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_EXISTING_LINEBREAKS/@EntryValue">True</s:Boolean>' >> .DotSettings
-        echo '  <!-- Using文やコメントの変更を無効化 -->' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SORT_USINGS/@EntryValue">False</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/REMOVE_BLANK_LINES_NEAR_BRACES_IN_CODE/@EntryValue">False</s:Boolean>' >> .DotSettings
-        echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/REMOVE_BLANK_LINES_NEAR_BRACES_IN_DECLARATIONS/@EntryValue">False</s:Boolean>' >> .DotSettings
-        echo '  <!-- 空行を完全に維持 -->' >> .DotSettings
-        echo '  <s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_BLANK_LINES_IN_CODE/@EntryValue">99</s:Int64>' >> .DotSettings
-        echo '  <s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_BLANK_LINES_IN_DECLARATIONS/@EntryValue">99</s:Int64>' >> .DotSettings
-        echo '</wpf:ResourceDictionary>' >> .DotSettings
+        # 既存の.editorconfigファイルを確認・表示
+        echo "📝 既存の.editorconfigファイルを使用中..."
+        echo "🔍 .editorconfigの主要設定を確認:"
+        echo "C#フォーマット設定:"
+        grep -E "(csharp_space_|csharp_preserve_)" .editorconfig | head -10 | sed 's/^/  /' || echo "  設定ファイルが見つかりません"
+        echo ""
+        echo "✅ プロジェクトの既存.editorconfigファイルを使用します"
+        echo "   - csharp_space_after_comma = true"
+        echo "   - csharp_space_around_binary_operators = before_and_after"
+        echo "   - csharp_preserve_single_line_blocks = true"
+        echo "   - 既存のコードスタイルを完全に維持"
         
         # ReSharper cleanupcode で利用可能なプロファイルを確認
         echo "🔍 利用可能なプロファイルを確認中..."
@@ -154,14 +142,13 @@ jobs:
         echo "対象ファイル（ScoreCalculator.cs）の現在の状態:"
         head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
         
-        # ReSharper cleanupcode の実行（Scripts以下の全ファイル、既存スタイル維持）
+        # ReSharper cleanupcode の実行（.editorconfigベース、Scripts以下全ファイル）
         echo ""
-        echo "⚡ ReSharper cleanupcode を実行中（Scripts以下全ファイル、既存スタイル維持）..."
+        echo "⚡ ReSharper cleanupcode を実行中（.editorconfigベース、Scripts以下全ファイル）..."
         jb cleanupcode void-red-analysis.sln \
           --verbosity=INFO \
           --include="Assets/Scripts/**/*.cs" \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
-          --settings=.DotSettings \
           --profile="Built-in: Reformat Code" \
           --no-build \
           --properties:Configuration=Debug \
@@ -181,11 +168,16 @@ jobs:
         git diff Assets/Scripts/Game/Logic/ScoreCalculator.cs | head -50 || echo "差分なし"
         
         echo ""
-        echo "🧪 期待されるフォーマット結果（現在のコードベーススタイル維持）:"
-        echo "  ✅ 修正される: カンマ後のスペース、演算子周りのスペース"
-        echo "  ❌ 変更されない: using文の順序、改行スタイル、インデント、コメント"
+        echo "🧪 期待されるフォーマット結果（.editorconfigベース）:"
+        echo "  ✅ 修正される: .editorconfigに基づくスペース設定"
+        echo "    - csharp_space_after_comma = true"
+        echo "    - csharp_space_around_binary_operators = before_and_after"
+        echo "    - csharp_space_before_comma = false"
+        echo "  ❌ 変更されない: 改行、インデント、ブロック構造"
+        echo "    - csharp_preserve_single_line_blocks = true"
+        echo "    - 既存のコードスタイルを維持"
         echo "  📁 対象: Assets/Scripts/**/*.cs のみ"
-        echo "  🎯 目標: 基本的なスペース問題のみを修正し、既存スタイルを完全に維持"
+        echo "  🎯 目標: .editorconfigに基づく標準的なフォーマット適用"
           
         echo "✅ ReSharper コードフォーマットが完了しました"
           
