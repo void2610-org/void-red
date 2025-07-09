@@ -68,6 +68,7 @@ Coffee.*.csproj
 *.csproj
 !Assembly-CSharp.csproj
 !Assembly-CSharp-Editor.csproj
+!Assembly-CSharp-Minimal.csproj
 
 # Unity3D generated meta files
 *.pidb.meta

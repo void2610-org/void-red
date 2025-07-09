@@ -40,16 +40,14 @@ jobs:
         
         # デバッグ情報
         echo "Current directory: $(pwd)"
-        echo "Assembly-CSharp.csproj exists: $(test -f Assembly-CSharp.csproj && echo 'YES' || echo 'NO')"
+        echo "Assembly-CSharp-Minimal.csproj exists: $(test -f Assembly-CSharp-Minimal.csproj && echo 'YES' || echo 'NO')"
         echo "Assets/Scripts directory exists: $(test -d Assets/Scripts && echo 'YES' || echo 'NO')"
         echo "CS files found: $(find Assets/Scripts -name "*.cs" 2>/dev/null | wc -l)"
         
         # ファイルが存在する場合のみ実行
-        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # 元のプロジェクトファイルを使用し、厳密なinclude/excludeパターンを指定
-          jb cleanupcode Assembly-CSharp.csproj \
-            --include="Assets/Scripts/Game/**/*.cs;Assets/Scripts/UI/**/*.cs;Assets/Scripts/Utils/**/*.cs;Assets/Scripts/Debug/**/*.cs;Assets/Scripts/VContainer/**/*.cs;Assets/Scripts/ScriptableObject/**/*.cs" \
-            --exclude="**/Packages/**;**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Logs/**;**/UserSettings/**;**/ProjectSettings/**;**/Builds/**;**/Docs/**;**/Editor/**;**/Plugins/**;**/Samples/**;**/SyskenTLib/**;**/TextMesh Pro/**;**/proTools/**;**/Assets/Packages/**;**/Assets/NuGet/**;**/Assets/StreamingAssets/**;**/Assets/Resources/**;**/Assets/Materials/**;**/Assets/Prefabs/**;**/Assets/Scenes/**;**/Assets/Sprites/**;**/Assets/Audio/**;**/Assets/Settings/**;**/Assets/ScriptableObjects/**;**/Plugins/**;**/*.json;**/*.xml;**/*.txt;**/*.md;**/*.shader;**/*.cginc;**/*.hlsl;**/*.asset;**/*.meta;**/*.asmdef;**/*.asmref;**/*.unity;**/*.prefab;**/*.mat;**/*.png;**/*.jpg;**/*.jpeg;**/*.gif;**/*.tga;**/*.tiff;**/*.wav;**/*.mp3;**/*.ogg;**/*.fbx;**/*.obj;**/*.3ds;**/*.dae;**/*.blend;**/*.mb;**/*.max;**/*.dll;**/*.exe;**/*.so;**/*.dylib;**/*.a;**/*.lib;**/*.pdb;**/*.mdb;**/*.ttf;**/*.otf;**/*.woff;**/*.woff2;**/*.eot;**/*.svg;**/*.ico;**/*.cur;**/*.ani;**/*.pdf;**/*.rtf;**/*.doc;**/*.docx;**/*.xls;**/*.xlsx;**/*.ppt;**/*.pptx;**/*.zip;**/*.rar;**/*.7z;**/*.tar;**/*.gz;**/*.bz2;**/*.xz;**/*.lzma;**/*.lzo;**/*.z;**/*.Z;**/*.dms;**/*.lha;**/*.lzh;**/*.arj;**/*.cab;**/*.chm;**/*.cpio;**/*.deb;**/*.dmg;**/*.hfs;**/*.iso;**/*.lzma;**/*.msi;**/*.nsis;**/*.rpm;**/*.udf;**/*.wim;**/*.xar;**/*.jar;**/*.war;**/*.ear;**/*.sar;**/*.rar;**/*.ace;**/*.zoo;**/*.cpt;**/*.pit;**/*.sit;**/*.sitx;**/*.sea;**/*.hqx;**/*.bin;**/*.macbin;**/*.uu;**/*.xxe;**/*.mime;**/*.b64;**/*.btoa;**/*.yenc" \
+        if [ -f "Assembly-CSharp-Minimal.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # C#ファイルのみを含むミニマルプロジェクトファイルを使用
+          jb cleanupcode Assembly-CSharp-Minimal.csproj \
             --profile="Built-in: Reformat Code" \
             --no-build \
             --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
@@ -82,13 +80,11 @@ jobs:
         export PATH="$HOME/.dotnet/tools:$PATH"
         
         # ファイルが存在する場合のみ実行
-        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # 元のプロジェクトファイルを使用し、厳密なinclude/excludeパターンを指定
-          jb inspectcode Assembly-CSharp.csproj \
+        if [ -f "Assembly-CSharp-Minimal.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # C#ファイルのみを含むミニマルプロジェクトファイルを使用
+          jb inspectcode Assembly-CSharp-Minimal.csproj \
             --output=resharper-inspection-report.xml \
             --format=xml \
-            --include="Assets/Scripts/Game/**/*.cs;Assets/Scripts/UI/**/*.cs;Assets/Scripts/Utils/**/*.cs;Assets/Scripts/Debug/**/*.cs;Assets/Scripts/VContainer/**/*.cs;Assets/Scripts/ScriptableObject/**/*.cs" \
-            --exclude="**/Packages/**;**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Logs/**;**/UserSettings/**;**/ProjectSettings/**;**/Builds/**;**/Docs/**;**/Editor/**;**/Plugins/**;**/Samples/**;**/SyskenTLib/**;**/TextMesh Pro/**;**/proTools/**;**/Assets/Packages/**;**/Assets/NuGet/**;**/Assets/StreamingAssets/**;**/Assets/Resources/**;**/Assets/Materials/**;**/Assets/Prefabs/**;**/Assets/Scenes/**;**/Assets/Sprites/**;**/Assets/Audio/**;**/Assets/Settings/**;**/Assets/ScriptableObjects/**;**/Plugins/**;**/*.json;**/*.xml;**/*.txt;**/*.md;**/*.shader;**/*.cginc;**/*.hlsl;**/*.asset;**/*.meta;**/*.asmdef;**/*.asmref;**/*.unity;**/*.prefab;**/*.mat;**/*.png;**/*.jpg;**/*.jpeg;**/*.gif;**/*.tga;**/*.tiff;**/*.wav;**/*.mp3;**/*.ogg;**/*.fbx;**/*.obj;**/*.3ds;**/*.dae;**/*.blend;**/*.mb;**/*.max;**/*.dll;**/*.exe;**/*.so;**/*.dylib;**/*.a;**/*.lib;**/*.pdb;**/*.mdb;**/*.ttf;**/*.otf;**/*.woff;**/*.woff2;**/*.eot;**/*.svg;**/*.ico;**/*.cur;**/*.ani;**/*.pdf;**/*.rtf;**/*.doc;**/*.docx;**/*.xls;**/*.xlsx;**/*.ppt;**/*.pptx;**/*.zip;**/*.rar;**/*.7z;**/*.tar;**/*.gz;**/*.bz2;**/*.xz;**/*.lzma;**/*.lzo;**/*.z;**/*.Z;**/*.dms;**/*.lha;**/*.lzh;**/*.arj;**/*.cab;**/*.chm;**/*.cpio;**/*.deb;**/*.dmg;**/*.hfs;**/*.iso;**/*.lzma;**/*.msi;**/*.nsis;**/*.rpm;**/*.udf;**/*.wim;**/*.xar;**/*.jar;**/*.war;**/*.ear;**/*.sar;**/*.rar;**/*.ace;**/*.zoo;**/*.cpt;**/*.pit;**/*.sit;**/*.sitx;**/*.sea;**/*.hqx;**/*.bin;**/*.macbin;**/*.uu;**/*.xxe;**/*.mime;**/*.b64;**/*.btoa;**/*.yenc" \
             --severity=WARNING \
             --no-build \
             --disable-settings-layers=GlobalAll \
