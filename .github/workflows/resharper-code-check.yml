@@ -118,14 +118,15 @@ jobs:
         echo "📋 ReSharper解析オプション:"
         echo "  - 標準C#解析（Unity extensionなし）"
         echo "  - ビルドスキップで依存関係問題を回避"
-        echo "  - メインプロジェクトのソースコードのみ解析"
+        echo "  - メインゲームコードのみ解析（サンプル除外）"
+        echo "  - Unity参照エラーを除外して実用的な品質チェック"
         
         jb inspectcode void-red-analysis.sln \
           --output=resharper-report.xml \
           --format=Xml \
           --no-build \
           --verbosity=WARN \
-          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**" \
+          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
           --properties:Configuration=Debug
           
         echo "✅ ReSharper 静的解析が完了しました"
