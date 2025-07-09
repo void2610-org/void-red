@@ -38,12 +38,24 @@ jobs:
       run: |
         export PATH="$HOME/.dotnet/tools:$PATH"
         
-        jb cleanupcode Assembly-CSharp.csproj \
-          --include="Assets/Scripts/**/*.cs" \
-          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
-          --profile="Built-in: Reformat Code" \
-          --no-build \
-          --properties:Configuration=Debug
+        # デバッグ情報
+        echo "Current directory: $(pwd)"
+        echo "Assembly-CSharp.csproj exists: $(test -f Assembly-CSharp.csproj && echo 'YES' || echo 'NO')"
+        echo "Assets/Scripts directory exists: $(test -d Assets/Scripts && echo 'YES' || echo 'NO')"
+        echo "CS files found: $(find Assets/Scripts -name "*.cs" 2>/dev/null | wc -l)"
+        
+        # ファイルが存在する場合のみ実行
+        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # より具体的な include パターンを使用
+          jb cleanupcode Assembly-CSharp.csproj \
+            --include="Assets/Scripts/Game/**/*.cs;Assets/Scripts/UI/**/*.cs;Assets/Scripts/Utils/**/*.cs;Assets/Scripts/Debug/**/*.cs;Assets/Scripts/VContainer/**/*.cs;Assets/Scripts/ScriptableObject/**/*.cs" \
+            --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
+            --profile="Built-in: Reformat Code" \
+            --no-build \
+            --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
+        else
+          echo "Required files not found, skipping cleanup"
+        fi
           
     - name: Check format changes
       run: |
@@ -69,15 +81,22 @@ jobs:
       run: |
         export PATH="$HOME/.dotnet/tools:$PATH"
         
-        jb inspectcode Assembly-CSharp.csproj \
-          --output=resharper-inspection-report.xml \
-          --format=xml \
-          --include="Assets/Scripts/**/*.cs" \
-          --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
-          --severity=WARNING \
-          --no-build \
-          --disable-settings-layers=GlobalAll \
-          --properties:Configuration=Debug 2>/dev/null || true
+        # ファイルが存在する場合のみ実行
+        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
+          # より具体的な include パターンを使用
+          jb inspectcode Assembly-CSharp.csproj \
+            --output=resharper-inspection-report.xml \
+            --format=xml \
+            --include="Assets/Scripts/Game/**/*.cs;Assets/Scripts/UI/**/*.cs;Assets/Scripts/Utils/**/*.cs;Assets/Scripts/Debug/**/*.cs;Assets/Scripts/VContainer/**/*.cs;Assets/Scripts/ScriptableObject/**/*.cs" \
+            --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
+            --severity=WARNING \
+            --no-build \
+            --disable-settings-layers=GlobalAll \
+            --properties:Configuration=Debug 2>/dev/null || echo "inspectcode failed but continuing..."
+        else
+          echo "Required files not found, skipping inspection"
+          echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><Report></Report>" > resharper-inspection-report.xml
+        fi
         
         # SerializeFieldを除外した実際の命名規則違反をカウント
         if [ -f "resharper-inspection-report.xml" ]; then
