@@ -14,6 +14,10 @@ public static class ScoreCalculator
     /// <param name="move">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
     /// <param name="theme">テーマデータ</param>
     /// <returns>計算されたスコア</returns>
+    // テスト用の命名規則違反
+    private static float test_multiplier = 1.5f;
+    private const int max_score = 100;
+    
     public static float CalculateScore(PlayerMove move,ThemeData theme)
     {
         if(move==null||!theme)  return 0f;
@@ -25,6 +29,7 @@ public static class ScoreCalculator
         var playStyleMultiplier = move.PlayStyle.GetScoreMultiplier();
         
         // スコア = 属性倍率 × 精神ベット × カード固有の倍率 × プレイスタイル倍率
-        return attributeMultiplier*move.MentalBet*move.SelectedCard.ScoreMultiplier*playStyleMultiplier;
+        var finalScore = attributeMultiplier*move.MentalBet*move.SelectedCard.ScoreMultiplier*playStyleMultiplier;
+        return finalScore * test_multiplier;
     }
 }
