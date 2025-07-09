@@ -328,11 +328,13 @@ jobs:
         # inspectcode を実行して命名規則違反のみをチェック
         jb inspectcode Assembly-CSharp.csproj \
           --output=resharper-inspection-report.xml \
+          --format=xml \
           --include="Assets/Scripts/**/*.cs" \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
           --severity=WARNING \
           --no-build \
-          --properties:Configuration=Debug || true
+          --disable-settings-layers=GlobalAll \
+          --properties:Configuration=Debug 2>/dev/null || true
         
         echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
         
