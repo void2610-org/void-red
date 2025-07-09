@@ -64,6 +64,10 @@ R3.*.csproj
 Coffee.*.csproj
 *Test*.csproj
 *Editor*.csproj
+# Unity 生成の他の .csproj ファイルを除外（Assembly-CSharp.csproj と Assembly-CSharp-Editor.csproj のみ保持）
+*.csproj
+!Assembly-CSharp.csproj
+!Assembly-CSharp-Editor.csproj
 
 # Unity3D generated meta files
 *.pidb.meta
