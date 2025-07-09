@@ -40,8 +40,7 @@ public class MainLifetimeScope : LifetimeScope
         
         builder.Register<CardPoolService>(Lifetime.Singleton);
         builder.Register<ThemeService>(Lifetime.Singleton);
-        builder.Register<StatsTracker>(Lifetime.Singleton);
-        builder.Register<EvolutionManager>(Lifetime.Singleton);
+        builder.Register<StatsTrackerService>(Lifetime.Singleton);
         
         // === エントリーポイントとPresenterの登録 ===
         

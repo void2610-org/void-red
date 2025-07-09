@@ -50,6 +50,39 @@ jobs:
             Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-
             Library-${{ runner.os }}-
 
+      - name: Verify Assets-based SerializeReferenceExtensions 📦
+        run: |
+          echo "🔍 Verifying Assets-based SerializeReferenceExtensions..."
+          
+          # Assets配置の確認
+          echo "📁 Checking Assets/Plugins directory:"
+          ls -la Assets/Plugins/ || echo "❌ No Plugins directory"
+          
+          if [ -d "Assets/Plugins/MackySoft.SerializeReferenceExtensions" ]; then
+            echo "✅ SerializeReferenceExtensions found in Assets"
+            echo "📁 Runtime directory:"
+            ls -la Assets/Plugins/MackySoft.SerializeReferenceExtensions/Runtime/
+            echo "📁 Editor directory:"
+            ls -la Assets/Plugins/MackySoft.SerializeReferenceExtensions/Editor/
+            
+            # 重要なファイルの存在確認
+            if [ -f "Assets/Plugins/MackySoft.SerializeReferenceExtensions/Runtime/SubclassSelectorAttribute.cs" ]; then
+              echo "✅ SubclassSelectorAttribute.cs found"
+            else
+              echo "❌ SubclassSelectorAttribute.cs NOT found"
+            fi
+          else
+            echo "❌ SerializeReferenceExtensions NOT found in Assets"
+          fi
+          
+          # manifest.jsonの確認（Gitパッケージが削除されているか）
+          echo "📄 Checking manifest.json (should not contain serializereference-extensions):"
+          if grep -q "serializereference-extensions" Packages/manifest.json; then
+            echo "❌ Git package reference still exists in manifest.json"
+          else
+            echo "✅ Git package reference removed from manifest.json"
+          fi
+
       - name: Build project 🏗️
         uses: game-ci/unity-builder@v4
         env:
