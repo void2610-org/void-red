@@ -139,6 +139,9 @@ jobs:
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SORT_USINGS/@EntryValue">False</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/REMOVE_BLANK_LINES_NEAR_BRACES_IN_CODE/@EntryValue">False</s:Boolean>' >> .DotSettings
         echo '  <s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/REMOVE_BLANK_LINES_NEAR_BRACES_IN_DECLARATIONS/@EntryValue">False</s:Boolean>' >> .DotSettings
+        echo '  <!-- 空行を完全に維持 -->' >> .DotSettings
+        echo '  <s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_BLANK_LINES_IN_CODE/@EntryValue">99</s:Int64>' >> .DotSettings
+        echo '  <s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_BLANK_LINES_IN_DECLARATIONS/@EntryValue">99</s:Int64>' >> .DotSettings
         echo '</wpf:ResourceDictionary>' >> .DotSettings
         
         # ReSharper cleanupcode で利用可能なプロファイルを確認
