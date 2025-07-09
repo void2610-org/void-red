@@ -10,98 +10,59 @@ on:
 jobs:
   code-quality:
     runs-on: ubuntu-latest
-    
+    permissions:
+      security-events: write
+      
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+      with:
+        submodules: recursive
+        
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
         
-    - name: Cache NuGet packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
-          
-    - name: Install ReSharper Command Line Tools with Unity support
+    - name: Check for Unity solution file
       run: |
-        dotnet tool install -g JetBrains.ReSharper.GlobalTools
-        
-    - name: Create Unity project file for ReSharper
-      run: |
-        # .editorconfigファイルの確認
-        if [ -f .editorconfig ]; then
-          echo "✅ Found .editorconfig file for formatting rules"
+        if [ -f "void-red.sln" ]; then
+          echo "✅ Unity solution file found"
         else
-          echo "⚠️ No .editorconfig file found"
+          echo "❌ Unity solution file not found"
+          echo "Available files:"
+          ls -la *.sln || echo "No .sln files found"
+          exit 1
         fi
         
-        # Unity向けの適切なプロジェクトファイルを作成
-        cat > Assembly-CSharp.csproj << 'PROJEOF'
-        <Project Sdk="Microsoft.NET.Sdk">
-          <PropertyGroup>
-            <TargetFramework>netstandard2.1</TargetFramework>
-            <LangVersion>9.0</LangVersion>
-            <Nullable>disable</Nullable>
-            <ImplicitUsings>disable</ImplicitUsings>
-            <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-            <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-            <DefineConstants>UNITY_6000_0_OR_NEWER;UNITY_6000_0;UNITY_6000;UNITY_5_3_OR_NEWER;UNITY_5_3;UNITY_5;UNITY_64;UNITY_EDITOR;UNITY_EDITOR_LINUX;UNITY_STANDALONE_LINUX;UNITY_STANDALONE;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_ADDRESSABLE_IMPORTER;ENABLE_TEXTURE_STREAMING;ENABLE_MOVIESTREAMING;ENABLE_UNITY_ANALYTICS;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_MANAGED_UNITYTLS;INCLUDE_DYNAMIC_GI;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;ENABLE_VIDEO;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;ENABLE_NAVIGATION_PACKAGE_DEBUG_VISUALIZATION;ENABLE_NAVIGATION_HEIGHTMESH_RUNTIME_SUPPORT;ENABLE_NAVIGATION_UI_REQUIRES_PACKAGE;PLATFORM_STANDALONE;TEXTCORE_1_0_OR_NEWER;TMPRO_3_0_OR_NEWER;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_NVIDIA;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;PLATFORM_UPDATES_TIME_OUTSIDE_OF_PLAYER_LOOP;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_STANDARD_2_0;NET_STANDARD;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_LINUX;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER</DefineConstants>
-          </PropertyGroup>
-          <ItemGroup>
-            <Compile Include="Assets\Scripts\**\*.cs" />
-          </ItemGroup>
-          <ItemGroup>
-            <PackageReference Include="Unity.Mathematics" Version="1.2.6" />
-            <PackageReference Include="Unity.Collections" Version="1.4.0" />
-            <PackageReference Include="Unity.Burst" Version="1.8.4" />
-            <PackageReference Include="Unity.Jobs" Version="0.70.0-preview.7" />
-          </ItemGroup>
-        </Project>
-        PROJEOF
+    - name: Install ReSharper Command Line Tools
+      run: |
+        dotnet tool install -g JetBrains.ReSharper.GlobalTools --version 2025.1.4
         
-        # ReSharper Code Inspection実行 (コンパイルエラーのみ)
-        jb inspectcode Assembly-CSharp.csproj \
+    - name: Restore dependencies
+      run: dotnet restore void-red.sln
+      
+    - name: Run ReSharper InspectCode
+      run: |
+        jb inspectcode void-red.sln \
           --output=inspectcode-results.xml \
           --format=xml \
           --severity=ERROR \
-          --no-build \
-          --disable-settings-layers=SolutionPersonal \
-          --disable-settings-layers=SolutionShared \
-          --disable-settings-layers=GlobalAll \
-          --disable-settings-layers=GlobalPerProduct \
-          --properties:Configuration=Debug \
-          --exclude="**/*.Generated.cs;**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
-          --verbosity=WARN || echo "Some issues found, continuing..."
+          --exclude="**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
+          --verbosity=WARN
           
     - name: Check inspection results
       run: |
         if [ -f inspectcode-results.xml ]; then
           ISSUES=$(grep -c '<Issue' inspectcode-results.xml || echo "0")
-          echo "Found $ISSUES code quality issues (ERROR level only)"
+          echo "Found $ISSUES error-level code quality issues"
           
           if [ "$ISSUES" -gt 0 ]; then
-            echo "::warning::Found $ISSUES error-level code quality issues"
-            echo "The following ERROR-level issues were found:"
-            
-            # エラーレベルの問題を簡潔に表示
-            if command -v xmllint >/dev/null 2>&1; then
-              xmllint --format inspectcode-results.xml | grep -A 1 -B 1 'Severity="ERROR"' | head -20
-            else
-              echo "Install xmllint to see detailed error information"
-            fi
-            
-            echo ""
-            echo "Please fix these ERROR-level issues before merging."
+            echo "::error::Code quality check failed: Found $ISSUES error-level issues"
             exit 1
           fi
           
-          echo "✅ Code quality check passed - No ERROR-level issues found"
+          echo "✅ Code quality check passed - No error-level issues found"
         else
           echo "::error::Inspection results file not found"
           exit 1
