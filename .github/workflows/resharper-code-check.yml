@@ -89,7 +89,6 @@ jobs:
             --format=xml \
             --severity=WARNING \
             --no-build \
-            --disable-settings-layers=GlobalAll \
             --properties:Configuration=Debug 2>/dev/null || echo "inspectcode failed but continuing..."
         else
           echo "Required files not found, skipping inspection"

@@ -4156,5 +4156,12 @@ resharper_consistent_naming_rule.UI = UI
 resharper_consistent_naming_rule.TMP = TMP
 resharper_consistent_naming_rule.NPC = NPC
 
+# ReSharper C#専用の命名規則（CLT用）
+resharper_csharp_naming_rule.private_static_fields = _camelCase
+resharper_csharp_naming_rule.private_static_fields.element_kinds = field
+resharper_csharp_naming_rule.private_static_fields.visibility = private
+resharper_csharp_naming_rule.private_static_fields.mutability = mutable
+resharper_csharp_naming_rule.private_static_fields.is_static = true
+
 # 特定のクラス名違反を無視
 dotnet_diagnostic.IDE1006.severity = none
