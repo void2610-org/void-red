@@ -1,4 +1,4 @@
-name: ReSharper Code Quality Check
+name: ReSharper Code Format
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_call:
 
 jobs:
-  code-quality:
+  code-format:
     runs-on: ubuntu-latest
     
     steps:
@@ -95,208 +95,119 @@ jobs:
           exit 1
         fi
         
-    - name: Restore NuGet packages (optional)
+    - name: Prepare for formatting
       run: |
-        echo "📦 NuGet パッケージの復元を試行します..."
-        
-        # 依存関係の問題があっても解析を続行するため、エラーを無視
-        dotnet restore void-red-analysis.sln || {
-          echo "⚠️ NuGet restore に失敗しましたが、ReSharper解析は --no-build で続行します"
-          echo "これは Unity プロジェクトの依存関係が複雑なため正常な動作です"
-        }
+        echo "🔧 ReSharper フォーマット準備中..."
+        echo "💡 Unity プロジェクトのコードフォーマットを実行します"
       
-    - name: Run ReSharper Code Inspection
+    - name: Run ReSharper Code Cleanup (Format)
       run: |
         # PATH を確実に設定
         export PATH="$HOME/.dotnet/tools:$PATH"
         
-        echo "🔍 ReSharper 静的解析を開始します..."
+        echo "🎨 ReSharper コードフォーマットを開始します..."
         echo "使用するソリューション: void-red-analysis.sln"
         
-        # Unity extension が利用できない場合は標準解析を実行
-        # --no-build オプションを使用して依存関係の問題を回避
-        echo "📋 ReSharper解析オプション:"
-        echo "  - 標準C#解析（Unity extensionなし）"
-        echo "  - ビルドスキップで依存関係問題を回避"
-        echo "  - メインゲームコードのみ解析（サンプル除外）"
-        echo "  - Unity参照エラーを除外して実用的な品質チェック"
+        # フォーマット前の状態を記録
+        echo "📸 フォーマット前の状態を保存..."
+        git add -A
+        git diff --cached --name-only > format-target-files.txt
+        git reset
         
-        jb inspectcode void-red-analysis.sln \
-          --output=resharper-report.xml \
-          --format=Xml \
-          --no-build \
+        echo "📋 ReSharper フォーマットオプション:"
+        echo "  - コードクリーンアップ（自動整形）"
+        echo "  - 標準C#フォーマット設定"
+        echo "  - メインゲームコードのみ対象（サンプル除外）"
+        echo "  - Unity プロジェクト最適化"
+        
+        # ReSharper cleanupcode の実行
+        jb cleanupcode void-red-analysis.sln \
           --verbosity=WARN \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
+          --profile="Built-in: Full Cleanup" \
           --properties:Configuration=Debug
           
-        echo "✅ ReSharper 静的解析が完了しました"
-        
-        # レポートファイルの存在確認
-        if [ -f "resharper-report.xml" ]; then
-          echo "📄 レポートファイルが生成されました: $(wc -l < resharper-report.xml) 行"
-          echo "ファイルサイズ: $(du -h resharper-report.xml | cut -f1)"
+        echo "✅ ReSharper コードフォーマットが完了しました"
           
-          # レポート内容の簡単な確認
-          echo "📊 解析結果のプレビュー:"
-          head -10 resharper-report.xml || echo "レポート内容の読み取りに失敗"
-        else
-          echo "❌ レポートファイルが生成されませんでした"
-          exit 1
-        fi
-          
-    - name: Upload inspection results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: resharper-inspection-results
-        path: resharper-report.xml
-        retention-days: 30
-        
-    - name: Generate inspection summary
+    - name: Check format changes
       run: |
-        # レポートのサマリーを生成
-        echo "## 📊 ReSharper 静的解析結果サマリー"
+        echo "🔍 フォーマット結果の差分を確認中..."
         
-        if [ -f "resharper-report.xml" ]; then
-          ERROR_COUNT=$(grep -c 'Severity="ERROR"' resharper-report.xml || echo "0")
-          WARNING_COUNT=$(grep -c 'Severity="WARNING"' resharper-report.xml || echo "0")
-          SUGGESTION_COUNT=$(grep -c 'Severity="SUGGESTION"' resharper-report.xml || echo "0")
-          
-          echo "- ❌ エラー: $ERROR_COUNT 件"
-          echo "- ⚠️  警告: $WARNING_COUNT 件"  
-          echo "- 💡 提案: $SUGGESTION_COUNT 件"
-          echo ""
-          
-          # 重大な問題の詳細を表示
-          if [ "$ERROR_COUNT" -gt 0 ]; then
-            echo "### 🚨 エラー詳細 (最初の5件):"
-            grep 'Severity="ERROR"' resharper-report.xml | head -5 | \
-              sed 's/.*Message="\([^"]*\)".*/- \1/' || true
-            echo ""
-          fi
-          
-          if [ "$WARNING_COUNT" -gt 0 ]; then
-            echo "### ⚠️ 警告詳細 (最初の5件):"
-            grep 'Severity="WARNING"' resharper-report.xml | head -5 | \
-              sed 's/.*Message="\([^"]*\)".*/- \1/' || true
-            echo ""
-          fi
+        # Git 設定
+        git config user.name "ReSharper Code Format Bot"
+        git config user.email "noreply@github.com"
+        
+        # フォーマット後の変更を確認
+        if git diff --quiet && git diff --cached --quiet; then
+          echo "✅ フォーマット変更はありませんでした"
+          echo "FORMAT_CHANGES=false" >> $GITHUB_ENV
         else
-          echo "❌ レポートファイルが見つかりません"
+          echo "🎨 フォーマット変更が検出されました"
+          echo "FORMAT_CHANGES=true" >> $GITHUB_ENV
+          
+          # 変更されたファイルの一覧を表示
+          echo "📁 変更されたファイル:"
+          git diff --name-only | head -20
+          
+          # 変更の概要を表示
+          echo ""
+          echo "📊 変更の統計:"
+          git diff --stat | tail -1
         fi
         
-    - name: Check for inspection violations
+    - name: Format summary
       run: |
-        # XMLレポートを解析して違反があるかチェック
-        if [ ! -f "resharper-report.xml" ]; then
-          echo "❌ ReSharper レポートファイルが見つかりません"
-          exit 1
-        fi
-        
-        echo "📊 ReSharper 解析結果の詳細分析:"
-        
-        # 各種レベルの問題をカウント
-        ERROR_COUNT=$(grep -c 'Severity="ERROR"' resharper-report.xml || echo "0")
-        WARNING_COUNT=$(grep -c 'Severity="WARNING"' resharper-report.xml || echo "0")
-        SUGGESTION_COUNT=$(grep -c 'Severity="SUGGESTION"' resharper-report.xml || echo "0")
-        INFO_COUNT=$(grep -c 'Severity="INFO"' resharper-report.xml || echo "0")
-        
-        echo "🔍 問題の詳細:"
-        echo "  ❌ エラー: $ERROR_COUNT 件"
-        echo "  ⚠️  警告: $WARNING_COUNT 件"
-        echo "  💡 提案: $SUGGESTION_COUNT 件"
-        echo "  ℹ️  情報: $INFO_COUNT 件"
-        
-        # 実際の問題（Issues）を取得して表示
+        echo "## 🎨 ReSharper コードフォーマット結果"
         echo ""
-        echo "🔍 ReSharper レポートの構造分析:"
-        echo "📄 総行数: $(wc -l < resharper-report.xml)"
-        echo "📊 Issues セクション:"
-        grep -c '<Issue ' resharper-report.xml 2>/dev/null || echo "0" | xargs -I {} echo "  実際の問題: {} 件"
         
-        # エラーレベルの実際の問題を表示
-        if [ "$ERROR_COUNT" -gt 0 ]; then
+        if [ "$FORMAT_CHANGES" = "true" ]; then
+          echo "### ✅ フォーマット完了"
+          echo "- 💫 コードスタイルが統一されました"
+          echo "- 📝 自動で整形・最適化されました"
+          echo "- 🔧 ReSharper 標準プロファイルを適用"
           echo ""
-          echo "🚨 エラーレベルの実際の問題:"
-          # <Issue> タグからエラーレベルの問題を抽出
-          grep '<Issue.*Severity="ERROR"' resharper-report.xml | head -5 | while read -r line; do
-            # ファイル名を抽出
-            file=$(echo "$line" | sed -n 's/.*File="\([^"]*\)".*/\1/p')
-            # 行番号を抽出
-            line_num=$(echo "$line" | sed -n 's/.*Line="\([^"]*\)".*/\1/p')
-            # メッセージを抽出
-            message=$(echo "$line" | sed -n 's/.*Message="\([^"]*\)".*/\1/p')
-            # タイプIDを抽出
-            type_id=$(echo "$line" | sed -n 's/.*TypeId="\([^"]*\)".*/\1/p')
-            
-            if [ -n "$file" ] && [ -n "$message" ]; then
-              echo "  📁 ${file##*/}:${line_num} - $message"
-              echo "    🔖 エラータイプ: $type_id"
-            else
-              echo "  🔍 詳細情報の抽出に失敗: $line"
-            fi
-          done || echo "  ℹ️ エラー詳細の抽出でエラーが発生しました"
-        fi
-        
-        # 警告レベルの実際の問題を表示（最初の3件）
-        if [ "$WARNING_COUNT" -gt 0 ]; then
+          echo "### 📁 変更されたファイル:"
+          git diff --name-only | sed 's/^/- /' | head -20
           echo ""
-          echo "⚠️ 警告レベルの問題 (最初の3件):"
-          grep '<Issue.*Severity="WARNING"' resharper-report.xml | head -3 | while read -r line; do
-            file=$(echo "$line" | sed -n 's/.*File="\([^"]*\)".*/\1/p')
-            line_num=$(echo "$line" | sed -n 's/.*Line="\([^"]*\)".*/\1/p')
-            message=$(echo "$line" | sed -n 's/.*Message="\([^"]*\)".*/\1/p')
-            type_id=$(echo "$line" | sed -n 's/.*TypeId="\([^"]*\)".*/\1/p')
-            
-            if [ -n "$file" ] && [ -n "$message" ]; then
-              echo "  📁 ${file##*/}:${line_num} - $message"
-            else
-              echo "  🔍 $type_id (詳細要確認)"
-            fi
-          done || echo "  ℹ️ 警告詳細の抽出でエラーが発生しました"
-        fi
-        
-        # デバッグ用: レポートの一部を表示
-        echo ""
-        echo "🧪 デバッグ情報 (レポート構造確認):"
-        echo "📋 最初の実際の Issue エントリ:"
-        grep '<Issue ' resharper-report.xml | head -2 || echo "  Issue エントリが見つかりません"
-        
-        echo ""
-        echo "📋 CI判定結果:"
-        
-        # Unity プロジェクトでは参照エラーが大量発生するため、実用的な判定に変更
-        if [ "$ERROR_COUNT" -gt 0 ]; then
-          echo "❌ エラーレベルの問題があります ($ERROR_COUNT 件)"
-          
-          # Unity 関連のエラーを除外した実用的なエラー数を算出
-          UNITY_ERRORS=$(grep -c 'Cannot resolve symbol.*Unity\|Cannot resolve symbol.*MonoBehaviour\|Cannot resolve symbol.*R3\|Cannot resolve symbol.*string\|Cannot resolve symbol.*System\|Cannot use.*this.*modifier\|A constant value is expected' resharper-report.xml || echo "0")
-          REAL_ERRORS=$((ERROR_COUNT - UNITY_ERRORS))
-          
-          echo "🔍 エラー内訳:"
-          echo "  📦 Unity/参照関連: $UNITY_ERRORS 件（CI環境の制約）"
-          echo "  🎯 実際のコード問題: $REAL_ERRORS 件"
-          
-          if [ "$REAL_ERRORS" -gt 0 ]; then
-            echo "⚠️ 実際のコード問題が検出されました ($REAL_ERRORS 件)"
-            echo "🔧 修正を検討してください"
-          else
-            echo "✅ Unity/参照関連エラーのみでした（正常範囲）"
-          fi
-          
-          echo "📎 詳細は Actions の Artifacts からレポートをダウンロードしてください"
-          # Unity プロジェクトでは参照エラーは正常なため CI を継続
-        elif [ "$WARNING_COUNT" -gt 0 ]; then
-          echo "⚠️  警告レベルの問題があります ($WARNING_COUNT 件)"
-          echo "💡 余裕があるときに確認・修正することをお勧めします"
+          echo "### 📊 変更統計:"
+          git diff --stat | tail -1
         else
-          echo "✅ コード品質に問題は見つかりませんでした！"
+          echo "### ✅ フォーマット確認完了"
+          echo "- コードスタイルは既に統一されています"
+          echo "- 追加の変更は必要ありませんでした"
         fi
         
+    - name: Check format compliance
+      run: |
+        echo "📋 コードフォーマット準拠チェック結果:"
         echo ""
-        echo "📋 解析の有効性："
-        echo "  ✅ 警告・提案レベルの品質チェック: 有効"
-        echo "  ⚠️ エラーレベルの品質チェック: Unity 環境制約により限定的"
-        echo "  🎯 推奨: 警告レベルの問題を定期的に確認・修正"
-        echo ""
-        echo "🎯 ReSharper 静的解析が正常に完了しました"
+        
+        if [ "$FORMAT_CHANGES" = "true" ]; then
+          echo "❌ コードフォーマットが準拠していません"
+          echo ""
+          echo "### 🔍 検出された問題:"
+          echo "- コードスタイルが統一されていません"
+          echo "- ReSharper 標準フォーマットとの差分があります"
+          echo "- 手動でフォーマット適用が必要です"
+          echo ""
+          echo "### 📁 影響を受けるファイル:"
+          git diff --name-only | sed 's/^/  - /' | head -20
+          echo ""
+          echo "### 🔧 修正方法:"
+          echo "1. ReSharper を使用してコードをフォーマット"
+          echo "2. IDE の自動フォーマット機能を使用"
+          echo "3. 手動でコードスタイルを調整"
+          echo ""
+          echo "### 📊 変更統計:"
+          git diff --stat | tail -1
+          echo ""
+          echo "❌ CI を失敗させます。コードをフォーマットしてから再度プッシュしてください。"
+          exit 1
+        else
+          echo "✅ コードフォーマットが準拠しています"
+          echo ""
+          echo "### ✅ 確認完了:"
+          echo "- コードスタイルが統一されています"
+          echo "- ReSharper 標準フォーマットに準拠しています"
+          echo "- 追加のフォーマット作業は不要です"
+        fi
