@@ -49,14 +49,13 @@ jobs:
         
     - name: Run ReSharper InspectCode
       run: |
-        echo "Running ReSharper inspection on main project only..."
-        jb inspectcode Assembly-CSharp.csproj \
+        echo "Running ReSharper inspection with Unity-specific settings..."
+        jb inspectcode void-red.sln \
           --output=inspectcode-results.xml \
           --format=xml \
           --severity=ERROR \
           --no-build \
-          --no-restore \
-          --properties:Configuration=Release \
+          --settings=void-red.sln.DotSettings \
           --exclude="**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
           --verbosity=WARN
           

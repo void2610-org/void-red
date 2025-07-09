@@ -35,4 +35,17 @@
 	
 	<!-- 名前空間の自動生成を無効化 -->
 	<s:Boolean x:Key="/Default/CodeEditing/CSharp/GENERATE_NAMESPACE_USING_FOLDER_NAME/@EntryValue">False</s:Boolean>
+	
+	<!-- Unity プロジェクト用の追加設定 -->
+	<!-- 参照解決エラーを無視 -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnresolvedReference/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CannotResolveSymbol/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	
+	<!-- Unity 固有の警告を無視 -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedMember.Global/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedParameter.Global/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MemberCanBePrivate.Global/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedAutoPropertyAccessor.Global/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=Unity.RedundantSerializeFieldAttribute/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=Unity.InefficientPropertyAccess/@EntryIndexedValue">WARNING</s:String>
 </wpf:ResourceDictionary>
