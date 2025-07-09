@@ -32,17 +32,22 @@ jobs:
       run: |
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         
-    - name: Verify Unity solution file
+    - name: Verify Unity project files
       run: |
-        # 既存のソリューションファイルが存在することを確認
+        echo "📁 プロジェクトファイルの確認:"
+        echo "ソリューションファイル:"
+        ls -la *.sln 2>/dev/null || echo "  ソリューションファイルが見つかりません"
+        echo "プロジェクトファイル:"
+        ls -la Assembly-CSharp*.csproj 2>/dev/null || echo "  Assembly-CSharp プロジェクトが見つかりません"
+        
+        # メインのソリューションファイルが存在するか確認
         if [ -f "void-red.sln" ]; then
           echo "✅ Unity ソリューションファイルが見つかりました: void-red.sln"
           echo "ファイル内容の確認:"
-          head -5 void-red.sln
+          head -3 void-red.sln
         else
-          echo "❌ void-red.sln が見つかりません"
-          echo "利用可能なファイル:"
-          ls -la *.sln 2>/dev/null || echo "ソリューションファイルが存在しません"
+          echo "❌ void-red.sln が見つかりません。.gitignore から除外されている可能性があります。"
+          echo "💡 .gitignore を修正して *.sln と *.csproj をコミットしてください。"
           exit 1
         fi
         
