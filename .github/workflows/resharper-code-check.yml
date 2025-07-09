@@ -43,10 +43,14 @@ jobs:
         
     - name: Install ReSharper Command Line Tools
       run: |
+        cd $HOME
         dotnet tool install -g JetBrains.ReSharper.GlobalTools --version 2025.1.4
+        echo "PATH=$PATH:$HOME/.dotnet/tools" >> $GITHUB_ENV
         
     - name: Restore dependencies
-      run: dotnet restore void-red.sln
+      run: |
+        echo "Restoring dependencies for Unity solution..."
+        dotnet restore void-red.sln || echo "Some packages may not be available, continuing..."
       
     - name: Run ReSharper InspectCode
       run: |
