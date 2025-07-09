@@ -4146,3 +4146,6 @@ dotnet_naming_style.underscore_camel_case.required_prefix = _
 # Unity開発では名前空間とファイル位置の対応を厳密に管理しない場合がある
 resharper_check_namespace_highlighting = none
 dotnet_diagnostic.ide0130.severity = none
+
+# 一般的な略語を許可（UI, NPC, TMP等）
+resharper_acronyms_list = UI|NPC|TMP|TMPro|AI|ID|OK|iOS|OS|PC|PS|VR|AR|XR|SDK|API|HTTP|HTTPS|URL|URI|XML|JSON|SQL|CSV|PDF|PNG|JPG|JPEG|GIF|RGB|RGBA|HSV|FPS|LOD|GPU|CPU|RAM|ROM|UUID|GUID|ASCII|UTF|GUI|HUD|SFX|BGM|SE|2D|3D|UV|SDK
