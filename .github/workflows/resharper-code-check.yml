@@ -143,16 +143,17 @@ jobs:
         echo "対象ファイル（ScoreCalculator.cs）の現在の状態:"
         head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
         
-        # ReSharper cleanupcode の実行（明示的なプロファイル指定）
+        # ReSharper cleanupcode の実行（ビルドをスキップして実行）
         echo ""
         echo "⚡ ReSharper cleanupcode を実行中..."
         jb cleanupcode void-red-analysis.sln \
-          --verbosity=INFO \
+          --verbosity=VERBOSE \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
           --settings=.DotSettings \
           --profile="Built-in: Full Cleanup" \
+          --no-build \
           --properties:Configuration=Debug \
-          2>&1 | head -100
+          2>&1 | head -200
         
         echo ""
         echo "🔄 フォーマット結果の詳細確認..."
@@ -162,6 +163,16 @@ jobs:
         echo ""
         echo "対象ファイル（ScoreCalculator.cs）のフォーマット後の状態:"
         head -30 Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
+        
+        echo ""
+        echo "🔍 フォーマット差分の詳細確認:"
+        git diff Assets/Scripts/Game/Logic/ScoreCalculator.cs | head -50 || echo "差分なし"
+        
+        echo ""
+        echo "🧪 手動フォーマット確認のため、期待されるフォーマット:"
+        echo "  15行目: 'PlayerMove move, ThemeData theme' (カンマ後にスペース)"
+        echo "  17行目: 'move == null || !theme' (演算子周りにスペース)"
+        echo "  20行目: 'attributeMultiplier * move.MentalBet' (演算子周りにスペース)"
           
         echo "✅ ReSharper コードフォーマットが完了しました"
           
