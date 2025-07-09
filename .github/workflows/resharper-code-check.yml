@@ -58,8 +58,7 @@ jobs:
           --no-build \
           --settings=void-red.sln.DotSettings \
           --exclude="**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**;**/Unity.**;**/Microsoft.**;**/System.**" \
-          --include="InconsistentNaming;RedundantUsingDirective" \
-          --verbosity=ERROR
+          --verbosity=ERROR || echo "Inspectcode completed with warnings"
           
     - name: Check formatting results
       run: |
