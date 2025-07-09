@@ -54,10 +54,9 @@ jobs:
         jb inspectcode void-red.sln \
           --output=inspectcode-results.xml \
           --format=xml \
-          --severity=WARNING \
+          --severity=SUGGESTION \
           --no-build \
           --settings=void-red.sln.DotSettings \
-          --include="InconsistentNaming;RedundantUsingDirective;ArrangeTypeMemberModifiers;ArrangeTypeModifiers;BuiltInTypeReferenceStyle;ArrangeTrailingCommaInMultilineLists;ArrangeTrailingCommaInSinglelineLists;SuggestVarOrType_BuiltInTypes;SuggestVarOrType_Elsewhere;SuggestVarOrType_SimpleTypes;UseExplicitOrImplicitModifier;ConvertToAutoProperty;MemberCanBePrivate.Local;UnusedMember.Local" \
           --exclude="**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
           --verbosity=WARN
           
