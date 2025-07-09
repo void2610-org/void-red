@@ -32,22 +32,18 @@ jobs:
       run: |
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         
-    - name: Find and inspect C# project files
+    - name: Find and inspect C# scripts
       run: |
-        # C#プロジェクトファイルを検索
-        CSPROJ_FILES=$(find . -name "*.csproj" -not -path "./Library/*" -not -path "./Temp/*" | head -5)
+        # C#スクリプトファイルを検索
+        CS_FILES=$(find Assets -name "*.cs" -not -path "*/Library/*" -not -path "*/Temp/*" | head -10)
         
-        if [ -z "$CSPROJ_FILES" ]; then
-          echo "No C# project files found"
+        if [ -z "$CS_FILES" ]; then
+          echo "No C# script files found in Assets folder"
           exit 1
         fi
         
-        echo "Found C# project files:"
-        echo "$CSPROJ_FILES"
-        
-        # 最初に見つかったプロジェクトファイルを使用
-        MAIN_PROJECT=$(echo "$CSPROJ_FILES" | head -1)
-        echo "Using project file: $MAIN_PROJECT"
+        echo "Found C# script files:"
+        echo "$CS_FILES"
         
         # .editorconfigファイルの確認
         if [ -f .editorconfig ]; then
@@ -56,8 +52,8 @@ jobs:
           echo "⚠️ No .editorconfig file found"
         fi
         
-        # ReSharper Code Inspection実行 (.editorconfigは自動的に認識される)
-        jb inspectcode "$MAIN_PROJECT" \
+        # ReSharper Code Inspection実行 (Assetsフォルダ全体を対象)
+        jb inspectcode Assets \
           --output=inspectcode-results.xml \
           --format=xml \
           --severity=WARNING \
