@@ -4230,21 +4230,9 @@ resharper_outdent_commas = false
 # 空行のインデントを維持するため、末尾の空白を削除しない
 trim_trailing_whitespace = false
 
-# ReSharperの空行処理を完全に停止
+# 基本的なフォーマットは適用、空行の削除のみ無効化
 resharper_formatter_off_tag = @formatter:off
 resharper_formatter_on_tag = @formatter:on
-resharper_blank_lines_around_field = keep
-resharper_blank_lines_around_property = keep
-resharper_blank_lines_around_auto_property = keep
-resharper_blank_lines_around_invocable = keep
-resharper_blank_lines_around_single_line_invocable = keep
-resharper_blank_lines_around_type = keep
-resharper_blank_lines_around_single_line_type = keep
-resharper_blank_lines_inside_type = keep
-resharper_blank_lines_around_namespace = keep
-resharper_blank_lines_inside_namespace = keep
-resharper_blank_lines_around_region = keep
-resharper_blank_lines_inside_region = keep
 
 # ReSharperの空行処理を完全に無効化
 resharper_remove_blank_lines_near_braces_in_code = false
