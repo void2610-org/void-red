@@ -4146,3 +4146,24 @@ dotnet_naming_symbols.public_fields_symbols.applicable_kinds = field
 dotnet_naming_symbols.public_fields_symbols.applicable_accessibilities = public
 
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# 定数フィールドの命名規則（UPPER_SNAKE_CASE）
+dotnet_naming_rule.constant_fields_rule.severity = error
+dotnet_naming_rule.constant_fields_rule.symbols = constant_fields_symbols
+dotnet_naming_rule.constant_fields_rule.style = upper_snake_case_style
+
+dotnet_naming_symbols.constant_fields_symbols.applicable_kinds = field
+dotnet_naming_symbols.constant_fields_symbols.applicable_accessibilities = private, internal, protected, public
+dotnet_naming_symbols.constant_fields_symbols.required_modifiers = const
+
+dotnet_naming_style.upper_snake_case_style.capitalization = all_upper
+dotnet_naming_style.upper_snake_case_style.word_separator = _
+
+# 静的読み取り専用フィールドの命名規則（UPPER_SNAKE_CASE）
+dotnet_naming_rule.static_readonly_fields_rule.severity = error
+dotnet_naming_rule.static_readonly_fields_rule.symbols = static_readonly_fields_symbols
+dotnet_naming_rule.static_readonly_fields_rule.style = upper_snake_case_style
+
+dotnet_naming_symbols.static_readonly_fields_symbols.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_fields_symbols.applicable_accessibilities = private, internal, protected, public
+dotnet_naming_symbols.static_readonly_fields_symbols.required_modifiers = static, readonly
