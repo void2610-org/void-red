@@ -30,7 +30,11 @@ jobs:
           
     - name: Install ReSharper Command Line Tools
       run: |
+        # ホームディレクトリに移動してインストール（プロジェクトファイルの干渉を避ける）
+        cd $HOME
+        
         # ReSharper Command Line Tools をグローバルツールとしてインストール
+        echo "🔧 ReSharper Command Line Tools をインストール中..."
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         
         # インストール確認とパス設定
