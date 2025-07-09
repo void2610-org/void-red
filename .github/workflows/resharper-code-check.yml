@@ -369,24 +369,51 @@ jobs:
             
             # XMLから命名規則違反を詳細に抽出（Assets/Scripts以下のC#ファイルのみ）
             echo "🔍 詳細な違反内容（Assets/Scripts以下のC#ファイルのみ）:"
-            grep 'InconsistentNaming' resharper-inspection-report.xml | \
-              grep 'File="Assets\\Scripts.*\.cs"' | \
+            
+            # 全ての命名規則違反を抽出
+            ALL_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"')
+            
+            # SerializeFieldフィールドの違反を除外するための分析
+            echo "📋 違反の分類:"
+            
+            # 通常のプライベートフィールド違反（SerializeField除外）
+            NON_SERIALIZED_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | grep -v 'SerializeField' | wc -l)
+            echo "  - 通常のプライベートフィールド違反: $NON_SERIALIZED_VIOLATIONS 件"
+            
+            # SerializeFieldフィールドの違反
+            SERIALIZED_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | grep 'SerializeField' | wc -l)
+            echo "  - SerializeFieldフィールド違反: $SERIALIZED_VIOLATIONS 件 (Unity慣習により除外)"
+            
+            # 実際に修正すべき違反のみを表示
+            echo ""
+            echo "🔧 修正すべき違反（SerializeFieldフィールドを除外）:"
+            echo "$ALL_VIOLATIONS" | \
+              grep -v 'SerializeField' | \
               sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/\1:\2 → \3/' | \
               head -20 | while read line; do
                 echo "  $line"
               done
             
-            # 実際の命名規則違反数を正確にカウント
-            ACTUAL_NAMING_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"' | wc -l)
+            # 実際の命名規則違反数を正確にカウント（SerializeField除外）
+            ACTUAL_NAMING_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | grep -v 'SerializeField' | wc -l)
+            TOTAL_VIOLATIONS=$(echo "$ALL_VIOLATIONS" | wc -l)
             echo ""
-            echo "📊 実際の命名規則違反数: $ACTUAL_NAMING_VIOLATIONS 件（Assets/Scripts以下のC#ファイルのみ）"
+            echo "📊 命名規則違反統計:"
+            echo "  - 全体: $TOTAL_VIOLATIONS 件"
+            echo "  - 修正すべき違反: $ACTUAL_NAMING_VIOLATIONS 件（SerializeFieldフィールドを除外）"
+            echo "  - Unity慣習による除外: $SERIALIZED_VIOLATIONS 件"
             
             # XMLサンプルを表示（デバッグ用）
             echo ""
             echo "📋 XMLサンプル（最初の5つの命名規則違反）:"
             grep -A 1 -B 1 'InconsistentNaming' resharper-inspection-report.xml | head -15 | sed 's/^/  /'
             
-            echo "NAMING_ISSUES_FOUND=true" >> $GITHUB_ENV
+            # 実際に修正すべき違反があるかどうかを判定（SerializeFieldフィールドを除外）
+            if [ $ACTUAL_NAMING_VIOLATIONS -gt 0 ]; then
+              echo "NAMING_ISSUES_FOUND=true" >> $GITHUB_ENV
+            else
+              echo "NAMING_ISSUES_FOUND=false" >> $GITHUB_ENV
+            fi
           else
             echo "✅ 命名規則違反は見つかりませんでした"
           fi
@@ -405,13 +432,13 @@ jobs:
           echo ""
           echo "### 🔍 検出された問題:"
           echo "- C# の命名規則に従っていない識別子があります"
-          echo "- クラス名、メソッド名、変数名などを確認してください"
+          echo "- 通常のプライベートフィールドに _プレフィックスが不足しています"
+          echo "- [SerializeField]フィールドはUnity慣習により除外されています"
           echo ""
           echo "### 🔧 修正方法:"
-          echo "- クラス名: PascalCase (例: PlayerController)"
-          echo "- パブリックメソッド: PascalCase (例: CalculateScore)"
-          echo "- プライベートフィールド: _camelCase (例: _playerName)"
+          echo "- 通常のプライベートフィールド: _camelCase (例: _playerName)"
           echo "- ローカル変数: camelCase (例: playerScore)"
+          echo "- [SerializeField]フィールド: camelCase (Unity慣習により変更不要)"
           echo ""
           echo "NAMING_CHECK_FAILED=true" >> $GITHUB_ENV
         else
@@ -419,6 +446,7 @@ jobs:
           echo ""
           echo "### ✅ 確認完了:"
           echo "- すべての識別子が C# 命名規則に従っています"
+          echo "- [SerializeField]フィールドはUnity慣習により適正です"
           echo "- 追加の修正作業は不要です"
           echo "NAMING_CHECK_FAILED=false" >> $GITHUB_ENV
         fi
