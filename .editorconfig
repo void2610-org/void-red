@@ -4229,10 +4229,32 @@ resharper_outdent_commas = false
 [*.cs]
 # 空行のインデントを維持するため、末尾の空白を削除しない
 trim_trailing_whitespace = false
+
+# ReSharperの空行処理を完全に無効化
 resharper_remove_blank_lines_near_braces_in_code = false
 resharper_remove_blank_lines_near_braces_in_declarations = false
 resharper_keep_blank_lines_in_code = 100
 resharper_keep_blank_lines_in_declarations = 100
+
+# 空行のインデントを保持する設定
+resharper_csharp_keep_blank_lines_in_code = 100
+resharper_csharp_keep_blank_lines_in_declarations = 100
+resharper_csharp_remove_blank_lines_near_braces_in_code = false
+resharper_csharp_remove_blank_lines_near_braces_in_declarations = false
+
+# 空行フォーマットの無効化
+resharper_csharp_blank_lines_around_field = 0
+resharper_csharp_blank_lines_around_property = 0
+resharper_csharp_blank_lines_around_auto_property = 0
+resharper_csharp_blank_lines_around_invocable = 0
+resharper_csharp_blank_lines_around_single_line_invocable = 0
+resharper_csharp_blank_lines_around_type = 0
+resharper_csharp_blank_lines_around_single_line_type = 0
+resharper_csharp_blank_lines_inside_type = 0
+resharper_csharp_blank_lines_around_namespace = 0
+resharper_csharp_blank_lines_inside_namespace = 0
+resharper_csharp_blank_lines_around_region = 0
+resharper_csharp_blank_lines_inside_region = 0
 
 # ReSharperの空行インデント削除を無効化
 resharper_place_simple_embedded_statement_on_same_line = false
