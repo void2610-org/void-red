@@ -40,16 +40,16 @@ jobs:
         
         # デバッグ情報
         echo "Current directory: $(pwd)"
-        echo "Assembly-CSharp.csproj exists: $(test -f Assembly-CSharp.csproj && echo 'YES' || echo 'NO')"
+        echo "void-red-minimal.slnf exists: $(test -f void-red-minimal.slnf && echo 'YES' || echo 'NO')"
         echo "Assets/Scripts directory exists: $(test -d Assets/Scripts && echo 'YES' || echo 'NO')"
         echo "CS files found: $(find Assets/Scripts -name "*.cs" 2>/dev/null | wc -l)"
         
         # ファイルが存在する場合のみ実行
-        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # より具体的な include パターンを使用
-          jb cleanupcode Assembly-CSharp.csproj \
+        if [ -f "void-red-minimal.slnf" ] && [ -d "Assets/Scripts" ]; then
+          # 軽量なソリューションフィルタを使用
+          jb cleanupcode void-red-minimal.slnf \
             --include="Assets/Scripts/Game/**/*.cs;Assets/Scripts/UI/**/*.cs;Assets/Scripts/Utils/**/*.cs;Assets/Scripts/Debug/**/*.cs;Assets/Scripts/VContainer/**/*.cs;Assets/Scripts/ScriptableObject/**/*.cs" \
-            --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
+            --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**;**/Assets/Packages/**;**/TextMesh Pro/**;**/SyskenTLib/**;**/proTools/**;**/Plugins/**;**/Editor/**;**/*.xml;**/*.json;**/*.txt;**/*.shader;**/*.cginc;**/*.hlsl;**/*.md" \
             --profile="Built-in: Reformat Code" \
             --no-build \
             --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
@@ -82,13 +82,13 @@ jobs:
         export PATH="$HOME/.dotnet/tools:$PATH"
         
         # ファイルが存在する場合のみ実行
-        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # より具体的な include パターンを使用
-          jb inspectcode Assembly-CSharp.csproj \
+        if [ -f "void-red-minimal.slnf" ] && [ -d "Assets/Scripts" ]; then
+          # 軽量なソリューションフィルタを使用
+          jb inspectcode void-red-minimal.slnf \
             --output=resharper-inspection-report.xml \
             --format=xml \
             --include="Assets/Scripts/Game/**/*.cs;Assets/Scripts/UI/**/*.cs;Assets/Scripts/Utils/**/*.cs;Assets/Scripts/Debug/**/*.cs;Assets/Scripts/VContainer/**/*.cs;Assets/Scripts/ScriptableObject/**/*.cs" \
-            --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
+            --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**;**/Assets/Packages/**;**/TextMesh Pro/**;**/SyskenTLib/**;**/proTools/**;**/Plugins/**;**/Editor/**;**/*.xml;**/*.json;**/*.txt;**/*.shader;**/*.cginc;**/*.hlsl;**/*.md" \
             --severity=WARNING \
             --no-build \
             --disable-settings-layers=GlobalAll \
