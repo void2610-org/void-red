@@ -47,45 +47,49 @@ jobs:
         dotnet tool install -g JetBrains.ReSharper.GlobalTools --version 2025.1.4
         echo "PATH=$PATH:$HOME/.dotnet/tools" >> $GITHUB_ENV
         
-    - name: Run ReSharper InspectCode
+    - name: Run ReSharper Code Format Check
       run: |
-        echo "Running ReSharper inspection with Unity-specific settings..."
+        echo "Running ReSharper code format check..."
+        # フォーマットと命名規則のみをチェック
         jb inspectcode void-red.sln \
           --output=inspectcode-results.xml \
           --format=xml \
-          --severity=ERROR \
+          --severity=WARNING \
           --no-build \
           --settings=void-red.sln.DotSettings \
+          --include="InconsistentNaming;RedundantUsingDirective;ArrangeTypeMemberModifiers;ArrangeTypeModifiers;BuiltInTypeReferenceStyle;ArrangeTrailingCommaInMultilineLists;ArrangeTrailingCommaInSinglelineLists;SuggestVarOrType_BuiltInTypes;SuggestVarOrType_Elsewhere;SuggestVarOrType_SimpleTypes;UseExplicitOrImplicitModifier;ConvertToAutoProperty;MemberCanBePrivate.Local;UnusedMember.Local" \
           --exclude="**/obj/**;**/bin/**;**/Library/**;**/Temp/**;**/Packages/**;**/PackageCache/**" \
           --verbosity=WARN
           
-    - name: Check inspection results
+    - name: Check formatting results
       run: |
         if [ -f inspectcode-results.xml ]; then
           ISSUES=$(grep -c '<Issue' inspectcode-results.xml || echo "0")
-          echo "Found $ISSUES error-level code quality issues"
+          echo "Found $ISSUES code format issues"
           
           if [ "$ISSUES" -gt 0 ]; then
-            echo "::warning::Found $ISSUES error-level issues - showing first 10:"
+            echo "::warning::Found $ISSUES code format issues"
             echo ""
+            echo "Common formatting issues found:"
             
-            # 最初の10個のエラーを表示
-            grep -A 3 '<Issue' inspectcode-results.xml | head -40 || true
+            # フォーマット関連の問題をカウント
+            NAMING_ISSUES=$(grep -c "InconsistentNaming" inspectcode-results.xml || echo "0")
+            USING_ISSUES=$(grep -c "RedundantUsingDirective" inspectcode-results.xml || echo "0")
+            MODIFIER_ISSUES=$(grep -c "ArrangeTypeMemberModifiers\|ArrangeTypeModifiers" inspectcode-results.xml || echo "0")
             
-            # Unity参照エラーを除外してカウント
-            REAL_ISSUES=$(grep '<Issue' inspectcode-results.xml | grep -v "UnityEngine" | grep -v "UnityEditor" | grep -v "Cannot resolve symbol" | wc -l || echo "0")
+            [ "$NAMING_ISSUES" -gt 0 ] && echo "- Naming convention violations: $NAMING_ISSUES"
+            [ "$USING_ISSUES" -gt 0 ] && echo "- Redundant using directives: $USING_ISSUES"
+            [ "$MODIFIER_ISSUES" -gt 0 ] && echo "- Modifier arrangement issues: $MODIFIER_ISSUES"
+            
             echo ""
-            echo "Non-Unity reference errors: $REAL_ISSUES"
+            echo "Run 'jb cleanupcode void-red.sln' locally to auto-fix these issues."
             
-            if [ "$REAL_ISSUES" -gt 0 ]; then
-              echo "::error::Found $REAL_ISSUES real code quality issues"
-              exit 1
-            else
-              echo "::warning::Only Unity reference errors found - passing"
-            fi
+            # フォーマット問題があったらビルドを失敗させる
+            echo "::error::Code formatting issues detected. Please fix them before merging."
+            exit 1
+          else
+            echo "✅ Code format check passed - No formatting issues found"
           fi
-          
-          echo "✅ Code quality check passed"
         else
           echo "::error::Inspection results file not found"
           exit 1
