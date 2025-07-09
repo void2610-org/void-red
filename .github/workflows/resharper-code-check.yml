@@ -40,25 +40,33 @@ jobs:
         echo "プロジェクトファイル:"
         ls -la Assembly-CSharp*.csproj 2>/dev/null || echo "  Assembly-CSharp プロジェクトが見つかりません"
         
-        # メインのソリューションファイルが存在するか確認
-        if [ -f "void-red.sln" ]; then
-          echo "✅ Unity ソリューションファイルが見つかりました: void-red.sln"
-          echo "ファイル内容の確認:"
-          head -3 void-red.sln
+        # メインプロジェクトファイルの存在確認
+        if [ -f "Assembly-CSharp.csproj" ]; then
+          echo "✅ Unity メインプロジェクトファイルが見つかりました: Assembly-CSharp.csproj"
         else
-          echo "❌ void-red.sln が見つかりません。.gitignore から除外されている可能性があります。"
-          echo "💡 .gitignore を修正して *.sln と *.csproj をコミットしてください。"
+          echo "❌ Assembly-CSharp.csproj が見つかりません。"
+          exit 1
+        fi
+        
+        # ReSharper解析用のクリーンなソリューションファイルを確認
+        if [ -f "void-red-analysis.sln" ]; then
+          echo "✅ ReSharper解析用ソリューションファイルが見つかりました: void-red-analysis.sln"
+          echo "ファイル内容の確認:"
+          head -3 void-red-analysis.sln
+        else
+          echo "❌ void-red-analysis.sln が見つかりません。"
           exit 1
         fi
         
     - name: Restore NuGet packages
-      run: dotnet restore void-red.sln
+      run: dotnet restore void-red-analysis.sln
       
     - name: Run ReSharper Code Inspection
       run: |
         # Unity 専用の extensions を使用して静的解析を実行
         # 参考: https://zenn.dev/masakura/articles/60e502a275e9c3
-        dotnet jb inspectcode void-red.sln \
+        # メインプロジェクトのみを含むクリーンなソリューションファイルを使用
+        dotnet jb inspectcode void-red-analysis.sln \
           --output=resharper-report.xml \
           --format=Xml \
           --build \
