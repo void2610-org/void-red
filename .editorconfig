@@ -4135,6 +4135,9 @@ dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
 
 dotnet_naming_symbols.private_fields_underscore.applicable_kinds = field
 dotnet_naming_symbols.private_fields_underscore.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields_underscore.required_modifiers = 
+dotnet_naming_symbols.private_fields_underscore.resharper_applicable_kinds = field
+dotnet_naming_symbols.private_fields_underscore.resharper_required_modifiers = instance
 
 dotnet_naming_style.underscore_camel_case.capitalization = camel_case
 dotnet_naming_style.underscore_camel_case.required_prefix = _
