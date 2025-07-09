@@ -120,14 +120,23 @@ jobs:
         echo "  - メインゲームコードのみ対象（サンプル除外）"
         echo "  - Unity プロジェクト最適化"
         
-        # ReSharper cleanupcode の実行（警告出力を抑制）
+        # ReSharper cleanupcode で利用可能なプロファイルを確認
+        echo "🔍 利用可能なプロファイルを確認中..."
+        jb cleanupcode --help | grep -A 10 -B 5 "profile" || true
+        
+        # ReSharper cleanupcode の実行（フォーマット専用プロファイルを使用）
         echo "⚡ ReSharper cleanupcode を実行中..."
         jb cleanupcode void-red-analysis.sln \
-          --verbosity=ERROR \
+          --verbosity=WARN \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
-          --profile="Built-in: Full Cleanup" \
+          --profile="Built-in: Reformat Code" \
           --properties:Configuration=Debug \
           2>&1 | grep -E -v "Referenced project.*not found|Unable to resolve reference|Could not resolve this reference|Could not locate the assembly" || true
+        
+        echo ""
+        echo "🔄 フォーマット結果の詳細確認..."
+        echo "現在のGit状態:"
+        git status --porcelain || true
           
         echo "✅ ReSharper コードフォーマットが完了しました"
           
