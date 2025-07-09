@@ -47,7 +47,9 @@ jobs:
         # ファイルが存在する場合のみ実行
         if [ -f "Assembly-CSharp-Minimal.csproj" ] && [ -d "Assets/Scripts" ]; then
           # C#ファイルのみを含むミニマルプロジェクトファイルを使用
+          # プロジェクトファイル自体は除外
           jb cleanupcode Assembly-CSharp-Minimal.csproj \
+            --exclude="**/*.csproj" \
             --profile="Built-in: Reformat Code" \
             --no-build \
             --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
@@ -137,7 +139,7 @@ jobs:
                 fi
               done <<< "$violations"
               
-              echo "$filtered_violations"
+              echo -n "$filtered_violations"
             }
             
             FILTERED_VIOLATIONS=$(filter_serialize_field_violations "$ALL_VIOLATIONS")
@@ -151,21 +153,13 @@ jobs:
             
             TOTAL_VIOLATIONS=$(printf "%s\n" "$ALL_VIOLATIONS" | grep -c . || echo "0")
             
-            # デバッグ出力
-            echo "Debug: TOTAL_VIOLATIONS='$TOTAL_VIOLATIONS'"
-            echo "Debug: ACTUAL_VIOLATIONS='$ACTUAL_VIOLATIONS'"
-            
-            # 数値を確実に整数に変換
-            TOTAL_VIOLATIONS=${TOTAL_VIOLATIONS:-0}
-            ACTUAL_VIOLATIONS=${ACTUAL_VIOLATIONS:-0}
-            
-            # 改行や空白を除去
-            TOTAL_VIOLATIONS=$(echo "$TOTAL_VIOLATIONS" | tr -d '\n\r\t ')
-            ACTUAL_VIOLATIONS=$(echo "$ACTUAL_VIOLATIONS" | tr -d '\n\r\t ')
+            # 改行や空白を除去して数値のみを取得
+            TOTAL_VIOLATIONS=$(echo "$TOTAL_VIOLATIONS" | head -1 | tr -cd '0-9')
+            ACTUAL_VIOLATIONS=$(echo "$ACTUAL_VIOLATIONS" | head -1 | tr -cd '0-9')
             
             # 空の場合は0を設定
-            [ -z "$TOTAL_VIOLATIONS" ] && TOTAL_VIOLATIONS=0
-            [ -z "$ACTUAL_VIOLATIONS" ] && ACTUAL_VIOLATIONS=0
+            TOTAL_VIOLATIONS=${TOTAL_VIOLATIONS:-0}
+            ACTUAL_VIOLATIONS=${ACTUAL_VIOLATIONS:-0}
             
             SERIALIZED_VIOLATIONS=$((TOTAL_VIOLATIONS - ACTUAL_VIOLATIONS))
             
