@@ -62,7 +62,7 @@ jobs:
           find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
             echo "Processing: $file"
             jb cleanupcode "$file" \
-              --profile="Built-in: Reformat Code" \
+              --profile="Built-in: Minimal cleanup" \
               --no-build 2>/dev/null || echo "Failed to process $file"
           done
         else
