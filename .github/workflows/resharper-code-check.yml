@@ -125,6 +125,7 @@ jobs:
         echo "🔍 .editorconfigの主要設定を確認:"
         echo "C#フォーマット設定:"
         grep -E "(csharp_space_|csharp_preserve_)" .editorconfig | head -10 | sed 's/^/  /' || echo "  設定ファイルが見つかりません"
+        
         echo ""
         echo "✅ プロジェクトの既存.editorconfigファイルを使用します"
         echo "   - csharp_space_after_comma = true"
@@ -145,14 +146,45 @@ jobs:
         # ReSharper cleanupcode の実行（.editorconfigベース、Scripts以下全ファイル）
         echo ""
         echo "⚡ ReSharper cleanupcode を実行中（.editorconfigベース、Scripts以下全ファイル）..."
+        echo "実行前のファイル状態（15-17行目）:"
+        sed -n '15,17p' Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
+        
+        # .editorconfigファイルの存在確認
+        ls -la .editorconfig
+        
+        # ReSharperのcleanupcode実行（実際のファイル変更を強制）
+        echo "📋 .editorconfigファイルの主要設定:"
+        grep -E "(csharp_space_after_comma|csharp_space_around_binary_operators)" .editorconfig
+        
+        echo ""
+        echo "⚡ ReSharper cleanupcode 実行中..."
+        
+        # まず特定のファイルで直接実行してテスト
+        echo "🧪 単一ファイルでのテスト実行:"
+        jb cleanupcode Assets/Scripts/Game/Logic/ScoreCalculator.cs \
+          --verbosity=VERBOSE \
+          --profile="Built-in: Full Cleanup" \
+          --no-build \
+          2>&1 | head -50
+        
+        echo ""
+        echo "🔄 単一ファイルテスト後の状態:"
+        sed -n '15,17p' Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
+        
+        echo ""
+        echo "📁 ソリューション全体での実行:"
         jb cleanupcode void-red-analysis.sln \
-          --verbosity=INFO \
+          --verbosity=VERBOSE \
           --include="Assets/Scripts/**/*.cs" \
           --exclude="**/Library/**;**/Temp/**;**/obj/**;**/bin/**;**/Packages/**;**/Samples/**" \
-          --profile="Built-in: Reformat Code" \
+          --profile="Built-in: Full Cleanup" \
           --no-build \
           --properties:Configuration=Debug \
-          2>&1 | head -100
+          2>&1 | head -150
+        
+        echo ""
+        echo "実行後のファイル状態（15-17行目）:"
+        sed -n '15,17p' Assets/Scripts/Game/Logic/ScoreCalculator.cs | cat -n
         
         echo ""
         echo "🔄 フォーマット結果の詳細確認..."
