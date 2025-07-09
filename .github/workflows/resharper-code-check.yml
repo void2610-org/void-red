@@ -350,7 +350,8 @@ jobs:
           echo "📋 レポート概要:"
           echo "  ファイルサイズ: $(wc -c < resharper-inspection-report.xml) bytes"
           echo "  問題の総数: $(grep -c '<Issue' resharper-inspection-report.xml || echo '0')"
-          echo "  命名規則違反: $(grep -c 'InconsistentNaming' resharper-inspection-report.xml || echo '0')"
+          echo "  命名規則違反（全体）: $(grep -c 'InconsistentNaming' resharper-inspection-report.xml || echo '0')"
+          echo "  プロジェクト内の命名規則違反: $(grep 'InconsistentNaming' resharper-inspection-report.xml | grep -c 'File="Assets\\Scripts.*\.cs"' || echo '0')"
           echo "  対象: Assets/Scripts/**/*.cs のみ"
           echo ""
           
@@ -358,6 +359,7 @@ jobs:
           echo "🔍 分析対象ファイルの確認:"
           echo "  C#ファイル数: $(find Assets/Scripts -name '*.cs' -type f | wc -l)"
           echo "  除外された問題: Unity依存関係、パッケージファイル、シェーダー等"
+          echo "  📝 Note: ReSharperは全ファイルを分析しますが、結果をプロジェクトコードのみにフィルタリングしています"
           echo ""
           
           # 命名規則違反を抽出（InconsistentNaming）
@@ -365,13 +367,19 @@ jobs:
             echo "❌ 命名規則違反が検出されました:"
             echo ""
             
-            # XMLから命名規則違反を詳細に抽出
-            echo "🔍 詳細な違反内容:"
+            # XMLから命名規則違反を詳細に抽出（Assets/Scripts以下のC#ファイルのみ）
+            echo "🔍 詳細な違反内容（Assets/Scripts以下のC#ファイルのみ）:"
             grep 'InconsistentNaming' resharper-inspection-report.xml | \
+              grep 'File="Assets\\Scripts.*\.cs"' | \
               sed 's/.*File="\([^"]*\)".*Line="\([^"]*\)".*Message="\([^"]*\)".*/\1:\2 → \3/' | \
               head -20 | while read line; do
                 echo "  $line"
               done
+            
+            # 実際の命名規則違反数を正確にカウント
+            ACTUAL_NAMING_VIOLATIONS=$(grep 'InconsistentNaming' resharper-inspection-report.xml | grep 'File="Assets\\Scripts.*\.cs"' | wc -l)
+            echo ""
+            echo "📊 実際の命名規則違反数: $ACTUAL_NAMING_VIOLATIONS 件（Assets/Scripts以下のC#ファイルのみ）"
             
             # XMLサンプルを表示（デバッグ用）
             echo ""
