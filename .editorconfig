@@ -4167,3 +4167,8 @@ dotnet_naming_rule.static_readonly_fields_rule.style = upper_snake_case_style
 dotnet_naming_symbols.static_readonly_fields_symbols.applicable_kinds = field
 dotnet_naming_symbols.static_readonly_fields_symbols.applicable_accessibilities = private, internal, protected, public
 dotnet_naming_symbols.static_readonly_fields_symbols.required_modifiers = static, readonly
+
+# ReSharperの名前空間チェックを無効化
+# Unity開発では名前空間とファイル位置の対応を厳密に管理しない場合がある
+resharper_check_namespace_highlighting = none
+dotnet_diagnostic.ide0130.severity = none
