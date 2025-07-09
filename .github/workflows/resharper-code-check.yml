@@ -46,15 +46,25 @@ jobs:
         
         # ファイルが存在する場合のみ実行
         if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # 1. Unity固有ファイルのみ除外（プロジェクトファイルは含めない）
+          # プロジェクトファイルアプローチ（これまでの方法）
+          echo "=== Attempting project-based cleanup ==="
           jb cleanupcode Assembly-CSharp.csproj \
             --exclude="**/*.meta;**/*.asset;**/*.prefab;**/*.unity;**/*.shader" \
             --profile="Built-in: Reformat Code" \
             --no-build \
-            --properties:Configuration=Debug || echo "cleanupcode failed but continuing..."
+            --properties:Configuration=Debug || echo "Project-based cleanup failed"
           
-          # 2. プロジェクトファイルの変更を元に戻す
+          # プロジェクトファイルの変更を元に戻す
           git checkout HEAD -- Assembly-CSharp.csproj || echo "Failed to revert project file changes"
+          
+          # 個別ファイルアプローチ（C#ファイルを直接指定）
+          echo "=== Attempting direct file cleanup ==="
+          find Assets/Scripts -name "*.cs" -type f | head -5 | while read -r file; do
+            echo "Processing: $file"
+            jb cleanupcode "$file" \
+              --profile="Built-in: Reformat Code" \
+              --no-build 2>/dev/null || echo "Failed to process $file"
+          done
         else
           echo "Required files not found, skipping cleanup"
         fi
