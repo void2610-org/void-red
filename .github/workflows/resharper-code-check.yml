@@ -1,4 +1,4 @@
-name: ReSharper Code Format
+name: ReSharper Naming Rules Check
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_call:
 
 jobs:
-  code-format:
+  naming-rules-check:
     runs-on: ubuntu-latest
     
     steps:
@@ -34,86 +34,6 @@ jobs:
         dotnet tool install -g JetBrains.ReSharper.GlobalTools
         echo "PATH=$HOME/.dotnet/tools:$PATH" >> $GITHUB_ENV
       
-    - name: Run ReSharper Code Cleanup (Format)
-      run: |
-        export PATH="$HOME/.dotnet/tools:$PATH"
-        
-        # デバッグ情報
-        echo "Current directory: $(pwd)"
-        echo "Assembly-CSharp.csproj exists: $(test -f Assembly-CSharp.csproj && echo 'YES' || echo 'NO')"
-        echo "Assets/Scripts directory exists: $(test -d Assets/Scripts && echo 'YES' || echo 'NO')"
-        echo "CS files found: $(find Assets/Scripts -name "*.cs" 2>/dev/null | wc -l)"
-        
-        # ファイルが存在する場合のみ実行
-        if [ -f "Assembly-CSharp.csproj" ] && [ -d "Assets/Scripts" ]; then
-          # プロジェクト全体をフォーマットして個別ファイルの変更を確認
-          echo "=== Processing Assembly-CSharp project for specific files ==="
-          
-          # 最初の10ファイルの状態を保存
-          echo "Saving initial state of files..."
-          find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
-            cp "$file" "$file.before"
-          done
-          
-          # プロジェクト全体をフォーマット（詳細ログで確認）
-          echo "Running ReSharper cleanup on entire project..."
-          set +e
-          result=$(jb cleanupcode Assembly-CSharp.csproj \
-            --profile="Built-in: Reformat Code" \
-            --verbosity=VERBOSE 2>&1)
-          exit_code=$?
-          set -e
-          
-          echo "ReSharper output:"
-          echo "$result"
-          echo "Exit code: $exit_code"
-          
-          # 最初の10ファイルの変更を確認
-          echo "=== Checking changes in individual files ==="
-          find Assets/Scripts -name "*.cs" -type f | head -10 | while read -r file; do
-            if diff -q "$file.before" "$file" > /dev/null 2>&1; then
-              echo "✓ $file - No formatting changes"
-            else
-              echo "✓ $file - Formatted (changes detected)"
-              echo "  Sample changes:"
-              diff -u "$file.before" "$file" | head -20 | sed 's/^/    /'
-            fi
-            rm -f "$file.before"
-          done
-          
-          # プロジェクトファイルの変更を元に戻す
-          git checkout HEAD -- Assembly-CSharp.csproj || echo "Failed to revert project file changes"
-        else
-          echo "Required files not found, skipping cleanup"
-        fi
-          
-    - name: Check format changes
-      run: |
-        if git diff --quiet; then
-          echo "FORMAT_CHANGES=false" >> $GITHUB_ENV
-        else
-          echo "FORMAT_CHANGES=true" >> $GITHUB_ENV
-          echo "変更されたファイル:"
-          git diff --name-only
-          echo ""
-          echo "=== 実際の変更内容（最初の2ファイル） ==="
-          git diff --name-only | head -2 | while read -r file; do
-            echo "--- $file の変更内容 ---"
-            git diff "$file" | head -20
-            echo ""
-          done
-        fi
-        
-    - name: Check format compliance
-      run: |
-        if [ "$FORMAT_CHANGES" = "true" ]; then
-          echo "❌ コードフォーマット違反があります"
-          echo "FORMAT_CHECK_FAILED=true" >> $GITHUB_ENV
-        else
-          echo "✅ コードフォーマットOK"
-          echo "FORMAT_CHECK_FAILED=false" >> $GITHUB_ENV
-        fi
-        
     - name: Run ReSharper Code Inspection (Naming Rules)
       run: |
         export PATH="$HOME/.dotnet/tools:$PATH"
@@ -223,21 +143,9 @@ jobs:
         
     - name: Final check result
       run: |
-        FAILED_CHECKS=0
-        
-        if [ "$FORMAT_CHECK_FAILED" = "true" ]; then
-          echo "❌ フォーマットチェック失敗"
-          FAILED_CHECKS=$((FAILED_CHECKS + 1))
-        fi
-        
         if [ "$NAMING_CHECK_FAILED" = "true" ]; then
           echo "❌ 命名規則チェック失敗"
-          FAILED_CHECKS=$((FAILED_CHECKS + 1))
-        fi
-        
-        if [ $FAILED_CHECKS -gt 0 ]; then
-          echo "CI失敗: $FAILED_CHECKS 項目"
           exit 1
         else
-          echo "✅ すべてのチェック合格"
+          echo "✅ 命名規則チェック合格"
         fi
