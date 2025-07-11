@@ -45,7 +45,7 @@ public class GameManager: IStartable, IDisposable
     public void Start()
     {
         InitializeGame().Forget();
-        SetupGameOverEventsAsync();
+        SetupGameOverEvents();
     }
     
     /// <summary>
@@ -436,7 +436,7 @@ public class GameManager: IStartable, IDisposable
     /// <summary>
     /// ゲームオーバー時のイベントを設定（非同期）
     /// </summary>
-    private void SetupGameOverEventsAsync()
+    private void SetupGameOverEvents()
     {
         // リトライボタンのイベント
         _uiPresenter.RetryButtonClicked.Subscribe(_ => OnRetryButtonClicked()).AddTo(_disposables);

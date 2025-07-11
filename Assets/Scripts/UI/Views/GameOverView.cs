@@ -13,8 +13,6 @@ using Cysharp.Threading.Tasks;
 [RequireComponent(typeof(CanvasGroup))]
 public class GameOverView : MonoBehaviour
 {
-    [Header("UIコンポーネント")]
-    [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI gameOverTitleText;
     [SerializeField] private TextMeshProUGUI gameOverReasonText;
     [SerializeField] private Button retryButton;
