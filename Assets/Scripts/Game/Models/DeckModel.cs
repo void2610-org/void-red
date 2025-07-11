@@ -16,12 +16,24 @@ public class DeckModel
     public List<CardData> DrawPile => new (_deck);
     
     /// <summary>
-    /// デッキ全体（手札含む概念的な全カード）
+    /// 獲得した全カード（崩壊しても記録として残る）
     /// </summary>
     public List<CardData> AllCards => new (_allCards);
     
+    /// <summary>
+    /// 現在プレイに使用可能なカード（崩壊したカードは除く）
+    /// </summary>
+    public List<CardData> ActiveCards => new (_activeCards);
+    
+    /// <summary>
+    /// 崩壊したカード（将来のメニュー表示用）
+    /// </summary>
+    public List<CardData> CollapsedCards => new (_collapsedCards);
+    
     private readonly List<CardData> _deck = new();           // 山札
-    private readonly List<CardData> _allCards = new();       // デッキ全体
+    private readonly List<CardData> _allCards = new();       // 獲得した全カード
+    private readonly List<CardData> _activeCards = new();    // 使用可能なカード
+    private readonly List<CardData> _collapsedCards = new(); // 崩壊したカード
     
     /// <summary>
     /// コンストラクタ
@@ -31,8 +43,9 @@ public class DeckModel
     {
         if (initialCards is { Count: > 0 })
         {
-            _allCards.AddRange(initialCards);  // デッキ全体に追加
-            _deck.AddRange(initialCards);      // 山札に追加
+            _allCards.AddRange(initialCards);      // 獲得した全カードに追加
+            _activeCards.AddRange(initialCards);   // 使用可能なカードに追加
+            _deck.AddRange(initialCards);          // 山札に追加
             Shuffle();
         }
     }
@@ -45,10 +58,14 @@ public class DeckModel
     {
         _deck.Clear();
         _allCards.Clear();
+        _activeCards.Clear();
+        _collapsedCards.Clear();
+        
         if (cardDataList is { Count: > 0 })
         {
-            _allCards.AddRange(cardDataList);  // デッキ全体に追加
-            _deck.AddRange(cardDataList);      // 山札に追加
+            _allCards.AddRange(cardDataList);      // 獲得した全カードに追加
+            _activeCards.AddRange(cardDataList);   // 使用可能なカードに追加
+            _deck.AddRange(cardDataList);          // 山札に追加
             Shuffle();
         }
     }
@@ -60,6 +77,8 @@ public class DeckModel
     {
         _deck.Clear();
         _allCards.Clear();
+        _activeCards.Clear();
+        _collapsedCards.Clear();
     }
     
     /// <summary>
@@ -140,19 +159,59 @@ public class DeckModel
     }
     
     /// <summary>
-    /// 指定したインデックスのカードを別のカードで置き換える（デッキ全体基準）
+    /// 指定したカードを別のカードで置き換える（進化・劣化時の処理）
     /// </summary>
-    /// <param name="index">置き換えるカードのインデックス（AllCards基準）</param>
+    /// <param name="oldCard">置き換える元のカード</param>
     /// <param name="newCard">新しいカード</param>
-    public void ReplaceCard(int index, CardData newCard)
+    /// <returns>置き換えに成功したかどうか</returns>
+    public bool ReplaceCard(CardData oldCard, CardData newCard)
     {
-        if (index < 0 || index >= _allCards.Count || !newCard) return;
+        if (!oldCard || !newCard) return false;
         
-        var oldCard = _allCards[index];
-        _allCards[index] = newCard;
+        // AllCardsで置き換え（獲得記録）
+        var allCardsIndex = _allCards.FindIndex(card => card == oldCard);
+        if (allCardsIndex >= 0)
+        {
+            _allCards[allCardsIndex] = newCard;
+        }
         
-        // 山札内にも同じカードがあれば置き換える
+        // ActiveCardsで置き換え（使用可能カード）
+        var activeIndex = _activeCards.FindIndex(card => card == oldCard);
+        if (activeIndex >= 0)
+        {
+            _activeCards[activeIndex] = newCard;
+        }
+        
+        // DrawPileで置き換え（山札）
         var deckIndex = _deck.FindIndex(card => card == oldCard);
-        if (deckIndex >= 0) _deck[deckIndex] = newCard;
+        if (deckIndex >= 0)
+        {
+            _deck[deckIndex] = newCard;
+        }
+        
+        return allCardsIndex >= 0 || activeIndex >= 0 || deckIndex >= 0;
     }
+    
+    /// <summary>
+    /// カードを崩壊させる（ActiveCardsから削除してCollapsedCardsに移動）
+    /// </summary>
+    /// <param name="cardData">崩壊するカード</param>
+    /// <returns>崩壊に成功したかどうか</returns>
+    public void CollapseCard(CardData cardData)
+    {
+        // ActiveCardsとDrawPileから削除
+        var removedFromActive = _activeCards.Remove(cardData);
+        var removedFromDeck = _deck.Remove(cardData);
+        
+        // 成功した場合はCollapsedCardsに追加
+        if (removedFromActive)
+        {
+            _collapsedCards.Add(cardData);
+        }
+    }
+    
+    /// <summary>
+    /// 使用可能なカードが全て失われたかどうか（真のゲームオーバー条件）
+    /// </summary>
+    public bool IsActiveCardsEmpty => _activeCards.Count == 0;
 }

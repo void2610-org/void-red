@@ -56,9 +56,14 @@ public abstract class PlayerPresenter : IDisposable
     }
     
     /// <summary>
-    /// デッキが空かどうか
+    /// デッキが空かどうか（山札のみ）
     /// </summary>
     public bool IsDeckEmpty => _deckModel?.IsEmpty ?? true;
+    
+    /// <summary>
+    /// 使用可能なカードが全て崩壊したかどうか（ゲームオーバー条件）
+    /// </summary>
+    public bool IsAllCardsCollapsed => _deckModel?.IsActiveCardsEmpty ?? true;
     
     /// <summary>
     /// カードを引く
@@ -173,7 +178,12 @@ public abstract class PlayerPresenter : IDisposable
         // 手札から削除
         if (!_handModel.TryRemoveCard(selectedCard)) return false;
         
-        if (!shouldCollapse)
+        if (shouldCollapse)
+        {
+            // 崩壊する場合はActiveCardsから削除してCollapsedCardsに移動
+            _deckModel?.CollapseCard(selectedCard);
+        }
+        else
         {
             // 崩壊しない場合はデッキに戻す
             _deckModel?.ReturnCard(selectedCard);

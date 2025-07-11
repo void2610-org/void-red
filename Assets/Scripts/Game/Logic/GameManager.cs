@@ -397,8 +397,8 @@ public class GameManager: IStartable, IDisposable
             return true;
         }
         
-        // プレイヤーのデッキが空（全カードが崩壊）になったか
-        if (_player.IsDeckEmpty)
+        // プレイヤーの全カードが崩壊したかどうか
+        if (_player.IsAllCardsCollapsed)
         {
             return true;
         }
@@ -423,21 +423,14 @@ public class GameManager: IStartable, IDisposable
         _isProcessing = true;
         
         // ゲームオーバーの理由を判定
-        string gameOverReason = "";
+        var gameOverReason = "";
         if (_player.MentalPower.CurrentValue <= 0)
-        {
             gameOverReason = "精神力が0になりました！";
-        }
-        else if (_player.IsDeckEmpty)
-        {
+        else if (_player.IsAllCardsCollapsed)
             gameOverReason = "すべてのカードが崩壊しました！";
-        }
         
         // ゲームオーバー画面を表示
         await _uiPresenter.ShowGameOverScreen(gameOverReason);
-        
-        // ボタンクリックを待機（イベントベースで処理）
-        // 処理はSetupGameOverEventsで設定したイベントハンドラーで実行
     }
     
     /// <summary>
