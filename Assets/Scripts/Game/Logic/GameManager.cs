@@ -98,6 +98,9 @@ public class GameManager: IStartable
             case GameState.ResultDisplay:
                 HandleResultDisplay();
                 break;
+            case GameState.GameOver:
+                HandleGameOver();
+                break;
         }
     }
     
@@ -368,6 +371,53 @@ public class GameManager: IStartable
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
         _isProcessing = false; // フラグリセット
+        
+        // ゲームオーバー条件をチェック
+        if (CheckGameOverConditions())
+        {
+            ChangeState(GameState.GameOver);
+        }
+        else
+        {
+            ChangeState(GameState.ThemeAnnouncement);
+        }
+    }
+    
+    /// <summary>
+    /// ゲームオーバー条件をチェック
+    /// </summary>
+    /// <returns>ゲームオーバー条件を満たしているかどうか</returns>
+    private bool CheckGameOverConditions()
+    {
+        // プレイヤーの精神力が0になったか
+        if (_player.MentalPower.CurrentValue <= 0)
+        {
+            return true;
+        }
+        
+        // プレイヤーのデッキが空（全カードが崩壊）になったか
+        if (_player.IsDeckEmpty)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// ゲームオーバーフェーズ
+    /// </summary>
+    private void HandleGameOver()
+    {
+        if (_isProcessing) return;
+        HandleGameOverAsync().Forget();
+    }
+    
+    /// <summary>
+    /// ゲームオーバー処理
+    /// </summary>
+    private async UniTask HandleGameOverAsync()
+    {
         ChangeState(GameState.ThemeAnnouncement);
     }
     
