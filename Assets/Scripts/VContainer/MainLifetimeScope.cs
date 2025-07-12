@@ -6,6 +6,7 @@ public class MainLifetimeScope : LifetimeScope
 {
     [SerializeField] private AllCardData allCardData;
     [SerializeField] private AllThemeData allThemeData;
+    [SerializeField] private AllEnemyData allEnemyData;
     [SerializeField] private HandView playerHandView;
     [SerializeField] private HandView enemyHandView;
     
@@ -17,6 +18,7 @@ public class MainLifetimeScope : LifetimeScope
         #if UNITY_EDITOR
         allCardData.RegisterAllCards();
         allThemeData.RegisterAllThemes();
+        allEnemyData.RegisterAllEnemies();
         #endif
     }
     
@@ -36,10 +38,12 @@ public class MainLifetimeScope : LifetimeScope
         
         builder.RegisterInstance(allCardData);
         builder.RegisterInstance(allThemeData);
+        builder.RegisterInstance(allEnemyData);
         RegisterAllData();
         
         builder.Register<CardPoolService>(Lifetime.Singleton);
         builder.Register<ThemeService>(Lifetime.Singleton);
+        builder.Register<EnemyProgressService>(Lifetime.Singleton);
         builder.Register<StatsTrackerService>(Lifetime.Singleton);
         
         // === エントリーポイントとPresenterの登録 ===
