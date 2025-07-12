@@ -9,7 +9,8 @@ public enum GameState
     PlayerCardSelection, // プレイヤーカード選択
     EnemyCardSelection,  // 敵カード選択
     Evaluation,         // 評価
-    ResultDisplay       // 勝敗表示
+    ResultDisplay,      // 勝敗表示
+    GameOver           // ゲームオーバー
 }
 
 /// <summary>

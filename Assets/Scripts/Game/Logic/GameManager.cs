@@ -6,7 +6,7 @@ using VContainer;
 using VContainer.Unity;
 using UnityEngine;
 
-public class GameManager: IStartable
+public class GameManager: IStartable, IDisposable
 {
     public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
     
@@ -18,6 +18,7 @@ public class GameManager: IStartable
     private readonly StatsTrackerService _statsTrackerService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
+    private readonly CompositeDisposable _disposables = new();
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
     private bool _isProcessing = false;
@@ -44,6 +45,7 @@ public class GameManager: IStartable
     public void Start()
     {
         InitializeGame().Forget();
+        SetupGameOverEvents();
     }
     
     /// <summary>
@@ -97,6 +99,9 @@ public class GameManager: IStartable
                 break;
             case GameState.ResultDisplay:
                 HandleResultDisplay();
+                break;
+            case GameState.GameOver:
+                HandleGameOver();
                 break;
         }
     }
@@ -368,7 +373,91 @@ public class GameManager: IStartable
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
         _isProcessing = false; // フラグリセット
-        ChangeState(GameState.ThemeAnnouncement);
+        
+        // ゲームオーバー条件をチェック
+        if (CheckGameOverConditions())
+        {
+            ChangeState(GameState.GameOver);
+        }
+        else
+        {
+            ChangeState(GameState.ThemeAnnouncement);
+        }
+    }
+    
+    /// <summary>
+    /// ゲームオーバー条件をチェック
+    /// </summary>
+    /// <returns>ゲームオーバー条件を満たしているかどうか</returns>
+    private bool CheckGameOverConditions()
+    {
+        // プレイヤーの精神力が0になったか
+        if (_player.MentalPower.CurrentValue <= 0)
+        {
+            return true;
+        }
+        
+        // プレイヤーの全カードが崩壊したかどうか
+        if (_player.IsAllCardsCollapsed)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// ゲームオーバーフェーズ
+    /// </summary>
+    private void HandleGameOver()
+    {
+        if (_isProcessing) return;
+        HandleGameOverAsync().Forget();
+    }
+    
+    /// <summary>
+    /// ゲームオーバー処理
+    /// </summary>
+    private async UniTask HandleGameOverAsync()
+    {
+        _isProcessing = true;
+        
+        // ゲームオーバーの理由を判定
+        var gameOverReason = "";
+        if (_player.MentalPower.CurrentValue <= 0)
+            gameOverReason = "精神力が0になりました！";
+        else if (_player.IsAllCardsCollapsed)
+            gameOverReason = "すべてのカードが崩壊しました！";
+        
+        // ゲームオーバー画面を表示
+        await _uiPresenter.ShowGameOverScreen(gameOverReason);
+    }
+    
+    /// <summary>
+    /// ゲームオーバー時のイベントを設定（非同期）
+    /// </summary>
+    private void SetupGameOverEvents()
+    {
+        // リトライボタンのイベント
+        _uiPresenter.RetryButtonClicked.Subscribe(_ => OnRetryButtonClicked()).AddTo(_disposables);
+        // タイトルボタンのイベント
+        _uiPresenter.TitleButtonClicked.Subscribe(_ => OnTitleButtonClicked()).AddTo(_disposables);
+    }
+    
+    /// <summary>
+    /// リトライボタンクリック時の処理
+    /// </summary>
+    private void OnRetryButtonClicked()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainScene");
+    }
+    
+    /// <summary>
+    /// タイトルボタンクリック時の処理
+    /// </summary>
+    private void OnTitleButtonClicked()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("TitleScene");
     }
     
     /// <summary>
@@ -378,5 +467,15 @@ public class GameManager: IStartable
     {
         await UniTask.Delay((int)(delay * 1000));
         ChangeState(newState);
+    }
+    
+    /// <summary>
+    /// リソースの解放
+    /// </summary>
+    public void Dispose()
+    {
+        _disposables?.Dispose();
+        _currentState?.Dispose();
+        _currentTheme?.Dispose();
     }
 }

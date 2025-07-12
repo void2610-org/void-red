@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Unity Project Overview
 
-void-red is a Unity card game project using Unity 6000.0.37f1 with VContainer for dependency injection, R3 for reactive programming, LitMotion for animations, UniTask for async operations, and Unity-SerializeReferenceExtensions for simplified editor customization.
+void-red is a Unity card game project using Unity 6000.0.50f1 with VContainer for dependency injection, R3 for reactive programming, LitMotion for animations, UniTask for async operations, and Unity-SerializeReferenceExtensions for simplified editor customization.
 
 ## Core Commands
 
