@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Void2610.UnityTemplate;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -24,27 +25,7 @@ public class AllCardData : ScriptableObject
     public void RegisterAllCards()
     {
 #if UNITY_EDITOR
-        // このScriptableObjectと同じディレクトリパスを取得
-        var path = AssetDatabase.GetAssetPath(this);
-        path = System.IO.Path.GetDirectoryName(path);
-        
-        // 指定ディレクトリ内の全てのCardDataを検索
-        var guids = AssetDatabase.FindAssets("t:CardData", new[] { path });
-        
-        // 検索結果をリストに追加
-        cardList.Clear();
-        foreach (var guid in guids)
-        {
-            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var cardData = AssetDatabase.LoadAssetAtPath<CardData>(assetPath);
-            if (cardData) cardList.Add(cardData);
-        }
-        
-        // カード名でソート
-        cardList = cardList.OrderBy(x => x.CardName).ToList();
-        
-        // ScriptableObjectを更新
-        EditorUtility.SetDirty(this);
+        this.RegisterAssetsInSameDirectory(cardList, x => x.CardName);
 #endif
     }
     

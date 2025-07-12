@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Void2610.UnityTemplate;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -24,27 +25,7 @@ public class AllThemeData : ScriptableObject
     public void RegisterAllThemes()
     {
 #if UNITY_EDITOR
-        // このScriptableObjectと同じディレクトリパスを取得
-        var path = AssetDatabase.GetAssetPath(this);
-        path = System.IO.Path.GetDirectoryName(path);
-        
-        // 指定ディレクトリ内の全てのThemeDataを検索
-        var guids = AssetDatabase.FindAssets("t:ThemeData", new[] { path });
-        
-        // 検索結果をリストに追加
-        themeList.Clear();
-        foreach (var guid in guids)
-        {
-            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var themeData = AssetDatabase.LoadAssetAtPath<ThemeData>(assetPath);
-            if (themeData) themeList.Add(themeData);
-        }
-        
-        // テーマ名でソート
-        themeList = themeList.OrderBy(x => x.name).ToList();
-        
-        // ScriptableObjectを更新
-        EditorUtility.SetDirty(this);
+        this.RegisterAssetsInSameDirectory(themeList, x => x.name);
 #endif
     }
     
