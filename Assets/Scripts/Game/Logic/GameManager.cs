@@ -23,6 +23,11 @@ public class GameManager: IStartable, IDisposable
     private PlayerMove _npcMove;
     private bool _isProcessing = false;
     
+    // バトル勝利数管理
+    private int _playerWins = 0;
+    private int _enemyWins = 0;
+    private const int WINS_TO_VICTORY = 3;
+    
     /// <summary>
     /// コンストラクタ（依存性注入）
     /// </summary>
@@ -54,6 +59,9 @@ public class GameManager: IStartable, IDisposable
     private async UniTaskVoid InitializeGame()
     {
         await UniTask.Delay(500);
+        
+        // バトル勝利数をリセット
+        ResetBattleWins();
         
         // カードデッキを初期化
         var playerDeck = _cardPoolService.GetRandomCards(5);
@@ -99,6 +107,9 @@ public class GameManager: IStartable, IDisposable
                 break;
             case GameState.ResultDisplay:
                 HandleResultDisplay();
+                break;
+            case GameState.BattleEnd:
+                HandleBattleEnd();
                 break;
             case GameState.GameOver:
                 HandleGameOver();
@@ -267,11 +278,9 @@ public class GameManager: IStartable, IDisposable
     /// </summary>
     private async UniTask ResultDisplayAsync()
     {
-        _isProcessing = true; // 処理開始フラグ
+        _isProcessing = true;
         
-        // スコアで勝敗判定（スコアが高い方が勝利）
         var currentTheme = _currentTheme.CurrentValue;
-        if (!currentTheme) return;
         
         var playerScore = ScoreCalculator.CalculateScore(_playerMove, currentTheme);
         var npcScore = ScoreCalculator.CalculateScore(_npcMove, currentTheme);
@@ -294,7 +303,7 @@ public class GameManager: IStartable, IDisposable
         // 崩壊結果を表示
         if (playerCollapse || npcCollapse)
         {
-            var collapseMessage = "";
+            string collapseMessage;
             if (playerCollapse && npcCollapse)
                 collapseMessage = "プレイヤーとNPCのカードが崩壊した！";
             else if (playerCollapse)
@@ -310,6 +319,18 @@ public class GameManager: IStartable, IDisposable
         _statsTrackerService.PlayerTracker.RecordGameResult(_playerMove, _npcMove, playerWon, playerCollapse);
         _statsTrackerService.EnemyTracker.RecordGameResult(_npcMove, _playerMove, !playerWon, npcCollapse);
         
+        // 引き分けでない場合、勝利数を更新してバトル終了チェック
+        if (!Mathf.Approximately(playerScore, npcScore))
+        {
+            if (UpdateWinsAndCheckBattleEnd(playerWon))
+            {
+                // 3勝に達した場合、カード処理をスキップしてバトル終了へ
+                _isProcessing = false;
+                ChangeState(GameState.BattleEnd);
+                return;
+            }
+        }
+        
         // 使用したカードをプレイ
         if (playerCollapse)
         {
@@ -321,9 +342,8 @@ public class GameManager: IStartable, IDisposable
             var playerCard = _player.RemoveSelectedCard();
             if (playerCard)
             {
-                // 即時進化チェック
+                // 進化
                 var playerCardAfterEvolution = _statsTrackerService.PlayerTracker.CheckCardEvolution(playerCard);
-                // 進化結果をアナウンス
                 if (playerCardAfterEvolution != playerCard)
                 {
                     await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！", 2f);
@@ -359,11 +379,7 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(1000);
         
         // 両プレイヤーの手札をデッキに戻す
-        var returnTasks = new UniTask[2];
-        returnTasks[0] = _player.ReturnHandToDeck();
-        returnTasks[1] = _enemy.ReturnHandToDeck();
-        
-        await UniTask.WhenAll(returnTasks);
+        await UniTask.WhenAll(_player.ReturnHandToDeck(), _enemy.ReturnHandToDeck());
         
         // 手札を3枚ずつ配る
         _player.DrawCard(3);
@@ -372,17 +388,13 @@ public class GameManager: IStartable, IDisposable
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
-        _isProcessing = false; // フラグリセット
+        _isProcessing = false;
         
         // ゲームオーバー条件をチェック
         if (CheckGameOverConditions())
-        {
             ChangeState(GameState.GameOver);
-        }
         else
-        {
             ChangeState(GameState.ThemeAnnouncement);
-        }
     }
     
     /// <summary>
@@ -404,6 +416,58 @@ public class GameManager: IStartable, IDisposable
         }
         
         return false;
+    }
+
+    /// <summary>
+    /// 勝利数を更新してバトル終了をチェック
+    /// </summary>
+    /// <param name="isPlayerWon"></param>
+    /// <returns>バトルが終了したかどうか</returns>
+    private bool UpdateWinsAndCheckBattleEnd(bool isPlayerWon)
+    {
+        if (isPlayerWon) _playerWins++;
+        else _enemyWins++;
+        
+        // 3勝に達したかチェック
+        return _playerWins >= WINS_TO_VICTORY || _enemyWins >= WINS_TO_VICTORY;
+    }
+    
+    /// <summary>
+    /// バトル終了フェーズ
+    /// </summary>
+    private void HandleBattleEnd()
+    {
+        if (_isProcessing) return;
+        HandleBattleEndAsync().Forget();
+    }
+    
+    /// <summary>
+    /// バトル終了処理
+    /// </summary>
+    private async UniTask HandleBattleEndAsync()
+    {
+        _isProcessing = true;
+        
+        var battleResult = "";
+        if (_playerWins >= WINS_TO_VICTORY)
+            battleResult = $"バトルに勝利しました！ ({_playerWins}-{_enemyWins})";
+        else if (_enemyWins >= WINS_TO_VICTORY)
+            battleResult = $"バトルに敗北しました... ({_playerWins}-{_enemyWins})";
+        
+        await _uiPresenter.ShowAnnouncement(battleResult, 3f);
+        
+        // TODO: 次の敵に進む処理（後で実装）
+        _isProcessing = false;
+        ChangeState(GameState.GameOver);
+    }
+    
+    /// <summary>
+    /// バトル勝利数をリセット
+    /// </summary>
+    private void ResetBattleWins()
+    {
+        _playerWins = 0;
+        _enemyWins = 0;
     }
     
     /// <summary>

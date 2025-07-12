@@ -10,6 +10,7 @@ public enum GameState
     EnemyCardSelection,  // 敵カード選択
     Evaluation,         // 評価
     ResultDisplay,      // 勝敗表示
+    BattleEnd,         // バトル終了（3勝達成）
     GameOver           // ゲームオーバー
 }
 
