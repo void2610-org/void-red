@@ -36,8 +36,6 @@ public class UIPresenter : MonoBehaviour
     public void ShowPlayButton() => _playButtonView.Show();
     public void HidePlayButton() => _playButtonView.Hide();
     public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
-    public async UniTask HideGameOverScreen()  => await _gameOverView.HideGameOverScreen();
-    public bool IsGameOverScreenVisible => _gameOverView?.IsVisible ?? false;
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
     
