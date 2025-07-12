@@ -31,10 +31,7 @@ public class EnemyProgressService
     public EnemyData GetCurrentEnemy()
     {
         if (IsAllEnemiesDefeated) return null;
-        
-        var currentEnemy = _allEnemyData.GetEnemyByIndex(CurrentEnemyIndex);
-        Debug.Log($"[ENEMY PROGRESS] Current Enemy: {currentEnemy?.EnemyName} (Index: {CurrentEnemyIndex})");
-        return currentEnemy;
+        return _allEnemyData.GetEnemyByIndex(CurrentEnemyIndex);
     }
     
     /// <summary>
@@ -44,9 +41,7 @@ public class EnemyProgressService
     public EnemyData AdvanceToNextEnemy()
     {
         if (IsAllEnemiesDefeated) return null;
-        
         CurrentEnemyIndex++;
-        Debug.Log($"[ENEMY PROGRESS] Advancing to enemy index: {CurrentEnemyIndex}");
         return GetCurrentEnemy();
     }
 }

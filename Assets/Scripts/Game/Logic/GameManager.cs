@@ -59,7 +59,8 @@ public class GameManager: IStartable, IDisposable
     /// <summary>
     /// ゲームを初期化
     /// </summary>
-    private async UniTaskVoid InitializeGame()
+    /// <param name="isNextEnemy">次の敵への進行かどうか</param>
+    private async UniTaskVoid InitializeGame(bool isNextEnemy = false)
     {
         await UniTask.Delay(500);
         
@@ -68,8 +69,27 @@ public class GameManager: IStartable, IDisposable
         
         // 現在の敵データを取得
         var currentEnemyData = _enemyProgressService.GetCurrentEnemy();
+        
+        // 次の敵への進行の場合は手札を戻す演出
+        if (isNextEnemy)
+        {
+            var returnTasks = new UniTask[2];
+            if (_player.HandCount > 0)
+                returnTasks[0] = _player.ReturnHandToDeck();
+            else
+                returnTasks[0] = UniTask.CompletedTask;
+                
+            if (_enemy.HandCount > 0)
+                returnTasks[1] = _enemy.ReturnHandToDeck();
+            else
+                returnTasks[1] = UniTask.CompletedTask;
+            
+            await UniTask.WhenAll(returnTasks);
+            await UniTask.Delay(300);
+        }
+        
         // 敵情報をアナウンス
-        await _uiPresenter.ShowAnnouncement($"敵: {currentEnemyData.EnemyName}");
+        await _uiPresenter.ShowAnnouncement($"敵: {currentEnemyData.EnemyName}", 1.5f);
         
         // カードデッキを初期化
         var playerDeck = _cardPoolService.GetRandomCards(5);
@@ -78,12 +98,11 @@ public class GameManager: IStartable, IDisposable
         _player.InitializeDeck(playerDeck);
         _enemy.InitializeDeck(enemyDeck);
         
-        Debug.Log($"[GAME MANAGER] Battle started against: {currentEnemyData.EnemyName}");
-        
         // 手札を配る
         _player.DrawCard(3);
         await UniTask.Delay(200);
         _enemy.DrawCard(3);
+        await UniTask.Delay(200);
         
         // エネミーのカードを非インタラクティブに設定
         _enemy.SetHandInteractable(false);
@@ -466,7 +485,6 @@ public class GameManager: IStartable, IDisposable
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         
-        Debug.Log($"[BATTLE END] Final Score - Player: {_playerWins}, Enemy: {_enemyWins}");
         
         // 次の敵への進行処理
         var nextEnemy = _enemyProgressService.AdvanceToNextEnemy();
@@ -482,7 +500,7 @@ public class GameManager: IStartable, IDisposable
         {
             // 次の敵がいる場合
             _isProcessing = false;
-            InitializeGame().Forget();
+            InitializeGame(isNextEnemy: true).Forget();
         }
     }
     
