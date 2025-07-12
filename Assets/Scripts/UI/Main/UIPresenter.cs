@@ -92,7 +92,7 @@ public class UIPresenter : IStartable, System.IDisposable
     public void Start()
     {
         // プレイヤーの精神力変化を監視
-        _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);;
+        _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
         
         // Viewイベントの設定
         SetupViewEvents();
