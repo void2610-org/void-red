@@ -15,6 +15,8 @@ public class DebugController : MonoBehaviour
     
     private void Awake()
     {
+        if(!Application.isEditor) return;
+        
         // 初期値設定
         _fastModeProperty.Value = enableFastMode;
         _timeScaleProperty.Value = timeScale;
