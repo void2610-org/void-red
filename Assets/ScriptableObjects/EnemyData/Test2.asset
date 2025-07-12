@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb4da0a364b7b422689a16d3223488ab, type: 3}
+  m_Name: Test2
+  m_EditorClassIdentifier: 
+  enemyId: E002
+  enemyName: "\u30C6\u30B9\u30C82"
+  enemyImage: {fileID: -1893766829421528891, guid: afb2931ab579248b6bab8814c8855e9a, type: 3}
+  description: "\u6575\u306E\u8AAC\u660E\u6587\u304C\u3053\u3053\u306B\u5165\u308A\u307E\u305922222"
+  maxMentalPower: 10
+  initialMentalPower: 10
+  initialDeck:
+  - {fileID: 11400000, guid: 49cdb945655a048a09f967ca7e3420b9, type: 2}
+  - {fileID: 11400000, guid: 7837cafdc41164c51b9798d876501fcb, type: 2}
+  - {fileID: 11400000, guid: 42527f7f2139246168146f74f60d2828, type: 2}
+  - {fileID: 11400000, guid: e0fc958e1d16741e6a114ae6fbc556ba, type: 2}
+  - {fileID: 11400000, guid: 7ad383a5532d94c388d7b947a6c5757e, type: 2}
