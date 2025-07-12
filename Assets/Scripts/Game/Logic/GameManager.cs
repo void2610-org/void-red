@@ -16,6 +16,7 @@ public class GameManager: IStartable, IDisposable
     private readonly Player _player;
     private readonly Enemy _enemy;
     private readonly StatsTrackerService _statsTrackerService;
+    private readonly EnemyProgressService _enemyProgressService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private readonly CompositeDisposable _disposables = new();
@@ -37,7 +38,8 @@ public class GameManager: IStartable, IDisposable
         UIPresenter uiPresenter,
         Player player,
         Enemy enemy,
-        StatsTrackerService statsTrackerService)
+        StatsTrackerService statsTrackerService,
+        EnemyProgressService enemyProgressService)
     {
         _cardPoolService = cardPoolService;
         _themeService = themeService;
@@ -45,6 +47,7 @@ public class GameManager: IStartable, IDisposable
         _player = player;
         _enemy = enemy;
         _statsTrackerService = statsTrackerService;
+        _enemyProgressService = enemyProgressService;
     }
     
     public void Start()
@@ -63,12 +66,19 @@ public class GameManager: IStartable, IDisposable
         // バトル勝利数をリセット
         ResetBattleWins();
         
+        // 現在の敵データを取得
+        var currentEnemyData = _enemyProgressService.GetCurrentEnemy();
+        // 敵情報をアナウンス
+        await _uiPresenter.ShowAnnouncement($"敵: {currentEnemyData.EnemyName}");
+        
         // カードデッキを初期化
         var playerDeck = _cardPoolService.GetRandomCards(5);
-        var npcDeck = _cardPoolService.GetRandomCards(5);
+        var enemyDeck = new List<CardData>(currentEnemyData.InitialDeck);
         
         _player.InitializeDeck(playerDeck);
-        _enemy.InitializeDeck(npcDeck);
+        _enemy.InitializeDeck(enemyDeck);
+        
+        Debug.Log($"[GAME MANAGER] Battle started against: {currentEnemyData.EnemyName}");
         
         // 手札を配る
         _player.DrawCard(3);
@@ -456,9 +466,24 @@ public class GameManager: IStartable, IDisposable
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         
-        // TODO: 次の敵に進む処理（後で実装）
-        _isProcessing = false;
-        ChangeState(GameState.GameOver);
+        Debug.Log($"[BATTLE END] Final Score - Player: {_playerWins}, Enemy: {_enemyWins}");
+        
+        // 次の敵への進行処理
+        var nextEnemy = _enemyProgressService.AdvanceToNextEnemy();
+        
+        if (!nextEnemy)
+        {
+            // 全ての敵を倒した場合
+            await _uiPresenter.ShowAnnouncement("🎉 全ての敵を倒しました！ゲームクリア！", 3f);
+            _isProcessing = false;
+            ChangeState(GameState.GameOver);
+        }
+        else
+        {
+            // 次の敵がいる場合
+            _isProcessing = false;
+            InitializeGame().Forget();
+        }
     }
     
     /// <summary>
