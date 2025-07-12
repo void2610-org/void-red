@@ -492,7 +492,7 @@ public class GameManager: IStartable, IDisposable
         if (!nextEnemy)
         {
             // 全ての敵を倒した場合
-            await _uiPresenter.ShowAnnouncement("🎉 全ての敵を倒しました！ゲームクリア！", 3f);
+            await _uiPresenter.ShowAnnouncement("ゲームクリア！", 3f);
             _isProcessing = false;
             ChangeState(GameState.GameOver);
         }
