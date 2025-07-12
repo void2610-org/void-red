@@ -1,7 +1,5 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using R3;
-using System;
 using VContainer;
 using VContainer.Unity;
 
@@ -9,7 +7,7 @@ using VContainer.Unity;
 /// UIのビジネスロジックとイベント処理を担当するPresenterクラス
 /// VContainerで依存性注入される
 /// </summary>
-public class UIPresenter : MonoBehaviour
+public class UIPresenter : IStartable, System.IDisposable
 {
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly ThemeService _themeService;
@@ -21,15 +19,16 @@ public class UIPresenter : MonoBehaviour
     private const int MIN_MENTAL_BET = 1;
     private const int MAX_MENTAL_BET = 7;
     
-    private ThemeView _themeView;
-    private AnnouncementView _announcementView;
-    private PlayButtonView _playButtonView;
-    private PlayStyleView _playStyleView;
-    private MentalBetView _mentalBetView;
-    private GameOverView _gameOverView;
+    private readonly ThemeView _themeView;
+    private readonly AnnouncementView _announcementView;
+    private readonly PlayButtonView _playButtonView;
+    private readonly PlayStyleView _playStyleView;
+    private readonly MentalBetView _mentalBetView;
+    private readonly GameOverView _gameOverView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
-    [Inject] private Player _player;
+    private readonly CompositeDisposable _disposables = new ();
+    private readonly Player _player;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
@@ -38,6 +37,19 @@ public class UIPresenter : MonoBehaviour
     public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
+    
+    public UIPresenter(Player player)
+    {
+        _player = player;
+        
+        // 初期化
+        _themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
+        _announcementView = UnityEngine.Object.FindFirstObjectByType<AnnouncementView>();
+        _playButtonView = UnityEngine.Object.FindFirstObjectByType<PlayButtonView>();
+        _playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
+        _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
+        _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
+    }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
     {
@@ -72,25 +84,15 @@ public class UIPresenter : MonoBehaviour
     private void SetupViewEvents()
     {
         // プレイスタイル選択イベント
-        _playStyleView.PlayStyleSelected.Subscribe(OnPlayStyleSelected).AddTo(this);
+        _playStyleView.PlayStyleSelected.Subscribe(OnPlayStyleSelected).AddTo(_disposables);
         // 精神ベット変更イベント
-        _mentalBetView.MentalBetChanged.Subscribe(OnMentalBetChanged).AddTo(this);
+        _mentalBetView.MentalBetChanged.Subscribe(OnMentalBetChanged).AddTo(_disposables);
     }
     
-    private void Awake()
-    {
-        _themeView = FindFirstObjectByType<ThemeView>();
-        _announcementView = FindFirstObjectByType<AnnouncementView>();
-        _playButtonView = FindFirstObjectByType<PlayButtonView>();
-        _playStyleView = FindFirstObjectByType<PlayStyleView>();
-        _mentalBetView = FindFirstObjectByType<MentalBetView>();
-        _gameOverView = FindFirstObjectByType<GameOverView>(FindObjectsInactive.Include);
-    }
-    
-    private void Start()
+    public void Start()
     {
         // プレイヤーの精神力変化を監視
-        _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(this);
+        _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);;
         
         // Viewイベントの設定
         SetupViewEvents();
@@ -98,5 +100,11 @@ public class UIPresenter : MonoBehaviour
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
         UpdateMentalBetDisplay();
+    }
+
+    public void Dispose()
+    {
+        // すべてのViewのイベントを解除
+        _disposables.Dispose();
     }
 }

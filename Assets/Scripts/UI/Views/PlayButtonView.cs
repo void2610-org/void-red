@@ -19,10 +19,12 @@ public class PlayButtonView : MonoBehaviour
     
     private void Awake()
     {
-        // 初期状態は非表示
-        playButton.gameObject.SetActive(false);
-        // ボタンイベントの設定
         playButton.onClick.AddListener(OnPlayButtonClicked);
+    }
+    
+    private void Start()
+    {
+        Hide(); // 初期状態では非表示
     }
     
     private void OnDestroy()
