@@ -15,6 +15,8 @@ public class UIPresenter : MonoBehaviour
     [Inject] private readonly ThemeService _themeService;
     
     public Observable<Unit> PlayButtonClicked => _playButtonView.PlayButtonClicked;
+    public Observable<Unit> RetryButtonClicked => _gameOverView?.OnRetryClicked ?? Observable.Empty<Unit>();
+    public Observable<Unit> TitleButtonClicked => _gameOverView?.OnTitleClicked ?? Observable.Empty<Unit>();
     
     private const int MIN_MENTAL_BET = 1;
     private const int MAX_MENTAL_BET = 7;
@@ -24,6 +26,7 @@ public class UIPresenter : MonoBehaviour
     private PlayButtonView _playButtonView;
     private PlayStyleView _playStyleView;
     private MentalBetView _mentalBetView;
+    private GameOverView _gameOverView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
     [Inject] private Player _player;
@@ -32,6 +35,9 @@ public class UIPresenter : MonoBehaviour
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public void ShowPlayButton() => _playButtonView.Show();
     public void HidePlayButton() => _playButtonView.Hide();
+    public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
+    public async UniTask HideGameOverScreen()  => await _gameOverView.HideGameOverScreen();
+    public bool IsGameOverScreenVisible => _gameOverView?.IsVisible ?? false;
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
     
@@ -80,6 +86,7 @@ public class UIPresenter : MonoBehaviour
         _playButtonView = FindFirstObjectByType<PlayButtonView>();
         _playStyleView = FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = FindFirstObjectByType<MentalBetView>();
+        _gameOverView = FindFirstObjectByType<GameOverView>(FindObjectsInactive.Include);
     }
     
     private void Start()
