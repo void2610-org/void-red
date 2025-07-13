@@ -48,7 +48,7 @@ public class MainLifetimeScope : LifetimeScope
         
         // === エントリーポイントとPresenterの登録 ===
         
+        builder.RegisterEntryPoint<UIPresenter>().AsSelf();
         builder.RegisterEntryPoint<GameManager>();
-        builder.RegisterComponentInHierarchy<UIPresenter>();
     }
 }
