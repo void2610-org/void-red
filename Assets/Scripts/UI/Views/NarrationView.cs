@@ -16,7 +16,7 @@ public class NarrationView : MonoBehaviour
     
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_OUT_DURATION = 0.3f;
-    private const float SLIDE_DISTANCE = 350f;
+    private const float CHARACTER_DISPLAY_INTERVAL = 0.05f; // 1文字あたりの表示間隔
     
     private CancellationTokenSource _currentNarrationCts;
 
@@ -43,11 +43,10 @@ public class NarrationView : MonoBehaviour
         {
             // テキストの位置をリセット（前回のアニメーションの影響を除去）
             var textRect = narrationText.rectTransform;
-            var originalPosition = Vector2.zero;
-            textRect.anchoredPosition = originalPosition;
+            textRect.anchoredPosition = Vector2.zero;
             
-            // メッセージを設定
-            narrationText.text = message;
+            // メッセージを空で初期化（後で1文字ずつ表示）
+            narrationText.text = "";
             
             // 初期状態を設定
             narrationBackground.gameObject.SetActive(true);
@@ -55,11 +54,8 @@ public class NarrationView : MonoBehaviour
             narrationBackground.color = new Color(narrationBackground.color.r, narrationBackground.color.g, narrationBackground.color.b, 0f);
             narrationText.color = new Color(narrationText.color.r, narrationText.color.g, narrationText.color.b, 0f);
             
-            // テキストを左側に配置
-            textRect.anchoredPosition = new Vector2(originalPosition.x - SLIDE_DISTANCE, originalPosition.y);
-            
             // フェードインアニメーション
-            var fadeInTasks = new UniTask[3];
+            var fadeInTasks = new UniTask[2];
             
             // 背景のフェードイン
             var bgColor = narrationBackground.color;
@@ -77,20 +73,16 @@ public class NarrationView : MonoBehaviour
                 .AddTo(gameObject)
                 .ToUniTask(cancellationToken);
             
-            // テキストのスライドインアニメーション
-            fadeInTasks[2] = LMotion.Create(new Vector2(originalPosition.x - SLIDE_DISTANCE, originalPosition.y), originalPosition, FADE_IN_DURATION)
-                .WithEase(Ease.OutCubic)
-                .BindToAnchoredPosition(textRect)
-                .AddTo(gameObject)
-                .ToUniTask(cancellationToken);
-            
             await UniTask.WhenAll(fadeInTasks);
+            
+            // 1文字ずつ表示するアニメーション
+            await TypewriterAnimation(message, cancellationToken);
             
             // 表示時間を待つ
             await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
             
             // フェードアウトアニメーション
-            var fadeOutTasks = new UniTask[3];
+            var fadeOutTasks = new UniTask[2];
             
             // 背景のフェードアウト
             var bgColorOut = narrationBackground.color;
@@ -105,13 +97,6 @@ public class NarrationView : MonoBehaviour
             fadeOutTasks[1] = LMotion.Create(new Color(textColorOut.r, textColorOut.g, textColorOut.b, 1f), new Color(textColorOut.r, textColorOut.g, textColorOut.b, 0f), FADE_OUT_DURATION)
                 .WithEase(Ease.InQuart)
                 .BindToColor(narrationText)
-                .AddTo(gameObject)
-                .ToUniTask(cancellationToken);
-            
-            // テキストのスライドアウトアニメーション
-            fadeOutTasks[2] = LMotion.Create(originalPosition, new Vector2(originalPosition.x + SLIDE_DISTANCE, originalPosition.y), FADE_OUT_DURATION)
-                .WithEase(Ease.InCubic)
-                .BindToAnchoredPosition(textRect)
                 .AddTo(gameObject)
                 .ToUniTask(cancellationToken);
             
@@ -146,6 +131,36 @@ public class NarrationView : MonoBehaviour
         // 初期状態の設定
         narrationBackground.gameObject.SetActive(false);
         narrationText.gameObject.SetActive(false);
+    }
+    
+    /// <summary>
+    /// タイプライターアニメーション（1文字ずつ表示）
+    /// </summary>
+    private async UniTask TypewriterAnimation(string message, CancellationToken cancellationToken)
+    {
+        var currentLength = 0;
+        var targetLength = message.Length;
+        
+        // LitMotionで文字数を増やすアニメーション
+        await LMotion.Create(0f, targetLength, targetLength * CHARACTER_DISPLAY_INTERVAL)
+            .WithEase(Ease.Linear)
+            .Bind(value =>
+            {
+                var newLength = Mathf.FloorToInt(value);
+                if (newLength != currentLength && narrationText)
+                {
+                    currentLength = newLength;
+                    narrationText.text = message.Substring(0, currentLength);
+                }
+            })
+            .AddTo(gameObject)
+            .ToUniTask(cancellationToken);
+        
+        // 最終的に全文を表示（念のため）
+        if (narrationText)
+        {
+            narrationText.text = message;
+        }
     }
     
     private void OnDestroy()
