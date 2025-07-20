@@ -21,6 +21,7 @@ public class UIPresenter : IStartable, System.IDisposable
     
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
+    private readonly NarrationView _narrationView;
     private readonly PlayButtonView _playButtonView;
     private readonly PlayStyleView _playStyleView;
     private readonly MentalBetView _mentalBetView;
@@ -32,6 +33,7 @@ public class UIPresenter : IStartable, System.IDisposable
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
+    public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
     public void ShowPlayButton() => _playButtonView.Show();
     public void HidePlayButton() => _playButtonView.Hide();
     public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
@@ -45,6 +47,7 @@ public class UIPresenter : IStartable, System.IDisposable
         // 初期化
         _themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
         _announcementView = UnityEngine.Object.FindFirstObjectByType<AnnouncementView>();
+        _narrationView = UnityEngine.Object.FindFirstObjectByType<NarrationView>();
         _playButtonView = UnityEngine.Object.FindFirstObjectByType<PlayButtonView>();
         _playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
