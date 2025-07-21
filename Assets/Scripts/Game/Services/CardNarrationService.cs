@@ -116,20 +116,8 @@ public class CardNarrationService
     {
         if (!cardData) return string.Empty;
         
-        // まずスプレッドシートから取得を試みる
-        var spreadsheetNarration = GetNarration(cardData.CardId, type, playStyle);
-        if (!string.IsNullOrEmpty(spreadsheetNarration))
-        {
-            return spreadsheetNarration;
-        }
-        
-        // スプレッドシートに無い場合で、PostBattleの場合のみカードデータ自体の語り文を返す
-        if (type == NarrationType.PostBattle)
-        {
-            return cardData.GetNarration(playStyle);
-        }
-        
-        return string.Empty;
+        // スプレッドシートから取得
+        return GetNarration(cardData.CardId, type, playStyle);
     }
 
     /// <summary>
