@@ -7,7 +7,7 @@ public static class GoogleSpreadSheetService
 {
     private static readonly string[] _scopes = new [] { SheetsService.Scope.SpreadsheetsReadonly };
 
-    public static async UniTask<IList<IList<object>>> GetSheet(string sheetId, string sheetRange = "Sheet!A:Z")
+    public static async UniTask<IList<IList<object>>> GetSheet(string sheetId, string sheetName)
     {
         var credential = GoogleAuthService.GetCredential(_scopes);
         if (credential == null) return null;
@@ -17,8 +17,9 @@ public static class GoogleSpreadSheetService
             HttpClientInitializer = credential
         });
 
-        // sheetRangeで指定されたセルのデータを取得
-        var result = await sheetService.Spreadsheets.Values.Get(sheetId, sheetRange).ExecuteAsync();
+        // シート全体のデータを取得
+        var range = $"{sheetName}";
+        var result = await sheetService.Spreadsheets.Values.Get(sheetId, range).ExecuteAsync();
         return result.Values;
     }
 }
