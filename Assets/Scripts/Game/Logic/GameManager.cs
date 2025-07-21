@@ -335,6 +335,11 @@ public class GameManager: IStartable, IDisposable
         var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
         await _uiPresenter.ShowNarration(displayNarration, 3f);
         
+        // 敵の勝敗確定後のナレーション
+        var enemyPostBattleNarration = _npcMove.SelectedCard.GetNarration(_npcMove.PlayStyle);
+        var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
+        await _uiPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
+        
         // カード崩壊判定
         var playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
         var npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);

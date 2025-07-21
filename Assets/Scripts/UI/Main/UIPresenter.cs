@@ -22,6 +22,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
     private readonly NarrationView _narrationView;
+    private readonly NarrationView _enemyNarrationView;
     private readonly PlayButtonView _playButtonView;
     private readonly PlayStyleView _playStyleView;
     private readonly MentalBetView _mentalBetView;
@@ -34,6 +35,7 @@ public class UIPresenter : IStartable, System.IDisposable
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
+    public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
     public void ShowPlayButton() => _playButtonView.Show();
     public void HidePlayButton() => _playButtonView.Hide();
     public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
@@ -47,7 +49,13 @@ public class UIPresenter : IStartable, System.IDisposable
         // 初期化
         _themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
         _announcementView = UnityEngine.Object.FindFirstObjectByType<AnnouncementView>();
-        _narrationView = UnityEngine.Object.FindFirstObjectByType<NarrationView>();
+        
+        // 複数のNarrationViewを取得して、プレイヤー用と敵用を区別
+        var narrationViews = UnityEngine.Object.FindObjectsByType<NarrationView>(UnityEngine.FindObjectsSortMode.None);
+        if (narrationViews.Length != 2) throw new System.Exception("Expected exactly two NarrationViews in the scene.");
+        _narrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
+        _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
+        
         _playButtonView = UnityEngine.Object.FindFirstObjectByType<PlayButtonView>();
         _playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
