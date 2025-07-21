@@ -27,6 +27,17 @@ MonoBehaviour:
   - conditions:
     - rid: 8005200165294309484
   degradationTarget: {fileID: 11400000, guid: 49cdb945655a048a09f967ca7e3420b9, type: 2}
+  narrationByPlayStyle:
+    _serializedList:
+    - key: 0
+      value: "\u8A9E\u308A\u6587 \u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5
+        \u8FF7\u3044"
+    - key: 1
+      value: "\u8A9E\u308A\u6587 \u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5
+        \u885D\u52D5"
+    - key: 2
+      value: "\u8A9E\u308A\u6587 \u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5
+        \u78BA\u4FE1"
   references:
     version: 2
     RefIds:
