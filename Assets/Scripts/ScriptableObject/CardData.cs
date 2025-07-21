@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カード情報を定義するScriptableObject
@@ -26,6 +28,9 @@ public class CardData : ScriptableObject
     [SerializeField] private List<EvolutionConditionGroup> degradationConditionGroups = new List<EvolutionConditionGroup>();
     [SerializeField] private CardData degradationTarget;
     
+    [Header("語り文")]
+    [SerializeField] private SerializableDictionary<PlayStyle, string> narrationByPlayStyle = new SerializableDictionary<PlayStyle, string>();
+    
     public string CardId => cardId;
     public string CardName => cardName;
     public CardAttribute Attribute => attribute;
@@ -49,4 +54,12 @@ public class CardData : ScriptableObject
     /// 劣化可能かどうかを判定
     /// </summary>
     public bool CanDegrade => degradationTarget && degradationConditionGroups.Count > 0;
+    
+    /// <summary>
+    /// PlayStyleに応じた語り内容を取得
+    /// </summary>
+    public string GetNarration(PlayStyle playStyle)
+    {
+        return narrationByPlayStyle.TryGetValue(playStyle, out var narration) ? narration : "";
+    }
 }

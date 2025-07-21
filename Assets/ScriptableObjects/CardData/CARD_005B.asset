@@ -18,8 +18,19 @@ MonoBehaviour:
   image: {fileID: 3313824153268924778, guid: a1b6636d1a89a4ced9d468c87f7d0d9f, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
-  evolutionConditions: []
+  evolutionConditionGroups: []
   evolutionTarget: {fileID: 0}
   isTransformationTarget: 1
-  degradationConditions: []
+  degradationConditionGroups: []
   degradationTarget: {fileID: 0}
+  narrationByPlayStyle:
+    _serializedList:
+    - key: 0
+      value: "\u8A9E\u308A\u6587 \u58F0\u306A\u304D\u5951\u7D04 \u8FF7\u3044"
+    - key: 1
+      value: "\u8A9E\u308A\u6587 \u58F0\u306A\u304D\u5951\u7D04 \u885D\u52D5"
+    - key: 2
+      value: "\u8A9E\u308A\u6587 \u58F0\u306A\u304D\u5951\u7D04 \u78BA\u4FE1"
+  references:
+    version: 2
+    RefIds: []
