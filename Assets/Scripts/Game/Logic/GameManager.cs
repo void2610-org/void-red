@@ -207,11 +207,13 @@ public class GameManager: IStartable, IDisposable
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
         if (!finalSelectedCard) return;
         
-        // カードプレイ前のナレーションを表示
-        await _uiPresenter.ShowNarration("プレイ前語りテスト", 2f);
-        
         // プレイヤーの手を作成
         var playStyle = _uiPresenter.GetSelectedPlayStyle();
+        
+        // カードプレイ前のナレーションを表示（実際の語り内容）
+        var narrationContent = finalSelectedCard.GetNarration(playStyle);
+        var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
+        await _uiPresenter.ShowNarration(displayContent, 3f);
         var mentalBet = _uiPresenter.GetMentalBetValue();
         
         // 精神力を消費
@@ -328,8 +330,10 @@ public class GameManager: IStartable, IDisposable
         // 結果を表示
         await _uiPresenter.ShowAnnouncement(result, 2f);
         
-        // 勝敗確定後のナレーション
-        await _uiPresenter.ShowNarration("勝敗決定後語りテスト", 2f);
+        // 勝敗確定後のナレーション（プレイヤーのカードとPlayStyleに基づく）
+        var postBattleNarration = _playerMove.SelectedCard.GetNarration(_playerMove.PlayStyle);
+        var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
+        await _uiPresenter.ShowNarration(displayNarration, 3f);
         
         // カード崩壊判定
         var playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
