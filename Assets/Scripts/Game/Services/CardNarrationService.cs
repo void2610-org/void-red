@@ -49,44 +49,51 @@ public class CardNarrationService
     /// </summary>
     private void ParseSpreadsheetData(IList<IList<object>> data)
     {
-        // ヘッダー行をスキップ
-        if (data.Count <= 1) return;
-
-        for (var i = 1; i < data.Count; i++)
+        try
         {
-            var row = data[i];
-            if (row == null || row.Count < 2) continue;
+            // ヘッダー行をスキップ
+            if (data.Count <= 1) return;
 
-            var cardId = row[0]?.ToString();
-            if (string.IsNullOrEmpty(cardId)) continue;
+            for (var i = 1; i < data.Count; i++)
+            {
+                var row = data[i];
+                if (row == null || row.Count < 2) continue;
 
-            var narrationData = new CardNarrationData();
-            
-            // プレイ前語り (列1-3)
-            if (row.Count > 1 && !string.IsNullOrEmpty(row[1]?.ToString()))
-                narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, row[1].ToString());
-            if (row.Count > 2 && !string.IsNullOrEmpty(row[2]?.ToString()))
-                narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Impulse, row[2].ToString());
-            if (row.Count > 3 && !string.IsNullOrEmpty(row[3]?.ToString()))
-                narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, row[3].ToString());
-            
-            // 勝負後語り (列4-6)
-            if (row.Count > 4 && !string.IsNullOrEmpty(row[4]?.ToString()))
-                narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Hesitation, row[4].ToString());
-            if (row.Count > 5 && !string.IsNullOrEmpty(row[5]?.ToString()))
-                narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Impulse, row[5].ToString());
-            if (row.Count > 6 && !string.IsNullOrEmpty(row[6]?.ToString()))
-                narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Conviction, row[6].ToString());
-            
-            // 勝負後語り（敵） (列7-9)
-            if (row.Count > 7 && !string.IsNullOrEmpty(row[7]?.ToString()))
-                narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Hesitation, row[7].ToString());
-            if (row.Count > 8 && !string.IsNullOrEmpty(row[8]?.ToString()))
-                narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Impulse, row[8].ToString());
-            if (row.Count > 9 && !string.IsNullOrEmpty(row[9]?.ToString()))
-                narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Conviction, row[9].ToString());
+                var cardId = row[0]?.ToString();
+                if (string.IsNullOrEmpty(cardId)) continue;
 
-            _narrationCache[cardId] = narrationData;
+                var narrationData = new CardNarrationData();
+                
+                // プレイ前語り (列1-3)
+                if (row.Count > 1 && !string.IsNullOrEmpty(row[1]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, row[1].ToString());
+                if (row.Count > 2 && !string.IsNullOrEmpty(row[2]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Impulse, row[2].ToString());
+                if (row.Count > 3 && !string.IsNullOrEmpty(row[3]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, row[3].ToString());
+                
+                // 勝負後語り (列4-6)
+                if (row.Count > 4 && !string.IsNullOrEmpty(row[4]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Hesitation, row[4].ToString());
+                if (row.Count > 5 && !string.IsNullOrEmpty(row[5]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Impulse, row[5].ToString());
+                if (row.Count > 6 && !string.IsNullOrEmpty(row[6]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Conviction, row[6].ToString());
+                
+                // 勝負後語り（敵） (列7-9)
+                if (row.Count > 7 && !string.IsNullOrEmpty(row[7]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Hesitation, row[7].ToString());
+                if (row.Count > 8 && !string.IsNullOrEmpty(row[8]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Impulse, row[8].ToString());
+                if (row.Count > 9 && !string.IsNullOrEmpty(row[9]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Conviction, row[9].ToString());
+
+                _narrationCache[cardId] = narrationData;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"CardNarrationService: スプレッドシートのパース中にエラーが発生しました: {e.Message}");
         }
     }
 

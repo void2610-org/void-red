@@ -340,7 +340,7 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowNarration(displayNarration, 3f);
         
         // 敵の勝敗確定後のナレーション
-        var enemyPostBattleNarration = _cardNarrationService.GetNarration(_npcMove.SelectedCard, NarrationType.PostBattleEnemy, _npcMove.PlayStyle);
+        var enemyPostBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PostBattleEnemy, _playerMove.PlayStyle);
         var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
         await _uiPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
         
