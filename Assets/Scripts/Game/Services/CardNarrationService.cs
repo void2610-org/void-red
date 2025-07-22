@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class CardNarrationService
     // スプレッドシートID（環境変数や設定ファイルから読み込むことを推奨）
     private const string SPREADSHEET_ID = "1Yj-f13peW3dxumUhcSdPNRZ5if5ogz9aXM2cB19bSgY";
     private const string SHEET_NAME = "main";
+    private const string LOCAL_CSV_FILENAME = "CardNarrationData.csv";
     
     // カードIDをキーとしたナレーションデータのキャッシュ
     private readonly Dictionary<string, CardNarrationData> _narrationCache = new();
@@ -24,23 +26,24 @@ public class CardNarrationService
         
         try
         {
+            // まずGoogle Sheets APIを試す
             var data = await GoogleSpreadSheetService.GetSheet(SPREADSHEET_ID, SHEET_NAME);
-            if (data == null || data.Count == 0)
+            if (data != null && data.Count > 0)
             {
-                Debug.LogWarning("CardNarrationService: スプレッドシートからデータを取得できませんでした");
+                ParseSpreadsheetData(data);
                 _isInitialized = true;
+                Debug.Log($"CardNarrationService: スプレッドシートから{_narrationCache.Count}件読み込み");
                 return;
             }
-
-            ParseSpreadsheetData(data);
-            _isInitialized = true;
-            Debug.Log($"CardNarrationService: {_narrationCache.Count}個のカードの語りを読み込みました");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"CardNarrationService: 初期化中にエラーが発生しました: {e.Message}");
-            _isInitialized = true;
+            Debug.LogWarning($"CardNarrationService: Google Sheets API失敗 - {e.Message}");
         }
+        
+        // Google Sheets APIが失敗した場合、ローカルCSVファイルを読み込む
+        LoadFromLocalCsv();
+        _isInitialized = true;
     }
 
     /// <summary>
@@ -93,7 +96,7 @@ public class CardNarrationService
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"CardNarrationService: スプレッドシートのパース中にエラーが発生しました: {e.Message}");
+            Debug.LogError($"CardNarrationService: データパースエラー - {e.Message}");
         }
     }
 
@@ -125,6 +128,88 @@ public class CardNarrationService
         
         // スプレッドシートから取得
         return GetNarration(cardData.CardId, type, playStyle);
+    }
+
+    /// <summary>
+    /// ローカルCSVファイルからデータを読み込む
+    /// </summary>
+    private void LoadFromLocalCsv()
+    {
+        try
+        {
+            var csvPath = Path.Combine(Application.streamingAssetsPath, LOCAL_CSV_FILENAME);
+            
+            if (!File.Exists(csvPath))
+            {
+                Debug.LogWarning($"CardNarrationService: CSVファイル未検出: {LOCAL_CSV_FILENAME}");
+                return;
+            }
+            
+            var csvText = File.ReadAllText(csvPath);
+            ParseCsvData(csvText);
+            Debug.Log($"CardNarrationService: CSVから{_narrationCache.Count}件読み込み");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"CardNarrationService: CSV読み込みエラー - {e.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// CSVデータをパース
+    /// </summary>
+    private void ParseCsvData(string csvText)
+    {
+        try
+        {
+            var lines = csvText.Split('\n');
+            if (lines.Length <= 1) return;
+            
+            // ヘッダー行をスキップ
+            for (var i = 1; i < lines.Length; i++)
+            {
+                var line = lines[i].Trim();
+                if (string.IsNullOrEmpty(line)) continue;
+                
+                var columns = line.Split(',');
+                if (columns.Length < 2) continue;
+                
+                var cardId = columns[0].Trim();
+                if (string.IsNullOrEmpty(cardId)) continue;
+                
+                var narrationData = new CardNarrationData();
+                
+                // プレイ前語り (列1-3)
+                if (columns.Length > 1 && !string.IsNullOrEmpty(columns[1].Trim()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, columns[1].Trim());
+                if (columns.Length > 2 && !string.IsNullOrEmpty(columns[2].Trim()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Impulse, columns[2].Trim());
+                if (columns.Length > 3 && !string.IsNullOrEmpty(columns[3].Trim()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, columns[3].Trim());
+                
+                // 勝負後語り (列4-6)
+                if (columns.Length > 4 && !string.IsNullOrEmpty(columns[4].Trim()))
+                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Hesitation, columns[4].Trim());
+                if (columns.Length > 5 && !string.IsNullOrEmpty(columns[5].Trim()))
+                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Impulse, columns[5].Trim());
+                if (columns.Length > 6 && !string.IsNullOrEmpty(columns[6].Trim()))
+                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Conviction, columns[6].Trim());
+                
+                // 勝負後語り（敵） (列7-9)
+                if (columns.Length > 7 && !string.IsNullOrEmpty(columns[7].Trim()))
+                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Hesitation, columns[7].Trim());
+                if (columns.Length > 8 && !string.IsNullOrEmpty(columns[8].Trim()))
+                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Impulse, columns[8].Trim());
+                if (columns.Length > 9 && !string.IsNullOrEmpty(columns[9].Trim()))
+                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Conviction, columns[9].Trim());
+                
+                _narrationCache[cardId] = narrationData;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"CardNarrationService: CSVパースエラー - {e.Message}");
+        }
     }
 
     /// <summary>
