@@ -16,7 +16,7 @@ public static class GoogleDriveService
 
     public static async UniTask<List<File>> GetFolderList(string folderId)
     {
-        var credential = await GoogleAuthService.GetCredentialAsync(_scopes);
+        var credential = GoogleAuthService.GetCredential(_scopes);
         var driveService = new DriveService(new BaseClientService.Initializer
         {
             HttpClientInitializer = credential,
@@ -37,7 +37,7 @@ public static class GoogleDriveService
 
     public static async UniTask<List<File>> GetSpreadSheetList(string folderId)
     {
-        var credential = await GoogleAuthService.GetCredentialAsync(_scopes);
+        var credential = GoogleAuthService.GetCredential(_scopes);
         var driveService = new DriveService(new BaseClientService.Initializer
         {
             HttpClientInitializer = credential,

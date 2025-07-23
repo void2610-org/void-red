@@ -25,9 +25,10 @@ public class CardNarrationService
     {
         if (_isInitialized) return;
         
+#if !UNITY_WEBGL || UNITY_EDITOR
+        // WebGL以外の環境でのみGoogle Sheets APIを試す
         try
         {
-            // まずGoogle Sheets APIを試す
             var data = await GoogleSpreadSheetService.GetSheet(SPREADSHEET_ID, SHEET_NAME);
             if (data != null && data.Count > 0)
             {
@@ -41,8 +42,9 @@ public class CardNarrationService
         {
             Debug.LogWarning($"CardNarrationService: Google Sheets API失敗 - {e.Message}");
         }
+#endif
         
-        // Google Sheets APIが失敗した場合、ローカルCSVファイルを読み込む
+        // WebGL環境、またはGoogle Sheets APIが失敗した場合、ローカルCSVファイルを読み込む
         await LoadFromLocalCsv();
         _isInitialized = true;
     }
