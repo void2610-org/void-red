@@ -17,6 +17,7 @@ public class GameManager: IStartable, IDisposable
     private readonly Enemy _enemy;
     private readonly StatsTrackerService _statsTrackerService;
     private readonly EnemyProgressService _enemyProgressService;
+    private readonly CardNarrationService _cardNarrationService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private readonly CompositeDisposable _disposables = new();
@@ -39,7 +40,8 @@ public class GameManager: IStartable, IDisposable
         Player player,
         Enemy enemy,
         StatsTrackerService statsTrackerService,
-        EnemyProgressService enemyProgressService)
+        EnemyProgressService enemyProgressService,
+        CardNarrationService cardNarrationService)
     {
         _cardPoolService = cardPoolService;
         _themeService = themeService;
@@ -48,6 +50,7 @@ public class GameManager: IStartable, IDisposable
         _enemy = enemy;
         _statsTrackerService = statsTrackerService;
         _enemyProgressService = enemyProgressService;
+        _cardNarrationService = cardNarrationService;
     }
     
     public void Start()
@@ -62,6 +65,7 @@ public class GameManager: IStartable, IDisposable
     /// <param name="isNextEnemy">次の敵への進行かどうか</param>
     private async UniTaskVoid InitializeGame(bool isNextEnemy = false)
     {
+        await _cardNarrationService.InitializeAsync();
         await UniTask.Delay(500);
         
         // バトル勝利数をリセット
@@ -211,7 +215,7 @@ public class GameManager: IStartable, IDisposable
         var playStyle = _uiPresenter.GetSelectedPlayStyle();
         
         // カードプレイ前のナレーションを表示（実際の語り内容）
-        var narrationContent = finalSelectedCard.GetNarration(playStyle);
+        var narrationContent = _cardNarrationService.GetNarration(finalSelectedCard, NarrationType.PrePlay, playStyle);
         var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
         await _uiPresenter.ShowNarration(displayContent, 3f);
         var mentalBet = _uiPresenter.GetMentalBetValue();
@@ -331,12 +335,12 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowAnnouncement(result, 2f);
         
         // 勝敗確定後のナレーション（プレイヤーのカードとPlayStyleに基づく）
-        var postBattleNarration = _playerMove.SelectedCard.GetNarration(_playerMove.PlayStyle);
+        var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PostBattle, _playerMove.PlayStyle);
         var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
         await _uiPresenter.ShowNarration(displayNarration, 3f);
         
         // 敵の勝敗確定後のナレーション
-        var enemyPostBattleNarration = _npcMove.SelectedCard.GetNarration(_npcMove.PlayStyle);
+        var enemyPostBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PostBattleEnemy, _playerMove.PlayStyle);
         var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
         await _uiPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
         
