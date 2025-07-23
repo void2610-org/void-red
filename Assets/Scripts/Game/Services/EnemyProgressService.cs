@@ -6,10 +6,7 @@ using UnityEngine;
 /// </summary>
 public class EnemyProgressService
 {
-    public int CurrentEnemyIndex { get; private set; } = 0;
-
-    public int TotalEnemyCount => _allEnemyData.Count;
-    private bool IsAllEnemiesDefeated => CurrentEnemyIndex >= _allEnemyData.Count;
+    public bool IsAllEnemiesDefeated(int chapter) => chapter >= _allEnemyData.Count;
     
     private readonly AllEnemyData _allEnemyData;
 
@@ -21,27 +18,16 @@ public class EnemyProgressService
     {
         _allEnemyData = allEnemyData;
         _allEnemyData.RegisterAllEnemies();
-        CurrentEnemyIndex = 0;
     }
     
     /// <summary>
-    /// 現在の敵データを取得
+    /// 指定チャプターの敵データを取得
     /// </summary>
-    /// <returns>現在の敵データ（全て倒した場合はnull）</returns>
-    public EnemyData GetCurrentEnemy()
+    /// <param name="chapter">チャプター番号（0ベース）</param>
+    /// <returns>指定チャプターの敵データ（範囲外の場合はnull）</returns>
+    public EnemyData GetEnemyByChapter(int chapter)
     {
-        if (IsAllEnemiesDefeated) return null;
-        return _allEnemyData.GetEnemyByIndex(CurrentEnemyIndex);
-    }
-    
-    /// <summary>
-    /// 次の敵に進む
-    /// </summary>
-    /// <returns>次の敵データ（全て倒した場合はnull）</returns>
-    public EnemyData AdvanceToNextEnemy()
-    {
-        if (IsAllEnemiesDefeated) return null;
-        CurrentEnemyIndex++;
-        return GetCurrentEnemy();
+        if (chapter < 0 || chapter >= _allEnemyData.Count) return null;
+        return _allEnemyData.GetEnemyByIndex(chapter);
     }
 }

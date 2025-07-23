@@ -75,8 +75,9 @@ public class GameManager: IStartable, IDisposable
         // 敵の統計をリセット
         _gameStatsService.ResetEnemyStats();
         
-        // 現在の敵データを取得
-        var currentEnemyData = _enemyProgressService.GetCurrentEnemy();
+        // 現在のチャプターに基づいて敵データを取得
+        var currentChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
+        var currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
         
         // 次の敵への進行の場合は手札を戻す演出
         if (isNextEnemy)
@@ -509,8 +510,13 @@ public class GameManager: IStartable, IDisposable
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         
-        // 次の敵への進行処理
-        var nextEnemy = _enemyProgressService.AdvanceToNextEnemy();
+        // チャプター進行処理
+        _gameStatsService.PlayerSaveData.AdvanceToNextChapter();
+        var nextChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
+        var nextEnemy = _enemyProgressService.GetEnemyByChapter(nextChapter);
+        
+        // セーブデータを保存
+        _saveDataManager.SavePlayerData(_gameStatsService.PlayerSaveData);
         
         if (!nextEnemy)
         {
