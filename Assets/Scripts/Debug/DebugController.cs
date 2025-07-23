@@ -18,13 +18,13 @@ public class DebugController : MonoBehaviour
     private readonly ReactiveProperty<bool> _fastModeProperty = new();
     private readonly ReactiveProperty<float> _timeScaleProperty = new();
     
-    private StatsTrackerService _statsTrackerService;
+    private GameStatsService _gameStatsService;
     private SaveDataManager _saveDataManager;
     
     [Inject]
-    public void Construct(StatsTrackerService statsTrackerService, SaveDataManager saveDataManager)
+    public void Construct(GameStatsService gameStatsService, SaveDataManager saveDataManager)
     {
-        _statsTrackerService = statsTrackerService;
+        _gameStatsService = gameStatsService;
         _saveDataManager = saveDataManager;
     }
     
@@ -62,7 +62,7 @@ public class DebugController : MonoBehaviour
     
     private void OnGUI()
     {
-        if (!Application.isEditor || !showSaveInfo || _statsTrackerService == null || _saveDataManager == null) return;
+        if (!Application.isEditor || !showSaveInfo || _gameStatsService == null || _saveDataManager == null) return;
         
         GUILayout.BeginArea(new Rect(10, 100, 300, 200));
         GUILayout.BeginVertical("box");
@@ -77,7 +77,7 @@ public class DebugController : MonoBehaviour
         GUILayout.Label($"新データ開始: {(startWithFreshData ? "ON" : "OFF")}");
         
         // プレイヤー統計情報表示
-        var playerData = _statsTrackerService.PlayerSaveData;
+        var playerData = _gameStatsService.PlayerSaveData;
         GUILayout.Label($"統計: {playerData.GetStatsString()}");
         
         if (GUILayout.Button("セーブファイル削除"))

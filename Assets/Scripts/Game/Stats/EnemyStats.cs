@@ -58,6 +58,28 @@ public class EnemyStats : IEvolutionStatsData
     }
     
     /// <summary>
+    /// 単一カードの進化チェック（即時進化用）
+    /// </summary>
+    /// <param name="card">チェックするカード</param>
+    /// <returns>進化先カード（進化しない場合は元のカード）</returns>
+    public CardData CheckCardEvolution(CardData card)
+    {
+        if (CheckAllEvolutionConditions(card))
+        {
+            return card.EvolutionTarget;
+        }
+        
+        // 進化しない場合は劣化チェック
+        if (CheckAllDegradationConditions(card))
+        {
+            return card.DegradationTarget;
+        }
+        
+        // 変化なしの場合は元のカードを返す
+        return card;
+    }
+    
+    /// <summary>
     /// デバッグ用：統計情報を文字列で取得
     /// </summary>
     public string GetStatsString()

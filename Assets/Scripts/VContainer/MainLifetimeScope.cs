@@ -45,7 +45,7 @@ public class MainLifetimeScope : LifetimeScope
         builder.Register<ThemeService>(Lifetime.Singleton);
         builder.Register<EnemyProgressService>(Lifetime.Singleton);
         builder.Register<SaveDataManager>(Lifetime.Singleton);
-        builder.Register<StatsTrackerService>(Lifetime.Singleton);
+        builder.Register<GameStatsService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
         
         // === エントリーポイントとPresenterの登録 ===

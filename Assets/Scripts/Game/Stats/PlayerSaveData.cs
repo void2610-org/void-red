@@ -11,7 +11,7 @@ public class PlayerSaveData : IEvolutionStatsData
     [SerializeField] private EvolutionStatsData evolutionStatsData = new EvolutionStatsData();
     
     [Header("ゲーム進行データ")]
-    [SerializeField] private int currentChapter = 1; // 現在のチャプター（1から開始）
+    [SerializeField] private int currentChapter = 0; // 現在のチャプター
     
     // EvolutionStatsDataの主要プロパティのラッパー
     public int TotalGames => evolutionStatsData.TotalGames;
@@ -67,6 +67,28 @@ public class PlayerSaveData : IEvolutionStatsData
     public bool CheckAllDegradationConditions(CardData cardData)
     {
         return evolutionStatsData.CheckAllDegradationConditions(cardData);
+    }
+    
+    /// <summary>
+    /// 単一カードの進化チェック（即時進化用）
+    /// </summary>
+    /// <param name="card">チェックするカード</param>
+    /// <returns>進化先カード（進化しない場合は元のカード）</returns>
+    public CardData CheckCardEvolution(CardData card)
+    {
+        if (CheckAllEvolutionConditions(card))
+        {
+            return card.EvolutionTarget;
+        }
+        
+        // 進化しない場合は劣化チェック
+        if (CheckAllDegradationConditions(card))
+        {
+            return card.DegradationTarget;
+        }
+        
+        // 変化なしの場合は元のカードを返す
+        return card;
     }
     
     /// <summary>
