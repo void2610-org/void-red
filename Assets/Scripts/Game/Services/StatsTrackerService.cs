@@ -3,10 +3,15 @@
 /// </summary>
 public class StatsTrackerService
 {
-    private readonly PlayerSaveData _playerSaveData = new();
+    private PlayerSaveData _playerSaveData;
     private EnemyStats _enemyStats = new();
     private StatsTracker _playerTracker;
     private StatsTracker _enemyTracker;
+    
+    public StatsTrackerService(SaveDataManager saveDataManager)
+    {
+        _playerSaveData = saveDataManager.LoadPlayerData();
+    }
 
     /// <summary>
     /// プレイヤー用StatsTrackerを取得

@@ -15,6 +15,7 @@ public class GameManager: IStartable, IDisposable
     private readonly Player _player;
     private readonly Enemy _enemy;
     private readonly StatsTrackerService _statsTrackerService;
+    private readonly SaveDataManager _saveDataManager;
     private readonly EnemyProgressService _enemyProgressService;
     private readonly CardNarrationService _cardNarrationService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
@@ -39,6 +40,7 @@ public class GameManager: IStartable, IDisposable
         Player player,
         Enemy enemy,
         StatsTrackerService statsTrackerService,
+        SaveDataManager saveDataManager,
         EnemyProgressService enemyProgressService,
         CardNarrationService cardNarrationService)
     {
@@ -48,6 +50,7 @@ public class GameManager: IStartable, IDisposable
         _player = player;
         _enemy = enemy;
         _statsTrackerService = statsTrackerService;
+        _saveDataManager = saveDataManager;
         _enemyProgressService = enemyProgressService;
         _cardNarrationService = cardNarrationService;
     }
@@ -499,6 +502,9 @@ public class GameManager: IStartable, IDisposable
             battleResult = $"バトルに勝利しました！ ({_playerWins}-{_enemyWins})";
         else if (_enemyWins >= WINS_TO_VICTORY)
             battleResult = $"バトルに敗北しました... ({_playerWins}-{_enemyWins})";
+        
+        // バトル終了時（どちらかが3勝）に自動セーブ
+        _saveDataManager.SavePlayerData(_statsTrackerService.PlayerSaveData);
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         

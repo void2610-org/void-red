@@ -37,7 +37,8 @@ Game/
 ├── Services/          → サービス層
 │   ├── CardPoolService.cs → カードプール管理
 │   ├── ThemeService.cs → テーマデータ管理
-│   ├── StatsTrackerService.cs → プレイヤー・敵の統計管理
+│   ├── StatsTrackerService.cs → プレイヤー・敵の統計管理 + セーブ・ロード
+│   ├── SaveDataManager.cs → セーブデータファイル管理
 │   └── CardViewFactory.cs → カードビューファクトリ
 ├── Logic/             → ゲームロジック
 │   ├── GameManager.cs → ゲーム進行制御 (IStartable)
@@ -79,7 +80,13 @@ Debug/
 - PlayerSaveData（プレイヤー固有）とEnemyStats（敵用簡略）の管理
 - PlayerTracker, EnemyTrackerの提供
 - 敵統計リセット機能（ResetEnemyStats）
-- 将来のセーブ機能に向けたPlayerSaveDataアクセス
+- SaveDataManagerと連携してセーブデータのロード
+
+**SaveDataManager (セーブデータ管理)**
+- JSON形式でのPlayerSaveDataのシリアライズ・デシリアライズ
+- Application.persistentDataPathを使った永続化
+- セーブファイルの存在確認・削除機能
+- エラーハンドリングによる安全なセーブ・ロード
 
 **StatsTracker (統計・進化管理)**
 - IEvolutionStatsDataインターフェースによる統一的な進化統計データ管理
@@ -130,6 +137,7 @@ builder.RegisterInstance(player);
 builder.RegisterInstance(enemy);
 builder.Register<CardPoolService>(Lifetime.Singleton);
 builder.Register<ThemeService>(Lifetime.Singleton);
+builder.Register<SaveDataManager>(Lifetime.Singleton);
 builder.Register<StatsTrackerService>(Lifetime.Singleton);
 builder.RegisterEntryPoint<GameManager>();
 builder.RegisterComponentInHierarchy<UIPresenter>();
@@ -273,6 +281,36 @@ var canEvolve = statsTrackerService.PlayerTracker.CanCardEvolve(cardData);
 // 敵の統計データ取得  
 var enemyStats = statsTrackerService.EnemyTracker.GetCardStats(cardData);
 ```
+
+### セーブ・ロード機能の使用
+```csharp
+// SaveDataManagerをDIで注入
+public GameManager(SaveDataManager saveDataManager, StatsTrackerService statsTrackerService)
+
+// バトル終了時の自動セーブ
+_saveDataManager.SavePlayerData(_statsTrackerService.PlayerSaveData);
+
+// セーブファイル存在確認
+bool saveExists = _saveDataManager.SaveFileExists();
+
+// プレイヤーセーブデータへのアクセス
+PlayerSaveData saveData = _statsTrackerService.PlayerSaveData;
+
+// セーブデータの手動ロード
+PlayerSaveData loadedData = _saveDataManager.LoadPlayerData();
+
+// デバッグ用：セーブファイル削除
+_saveDataManager.DeleteSaveFile();
+
+// セーブファイルパスの取得（デバッグ用）
+string savePath = _saveDataManager.SaveFilePath;
+```
+
+### セーブデータの自動ロード
+- StatsTrackerServiceのコンストラクタで自動的にセーブデータをロード
+- セーブファイルが存在しない場合は新規データを作成
+- 読み込みエラー時も新規データで安全にフォールバック
+- セーブデータはJSON形式でApplication.persistentDataPathに保存
 
 ## Coding Guidelines
 
