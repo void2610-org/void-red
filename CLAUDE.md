@@ -44,8 +44,11 @@ Game/
 │   ├── ScoreCalculator.cs → スコア計算ロジック (static)
 │   └── CollapseJudge.cs → カード崩壊判定ロジック (static)
 └── Stats/             → 統計・進化システム
-    ├── StatsTracker.cs → 統計データ + 即時進化チェック
-    ├── PlayerStats.cs → プレイヤー統計データ
+    ├── IEvolutionStatsData.cs → 進化統計データ共通インターフェース
+    ├── EvolutionStatsData.cs → プレイヤー・敵共通の進化統計データ
+    ├── PlayerSaveData.cs → プレイヤー固有のセーブデータ
+    ├── EnemyStats.cs  → 敵用簡略統計データ
+    ├── StatsTracker.cs → 統計データ管理 + 即時進化チェック
     ├── CardStats.cs   → カード統計データ
     ├── EvolutionConditions.cs → 進化条件（SubclassSelector使用）
     └── EvolutionConditionGroup.cs → 進化条件グループ
@@ -73,14 +76,21 @@ Debug/
 - 即時進化チェック機能の統合
 
 **StatsTrackerService (統計管理サービス)**
-- プレイヤーと敵の独立した統計管理
+- PlayerSaveData（プレイヤー固有）とEnemyStats（敵用簡略）の管理
 - PlayerTracker, EnemyTrackerの提供
-- 統計データの分離とカプセル化
+- 敵統計リセット機能（ResetEnemyStats）
+- 将来のセーブ機能に向けたPlayerSaveDataアクセス
 
 **StatsTracker (統計・進化管理)**
-- 個別プレイヤーの統計データ管理
+- IEvolutionStatsDataインターフェースによる統一的な進化統計データ管理
 - 即時進化チェック機能（CheckCardEvolution）
 - 進化・劣化条件の判定
+
+**新しいデータ構造**
+- **EvolutionStatsData**: プレイヤー・敵共通の進化統計データ（進化機能用）
+- **PlayerSaveData**: プレイヤー固有データ（進化統計 + 将来の章クリア状況等）
+- **EnemyStats**: 敵用簡略統計（進化に必要な最小限のみ）
+- **IEvolutionStatsData**: 進化統計データの統一インターフェース
 
 **DeckModel (デッキ管理)**
 - DrawPile（山札）とAllCards（デッキ全体）の二重管理

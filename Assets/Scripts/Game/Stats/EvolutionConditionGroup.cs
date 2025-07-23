@@ -15,13 +15,13 @@ public class EvolutionConditionGroup
     /// <summary>
     /// このグループの全ての条件を満たしているかチェック
     /// </summary>
-    public bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         if (conditions == null || conditions.Count == 0) return true;
         
         foreach (var condition in conditions)
         {
-            if (condition == null || !condition.IsSatisfied(cardStats, playerStats))
+            if (condition == null || !condition.IsSatisfied(cardStats, evolutionStatsData))
                 return false;
         }
         

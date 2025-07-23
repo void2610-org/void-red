@@ -3,25 +3,26 @@ using VContainer;
 using Void2610.UnityTemplate;
 
 /// <summary>
-/// プレイヤーの統計データを追跡・管理するサービスクラス
+/// 統計データを追跡・管理するサービスクラス
 /// </summary>
 public class StatsTracker
 {
-    private PlayerStats _playerStats;
+    private readonly IEvolutionStatsData _evolutionStatsData;
     private readonly string _ownerId;
     
     /// <summary>
-    /// 現在の統計データ
+    /// 現在の進化統計データ
     /// </summary>
-    public PlayerStats PlayerStats => _playerStats ??= new PlayerStats();
+    public IEvolutionStatsData EvolutionStatsData => _evolutionStatsData;
     
     /// <summary>
     /// 統計トラッカーのオーナーID（プレイヤー/敵の識別用）
     /// </summary>
     public string OwnerId => _ownerId;
     
-    public StatsTracker(string ownerId = "Player")
+    public StatsTracker(IEvolutionStatsData evolutionStatsData, string ownerId)
     {
+        _evolutionStatsData = evolutionStatsData;
         _ownerId = ownerId;
     }
     
@@ -37,7 +38,7 @@ public class StatsTracker
         if (!ownerMove?.SelectedCard) return;
         
         // 統計データを更新
-        PlayerStats.RecordGameResult(ownerWon, ownerMove, ownerCollapsed);
+        _evolutionStatsData.RecordGameResult(ownerWon, ownerMove, ownerCollapsed);
     }
     
     /// <summary>
@@ -48,7 +49,7 @@ public class StatsTracker
     public CardStats GetCardStats(CardData cardData)
     {
         if (!cardData) return new CardStats();
-        return PlayerStats.GetCardStats(cardData.CardId);
+        return _evolutionStatsData.GetCardStats(cardData.CardId);
     }
     
     /// <summary>
@@ -58,7 +59,7 @@ public class StatsTracker
     /// <returns>進化可能かどうか</returns>
     public bool CanCardEvolve(CardData cardData)
     {
-        return PlayerStats.CheckAllEvolutionConditions(cardData);
+        return _evolutionStatsData.CheckAllEvolutionConditions(cardData);
     }
     
     /// <summary>
@@ -68,7 +69,7 @@ public class StatsTracker
     /// <returns>劣化可能かどうか</returns>
     public bool CanCardDegrade(CardData cardData)
     {
-        return PlayerStats.CheckAllDegradationConditions(cardData);
+        return _evolutionStatsData.CheckAllDegradationConditions(cardData);
     }
     
     /// <summary>
@@ -93,11 +94,4 @@ public class StatsTracker
         return card;
     }
     
-    /// <summary>
-    /// 統計データをリセット
-    /// </summary>
-    public void ResetStats()
-    {
-        _playerStats = new PlayerStats();
-    }
 }

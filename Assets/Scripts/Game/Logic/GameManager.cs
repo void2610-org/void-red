@@ -70,7 +70,7 @@ public class GameManager: IStartable, IDisposable
         // バトル勝利数をリセット
         ResetBattleWins();
         // 敵の統計をリセット
-        _statsTrackerService.EnemyTracker.ResetStats();
+        _statsTrackerService.ResetEnemyStats();
         
         // 現在の敵データを取得
         var currentEnemyData = _enemyProgressService.GetCurrentEnemy();
