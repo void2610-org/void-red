@@ -1,5 +1,11 @@
 using UnityEngine;
 
+public enum BgmType
+{
+    Title, // タイトルBGM
+    Battle, // バトルBGM
+}
+
 /// <summary>
 /// ゲームの状態を表すEnum
 /// </summary>

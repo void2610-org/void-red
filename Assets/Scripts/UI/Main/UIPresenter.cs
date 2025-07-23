@@ -27,6 +27,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly PlayStyleView _playStyleView;
     private readonly MentalBetView _mentalBetView;
     private readonly GameOverView _gameOverView;
+    private readonly ConfirmationDialogView _confirmationDialogView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
@@ -39,6 +40,8 @@ public class UIPresenter : IStartable, System.IDisposable
     public void ShowPlayButton() => _playButtonView.Show();
     public void HidePlayButton() => _playButtonView.Hide();
     public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
+    public async UniTask<bool> ShowConfirmationDialog(string message, string confirmText = "OK", string cancelText = "キャンセル") 
+        => await _confirmationDialogView.ShowDialog(message, confirmText, cancelText);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
     
@@ -60,6 +63,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
         _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
+        _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)

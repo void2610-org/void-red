@@ -27,7 +27,7 @@ public class EnemyProgressService
     /// <returns>指定チャプターの敵データ（範囲外の場合はnull）</returns>
     public EnemyData GetEnemyByChapter(int chapter)
     {
-        if (chapter -1 < 0 || chapter - 1 >= _allEnemyData.Count) return null;
-        return _allEnemyData.GetEnemyByIndex(chapter - 1);
+        if (chapter < 0 || chapter >= _allEnemyData.Count) return null;
+        return _allEnemyData.GetEnemyByIndex(chapter);
     }
 }
