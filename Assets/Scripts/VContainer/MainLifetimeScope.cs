@@ -54,9 +54,6 @@ public class MainLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<UIPresenter>().AsSelf();
         builder.RegisterEntryPoint<GameManager>();
         
-        // === UI Presentersの登録 ===
-        builder.RegisterComponentInHierarchy<SettingsPresenter>();
-        
         // === デバッグ機能の登録（エディター用） ===
         #if UNITY_EDITOR
         builder.RegisterComponentInHierarchy<DebugController>();

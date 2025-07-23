@@ -26,6 +26,7 @@ public class SettingsPresenter : IStartable, IDisposable
         
         SubscribeToViewEvents();
         RefreshSettingsView();
+        HideSettings(); // 初期状態では非表示にする
     }
     
     /// <summary>
