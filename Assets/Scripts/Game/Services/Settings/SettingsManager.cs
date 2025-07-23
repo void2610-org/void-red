@@ -1,31 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MackySoft.SerializeReferenceExtensions;
 using R3;
 using UnityEngine;
-using VContainer;
 using Void2610.UnityTemplate;
 
 /// <summary>
 /// ゲーム設定の管理を行うサービスクラス
 /// VContainerでシングルトンとして注入される
-/// 
-/// 使用例:
-/// var setting = new SliderSetting("SE音量", "効果音の音量", 0.8f, 0f, 1f);
-/// setting.OnValueChanged.Subscribe(_ => SeManager.Instance.SeVolume = setting.CurrentValue).AddTo(_disposables);
-/// settingsManager.AddSetting(setting);
 /// </summary>
-[System.Serializable]
 public class SettingsManager
 {
-    [SerializeReference, SubclassSelector]
-    private List<ISettingBase> settings = new();
-    
+    private readonly List<ISettingBase> _settings = new();
     private readonly Subject<string> _onSettingChanged = new();
     private readonly CompositeDisposable _disposables = new();
-    
-    private SaveDataManager _saveDataManager;
+    private readonly SaveDataManager _saveDataManager;
     
     /// <summary>
     /// 設定値が変更された時のイベント（設定名を通知）
@@ -35,14 +24,14 @@ public class SettingsManager
     /// <summary>
     /// 全ての設定項目の読み取り専用リスト
     /// </summary>
-    public IReadOnlyList<ISettingBase> Settings => settings.AsReadOnly();
+    public IReadOnlyList<ISettingBase> Settings => _settings.AsReadOnly();
     
     public SettingsManager(SaveDataManager saveDataManager)
     {
         _saveDataManager = saveDataManager;
         
         // 既存の設定がない場合は初期設定を作成
-        if (settings.Count == 0) InitializeDefaultSettings();
+        if (_settings.Count == 0) InitializeDefaultSettings();
         
         // 各設定の値変更イベントを監視
         SubscribeToSettingChanges();
@@ -60,27 +49,20 @@ public class SettingsManager
         // BGM音量設定
         var bgmSetting = new SliderSetting("BGM音量", "バックグラウンドミュージックの音量", 0.8f, 0f, 1f);
         bgmSetting.OnValueChanged.Subscribe(v => Debug.Log($"BGM音量を {v} に設定")).AddTo(_disposables);
-        settings.Add(bgmSetting);
+        _settings.Add(bgmSetting);
         
         // SE音量設定（SeManager初期化後に適用）
         var seSetting = new SliderSetting("SE音量", "効果音の音量", 0.8f, 0f, 1f);
         seSetting.OnValueChanged.Subscribe(v => {
-            if (SeManager.Instance != null)
-            {
-                SeManager.Instance.SeVolume = v;
-            }
-            else
-            {
-                Debug.Log($"SeManager未初期化のため、SE音量設定を遅延: {v}");
-            }
+            if (SeManager.Instance) SeManager.Instance.SeVolume = v;
         }).AddTo(_disposables);
-        settings.Add(seSetting);
+        _settings.Add(seSetting);
         
         // フルスクリーン切り替え
         var fullscreenSetting = new EnumSetting("フルスクリーン", "フルスクリーン表示の切り替え", 
             new[] { "false", "true" }, Screen.fullScreen ? "true" : "false", new[] { "オフ", "オン" });
         fullscreenSetting.OnValueChanged.Subscribe(v => Screen.fullScreen = v == "true").AddTo(_disposables);
-        settings.Add(fullscreenSetting);
+        _settings.Add(fullscreenSetting);
         
         // セーブデータ削除ボタン
         var deleteDataSetting = new ButtonSetting(
@@ -91,7 +73,7 @@ public class SettingsManager
             "本当にセーブデータを削除しますか？この操作は元に戻せません。"
         );
         deleteDataSetting.ButtonAction = () => _saveDataManager.DeleteSaveFile();
-        settings.Add(deleteDataSetting);
+        _settings.Add(deleteDataSetting);
     }
     
     /// <summary>
@@ -99,7 +81,7 @@ public class SettingsManager
     /// </summary>
     private void SubscribeToSettingChanges()
     {
-        foreach (var setting in settings)
+        foreach (var setting in _settings)
         {
             setting.OnSettingChanged
                 .Subscribe(_ => {
@@ -115,7 +97,7 @@ public class SettingsManager
     /// </summary>
     public T GetSetting<T>(string settingName) where T : class, ISettingBase
     {
-        return settings.FirstOrDefault(s => s.SettingName == settingName) as T;
+        return _settings.FirstOrDefault(s => s.SettingName == settingName) as T;
     }
     
     /// <summary>
@@ -123,7 +105,7 @@ public class SettingsManager
     /// </summary>
     public void ResetAllSettings()
     {
-        foreach (var setting in settings)
+        foreach (var setting in _settings)
         {
             setting.ResetToDefault();
         }
@@ -140,7 +122,7 @@ public class SettingsManager
         {
             var settingsData = new SettingsData();
             
-            foreach (var setting in settings)
+            foreach (var setting in _settings)
             {
                 settingsData.settingValues[setting.SettingName] = setting.SerializeValue();
             }
@@ -178,7 +160,7 @@ public class SettingsManager
             
             if (settingsData?.settingValues != null)
             {
-                foreach (var setting in settings)
+                foreach (var setting in _settings)
                 {
                     if (settingsData.settingValues.TryGetValue(setting.SettingName, out var value))
                     {
@@ -203,7 +185,7 @@ public class SettingsManager
     /// </summary>
     private void ApplyCurrentValues()
     {
-        foreach (var setting in settings)
+        foreach (var setting in _settings)
         {
             setting.ApplyCurrentValue();
         }

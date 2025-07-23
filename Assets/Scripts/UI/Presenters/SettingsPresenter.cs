@@ -1,31 +1,30 @@
+using System;
 using System.Linq;
 using R3;
 using UnityEngine;
-using VContainer;
+using VContainer.Unity;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// SettingsManagerとSettingsViewの橋渡しを行うPresenterクラス
 /// MVPパターンに基づいてViewとModelを分離
 /// </summary>
-public class SettingsPresenter : MonoBehaviour
+public class SettingsPresenter : IStartable, IDisposable
 {
-    [SerializeField] private SettingsView settingsView;
-    
-    private SettingsManager _settingsManager;
+    private SettingsView _settingsView;
+    private readonly SettingsManager _settingsManager;
     private readonly CompositeDisposable _disposables = new();
     
-    [Inject]
-    public void Construct(SettingsManager settingsManager)
+    public SettingsPresenter(SettingsManager settingsManager)
     {
         _settingsManager = settingsManager;
     }
     
-    private void Start()
+    public void Start()
     {
-        // Viewのイベントを監視
-        SubscribeToViewEvents();
+        _settingsView = Object.FindFirstObjectByType<SettingsView>();
         
-        // 初期設定データをViewに注入
+        SubscribeToViewEvents();
         RefreshSettingsView();
     }
     
@@ -34,11 +33,8 @@ public class SettingsPresenter : MonoBehaviour
     /// </summary>
     public void ShowSettings()
     {
-        if (settingsView)
-        {
-            RefreshSettingsView(); // 最新データで更新
-            settingsView.ShowSettings();
-        }
+        RefreshSettingsView(); // 最新データで更新
+        _settingsView.ShowSettings();
     }
     
     /// <summary>
@@ -46,7 +42,7 @@ public class SettingsPresenter : MonoBehaviour
     /// </summary>
     public void HideSettings()
     {
-        settingsView?.HideSettings();
+        _settingsView?.HideSettings();
     }
     
     /// <summary>
@@ -55,38 +51,26 @@ public class SettingsPresenter : MonoBehaviour
     private void SubscribeToViewEvents()
     {
         // スライダー変更イベント
-        settingsView.OnSliderChanged
+        _settingsView.OnSliderChanged
             .Subscribe(data => {
                 var setting = _settingsManager.GetSetting<SliderSetting>(data.settingName);
-                if (setting != null)
-                {
-                    setting.CurrentValue = data.value;
-                    Debug.Log($"スライダー設定更新: {data.settingName} = {data.value}");
-                }
+                if (setting != null) setting.CurrentValue = data.value;
             })
             .AddTo(_disposables);
         
         // 列挙型変更イベント
-        settingsView.OnEnumChanged
+        _settingsView.OnEnumChanged
             .Subscribe(data => {
                 var setting = _settingsManager.GetSetting<EnumSetting>(data.settingName);
-                if (setting != null)
-                {
-                    setting.CurrentValue = data.value;
-                    Debug.Log($"列挙型設定更新: {data.settingName} = {data.value}");
-                }
+                if (setting != null) setting.CurrentValue = data.value;
             })
             .AddTo(_disposables);
         
         // ボタンクリックイベント
-        settingsView.OnButtonClicked
+        _settingsView.OnButtonClicked
             .Subscribe(settingName => {
                 var setting = _settingsManager.GetSetting<ButtonSetting>(settingName);
-                if (setting != null)
-                {
-                    setting.ExecuteAction();
-                    Debug.Log($"ボタン設定実行: {settingName}");
-                }
+                setting?.ExecuteAction();
             })
             .AddTo(_disposables);
     }
@@ -96,11 +80,8 @@ public class SettingsPresenter : MonoBehaviour
     /// </summary>
     private void RefreshSettingsView()
     {
-        var settingsData = _settingsManager.Settings
-            .Select(ConvertToDisplayData)
-            .ToArray();
-        
-        settingsView.SetSettings(settingsData);
+        var settingsData = _settingsManager.Settings.Select(ConvertToDisplayData).ToArray();
+        _settingsView.SetSettings(settingsData);
     }
     
     /// <summary>
@@ -141,7 +122,7 @@ public class SettingsPresenter : MonoBehaviour
         return data;
     }
     
-    private void OnDestroy()
+    public void Dispose()
     {
         _disposables?.Dispose();
     }
