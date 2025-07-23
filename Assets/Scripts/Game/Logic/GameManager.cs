@@ -14,7 +14,8 @@ public class GameManager: IStartable, IDisposable
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
-    private readonly StatsTrackerService _statsTrackerService;
+    private readonly GameStatsService _gameStatsService;
+    private readonly SaveDataManager _saveDataManager;
     private readonly EnemyProgressService _enemyProgressService;
     private readonly CardNarrationService _cardNarrationService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
@@ -38,7 +39,8 @@ public class GameManager: IStartable, IDisposable
         UIPresenter uiPresenter,
         Player player,
         Enemy enemy,
-        StatsTrackerService statsTrackerService,
+        GameStatsService gameStatsService,
+        SaveDataManager saveDataManager,
         EnemyProgressService enemyProgressService,
         CardNarrationService cardNarrationService)
     {
@@ -47,7 +49,8 @@ public class GameManager: IStartable, IDisposable
         _uiPresenter = uiPresenter;
         _player = player;
         _enemy = enemy;
-        _statsTrackerService = statsTrackerService;
+        _gameStatsService = gameStatsService;
+        _saveDataManager = saveDataManager;
         _enemyProgressService = enemyProgressService;
         _cardNarrationService = cardNarrationService;
     }
@@ -70,10 +73,11 @@ public class GameManager: IStartable, IDisposable
         // バトル勝利数をリセット
         ResetBattleWins();
         // 敵の統計をリセット
-        _statsTrackerService.EnemyTracker.ResetStats();
+        _gameStatsService.ResetEnemyStats();
         
-        // 現在の敵データを取得
-        var currentEnemyData = _enemyProgressService.GetCurrentEnemy();
+        // 現在のチャプターに基づいて敵データを取得
+        var currentChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
+        var currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
         
         // 次の敵への進行の場合は手札を戻す演出
         if (isNextEnemy)
@@ -365,8 +369,8 @@ public class GameManager: IStartable, IDisposable
         
         // ゲーム結果を統計に記録（進化チェック前に実行）
         var playerWon = playerScore > npcScore;
-        _statsTrackerService.PlayerTracker.RecordGameResult(_playerMove, _npcMove, playerWon, playerCollapse);
-        _statsTrackerService.EnemyTracker.RecordGameResult(_npcMove, _playerMove, !playerWon, npcCollapse);
+        _gameStatsService.PlayerSaveData.RecordGameResult(playerWon, _playerMove, playerCollapse);
+        _gameStatsService.EnemyStats.RecordGameResult(!playerWon, _npcMove, npcCollapse);
         
         // 引き分けでない場合、勝利数を更新してバトル終了チェック
         if (!Mathf.Approximately(playerScore, npcScore))
@@ -392,7 +396,7 @@ public class GameManager: IStartable, IDisposable
             if (playerCard)
             {
                 // 進化
-                var playerCardAfterEvolution = _statsTrackerService.PlayerTracker.CheckCardEvolution(playerCard);
+                var playerCardAfterEvolution = _gameStatsService.PlayerSaveData.CheckCardEvolution(playerCard);
                 if (playerCardAfterEvolution != playerCard)
                 {
                     await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！");
@@ -413,7 +417,7 @@ public class GameManager: IStartable, IDisposable
             if (npcCard)
             {
                 // 即時進化チェック
-                var npcCardAfterEvolution = _statsTrackerService.EnemyTracker.CheckCardEvolution(npcCard);
+                var npcCardAfterEvolution = _gameStatsService.EnemyStats.CheckCardEvolution(npcCard);
                 // 進化結果をアナウンス
                 if (npcCardAfterEvolution != npcCard)
                 {
@@ -502,8 +506,13 @@ public class GameManager: IStartable, IDisposable
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         
-        // 次の敵への進行処理
-        var nextEnemy = _enemyProgressService.AdvanceToNextEnemy();
+        // チャプター進行処理
+        _gameStatsService.PlayerSaveData.AdvanceToNextChapter();
+        var nextChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
+        var nextEnemy = _enemyProgressService.GetEnemyByChapter(nextChapter);
+        
+        // セーブデータを保存
+        _saveDataManager.SavePlayerData(_gameStatsService.PlayerSaveData);
         
         if (!nextEnemy)
         {
