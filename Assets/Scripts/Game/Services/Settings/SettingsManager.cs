@@ -111,8 +111,6 @@ public class SettingsManager : IDisposable
         {
             setting.ResetToDefault();
         }
-        
-        Debug.Log("すべての設定をデフォルト値にリセットしました");
     }
     
     /// <summary>
@@ -131,8 +129,6 @@ public class SettingsManager : IDisposable
             
             var json = JsonUtility.ToJson(settingsData, true);
             System.IO.File.WriteAllText(GetSettingsFilePath(), json);
-            
-            Debug.Log("設定データを保存しました");
         }
         catch (Exception e)
         {
@@ -152,7 +148,6 @@ public class SettingsManager : IDisposable
             
             if (!System.IO.File.Exists(filePath))
             {
-                Debug.Log("設定ファイルが存在しません。デフォルト設定を使用します。");
                 if (applyValues) ApplyCurrentValues();
                 return;
             }
@@ -169,8 +164,6 @@ public class SettingsManager : IDisposable
                         setting.DeserializeValue(value);
                     }
                 }
-                
-                Debug.Log("設定データを読み込みました");
             }
             
             if (applyValues) ApplyCurrentValues();

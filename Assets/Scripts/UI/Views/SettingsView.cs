@@ -89,7 +89,6 @@ public class SettingsView : MonoBehaviour
     private void Start()
     {
         closeButton.onClick.AddListener(HideSettings);
-        // if (settingsPanel) settingsPanel.SetActive(false);
     }
     
     /// <summary>
@@ -106,17 +105,6 @@ public class SettingsView : MonoBehaviour
         {
             CreateSettingUI(settingData);
         }
-    }
-    
-    /// <summary>
-    /// 個別設定値を更新
-    /// </summary>
-    /// <param name="settingName">設定名</param>
-    /// <param name="value">新しい値</param>
-    public void UpdateSettingValue(string settingName, object value)
-    {
-        // 実装は後で追加（現在は設定UI生成時に値を設定）
-        Debug.Log($"設定値更新: {settingName} = {value}");
     }
     
     /// <summary>
@@ -156,25 +144,11 @@ public class SettingsView : MonoBehaviour
     /// </summary>
     private void CreateTitleText(Transform parent, string titleText)
     {
-        if (!titleTextPrefab)
-        {
-            Debug.LogError("TitleTextPrefabが設定されていません");
-            return;
-        }
-        
         var titleObject = Instantiate(titleTextPrefab, parent);
         
         // プレハブからTextコンポーネントを取得してテキストを設定
         var textComponent = titleObject.GetComponentInChildren<TextMeshProUGUI>();
-        if (textComponent)
-        {
-            textComponent.text = titleText;
-        }
-        else
-        {
-            Debug.LogWarning("TitleTextPrefabにTextMeshProUGUIコンポーネントが見つかりません");
-        }
-        
+        textComponent.text = titleText;
         // レイアウト要素を追加してタイトル幅を固定
         var layoutElement = titleObject.GetComponent<UnityEngine.UI.LayoutElement>();
         if (!layoutElement)
@@ -190,12 +164,6 @@ public class SettingsView : MonoBehaviour
     /// </summary>
     private GameObject CreateSliderUI(SettingDisplayData settingData, Transform parent)
     {
-        if (!sliderSettingPrefab)
-        {
-            Debug.LogError("SliderSettingPrefabが設定されていません");
-            return null;
-        }
-        
         var uiObject = Instantiate(sliderSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
@@ -235,12 +203,6 @@ public class SettingsView : MonoBehaviour
     /// </summary>
     private GameObject CreateButtonUI(SettingDisplayData settingData, Transform parent)
     {
-        if (!buttonSettingPrefab)
-        {
-            Debug.LogError("ButtonSettingPrefabが設定されていません");
-            return null;
-        }
-        
         var uiObject = Instantiate(buttonSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
@@ -281,12 +243,6 @@ public class SettingsView : MonoBehaviour
     /// </summary>
     private async UniTaskVoid ShowConfirmationDialog(SettingDisplayData settingData)
     {
-        if (!confirmationDialog)
-        {
-            Debug.LogError("ConfirmationDialogが設定されていません");
-            return;
-        }
-        
         var result = await confirmationDialog.ShowDialog(
             settingData.confirmationMessage,
             "実行",
@@ -316,12 +272,6 @@ public class SettingsView : MonoBehaviour
     /// </summary>
     private GameObject CreateEnumUI(SettingDisplayData settingData, Transform parent)
     {
-        if (!enumSettingPrefab)
-        {
-            Debug.LogError("EnumSettingPrefabが設定されていません");
-            return null;
-        }
-        
         var uiObject = Instantiate(enumSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
