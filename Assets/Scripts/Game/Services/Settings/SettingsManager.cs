@@ -9,7 +9,7 @@ using Void2610.UnityTemplate;
 /// ゲーム設定の管理を行うサービスクラス
 /// VContainerでシングルトンとして注入される
 /// </summary>
-public class SettingsManager
+public class SettingsManager : IDisposable
 {
     private readonly List<ISettingBase> _settings = new();
     private readonly Subject<string> _onSettingChanged = new();
@@ -45,17 +45,14 @@ public class SettingsManager
     /// </summary>
     private void InitializeDefaultSettings()
     {
-        // TODO: BgmManagerを移植
         // BGM音量設定
         var bgmSetting = new SliderSetting("BGM音量", "バックグラウンドミュージックの音量", 0.8f, 0f, 1f);
-        bgmSetting.OnValueChanged.Subscribe(v => Debug.Log($"BGM音量を {v} に設定")).AddTo(_disposables);
+        bgmSetting.OnValueChanged.Subscribe(v => BgmManager.Instance.BgmVolume = v).AddTo(_disposables);
         _settings.Add(bgmSetting);
         
-        // SE音量設定（SeManager初期化後に適用）
+        // SE音量設定
         var seSetting = new SliderSetting("SE音量", "効果音の音量", 0.8f, 0f, 1f);
-        seSetting.OnValueChanged.Subscribe(v => {
-            if (SeManager.Instance) SeManager.Instance.SeVolume = v;
-        }).AddTo(_disposables);
+        seSetting.OnValueChanged.Subscribe(v => SeManager.Instance.SeVolume = v).AddTo(_disposables);
         _settings.Add(seSetting);
         
         // フルスクリーン切り替え
@@ -188,44 +185,6 @@ public class SettingsManager
         foreach (var setting in _settings)
         {
             setting.ApplyCurrentValue();
-        }
-    }
-    
-    /// <summary>
-    /// 外部システム初期化後に全設定を適用
-    /// </summary>
-    public void ApplyAllSettingsWhenReady()
-    {
-        // SE音量設定の適用
-        var seSetting = GetSetting<SliderSetting>("SE音量");
-        if (seSetting != null && SeManager.Instance != null)
-        {
-            SeManager.Instance.SeVolume = seSetting.CurrentValue;
-            Debug.Log($"SeManager初期化後にSE音量を適用: {seSetting.CurrentValue}");
-        }
-        
-        // 他の設定も安全に適用
-        var fullscreenSetting = GetSetting<EnumSetting>("フルスクリーン");
-        if (fullscreenSetting != null)
-        {
-            Screen.fullScreen = fullscreenSetting.CurrentValue == "true";
-            Debug.Log($"フルスクリーン設定を適用: {fullscreenSetting.CurrentValue}");
-        }
-        
-        // BGM設定は既にデバッグログ出力のみなので安全
-        Debug.Log("全設定を外部システム初期化後に適用しました");
-    }
-    
-    /// <summary>
-    /// SeManagerが初期化された後にSE音量設定を適用（後方互換性のため残す）
-    /// </summary>
-    public void ApplySeVolumeWhenReady()
-    {
-        var seSetting = GetSetting<SliderSetting>("SE音量");
-        if (seSetting != null && SeManager.Instance != null)
-        {
-            SeManager.Instance.SeVolume = seSetting.CurrentValue;
-            Debug.Log($"SeManager初期化後にSE音量を適用: {seSetting.CurrentValue}");
         }
     }
     

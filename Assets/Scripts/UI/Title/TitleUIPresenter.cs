@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using R3;
 using VContainer;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// タイトル画面のUI管理を担当するプレゼンター
@@ -25,6 +26,8 @@ public class TitleUIPresenter : MonoBehaviour
     {
         startButton.OnClickAsObservable().Subscribe(_ => OnStartButtonClicked()).AddTo(this);
         settingsButton.OnClickAsObservable().Subscribe(_ => OnSettingsButtonClicked()).AddTo(this);
+        
+        BgmManager.Instance.PlayRandomBGM(BgmType.Title);
     }
 
     /// <summary>
