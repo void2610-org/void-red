@@ -94,7 +94,7 @@ public class StatsTracker
     }
     
     /// <summary>
-    /// 統計データをリセット（デバッグ用）
+    /// 統計データをリセット
     /// </summary>
     public void ResetStats()
     {
