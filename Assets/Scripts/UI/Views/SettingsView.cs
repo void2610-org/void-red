@@ -4,6 +4,7 @@ using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// 設定画面のUI表示を担当するViewクラス
@@ -15,6 +16,9 @@ public class SettingsView : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private Transform settingsContainer;
     [SerializeField] private Button closeButton;
+    
+    [Header("ダイアログ")]
+    [SerializeField] private ConfirmationDialogView confirmationDialog;
     
     [Header("設定項目プレハブ")]
     [SerializeField] private GameObject settingsContentContainerPrefab;
@@ -260,7 +264,7 @@ public class SettingsView : MonoBehaviour
             button.onClick.AddListener(() => {
                 if (settingData.requiresConfirmation)
                 {
-                    ShowConfirmationDialog(settingData);
+                    ShowConfirmationDialog(settingData).Forget();
                 }
                 else
                 {
@@ -275,26 +279,22 @@ public class SettingsView : MonoBehaviour
     /// <summary>
     /// 確認ダイアログを表示
     /// </summary>
-    private void ShowConfirmationDialog(SettingDisplayData settingData)
+    private async UniTaskVoid ShowConfirmationDialog(SettingDisplayData settingData)
     {
-        // TODO: より適切なダイアログシステムがあれば置き換える
-        if (Application.isEditor)
+        if (!confirmationDialog)
         {
-#if UNITY_EDITOR
-            if (UnityEditor.EditorUtility.DisplayDialog(
-                "確認",
-                settingData.confirmationMessage,
-                "実行",
-                "キャンセル"))
-            {
-                _onButtonClicked.OnNext(settingData.name);
-            }
-#endif
+            Debug.LogError("ConfirmationDialogが設定されていません");
+            return;
         }
-        else
+        
+        var result = await confirmationDialog.ShowDialog(
+            settingData.confirmationMessage,
+            "実行",
+            "キャンセル"
+        );
+        
+        if (result)
         {
-            // ランタイムでは常に実行（適切なダイアログシステムが必要）
-            Debug.Log($"確認: {settingData.confirmationMessage}");
             _onButtonClicked.OnNext(settingData.name);
         }
     }

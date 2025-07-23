@@ -56,7 +56,6 @@ public class ButtonSetting : SettingBase<Unit>
         try
         {
             ButtonAction?.Invoke();
-            Debug.Log($"ButtonSetting {settingName} のアクションを実行しました");
         }
         catch (Exception e)
         {

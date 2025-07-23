@@ -56,7 +56,7 @@ public class SettingsManager : IDisposable
         _settings.Add(seSetting);
         
         // SE音量テスト
-        var seTestSetting = new ButtonSetting("SE音量テスト", "現在のSE音量で効果音を再生します", "テスト再生", false);
+        var seTestSetting = new ButtonSetting("SE音量テスト", "現在のSE音量で効果音を再生します", "再生");
         seTestSetting.ButtonAction = () => SeManager.Instance.PlaySe("Test");
         _settings.Add(seTestSetting);
         
