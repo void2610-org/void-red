@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 /// <summary>
 /// Googleスプレッドシートからカードのナレーション内容を管理するサービス
@@ -42,7 +43,7 @@ public class CardNarrationService
         }
         
         // Google Sheets APIが失敗した場合、ローカルCSVファイルを読み込む
-        LoadFromLocalCsv();
+        await LoadFromLocalCsv();
         _isInitialized = true;
     }
 
@@ -133,12 +134,26 @@ public class CardNarrationService
     /// <summary>
     /// ローカルCSVファイルからデータを読み込む
     /// </summary>
-    private void LoadFromLocalCsv()
+    private async UniTask LoadFromLocalCsv()
     {
         try
         {
             var csvPath = Path.Combine(Application.streamingAssetsPath, LOCAL_CSV_FILENAME);
             
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // WebGL環境ではUnityWebRequestを使用
+            var request = UnityWebRequest.Get(csvPath);
+            await request.SendWebRequest();
+            
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning($"CardNarrationService: CSVファイル未検出: {LOCAL_CSV_FILENAME}");
+                return;
+            }
+            
+            var csvText = request.downloadHandler.text;
+#else
+            // その他の環境では従来通りFileStreamを使用
             if (!File.Exists(csvPath))
             {
                 Debug.LogWarning($"CardNarrationService: CSVファイル未検出: {LOCAL_CSV_FILENAME}");
@@ -146,6 +161,8 @@ public class CardNarrationService
             }
             
             var csvText = File.ReadAllText(csvPath);
+#endif
+            
             ParseCsvData(csvText);
             Debug.Log($"CardNarrationService: CSVから{_narrationCache.Count}件読み込み");
         }

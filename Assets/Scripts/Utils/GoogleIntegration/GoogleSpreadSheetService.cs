@@ -9,7 +9,7 @@ public static class GoogleSpreadSheetService
 
     public static async UniTask<IList<IList<object>>> GetSheet(string sheetId, string sheetName)
     {
-        var credential = GoogleAuthService.GetCredential(_scopes);
+        var credential = await GoogleAuthService.GetCredentialAsync(_scopes);
         if (credential == null) return null;
 
         var sheetService = new SheetsService(new BaseClientService.Initializer

@@ -33,9 +33,6 @@ jobs:
 
       - name: Generate GCP credentials file 🔐
         run: |
-          # StreamingAssetsディレクトリが存在することを確認
-          mkdir -p Assets/StreamingAssets
-          
           # GitHubシークレットからJSONファイルを生成
           echo "${{ secrets.GCP_KEY }}" > Assets/StreamingAssets/${{ secrets.GCP_KEY_FILE_NAME }}.json
           
@@ -43,9 +40,6 @@ jobs:
           if [ -f "Assets/StreamingAssets/${{ secrets.GCP_KEY_FILE_NAME }}.json" ]; then
             echo "✅ GCP credentials file created successfully"
             echo "📄 File: ${{ secrets.GCP_KEY_FILE_NAME }}.json"
-            echo "📁 Location: Assets/StreamingAssets/"
-            # ファイルサイズを確認（内容は表示しない）
-            ls -lh "Assets/StreamingAssets/${{ secrets.GCP_KEY_FILE_NAME }}.json"
           else
             echo "❌ Failed to create GCP credentials file"
             exit 1
