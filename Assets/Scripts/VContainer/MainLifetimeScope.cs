@@ -44,9 +44,10 @@ public class MainLifetimeScope : LifetimeScope
         builder.Register<CardPoolService>(Lifetime.Singleton);
         builder.Register<ThemeService>(Lifetime.Singleton);
         builder.Register<EnemyProgressService>(Lifetime.Singleton);
-        builder.Register<SaveDataManager>(Lifetime.Singleton);
         builder.Register<GameStatsService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
+        
+        // SaveDataManager, SettingsManagerはRootLifetimeScopeで登録済み
         
         // === エントリーポイントとPresenterの登録 ===
         
