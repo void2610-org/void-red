@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Respond in Japanese and avoid excessive comments. When refactoring, implement clean replacements rather than maintaining backward compatibility.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Unity Project Overview
 
@@ -37,15 +37,19 @@ Game/
 ├── Services/          → サービス層
 │   ├── CardPoolService.cs → カードプール管理
 │   ├── ThemeService.cs → テーマデータ管理
-│   ├── StatsTrackerService.cs → プレイヤー・敵の統計管理
+│   ├── StatsTrackerService.cs → プレイヤー・敵の統計管理 + セーブ・ロード
+│   ├── SaveDataManager.cs → セーブデータファイル管理
 │   └── CardViewFactory.cs → カードビューファクトリ
 ├── Logic/             → ゲームロジック
 │   ├── GameManager.cs → ゲーム進行制御 (IStartable)
 │   ├── ScoreCalculator.cs → スコア計算ロジック (static)
 │   └── CollapseJudge.cs → カード崩壊判定ロジック (static)
 └── Stats/             → 統計・進化システム
-    ├── StatsTracker.cs → 統計データ + 即時進化チェック
-    ├── PlayerStats.cs → プレイヤー統計データ
+    ├── IEvolutionStatsData.cs → 進化統計データ共通インターフェース
+    ├── EvolutionStatsData.cs → プレイヤー・敵共通の進化統計データ
+    ├── PlayerSaveData.cs → プレイヤー固有のセーブデータ
+    ├── EnemyStats.cs  → 敵用簡略統計データ
+    ├── StatsTracker.cs → 統計データ管理 + 即時進化チェック
     ├── CardStats.cs   → カード統計データ
     ├── EvolutionConditions.cs → 進化条件（SubclassSelector使用）
     └── EvolutionConditionGroup.cs → 進化条件グループ
@@ -73,14 +77,27 @@ Debug/
 - 即時進化チェック機能の統合
 
 **StatsTrackerService (統計管理サービス)**
-- プレイヤーと敵の独立した統計管理
+- PlayerSaveData（プレイヤー固有）とEnemyStats（敵用簡略）の管理
 - PlayerTracker, EnemyTrackerの提供
-- 統計データの分離とカプセル化
+- 敵統計リセット機能（ResetEnemyStats）
+- SaveDataManagerと連携してセーブデータのロード
+
+**SaveDataManager (セーブデータ管理)**
+- JSON形式でのPlayerSaveDataのシリアライズ・デシリアライズ
+- Application.persistentDataPathを使った永続化
+- セーブファイルの存在確認・削除機能
+- エラーハンドリングによる安全なセーブ・ロード
 
 **StatsTracker (統計・進化管理)**
-- 個別プレイヤーの統計データ管理
+- IEvolutionStatsDataインターフェースによる統一的な進化統計データ管理
 - 即時進化チェック機能（CheckCardEvolution）
 - 進化・劣化条件の判定
+
+**新しいデータ構造**
+- **EvolutionStatsData**: プレイヤー・敵共通の進化統計データ（進化機能用）
+- **PlayerSaveData**: プレイヤー固有データ（進化統計 + 将来の章クリア状況等）
+- **EnemyStats**: 敵用簡略統計（進化に必要な最小限のみ）
+- **IEvolutionStatsData**: 進化統計データの統一インターフェース
 
 **DeckModel (デッキ管理)**
 - DrawPile（山札）とAllCards（デッキ全体）の二重管理
@@ -120,6 +137,7 @@ builder.RegisterInstance(player);
 builder.RegisterInstance(enemy);
 builder.Register<CardPoolService>(Lifetime.Singleton);
 builder.Register<ThemeService>(Lifetime.Singleton);
+builder.Register<SaveDataManager>(Lifetime.Singleton);
 builder.Register<StatsTrackerService>(Lifetime.Singleton);
 builder.RegisterEntryPoint<GameManager>();
 builder.RegisterComponentInHierarchy<UIPresenter>();
@@ -264,6 +282,36 @@ var canEvolve = statsTrackerService.PlayerTracker.CanCardEvolve(cardData);
 var enemyStats = statsTrackerService.EnemyTracker.GetCardStats(cardData);
 ```
 
+### セーブ・ロード機能の使用
+```csharp
+// SaveDataManagerをDIで注入
+public GameManager(SaveDataManager saveDataManager, StatsTrackerService statsTrackerService)
+
+// バトル終了時の自動セーブ（どちらかが3勝した時）
+_saveDataManager.SavePlayerData(_statsTrackerService.PlayerSaveData);
+
+// セーブファイル存在確認
+bool saveExists = _saveDataManager.SaveFileExists();
+
+// プレイヤーセーブデータへのアクセス
+PlayerSaveData saveData = _statsTrackerService.PlayerSaveData;
+
+// セーブデータの手動ロード
+PlayerSaveData loadedData = _saveDataManager.LoadPlayerData();
+
+// デバッグ用：セーブファイル削除
+_saveDataManager.DeleteSaveFile();
+
+// セーブファイルパスの取得（デバッグ用）
+string savePath = _saveDataManager.SaveFilePath;
+```
+
+### セーブデータの自動ロード
+- StatsTrackerServiceのコンストラクタで自動的にセーブデータをロード
+- セーブファイルが存在しない場合は新規データを作成
+- 読み込みエラー時も新規データで安全にフォールバック
+- セーブデータはJSON形式でApplication.persistentDataPathに保存
+
 ## Coding Guidelines
 
 ### Class Member Declaration Order
@@ -314,3 +362,46 @@ public class ExampleView : MonoBehaviour
     private void OnDestroy() { }
 }
 ```
+
+### Naming Conventions (from copilot-instructions.md)
+
+**PascalCase (クラス名, メソッド名, public/protectedフィールド, Enum):**
+- public class TestClass{}
+- private void TestMethod(){}
+- protected int TestField = 0;
+- public enum TestEnum{}
+
+**camelCase ([SerializeField]フィールド, ローカル変数, 仮引数):**
+- [SerializeField] private int testField = 0;
+- private void Sum(int firstNumber, int secondNumber)
+- var sumNumber = firstNumber + secondNumber;
+
+**_camelCase (プライベートフィールド):**
+- private int _testField = 0;
+- private string _testString = "test";
+
+**UPPER_SNAKE_CASE (定数):**
+- private const int TEST_CONSTANT = 0;
+
+**IPascalCase (インターフェース):**
+- public interface ITestInterface(){}
+
+### Unity Coding Patterns
+- `nullチェック`: Unityオブジェクトは`!obj`を使用（`obj != null`ではなく）
+- `SerializeField`: Inspector設定されるコンポーネントはそのままNullReferenceExceptionを発生させる
+- `UniTask`: 非同期処理はすべてUniTaskを使用
+- `R3`: Observableパターンはすべて R3 を使用
+- `LitMotion`: アニメーションはLitMotionを使用
+- `VContainer`: 依存性注入はVContainerを使用
+
+### Performance and Memory Guidelines
+- `new`でのオブジェクト生成を最小限に留める
+- `string`連結ではなく`StringBuilder`や`string interpolation`を使用
+- `foreach`の代わりに`for`ループを使用（ガベージコレクション回避）
+- `UniTask.WhenAll`で並列処理を活用する
+
+## Response Guidelines
+
+- プログラム内の全てのコメントは日本語で記述してください (from user's CLAUDE.md)
+- Respond in Japanese and avoid excessive comments
+- When refactoring, implement clean replacements rather than maintaining backward compatibility

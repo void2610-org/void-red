@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Void2610.UnityTemplate;
 
-/// <summary>
-/// プレイヤーの統計データを管理するクラス
+/// <summary>  
+/// プレイヤーと敵の共通統計データ（進化機能に必要な基本統計）
 /// </summary>
 [Serializable]
-public class PlayerStats
+public class EvolutionStatsData : IEvolutionStatsData
 {
     [Header("全体統計")]
     [SerializeField] private int totalGames;
@@ -42,26 +41,26 @@ public class PlayerStats
     /// <summary>
     /// ゲーム結果を記録
     /// </summary>
-    /// <param name="playerWon">プレイヤーが勝利したかどうか</param>
-    /// <param name="playerMove">プレイヤーの手</param>
-    /// <param name="playerCollapsed">プレイヤーのカードが崩壊したかどうか</param>
-    public void RecordGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
+    /// <param name="ownerWon">オーナーが勝利したかどうか</param>
+    /// <param name="ownerMove">オーナーの手</param>
+    /// <param name="ownerCollapsed">オーナーのカードが崩壊したかどうか</param>
+    public void RecordGameResult(bool ownerWon, PlayerMove ownerMove, bool ownerCollapsed)
     {
-        if (!playerMove?.SelectedCard) return;
+        if (!ownerMove?.SelectedCard) return;
         
         // 全体統計を更新
         totalGames++;
-        if (playerWon) totalWins++;
+        if (ownerWon) totalWins++;
         else totalLosses++;
         
         // カード別統計を更新
-        var cardStats = GetCardStats(playerMove.SelectedCard.CardId);
+        var cardStats = GetCardStats(ownerMove.SelectedCard.CardId);
         cardStats.RecordUse();
         
-        if (playerWon) cardStats.RecordWin(playerMove.PlayStyle);
-        else cardStats.RecordLoss(playerMove.PlayStyle);
+        if (ownerWon) cardStats.RecordWin(ownerMove.PlayStyle);
+        else cardStats.RecordLoss(ownerMove.PlayStyle);
         
-        if (playerCollapsed) cardStats.RecordCollapse();
+        if (ownerCollapsed) cardStats.RecordCollapse();
     }
     
     /// <summary>
@@ -78,7 +77,7 @@ public class PlayerStats
         // いずれかのグループの条件を全て満たしていればOK（OR条件）
         foreach (var group in cardData.EvolutionConditionGroups)
         {
-            if (group.IsSatisfied(cardStats, this))
+            if (group.IsSatisfied(cardStats, (IEvolutionStatsData)this))
                 return true;
         }
         
@@ -99,7 +98,7 @@ public class PlayerStats
         // いずれかのグループの条件を全て満たしていればOK（OR条件）
         foreach (var group in cardData.DegradationConditionGroups)
         {
-            if (group.IsSatisfied(cardStats, this))
+            if (group.IsSatisfied(cardStats, (IEvolutionStatsData)this))
                 return true;
         }
         

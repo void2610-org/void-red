@@ -1,5 +1,6 @@
 using UnityEngine;
 using R3;
+using VContainer;
 
 /// <summary>
 /// デバッグ機能をまとめて管理するコンポーネント
@@ -10,12 +11,30 @@ public class DebugController : MonoBehaviour
     [SerializeField] private bool enableFastMode = false;
     [SerializeField, Range(0.1f, 10f)] private float timeScale = 2f;
     
+    [Header("セーブデータ")]
+    [SerializeField] private bool showSaveInfo = false;
+    [SerializeField] private bool startWithFreshData = false; // 毎回新しいセーブデータで始める
+    
     private readonly ReactiveProperty<bool> _fastModeProperty = new();
     private readonly ReactiveProperty<float> _timeScaleProperty = new();
     
+    private GameStatsService _gameStatsService;
+    private SaveDataManager _saveDataManager;
+    
+    [Inject]
+    public void Construct(GameStatsService gameStatsService, SaveDataManager saveDataManager)
+    {
+        _gameStatsService = gameStatsService;
+        _saveDataManager = saveDataManager;
+    }
+    
     private void Awake()
     {
-        if(!Application.isEditor) return;
+        if (!Application.isEditor)
+        {
+            Destroy(this);
+            return;
+        }
         
         // 初期値設定
         _fastModeProperty.Value = enableFastMode;
@@ -25,6 +44,17 @@ public class DebugController : MonoBehaviour
         _fastModeProperty.CombineLatest(_timeScaleProperty, (fastMode, scale) => fastMode ? scale : 1f)
             .Subscribe(scale => Time.timeScale = scale)
             .AddTo(this);
+        
+        // 新しいセーブデータで始めるフラグがtrueの場合、セーブファイルを削除
+        if (startWithFreshData && _saveDataManager != null)
+        {
+            var success = _saveDataManager.DeleteSaveFile();
+            if (success)
+            {
+                _gameStatsService.ReloadPlayerSaveData();
+                Debug.Log("[DebugController] 新しいセーブデータで開始: セーブファイル削除 & 再読み込み完了");
+            }
+        }
     }
     
     private void OnValidate()
@@ -35,5 +65,43 @@ public class DebugController : MonoBehaviour
             _fastModeProperty.Value = enableFastMode;
             _timeScaleProperty.Value = timeScale;
         }
+    }
+    
+    private void OnGUI()
+    {
+        if (!Application.isEditor || !showSaveInfo || _gameStatsService == null || _saveDataManager == null) return;
+        
+        GUILayout.BeginArea(new Rect(10, 100, 300, 200));
+        GUILayout.BeginVertical("box");
+        
+        GUILayout.Label("=== セーブデータ情報 ===");
+        
+        // セーブファイル存在確認
+        var saveExists = _saveDataManager.SaveFileExists();
+        GUILayout.Label($"セーブファイル: {(saveExists ? "存在" : "なし")}");
+        
+        // フラグ状態表示
+        GUILayout.Label($"新データ開始: {(startWithFreshData ? "ON" : "OFF")}");
+        
+        // プレイヤー統計情報表示
+        var playerData = _gameStatsService.PlayerSaveData;
+        GUILayout.Label($"統計: {playerData.GetStatsString()}");
+        
+        if (GUILayout.Button("セーブファイル削除"))
+        {
+            var success = _saveDataManager.DeleteSaveFile();
+            if (success)
+            {
+                _gameStatsService.ReloadPlayerSaveData();
+                Debug.Log("セーブファイル削除 & 再読み込み: 成功");
+            }
+            else
+            {
+                Debug.Log("セーブファイル削除: 失敗");
+            }
+        }
+        
+        GUILayout.EndVertical();
+        GUILayout.EndArea();
     }
 }

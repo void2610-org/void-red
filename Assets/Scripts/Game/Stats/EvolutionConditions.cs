@@ -10,7 +10,7 @@ public abstract class EvolutionConditionBase
     /// <summary>
     /// 条件を満たしているかチェック
     /// </summary>
-    public abstract bool IsSatisfied(CardStats cardStats, PlayerStats playerStats);
+    public abstract bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData);
     
     /// <summary>
     /// 条件の説明文を取得(エディタ表示用)
@@ -35,7 +35,7 @@ public class PlayStyleWinCondition : EvolutionConditionBase
     [Header("必要勝利数")]
     public RandomRangeValue requiredCount = new(1);
     
-    public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public override bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         return cardStats.GetPlayStyleWins(requiredPlayStyle) >= requiredCount.Value;
     }
@@ -60,7 +60,7 @@ public class PlayStyleLoseCondition : EvolutionConditionBase
     [Header("必要敗北数")]
     public RandomRangeValue requiredCount = new(1);
     
-    public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public override bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         return cardStats.GetPlayStyleLosses(requiredPlayStyle) >= requiredCount.Value;
     }
@@ -82,7 +82,7 @@ public class TotalWinCondition : EvolutionConditionBase
     [Header("必要勝利数")]
     public RandomRangeValue requiredCount = new(1);
     
-    public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public override bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         return cardStats.TotalWin >= requiredCount.Value;
     }
@@ -104,7 +104,7 @@ public class CollapseCountCondition : EvolutionConditionBase
     [Header("必要崩壊数")]
     public RandomRangeValue requiredCount = new(1);
     
-    public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public override bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         return cardStats.CollapseCount >= requiredCount.Value;
     }
@@ -126,7 +126,7 @@ public class ConsecutiveWinCondition : EvolutionConditionBase
     [Header("必要連続勝利数")]
     public RandomRangeValue requiredCount = new(1);
     
-    public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public override bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         return cardStats.MaxConsecutiveWin >= requiredCount.Value;
     }
@@ -148,7 +148,7 @@ public class TotalUseCondition : EvolutionConditionBase
     [Header("必要使用回数")]
     public RandomRangeValue requiredCount = new(1);
     
-    public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public override bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         return cardStats.TotalUse >= requiredCount.Value;
     }
@@ -175,7 +175,7 @@ public class WinRateCondition : EvolutionConditionBase
     [Header("最低試合数")]
     public int minimumGames = 5;
     
-    public override bool IsSatisfied(CardStats cardStats, PlayerStats playerStats)
+    public override bool IsSatisfied(CardStats cardStats, IEvolutionStatsData evolutionStatsData)
     {
         if (cardStats.TotalUse < minimumGames) return false;
         
