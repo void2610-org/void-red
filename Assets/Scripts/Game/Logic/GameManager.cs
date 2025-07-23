@@ -2,7 +2,6 @@ using R3;
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using VContainer;
 using VContainer.Unity;
 using UnityEngine;
 
@@ -23,11 +22,11 @@ public class GameManager: IStartable, IDisposable
     private readonly CompositeDisposable _disposables = new();
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
-    private bool _isProcessing = false;
+    private bool _isProcessing;
     
     // バトル勝利数管理
-    private int _playerWins = 0;
-    private int _enemyWins = 0;
+    private int _playerWins;
+    private int _enemyWins;
     private const int WINS_TO_VICTORY = 3;
     
     /// <summary>
@@ -70,6 +69,8 @@ public class GameManager: IStartable, IDisposable
         
         // バトル勝利数をリセット
         ResetBattleWins();
+        // 敵の統計をリセット
+        _statsTrackerService.EnemyTracker.ResetStats();
         
         // 現在の敵データを取得
         var currentEnemyData = _enemyProgressService.GetCurrentEnemy();
@@ -332,7 +333,7 @@ public class GameManager: IStartable, IDisposable
             result = "引き分け!";
         
         // 結果を表示
-        await _uiPresenter.ShowAnnouncement(result, 2f);
+        await _uiPresenter.ShowAnnouncement(result);
         
         // 勝敗確定後のナレーション（プレイヤーのカードとPlayStyleに基づく）
         var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PostBattle, _playerMove.PlayStyle);
@@ -394,7 +395,7 @@ public class GameManager: IStartable, IDisposable
                 var playerCardAfterEvolution = _statsTrackerService.PlayerTracker.CheckCardEvolution(playerCard);
                 if (playerCardAfterEvolution != playerCard)
                 {
-                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！", 2f);
+                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！");
                 }
                 // 進化後のカードをデッキに戻す
                 _player.ReturnCardToDeck(playerCardAfterEvolution);
@@ -416,7 +417,7 @@ public class GameManager: IStartable, IDisposable
                 // 進化結果をアナウンス
                 if (npcCardAfterEvolution != npcCard)
                 {
-                    await _uiPresenter.ShowAnnouncement($"NPCの {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化しました！", 2f);
+                    await _uiPresenter.ShowAnnouncement($"NPCの {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化しました！");
                 }
                 // 進化後のカードをデッキに戻す
                 _enemy.ReturnCardToDeck(npcCardAfterEvolution);
@@ -439,10 +440,7 @@ public class GameManager: IStartable, IDisposable
         _isProcessing = false;
         
         // ゲームオーバー条件をチェック
-        if (CheckGameOverConditions())
-            ChangeState(GameState.GameOver);
-        else
-            ChangeState(GameState.ThemeAnnouncement);
+        ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement);
     }
     
     /// <summary>
@@ -503,7 +501,6 @@ public class GameManager: IStartable, IDisposable
             battleResult = $"バトルに敗北しました... ({_playerWins}-{_enemyWins})";
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
-        
         
         // 次の敵への進行処理
         var nextEnemy = _enemyProgressService.AdvanceToNextEnemy();
