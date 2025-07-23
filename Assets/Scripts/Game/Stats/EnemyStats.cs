@@ -10,11 +10,6 @@ public class EnemyStats : IEvolutionStatsData
     [Header("進化統計データ")]
     [SerializeField] private EvolutionStatsData evolutionStatsData = new EvolutionStatsData();
     
-    /// <summary>
-    /// 進化統計データへのアクセス
-    /// </summary>
-    public EvolutionStatsData EvolutionStatsData => evolutionStatsData;
-    
     // EvolutionStatsDataの主要プロパティのラッパー
     public int TotalGames => evolutionStatsData.TotalGames;
     public int TotalWins => evolutionStatsData.TotalWins;

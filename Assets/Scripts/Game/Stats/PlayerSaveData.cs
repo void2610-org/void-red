@@ -15,11 +15,6 @@ public class PlayerSaveData : IEvolutionStatsData
     // [SerializeField] private ChapterProgressData chapterProgress;
     // [SerializeField] private PlayerSettingsData playerSettings;
     
-    /// <summary>
-    /// 進化統計データへのアクセス
-    /// </summary>
-    public EvolutionStatsData EvolutionStatsData => evolutionStatsData;
-    
     // EvolutionStatsDataの主要プロパティのラッパー
     public int TotalGames => evolutionStatsData.TotalGames;
     public int TotalWins => evolutionStatsData.TotalWins;

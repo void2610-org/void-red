@@ -38,8 +38,4 @@ public interface IEvolutionStatsData
     /// <returns>いずれかのグループの条件を全て満たしているかどうか</returns>
     bool CheckAllDegradationConditions(CardData cardData);
     
-    /// <summary>
-    /// デバッグ用：統計情報を文字列で取得
-    /// </summary>
-    string GetStatsString();
 }

@@ -10,16 +10,6 @@ public class StatsTracker
     private readonly IEvolutionStatsData _evolutionStatsData;
     private readonly string _ownerId;
     
-    /// <summary>
-    /// 現在の進化統計データ
-    /// </summary>
-    public IEvolutionStatsData EvolutionStatsData => _evolutionStatsData;
-    
-    /// <summary>
-    /// 統計トラッカーのオーナーID（プレイヤー/敵の識別用）
-    /// </summary>
-    public string OwnerId => _ownerId;
-    
     public StatsTracker(IEvolutionStatsData evolutionStatsData, string ownerId)
     {
         _evolutionStatsData = evolutionStatsData;
@@ -39,17 +29,6 @@ public class StatsTracker
         
         // 統計データを更新
         _evolutionStatsData.RecordGameResult(ownerWon, ownerMove, ownerCollapsed);
-    }
-    
-    /// <summary>
-    /// 指定したカードの統計を取得
-    /// </summary>
-    /// <param name="cardData">カードデータ</param>
-    /// <returns>カード統計</returns>
-    public CardStats GetCardStats(CardData cardData)
-    {
-        if (!cardData) return new CardStats();
-        return _evolutionStatsData.GetCardStats(cardData.CardId);
     }
     
     /// <summary>
