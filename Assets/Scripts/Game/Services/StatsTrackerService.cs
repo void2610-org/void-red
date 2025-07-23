@@ -3,7 +3,7 @@
 /// </summary>
 public class StatsTrackerService
 {
-    private PlayerSaveData _playerSaveData;
+    private readonly PlayerSaveData _playerSaveData;
     private EnemyStats _enemyStats = new();
     private StatsTracker _playerTracker;
     private StatsTracker _enemyTracker;

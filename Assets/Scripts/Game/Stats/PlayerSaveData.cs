@@ -10,16 +10,15 @@ public class PlayerSaveData : IEvolutionStatsData
     [Header("進化統計データ")]
     [SerializeField] private EvolutionStatsData evolutionStatsData = new EvolutionStatsData();
     
-    // TODO: 将来的に追加するプレイヤー固有データ
-    // [Header("ゲーム進行データ")]
-    // [SerializeField] private ChapterProgressData chapterProgress;
-    // [SerializeField] private PlayerSettingsData playerSettings;
+    [Header("ゲーム進行データ")]
+    [SerializeField] private int currentChapter = 1; // 現在のチャプター（1から開始）
     
     // EvolutionStatsDataの主要プロパティのラッパー
     public int TotalGames => evolutionStatsData.TotalGames;
     public int TotalWins => evolutionStatsData.TotalWins;
     public int TotalLosses => evolutionStatsData.TotalLosses;
     public float WinRate => evolutionStatsData.WinRate;
+    public int CurrentChapter => currentChapter;
     
     /// <summary>
     /// 指定したカードの統計を取得
@@ -40,8 +39,14 @@ public class PlayerSaveData : IEvolutionStatsData
     public void RecordGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
     {
         evolutionStatsData.RecordGameResult(playerWon, playerMove, playerCollapsed);
-        
-        // TODO: 将来的にここで章進行状況の更新等を行う
+    }
+    
+    /// <summary>
+    /// 次のチャプターに進行
+    /// </summary>
+    public void AdvanceToNextChapter()
+    {
+        currentChapter++;
     }
     
     /// <summary>
@@ -69,6 +74,6 @@ public class PlayerSaveData : IEvolutionStatsData
     /// </summary>
     public string GetStatsString()
     {
-        return evolutionStatsData.GetStatsString();
+        return $"Chapter: {currentChapter}, {evolutionStatsData.GetStatsString()}";
     }
 }

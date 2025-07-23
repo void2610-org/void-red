@@ -503,7 +503,8 @@ public class GameManager: IStartable, IDisposable
         else if (_enemyWins >= WINS_TO_VICTORY)
             battleResult = $"バトルに敗北しました... ({_playerWins}-{_enemyWins})";
         
-        // バトル終了時（どちらかが3勝）に自動セーブ
+        // バトル終了時に自動セーブ
+        _statsTrackerService.PlayerSaveData.AdvanceToNextChapter();
         _saveDataManager.SavePlayerData(_statsTrackerService.PlayerSaveData);
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);

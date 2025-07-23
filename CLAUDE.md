@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Respond in Japanese and avoid excessive comments. When refactoring, implement clean replacements rather than maintaining backward compatibility.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Unity Project Overview
 
@@ -287,7 +287,7 @@ var enemyStats = statsTrackerService.EnemyTracker.GetCardStats(cardData);
 // SaveDataManagerをDIで注入
 public GameManager(SaveDataManager saveDataManager, StatsTrackerService statsTrackerService)
 
-// バトル終了時の自動セーブ
+// バトル終了時の自動セーブ（どちらかが3勝した時）
 _saveDataManager.SavePlayerData(_statsTrackerService.PlayerSaveData);
 
 // セーブファイル存在確認
@@ -362,3 +362,46 @@ public class ExampleView : MonoBehaviour
     private void OnDestroy() { }
 }
 ```
+
+### Naming Conventions (from copilot-instructions.md)
+
+**PascalCase (クラス名, メソッド名, public/protectedフィールド, Enum):**
+- public class TestClass{}
+- private void TestMethod(){}
+- protected int TestField = 0;
+- public enum TestEnum{}
+
+**camelCase ([SerializeField]フィールド, ローカル変数, 仮引数):**
+- [SerializeField] private int testField = 0;
+- private void Sum(int firstNumber, int secondNumber)
+- var sumNumber = firstNumber + secondNumber;
+
+**_camelCase (プライベートフィールド):**
+- private int _testField = 0;
+- private string _testString = "test";
+
+**UPPER_SNAKE_CASE (定数):**
+- private const int TEST_CONSTANT = 0;
+
+**IPascalCase (インターフェース):**
+- public interface ITestInterface(){}
+
+### Unity Coding Patterns
+- `nullチェック`: Unityオブジェクトは`!obj`を使用（`obj != null`ではなく）
+- `SerializeField`: Inspector設定されるコンポーネントはそのままNullReferenceExceptionを発生させる
+- `UniTask`: 非同期処理はすべてUniTaskを使用
+- `R3`: Observableパターンはすべて R3 を使用
+- `LitMotion`: アニメーションはLitMotionを使用
+- `VContainer`: 依存性注入はVContainerを使用
+
+### Performance and Memory Guidelines
+- `new`でのオブジェクト生成を最小限に留める
+- `string`連結ではなく`StringBuilder`や`string interpolation`を使用
+- `foreach`の代わりに`for`ループを使用（ガベージコレクション回避）
+- `UniTask.WhenAll`で並列処理を活用する
+
+## Response Guidelines
+
+- プログラム内の全てのコメントは日本語で記述してください (from user's CLAUDE.md)
+- Respond in Japanese and avoid excessive comments
+- When refactoring, implement clean replacements rather than maintaining backward compatibility

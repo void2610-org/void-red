@@ -186,6 +186,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableFastMode: 1
   timeScale: 5
+  showSaveInfo: 0
+  startWithFreshData: 1
 --- !u!224 &293733585 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 826855667442878079, guid: 800b4031ad3ac4672b53efa6a10ee6f0, type: 3}

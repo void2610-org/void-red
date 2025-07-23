@@ -13,6 +13,7 @@ public class DebugController : MonoBehaviour
     
     [Header("セーブデータ")]
     [SerializeField] private bool showSaveInfo = false;
+    [SerializeField] private bool startWithFreshData = false; // 毎回新しいセーブデータで始める
     
     private readonly ReactiveProperty<bool> _fastModeProperty = new();
     private readonly ReactiveProperty<float> _timeScaleProperty = new();
@@ -29,7 +30,11 @@ public class DebugController : MonoBehaviour
     
     private void Awake()
     {
-        if(!Application.isEditor) return;
+        if (!Application.isEditor)
+        {
+            Destroy(this);
+            return;
+        }
         
         // 初期値設定
         _fastModeProperty.Value = enableFastMode;
@@ -39,6 +44,10 @@ public class DebugController : MonoBehaviour
         _fastModeProperty.CombineLatest(_timeScaleProperty, (fastMode, scale) => fastMode ? scale : 1f)
             .Subscribe(scale => Time.timeScale = scale)
             .AddTo(this);
+        
+        // 新しいセーブデータで始めるフラグがtrueの場合、セーブファイルを削除
+        if (startWithFreshData && _saveDataManager != null)
+            _saveDataManager.DeleteSaveFile();
     }
     
     private void OnValidate()
@@ -64,16 +73,12 @@ public class DebugController : MonoBehaviour
         var saveExists = _saveDataManager.SaveFileExists();
         GUILayout.Label($"セーブファイル: {(saveExists ? "存在" : "なし")}");
         
+        // フラグ状態表示
+        GUILayout.Label($"新データ開始: {(startWithFreshData ? "ON" : "OFF")}");
+        
         // プレイヤー統計情報表示
         var playerData = _statsTrackerService.PlayerSaveData;
         GUILayout.Label($"統計: {playerData.GetStatsString()}");
-        
-        // デバッグボタン
-        if (GUILayout.Button("手動セーブ"))
-        {
-            var success = _saveDataManager.SavePlayerData(_statsTrackerService.PlayerSaveData);
-            Debug.Log($"手動セーブ: {(success ? "成功" : "失敗")}");
-        }
         
         if (GUILayout.Button("セーブファイル削除"))
         {
