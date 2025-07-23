@@ -75,8 +75,8 @@ public class SaveDataManager
     
     /// <summary>
     /// セーブファイルが存在するかチェック
-    /// <returns>セーブファイルの存在有無</returns>
     /// </summary>
+    /// <returns>セーブファイルの存在有無</returns>
     public bool SaveFileExists()
     {
         return File.Exists(_saveFilePath);
