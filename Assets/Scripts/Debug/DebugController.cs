@@ -47,7 +47,14 @@ public class DebugController : MonoBehaviour
         
         // 新しいセーブデータで始めるフラグがtrueの場合、セーブファイルを削除
         if (startWithFreshData && _saveDataManager != null)
-            _saveDataManager.DeleteSaveFile();
+        {
+            var success = _saveDataManager.DeleteSaveFile();
+            if (success)
+            {
+                _gameStatsService.ReloadPlayerSaveData();
+                Debug.Log("[DebugController] 新しいセーブデータで開始: セーブファイル削除 & 再読み込み完了");
+            }
+        }
     }
     
     private void OnValidate()
@@ -83,7 +90,15 @@ public class DebugController : MonoBehaviour
         if (GUILayout.Button("セーブファイル削除"))
         {
             var success = _saveDataManager.DeleteSaveFile();
-            Debug.Log($"セーブファイル削除: {(success ? "成功" : "失敗")}");
+            if (success)
+            {
+                _gameStatsService.ReloadPlayerSaveData();
+                Debug.Log("セーブファイル削除 & 再読み込み: 成功");
+            }
+            else
+            {
+                Debug.Log("セーブファイル削除: 失敗");
+            }
         }
         
         GUILayout.EndVertical();

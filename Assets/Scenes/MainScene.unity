@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableFastMode: 1
-  timeScale: 5
+  timeScale: 10
   showSaveInfo: 0
   startWithFreshData: 1
 --- !u!224 &293733585 stripped
