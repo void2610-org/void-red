@@ -49,3 +49,6 @@ MonoBehaviour:
   - name: Card
     audioClip: {fileID: 8300000, guid: 3c28173e004dd4f1daa7b532ddd2ea0e, type: 3}
     volume: 1
+  - name: Test
+    audioClip: {fileID: 8300000, guid: 9d8989d9447d6455ba208d9aef4891f3, type: 3}
+    volume: 1
