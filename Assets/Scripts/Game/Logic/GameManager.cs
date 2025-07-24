@@ -301,6 +301,27 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(300);
         await _uiPresenter.ShowAnnouncement($"NPCのスコア: {npcScore:F2}", 1f);
         
+        // 崩壊判定を追加
+        await UniTask.Delay(500);
+        
+        // カード崩壊判定
+        var playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
+        var npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);
+        
+        // 崩壊結果を表示
+        if (playerCollapse || npcCollapse)
+        {
+            string collapseMessage;
+            if (playerCollapse && npcCollapse)
+                collapseMessage = "プレイヤーとNPCのカードが崩壊した！";
+            else if (playerCollapse)
+                collapseMessage = "プレイヤーのカードが崩壊した！";
+            else
+                collapseMessage = "NPCのカードが崩壊した！";
+                
+            await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
+        }
+        
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
         _isProcessing = false; // フラグリセット
@@ -328,13 +349,48 @@ public class GameManager: IStartable, IDisposable
         var playerScore = ScoreCalculator.CalculateScore(_playerMove, currentTheme);
         var npcScore = ScoreCalculator.CalculateScore(_npcMove, currentTheme);
         
+        // 崩壊判定を再取得（既にEvaluationAsyncで実行済み）
+        var playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
+        var npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);
+        
+        // 崩壊結果を考慮した勝敗決定
         string result;
-        if (playerScore > npcScore)
-            result = "プレイヤーの勝利!";
-        else if (npcScore > playerScore)
-            result = "NPCの勝利!";
+        bool playerWon;
+        
+        if (playerCollapse && npcCollapse)
+        {
+            result = "引き分け（両者カード崩壊）";
+            playerWon = false; // 引き分けとして扱う
+        }
+        else if (playerCollapse)
+        {
+            result = "NPCの勝利（プレイヤーカード崩壊）";
+            playerWon = false;
+        }
+        else if (npcCollapse)
+        {
+            result = "プレイヤーの勝利（NPCカード崩壊）";
+            playerWon = true;
+        }
         else
-            result = "引き分け!";
+        {
+            // 崩壊がない場合は従来のスコア比較
+            if (playerScore > npcScore)
+            {
+                result = "プレイヤーの勝利!";
+                playerWon = true;
+            }
+            else if (npcScore > playerScore)
+            {
+                result = "NPCの勝利!";
+                playerWon = false;
+            }
+            else
+            {
+                result = "引き分け!";
+                playerWon = false; // 引き分けとして扱う
+            }
+        }
         
         // 結果を表示
         await _uiPresenter.ShowAnnouncement(result);
@@ -349,31 +405,13 @@ public class GameManager: IStartable, IDisposable
         var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
         await _uiPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
         
-        // カード崩壊判定
-        var playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
-        var npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);
-        
-        // 崩壊結果を表示
-        if (playerCollapse || npcCollapse)
-        {
-            string collapseMessage;
-            if (playerCollapse && npcCollapse)
-                collapseMessage = "プレイヤーとNPCのカードが崩壊した！";
-            else if (playerCollapse)
-                collapseMessage = "プレイヤーのカードが崩壊した！";
-            else
-                collapseMessage = "NPCのカードが崩壊した！";
-                
-            await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
-        }
-        
         // ゲーム結果を統計に記録（進化チェック前に実行）
-        var playerWon = playerScore > npcScore;
         _gameStatsService.PlayerSaveData.RecordGameResult(playerWon, _playerMove, playerCollapse);
         _gameStatsService.EnemyStats.RecordGameResult(!playerWon, _npcMove, npcCollapse);
         
         // 引き分けでない場合、勝利数を更新してバトル終了チェック
-        if (!Mathf.Approximately(playerScore, npcScore))
+        // 崩壊による引き分けも考慮
+        if (!(playerCollapse && npcCollapse) && !Mathf.Approximately(playerScore, npcScore))
         {
             if (UpdateWinsAndCheckBattleEnd(playerWon))
             {
