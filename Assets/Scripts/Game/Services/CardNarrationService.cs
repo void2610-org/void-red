@@ -70,7 +70,6 @@ public class CardNarrationService
 
                 var narrationData = new CardNarrationData();
                 
-                // プレイ前語り (列1-3)
                 if (row.Count > 1 && !string.IsNullOrEmpty(row[1]?.ToString()))
                     narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, row[1].ToString());
                 if (row.Count > 2 && !string.IsNullOrEmpty(row[2]?.ToString()))
@@ -78,22 +77,34 @@ public class CardNarrationService
                 if (row.Count > 3 && !string.IsNullOrEmpty(row[3]?.ToString()))
                     narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, row[3].ToString());
                 
-                // 勝負後語り (列4-6)
                 if (row.Count > 4 && !string.IsNullOrEmpty(row[4]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Hesitation, row[4].ToString());
+                    narrationData.SetNarration(NarrationType.PostBattleWin, PlayStyle.Hesitation, row[4].ToString());
                 if (row.Count > 5 && !string.IsNullOrEmpty(row[5]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Impulse, row[5].ToString());
+                    narrationData.SetNarration(NarrationType.PostBattleWin, PlayStyle.Impulse, row[5].ToString());
                 if (row.Count > 6 && !string.IsNullOrEmpty(row[6]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Conviction, row[6].ToString());
+                    narrationData.SetNarration(NarrationType.PostBattleWin, PlayStyle.Conviction, row[6].ToString());
                 
-                // 勝負後語り（敵） (列7-9)
                 if (row.Count > 7 && !string.IsNullOrEmpty(row[7]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Hesitation, row[7].ToString());
+                    narrationData.SetNarration(NarrationType.PostBattleLose, PlayStyle.Hesitation, row[7].ToString());
                 if (row.Count > 8 && !string.IsNullOrEmpty(row[8]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Impulse, row[8].ToString());
+                    narrationData.SetNarration(NarrationType.PostBattleLose, PlayStyle.Impulse, row[8].ToString());
                 if (row.Count > 9 && !string.IsNullOrEmpty(row[9]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Conviction, row[9].ToString());
-
+                    narrationData.SetNarration(NarrationType.PostBattleLose, PlayStyle.Conviction, row[9].ToString());
+                
+                if (row.Count > 10 && !string.IsNullOrEmpty(row[10]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWinEnemy, PlayStyle.Hesitation, row[10].ToString());
+                if (row.Count > 11 && !string.IsNullOrEmpty(row[11]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWinEnemy, PlayStyle.Impulse, row[11].ToString());
+                if (row.Count > 12 && !string.IsNullOrEmpty(row[12]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWinEnemy, PlayStyle.Conviction, row[12].ToString());
+                
+                if (row.Count > 13 && !string.IsNullOrEmpty(row[13]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLoseEnemy, PlayStyle.Hesitation, row[13].ToString());
+                if (row.Count > 14 && !string.IsNullOrEmpty(row[14]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLoseEnemy, PlayStyle.Impulse, row[14].ToString());
+                if (row.Count > 15 && !string.IsNullOrEmpty(row[15]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLoseEnemy, PlayStyle.Conviction, row[15].ToString());
+                
                 _narrationCache[cardId] = narrationData;
             }
         }
@@ -198,29 +209,40 @@ public class CardNarrationService
                 
                 var narrationData = new CardNarrationData();
                 
-                // プレイ前語り (列1-3)
-                if (columns.Length > 1 && !string.IsNullOrEmpty(columns[1].Trim()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, columns[1].Trim());
-                if (columns.Length > 2 && !string.IsNullOrEmpty(columns[2].Trim()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Impulse, columns[2].Trim());
-                if (columns.Length > 3 && !string.IsNullOrEmpty(columns[3].Trim()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, columns[3].Trim());
+                if (columns.Length > 1 && !string.IsNullOrEmpty(columns[1]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, columns[1].ToString());
+                if (columns.Length > 2 && !string.IsNullOrEmpty(columns[2]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Impulse, columns[2].ToString());
+                if (columns.Length > 3 && !string.IsNullOrEmpty(columns[3]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, columns[3].ToString());
                 
-                // 勝負後語り (列4-6)
-                if (columns.Length > 4 && !string.IsNullOrEmpty(columns[4].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Hesitation, columns[4].Trim());
-                if (columns.Length > 5 && !string.IsNullOrEmpty(columns[5].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Impulse, columns[5].Trim());
-                if (columns.Length > 6 && !string.IsNullOrEmpty(columns[6].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Conviction, columns[6].Trim());
+                if (columns.Length > 4 && !string.IsNullOrEmpty(columns[4]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWin, PlayStyle.Hesitation, columns[4].ToString());
+                if (columns.Length > 5 && !string.IsNullOrEmpty(columns[5]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWin, PlayStyle.Impulse, columns[5].ToString());
+                if (columns.Length > 6 && !string.IsNullOrEmpty(columns[6]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWin, PlayStyle.Conviction, columns[6].ToString());
                 
-                // 勝負後語り（敵） (列7-9)
-                if (columns.Length > 7 && !string.IsNullOrEmpty(columns[7].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Hesitation, columns[7].Trim());
-                if (columns.Length > 8 && !string.IsNullOrEmpty(columns[8].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Impulse, columns[8].Trim());
-                if (columns.Length > 9 && !string.IsNullOrEmpty(columns[9].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Conviction, columns[9].Trim());
+                if (columns.Length > 7 && !string.IsNullOrEmpty(columns[7]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLose, PlayStyle.Hesitation, columns[7].ToString());
+                if (columns.Length > 8 && !string.IsNullOrEmpty(columns[8]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLose, PlayStyle.Impulse, columns[8].ToString());
+                if (columns.Length > 9 && !string.IsNullOrEmpty(columns[9]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLose, PlayStyle.Conviction, columns[9].ToString());
+                
+                if (columns.Length > 10 && !string.IsNullOrEmpty(columns[10]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWinEnemy, PlayStyle.Hesitation, columns[10].ToString());
+                if (columns.Length > 11 && !string.IsNullOrEmpty(columns[11]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWinEnemy, PlayStyle.Impulse, columns[11].ToString());
+                if (columns.Length > 12 && !string.IsNullOrEmpty(columns[12]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleWinEnemy, PlayStyle.Conviction, columns[12].ToString());
+                
+                if (columns.Length > 13 && !string.IsNullOrEmpty(columns[13]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLoseEnemy, PlayStyle.Hesitation, columns[13].ToString());
+                if (columns.Length > 14 && !string.IsNullOrEmpty(columns[14]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLoseEnemy, PlayStyle.Impulse, columns[14].ToString());
+                if (columns.Length > 15 && !string.IsNullOrEmpty(columns[15]?.ToString()))
+                    narrationData.SetNarration(NarrationType.PostBattleLoseEnemy, PlayStyle.Conviction, columns[15].ToString());
                 
                 _narrationCache[cardId] = narrationData;
             }

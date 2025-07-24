@@ -339,13 +339,15 @@ public class GameManager: IStartable, IDisposable
         // 結果を表示
         await _uiPresenter.ShowAnnouncement(result);
         
-        // 勝敗確定後のナレーション（プレイヤーのカードとPlayStyleに基づく）
-        var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PostBattle, _playerMove.PlayStyle);
+        // 勝敗確定後のナレーション（プレイヤーの勝敗に基づく）
+        var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
+        var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, playerNarrationType, _playerMove.PlayStyle);
         var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
         await _uiPresenter.ShowNarration(displayNarration, 3f);
         
         // 敵の勝敗確定後のナレーション
-        var enemyPostBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PostBattleEnemy, _playerMove.PlayStyle);
+        var enemyNarrationType = playerScore > npcScore ? NarrationType.PostBattleLoseEnemy : NarrationType.PostBattleWinEnemy;
+        var enemyPostBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, enemyNarrationType, _playerMove.PlayStyle);
         var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
         await _uiPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
         

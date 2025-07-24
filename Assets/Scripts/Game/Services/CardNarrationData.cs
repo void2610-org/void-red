@@ -6,8 +6,10 @@ using System.Collections.Generic;
 public enum NarrationType
 {
     PrePlay,        // プレイ前語り
-    PostBattle,     // 勝負後語り
-    PostBattleEnemy // 勝負後語り（敵）
+    PostBattleWin,  // 勝負後語り（勝利）
+    PostBattleLose, // 勝負後語り（敗北）
+    PostBattleWinEnemy, // 勝負後語り（敵勝利）
+    PostBattleLoseEnemy, // 勝負後語り（敵敗北）
 }
 
 /// <summary>
