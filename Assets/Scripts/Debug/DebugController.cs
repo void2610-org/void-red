@@ -49,11 +49,7 @@ public class DebugController : MonoBehaviour
         if (startWithFreshData && _saveDataManager != null)
         {
             var success = _saveDataManager.DeleteSaveFile();
-            if (success)
-            {
-                _gameStatsService.ReloadPlayerSaveData();
-                Debug.Log("[DebugController] 新しいセーブデータで開始: セーブファイル削除 & 再読み込み完了");
-            }
+            if (success) _gameStatsService.ReloadPlayerSaveData();
         }
     }
     
@@ -77,7 +73,7 @@ public class DebugController : MonoBehaviour
         GUILayout.Label("=== セーブデータ情報 ===");
         
         // セーブファイル存在確認
-        var saveExists = _saveDataManager.SaveFileExists();
+        var saveExists = _saveDataManager.IsSaveFileExists();
         GUILayout.Label($"セーブファイル: {(saveExists ? "存在" : "なし")}");
         
         // フラグ状態表示
@@ -90,15 +86,7 @@ public class DebugController : MonoBehaviour
         if (GUILayout.Button("セーブファイル削除"))
         {
             var success = _saveDataManager.DeleteSaveFile();
-            if (success)
-            {
-                _gameStatsService.ReloadPlayerSaveData();
-                Debug.Log("セーブファイル削除 & 再読み込み: 成功");
-            }
-            else
-            {
-                Debug.Log("セーブファイル削除: 失敗");
-            }
+            if (success) _gameStatsService.ReloadPlayerSaveData();
         }
         
         GUILayout.EndVertical();

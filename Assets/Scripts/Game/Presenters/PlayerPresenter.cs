@@ -13,7 +13,6 @@ public abstract class PlayerPresenter : IDisposable
     public ReadOnlyReactiveProperty<CardData> SelectedCard => _handModel.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _playerModel.MentalPower;
     public ReadOnlyReactiveProperty<int> SelectedIndex => _handModel.SelectedIndex;
-    public static int MaxMentalPower => PlayerModel.MaxMentalPower;
     public int HandCount => _handModel.Count;
     public int MaxHandSize => _handModel.MaxHandSize;
     public DeckModel DeckModel => _deckModel;
@@ -280,6 +279,12 @@ public abstract class PlayerPresenter : IDisposable
     /// <returns>足りるかどうか</returns>
     public bool HasEnoughMentalPower(int requiredAmount) => _playerModel.MentalPower.CurrentValue >= requiredAmount;
     
+    /// <summary>
+    /// 精神力を設定
+    /// </summary>
+    /// <param name="value">設定する精神力</param>
+    public void SetMentalPower(int value) => _playerModel.SetMentalPower(value);
+    
     // === 手札・デッキリセット ===
     
     /// <summary>
@@ -313,7 +318,7 @@ public abstract class PlayerPresenter : IDisposable
     {
         _handModel.DeselectCard();
         _handModel.Clear();
-        _playerModel.SetMentalPower(PlayerModel.MaxMentalPower);
+        _playerModel.SetMentalPower(GameConstants.MAX_MENTAL_POWER);
     }
     
     // === UI制御 ===

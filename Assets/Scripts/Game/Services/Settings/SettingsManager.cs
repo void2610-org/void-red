@@ -16,10 +16,7 @@ public class SettingsManager : IDisposable
     private readonly CompositeDisposable _disposables = new();
     private readonly SaveDataManager _saveDataManager;
     
-    /// <summary>
-    /// 設定値が変更された時のイベント（設定名を通知）
-    /// </summary>
-    public Observable<string> OnSettingChanged => _onSettingChanged;
+    private static string SettingsFilePath => System.IO.Path.Combine(Application.persistentDataPath, "game_settings.json");
     
     /// <summary>
     /// 全ての設定項目の読み取り専用リスト
@@ -35,8 +32,10 @@ public class SettingsManager : IDisposable
         
         // 各設定の値変更イベントを監視
         SubscribeToSettingChanges();
-        // セーブデータから設定を読み込み（初期適用はスキップ）
-        LoadSettings(applyValues: false);
+        
+        // セーブデータから設定を読み込む
+        LoadSettings();
+        ApplyCurrentValues();
     }
     
     /// <summary>
@@ -128,7 +127,13 @@ public class SettingsManager : IDisposable
             }
             
             var json = JsonUtility.ToJson(settingsData, true);
-            System.IO.File.WriteAllText(GetSettingsFilePath(), json);
+            
+#if UNITY_WEBGL && !UNITY_EDITOR
+            PlayerPrefs.SetString("GameSettings", json);
+            PlayerPrefs.Save();
+#else
+            System.IO.File.WriteAllText(SettingsFilePath, json);
+#endif
         }
         catch (Exception e)
         {
@@ -139,20 +144,21 @@ public class SettingsManager : IDisposable
     /// <summary>
     /// ファイルから設定データを読み込み
     /// </summary>
-    /// <param name="applyValues">読み込み後に設定値を適用するかどうか</param>
-    public void LoadSettings(bool applyValues = true)
+    public void LoadSettings()
     {
         try
         {
-            var filePath = GetSettingsFilePath();
+            string json;
             
-            if (!System.IO.File.Exists(filePath))
-            {
-                if (applyValues) ApplyCurrentValues();
-                return;
-            }
+#if UNITY_WEBGL && !UNITY_EDITOR
+            json = PlayerPrefs.GetString("GameSettings", "");
+            if (string.IsNullOrEmpty(json)) return;
+#else
+            var filePath = SettingsFilePath;
+            if (!System.IO.File.Exists(filePath)) return;
+            json = System.IO.File.ReadAllText(filePath);
+#endif
             
-            var json = System.IO.File.ReadAllText(filePath);
             var settingsData = JsonUtility.FromJson<SettingsData>(json);
             
             if (settingsData?.settingValues != null)
@@ -165,13 +171,10 @@ public class SettingsManager : IDisposable
                     }
                 }
             }
-            
-            if (applyValues) ApplyCurrentValues();
         }
         catch (Exception e)
         {
             Debug.LogError($"設定データの読み込みに失敗しました: {e.Message}");
-            if (applyValues) ApplyCurrentValues();
         }
     }
     
@@ -184,14 +187,6 @@ public class SettingsManager : IDisposable
         {
             setting.ApplyCurrentValue();
         }
-    }
-    
-    /// <summary>
-    /// 設定ファイルのパスを取得
-    /// </summary>
-    private string GetSettingsFilePath()
-    {
-        return System.IO.Path.Combine(Application.persistentDataPath, "game_settings.json");
     }
     
     /// <summary>
