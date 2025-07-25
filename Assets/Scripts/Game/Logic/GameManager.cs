@@ -57,15 +57,15 @@ public class GameManager: IStartable, IDisposable
     
     public void Start()
     {
-        InitializeGame().Forget();
+        InitializeGame(true).Forget();
         SetupGameOverEvents();
     }
     
     /// <summary>
     /// ゲームを初期化
     /// </summary>
-    /// <param name="isNextEnemy">次の敵への進行かどうか</param>
-    private async UniTaskVoid InitializeGame(bool isNextEnemy = false)
+    /// <param name="isInitialStart">ゲームの最初の起動かどうか</param>
+    private async UniTaskVoid InitializeGame(bool isInitialStart)
     {
         await _cardNarrationService.InitializeAsync();
         await UniTask.Delay(500);
@@ -79,8 +79,14 @@ public class GameManager: IStartable, IDisposable
         var currentChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
         var currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
         
+        // プレイヤーの精神力を復元（最初の起動時のみ）
+        if (isInitialStart)
+        {
+            _player.SetMentalPower(_gameStatsService.PlayerSaveData.CurrentMentalPower);
+        }
+        
         // 次の敵への進行の場合は手札を戻す演出
-        if (isNextEnemy)
+        if (!isInitialStart)
         {
             var returnTasks = new UniTask[2];
             if (_player.HandCount > 0)
@@ -508,6 +514,8 @@ public class GameManager: IStartable, IDisposable
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         
+        // 現在の精神力をセーブデータに反映
+        _gameStatsService.PlayerSaveData.UpdateMentalPower(_player.MentalPower.CurrentValue);
         // チャプター進行処理
         _gameStatsService.PlayerSaveData.AdvanceToNextChapter();
         var nextChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
@@ -527,7 +535,7 @@ public class GameManager: IStartable, IDisposable
         {
             // 次の敵がいる場合
             _isProcessing = false;
-            InitializeGame(isNextEnemy: true).Forget();
+            InitializeGame(isInitialStart: false).Forget();
         }
     }
     

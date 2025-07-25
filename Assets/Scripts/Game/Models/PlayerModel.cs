@@ -11,10 +11,6 @@ public class PlayerModel : IDisposable
     // 公開プロパティ（読み取り専用）
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
     
-    // 定数
-    public static int MaxMentalPower => MAX_MENTAL_POWER;
-    private const int MAX_MENTAL_POWER = 20;
-    
     // プライベートフィールド
     private readonly ReactiveProperty<int> _mentalPower = new();
     
@@ -23,7 +19,7 @@ public class PlayerModel : IDisposable
     /// </summary>
     public PlayerModel()
     {
-        _mentalPower.Value = MAX_MENTAL_POWER;
+        _mentalPower.Value = GameConstants.MAX_MENTAL_POWER;
     }
     
     // === 精神力関連メソッド ===
@@ -46,7 +42,7 @@ public class PlayerModel : IDisposable
     /// <param name="amount">回復量</param>
     public void RestoreMentalPower(int amount)
     {
-        _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, MAX_MENTAL_POWER);
+        _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, GameConstants.MAX_MENTAL_POWER);
     }
     
     /// <summary>
@@ -55,7 +51,7 @@ public class PlayerModel : IDisposable
     /// <param name="value">設定する値</param>
     public void SetMentalPower(int value)
     {
-        _mentalPower.Value = Mathf.Clamp(value, 0, MAX_MENTAL_POWER);
+        _mentalPower.Value = Mathf.Clamp(value, 0, GameConstants.MAX_MENTAL_POWER);
     }
     
     /// <summary>
