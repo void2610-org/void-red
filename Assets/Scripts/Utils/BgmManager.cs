@@ -44,7 +44,6 @@ namespace Void2610.UnityTemplate
                 }
                 
                 bgmMixerGroup.audioMixer.SetFloat("BgmVolume", Mathf.Log10(value) * 20);
-                PlayerPrefs.SetFloat("BgmVolume", value);
             }
         }
 
@@ -163,7 +162,6 @@ namespace Void2610.UnityTemplate
         private void Start()
         {
             _currentBGM = null;
-            BgmVolume = PlayerPrefs.GetFloat("BgmVolume", 1.0f);
             bgmMixerGroup.audioMixer.SetFloat("BgmVolume", Mathf.Log10(_bgmVolume) * 20);
             _audioSource.volume = 0;
             

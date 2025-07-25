@@ -35,8 +35,8 @@ public class SettingsManager : IDisposable
         
         // 各設定の値変更イベントを監視
         SubscribeToSettingChanges();
-        // セーブデータから設定を読み込み（初期適用はスキップ）
-        LoadSettings(applyValues: false);
+        // セーブデータから設定を読み込み（初期化時に適用）
+        LoadSettings(applyValues: true);
     }
     
     /// <summary>

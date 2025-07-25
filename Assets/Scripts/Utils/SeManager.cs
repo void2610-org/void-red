@@ -33,7 +33,6 @@ namespace Void2610.UnityTemplate
                     value = 0.0001f;
                 }
                 seMixerGroup.audioMixer.SetFloat("SeVolume", Mathf.Log10(value) * 20);
-                PlayerPrefs.SetFloat("SeVolume", value);
             }
         }
 
@@ -94,7 +93,6 @@ namespace Void2610.UnityTemplate
         
         private void Start()
         {
-            SeVolume = PlayerPrefs.GetFloat("SeVolume", 0.5f);
             seMixerGroup.audioMixer.SetFloat("SeVolume", Mathf.Log10(_seVolume) * 20);
         }
     }
