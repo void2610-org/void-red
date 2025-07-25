@@ -14,7 +14,7 @@ public class PlayerSaveData : IEvolutionStatsData
     [SerializeField] private int currentChapter = 0; // 現在のチャプター
     
     [Header("プレイヤー関連データ")]
-    [SerializeField] private int currentMentalPower = 20; // 現在の精神力
+    [SerializeField] private int currentMentalPower = GameConstants.MAX_MENTAL_POWER; // 現在の精神力
     
     // EvolutionStatsDataの主要プロパティのラッパー
     public int TotalGames => evolutionStatsData.TotalGames;
@@ -59,7 +59,7 @@ public class PlayerSaveData : IEvolutionStatsData
     /// <param name="mentalPower">新しい精神力の値</param>
     public void UpdateMentalPower(int mentalPower)
     {
-        currentMentalPower = Mathf.Clamp(mentalPower, 0, 20);
+        currentMentalPower = Mathf.Clamp(mentalPower, 0, GameConstants.MAX_MENTAL_POWER);
     }
     
     /// <summary>

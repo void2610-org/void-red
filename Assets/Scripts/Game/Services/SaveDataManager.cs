@@ -54,7 +54,7 @@ public class SaveDataManager
             
 #if UNITY_WEBGL && !UNITY_EDITOR
             json = PlayerPrefs.GetString("SaveData", "");
-            if (string.IsNullOrEmpty(json))return new PlayerSaveData();
+            if (string.IsNullOrEmpty(json)) return new PlayerSaveData();
 #else
             if (!File.Exists(SaveFilePath)) return new PlayerSaveData();
             json = File.ReadAllText(SaveFilePath);

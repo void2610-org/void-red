@@ -152,7 +152,7 @@ public class SettingsManager : IDisposable
             
 #if UNITY_WEBGL && !UNITY_EDITOR
             json = PlayerPrefs.GetString("GameSettings", "");
-            if (string.IsNullOrEmpty(json))return;
+            if (string.IsNullOrEmpty(json)) return;
 #else
             var filePath = SettingsFilePath;
             if (!System.IO.File.Exists(filePath)) return;

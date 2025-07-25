@@ -16,8 +16,6 @@ public class UIPresenter : IStartable, System.IDisposable
     public Observable<Unit> RetryButtonClicked => _gameOverView?.OnRetryClicked ?? Observable.Empty<Unit>();
     public Observable<Unit> TitleButtonClicked => _gameOverView?.OnTitleClicked ?? Observable.Empty<Unit>();
     
-    private const int MIN_MENTAL_BET = 1;
-    private const int MAX_MENTAL_BET = 7;
     
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
@@ -76,7 +74,7 @@ public class UIPresenter : IStartable, System.IDisposable
         var newValue = _mentalBetValue + delta;
         
         // 範囲チェック
-        if (newValue < MIN_MENTAL_BET || newValue > MAX_MENTAL_BET) return;
+        if (newValue < GameConstants.MIN_MENTAL_BET || newValue > GameConstants.MAX_MENTAL_BET) return;
         
         _mentalBetValue = newValue;
         UpdateMentalBetDisplay();
@@ -89,11 +87,11 @@ public class UIPresenter : IStartable, System.IDisposable
         // 現在のベット値が精神力を超えている場合や最小値を下回る場合は調整
         if (_mentalBetValue > currentMentalPower)
             _mentalBetValue = currentMentalPower;
-        if (_mentalBetValue < MIN_MENTAL_BET)
-            _mentalBetValue = MIN_MENTAL_BET;
+        if (_mentalBetValue < GameConstants.MIN_MENTAL_BET)
+            _mentalBetValue = GameConstants.MIN_MENTAL_BET;
         
         // MentalBetViewに表示を委譲
-        _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, PlayerPresenter.MaxMentalPower, MIN_MENTAL_BET, MAX_MENTAL_BET);
+        _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, GameConstants.MAX_MENTAL_POWER, GameConstants.MIN_MENTAL_BET, GameConstants.MAX_MENTAL_BET);
     }
     
     private void SetupViewEvents()
