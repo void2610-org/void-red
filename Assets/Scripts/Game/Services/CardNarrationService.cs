@@ -19,6 +19,62 @@ public class CardNarrationService
     private bool _isInitialized = false;
 
     /// <summary>
+    /// カラムマッピング情報
+    /// </summary>
+    private struct ColumnMapping
+    {
+        public readonly int ColumnIndex;
+        public readonly NarrationType NarrationType;
+        public readonly PlayStyle PlayStyle;
+
+        public ColumnMapping(int columnIndex, NarrationType narrationType, PlayStyle playStyle)
+        {
+            ColumnIndex = columnIndex;
+            NarrationType = narrationType;
+            PlayStyle = playStyle;
+        }
+    }
+
+    // カラムマッピング定義
+    private static readonly ColumnMapping[] _columnMappings = new[]
+    {
+        new ColumnMapping(1, NarrationType.PrePlay, PlayStyle.Hesitation),
+        new ColumnMapping(2, NarrationType.PrePlay, PlayStyle.Impulse),
+        new ColumnMapping(3, NarrationType.PrePlay, PlayStyle.Conviction),
+        new ColumnMapping(4, NarrationType.PostBattleWin, PlayStyle.Hesitation),
+        new ColumnMapping(5, NarrationType.PostBattleWin, PlayStyle.Impulse),
+        new ColumnMapping(6, NarrationType.PostBattleWin, PlayStyle.Conviction),
+        new ColumnMapping(7, NarrationType.PostBattleLose, PlayStyle.Hesitation),
+        new ColumnMapping(8, NarrationType.PostBattleLose, PlayStyle.Impulse),
+        new ColumnMapping(9, NarrationType.PostBattleLose, PlayStyle.Conviction),
+        new ColumnMapping(10, NarrationType.PostBattleWinEnemy, PlayStyle.Hesitation),
+        new ColumnMapping(11, NarrationType.PostBattleWinEnemy, PlayStyle.Impulse),
+        new ColumnMapping(12, NarrationType.PostBattleWinEnemy, PlayStyle.Conviction),
+        new ColumnMapping(13, NarrationType.PostBattleLoseEnemy, PlayStyle.Hesitation),
+        new ColumnMapping(14, NarrationType.PostBattleLoseEnemy, PlayStyle.Impulse),
+        new ColumnMapping(15, NarrationType.PostBattleLoseEnemy, PlayStyle.Conviction)
+    };
+
+    /// <summary>
+    /// カラムデータからCardNarrationDataを作成する共通関数
+    /// </summary>
+    private static CardNarrationData CreateNarrationDataFromColumns(string[] columns)
+    {
+        var narrationData = new CardNarrationData();
+        
+        foreach (var mapping in _columnMappings)
+        {
+            if (columns.Length > mapping.ColumnIndex && 
+                !string.IsNullOrEmpty(columns[mapping.ColumnIndex]?.Trim()))
+            {
+                narrationData.SetNarration(mapping.NarrationType, mapping.PlayStyle, columns[mapping.ColumnIndex].Trim());
+            }
+        }
+        
+        return narrationData;
+    }
+
+    /// <summary>
     /// サービスの初期化（スプレッドシートからデータを読み込む）
     /// </summary>
     public async UniTask InitializeAsync()
@@ -68,32 +124,14 @@ public class CardNarrationService
                 var cardId = row[0]?.ToString();
                 if (string.IsNullOrEmpty(cardId)) continue;
 
-                var narrationData = new CardNarrationData();
-                
-                // プレイ前語り (列1-3)
-                if (row.Count > 1 && !string.IsNullOrEmpty(row[1]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, row[1].ToString());
-                if (row.Count > 2 && !string.IsNullOrEmpty(row[2]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Impulse, row[2].ToString());
-                if (row.Count > 3 && !string.IsNullOrEmpty(row[3]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, row[3].ToString());
-                
-                // 勝負後語り (列4-6)
-                if (row.Count > 4 && !string.IsNullOrEmpty(row[4]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Hesitation, row[4].ToString());
-                if (row.Count > 5 && !string.IsNullOrEmpty(row[5]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Impulse, row[5].ToString());
-                if (row.Count > 6 && !string.IsNullOrEmpty(row[6]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Conviction, row[6].ToString());
-                
-                // 勝負後語り（敵） (列7-9)
-                if (row.Count > 7 && !string.IsNullOrEmpty(row[7]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Hesitation, row[7].ToString());
-                if (row.Count > 8 && !string.IsNullOrEmpty(row[8]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Impulse, row[8].ToString());
-                if (row.Count > 9 && !string.IsNullOrEmpty(row[9]?.ToString()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Conviction, row[9].ToString());
+                // スプレッドシートの行データをstring配列に変換
+                var columns = new string[row.Count];
+                for (var j = 0; j < row.Count; j++)
+                {
+                    columns[j] = row[j]?.ToString() ?? string.Empty;
+                }
 
+                var narrationData = CreateNarrationDataFromColumns(columns);
                 _narrationCache[cardId] = narrationData;
             }
         }
@@ -162,7 +200,7 @@ public class CardNarrationService
                 return;
             }
             
-            var csvText = File.ReadAllText(csvPath);
+            var csvText = await File.ReadAllTextAsync(csvPath);
 #endif
             
             ParseCsvData(csvText);
@@ -196,32 +234,7 @@ public class CardNarrationService
                 var cardId = columns[0].Trim();
                 if (string.IsNullOrEmpty(cardId)) continue;
                 
-                var narrationData = new CardNarrationData();
-                
-                // プレイ前語り (列1-3)
-                if (columns.Length > 1 && !string.IsNullOrEmpty(columns[1].Trim()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Hesitation, columns[1].Trim());
-                if (columns.Length > 2 && !string.IsNullOrEmpty(columns[2].Trim()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Impulse, columns[2].Trim());
-                if (columns.Length > 3 && !string.IsNullOrEmpty(columns[3].Trim()))
-                    narrationData.SetNarration(NarrationType.PrePlay, PlayStyle.Conviction, columns[3].Trim());
-                
-                // 勝負後語り (列4-6)
-                if (columns.Length > 4 && !string.IsNullOrEmpty(columns[4].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Hesitation, columns[4].Trim());
-                if (columns.Length > 5 && !string.IsNullOrEmpty(columns[5].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Impulse, columns[5].Trim());
-                if (columns.Length > 6 && !string.IsNullOrEmpty(columns[6].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattle, PlayStyle.Conviction, columns[6].Trim());
-                
-                // 勝負後語り（敵） (列7-9)
-                if (columns.Length > 7 && !string.IsNullOrEmpty(columns[7].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Hesitation, columns[7].Trim());
-                if (columns.Length > 8 && !string.IsNullOrEmpty(columns[8].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Impulse, columns[8].Trim());
-                if (columns.Length > 9 && !string.IsNullOrEmpty(columns[9].Trim()))
-                    narrationData.SetNarration(NarrationType.PostBattleEnemy, PlayStyle.Conviction, columns[9].Trim());
-                
+                var narrationData = CreateNarrationDataFromColumns(columns);
                 _narrationCache[cardId] = narrationData;
             }
         }
