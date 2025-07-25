@@ -13,12 +13,16 @@ public class PlayerSaveData : IEvolutionStatsData
     [Header("ゲーム進行データ")]
     [SerializeField] private int currentChapter = 0; // 現在のチャプター
     
+    [Header("プレイヤー関連データ")]
+    [SerializeField] private int currentMentalPower = 20; // 現在の精神力
+    
     // EvolutionStatsDataの主要プロパティのラッパー
     public int TotalGames => evolutionStatsData.TotalGames;
     public int TotalWins => evolutionStatsData.TotalWins;
     public int TotalLosses => evolutionStatsData.TotalLosses;
     public float WinRate => evolutionStatsData.WinRate;
     public int CurrentChapter => currentChapter;
+    public int CurrentMentalPower => currentMentalPower;
     
     /// <summary>
     /// 指定したカードの統計を取得
@@ -47,6 +51,15 @@ public class PlayerSaveData : IEvolutionStatsData
     public void AdvanceToNextChapter()
     {
         currentChapter++;
+    }
+    
+    /// <summary>
+    /// 現在の精神力を更新
+    /// </summary>
+    /// <param name="mentalPower">新しい精神力の値</param>
+    public void UpdateMentalPower(int mentalPower)
+    {
+        currentMentalPower = Mathf.Clamp(mentalPower, 0, 20);
     }
     
     /// <summary>
@@ -96,6 +109,6 @@ public class PlayerSaveData : IEvolutionStatsData
     /// </summary>
     public string GetStatsString()
     {
-        return $"Chapter: {currentChapter}, {evolutionStatsData.GetStatsString()}";
+        return $"Chapter: {currentChapter}, MentalPower: {currentMentalPower}, {evolutionStatsData.GetStatsString()}";
     }
 }

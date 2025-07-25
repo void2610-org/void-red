@@ -79,6 +79,12 @@ public class GameManager: IStartable, IDisposable
         var currentChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
         var currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
         
+        // プレイヤーの精神力を復元（次の敵への進行でない場合のみ）
+        if (!isNextEnemy)
+        {
+            _player.SetMentalPower(_gameStatsService.PlayerSaveData.CurrentMentalPower);
+        }
+        
         // 次の敵への進行の場合は手札を戻す演出
         if (isNextEnemy)
         {
@@ -508,6 +514,8 @@ public class GameManager: IStartable, IDisposable
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         
+        // 現在の精神力をセーブデータに反映
+        _gameStatsService.PlayerSaveData.UpdateMentalPower(_player.MentalPower.CurrentValue);
         // チャプター進行処理
         _gameStatsService.PlayerSaveData.AdvanceToNextChapter();
         var nextChapter = _gameStatsService.PlayerSaveData.CurrentChapter;

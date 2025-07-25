@@ -280,6 +280,12 @@ public abstract class PlayerPresenter : IDisposable
     /// <returns>足りるかどうか</returns>
     public bool HasEnoughMentalPower(int requiredAmount) => _playerModel.MentalPower.CurrentValue >= requiredAmount;
     
+    /// <summary>
+    /// 精神力を設定
+    /// </summary>
+    /// <param name="value">設定する精神力</param>
+    public void SetMentalPower(int value) => _playerModel.SetMentalPower(value);
+    
     // === 手札・デッキリセット ===
     
     /// <summary>
