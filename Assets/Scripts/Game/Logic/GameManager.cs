@@ -150,6 +150,8 @@ public class GameManager: IStartable, IDisposable
                 _isProcessing = false; // フラグリセット
                 _playerCollapse = false; // 崩壊フラグリセット
                 _npcCollapse = false; // 崩壊フラグリセット
+                // 敵をデフォルト立ち絵に戻す
+                _uiPresenter.ResetEnemyToDefault().Forget();
                 HandleThemeAnnouncement();
                 break;
             case GameState.PlayerCardSelection:
@@ -248,6 +250,8 @@ public class GameManager: IStartable, IDisposable
         // 精神力を消費
         _player.ConsumeMentalPower(mentalBet);
         _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
+        
+        await _uiPresenter.UpdateEnemySprite(finalSelectedCard.Attribute);
         
         // プレイヤーの選択を表示
         await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);

@@ -31,6 +31,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
     private readonly Player _player;
+    private bool _isEnemySpriteManualMode = false;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
@@ -46,6 +47,17 @@ public class UIPresenter : IStartable, System.IDisposable
     public void InitializeEnemy(EnemyData enemyData) => _enemyView.Initialize(enemyData);
     public async UniTask ShowEnemy() => await _enemyView.Show();
     public async UniTask HideEnemy() => await _enemyView.Hide();
+    public async UniTask ResetEnemyToDefault() 
+    {
+        _isEnemySpriteManualMode = false; // 自動監視モードに戻す
+        await _enemyView.ResetToDefaultSprite();
+    }
+    
+    public async UniTask UpdateEnemySprite(CardAttribute attribute) 
+    {
+        _isEnemySpriteManualMode = true; // 手動制御モードに切り替え
+        await _enemyView.UpdateSpriteForAttribute(attribute);
+    }
     
     public UIPresenter(Player player)
     {
@@ -115,6 +127,9 @@ public class UIPresenter : IStartable, System.IDisposable
         // プレイヤーのカード選択を監視して敵のSpriteを更新
         _player.SelectedCard.Subscribe(cardData => 
         {
+            // 手動制御モード中は自動更新をスキップ
+            if (_isEnemySpriteManualMode) return;
+            
             if (cardData)
             {
                 _enemyView.UpdateSpriteForAttribute(cardData.Attribute).Forget();
