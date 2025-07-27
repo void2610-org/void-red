@@ -14,8 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyId: E002
   enemyName: "\u30C6\u30B9\u30C82"
-  enemyImage: {fileID: -1893766829421528891, guid: afb2931ab579248b6bab8814c8855e9a, type: 3}
   description: "\u6575\u306E\u8AAC\u660E\u6587\u304C\u3053\u3053\u306B\u5165\u308A\u307E\u305922222"
+  attributeSprites:
+    serializedList:
+    - key: 0
+      value: {fileID: 4869381963916949796, guid: b463adf36e861401189ccd1001e0add7, type: 3}
+    - key: 1
+      value: {fileID: -4800735439619727961, guid: cffb9797cc971421bb86a137795eabbb, type: 3}
+    - key: 2
+      value: {fileID: -231370578599977729, guid: 86316be4ed3384d0d8389405813160e0, type: 3}
+    - key: 3
+      value: {fileID: -1110130244021657116, guid: 9958cef1761bd44ea8aaeaababecd87c, type: 3}
+    - key: 4
+      value: {fileID: -3945786102844104264, guid: 1c39786a6026f462789b073818b8d82b, type: 3}
+    - key: 5
+      value: {fileID: -7340421124048253533, guid: 3f0119e639c1845cd9f1ef6014408650, type: 3}
   maxMentalPower: 10
   initialMentalPower: 10
   initialDeck:

@@ -14,7 +14,6 @@ public class EnemyView : MonoBehaviour
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Image enemyImage;
-    [SerializeField] private TextMeshProUGUI enemyNameText;
     
     [Header("アニメーション設定")]
     [SerializeField] private float fadeDuration = 0.3f;
@@ -29,12 +28,6 @@ public class EnemyView : MonoBehaviour
     public void Initialize(EnemyData enemyData)
     {
         _enemyData = enemyData;
-        
-        if (enemyNameText)
-        {
-            enemyNameText.text = enemyData.EnemyName;
-        }
-        
         // 初期状態では非表示
         gameObject.SetActive(false);
     }
