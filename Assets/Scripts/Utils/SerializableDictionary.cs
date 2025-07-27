@@ -27,7 +27,7 @@ namespace Void2610.UnityTemplate
         }
 
         [SerializeField]
-        private List<Pair> _serializedList = new List<Pair>();
+        private List<Pair> serializedList = new List<Pair>();
 
         /// <summary>
         /// Unityがオブジェクトをデシリアライズした後に呼ばれる
@@ -37,7 +37,7 @@ namespace Void2610.UnityTemplate
         {
             Clear();
             
-            foreach (var pair in _serializedList)
+            foreach (var pair in serializedList)
             {
                 if (pair.key != null && !ContainsKey(pair.key))
                 {
@@ -52,11 +52,11 @@ namespace Void2610.UnityTemplate
         /// </summary>
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            _serializedList.Clear();
+            serializedList.Clear();
             
             foreach (var kvp in this)
             {
-                _serializedList.Add(new Pair(kvp.Key, kvp.Value));
+                serializedList.Add(new Pair(kvp.Key, kvp.Value));
             }
         }
     }
