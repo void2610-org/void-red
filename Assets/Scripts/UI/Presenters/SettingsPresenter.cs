@@ -43,7 +43,7 @@ public class SettingsPresenter : IStartable, IDisposable
     /// </summary>
     public void HideSettings()
     {
-        _settingsView?.HideSettings();
+        _settingsView.HideSettings();
     }
     
     /// <summary>

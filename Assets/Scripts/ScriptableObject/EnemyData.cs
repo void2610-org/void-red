@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 敵情報を定義するScriptableObject
@@ -10,8 +11,13 @@ public class EnemyData : ScriptableObject
     [Header("基本情報")]
     [SerializeField] private string enemyId;
     [SerializeField] private string enemyName;
-    [SerializeField] private Sprite enemyImage;
     [SerializeField, TextArea(3, 5)] private string description;
+    
+    [Header("敵画像")]
+    [SerializeField] private Sprite defaultSprite;
+    
+    [Header("属性別画像")]
+    [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
     
     [Header("ステータス")]
     [SerializeField] private int maxMentalPower = 10;
@@ -23,9 +29,22 @@ public class EnemyData : ScriptableObject
     // プロパティ
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
-    public Sprite EnemyImage => enemyImage;
     public string Description => description;
+    public Sprite DefaultSprite => defaultSprite;
     public int MaxMentalPower => maxMentalPower;
     public int InitialMentalPower => initialMentalPower;
     public List<CardData> InitialDeck => initialDeck;
+    
+    /// <summary>
+    /// 指定された属性に対応するSpriteを取得
+    /// 対応するSpriteがない場合はnullを返す
+    /// </summary>
+    public Sprite GetSpriteForAttribute(CardAttribute attribute)
+    {
+        if (attributeSprites.TryGetValue(attribute, out var sprite))
+        {
+            return sprite;
+        }
+        return null;
+    }
 }
