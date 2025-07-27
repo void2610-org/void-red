@@ -400,8 +400,43 @@ public class ExampleView : MonoBehaviour
 - `foreach`の代わりに`for`ループを使用（ガベージコレクション回避）
 - `UniTask.WhenAll`で並列処理を活用する
 
+### Development Philosophy - YAGNI & KISS Principles
+
+**YAGNI (You Aren't Gonna Need It) 原則:**
+- 将来必要になるかもしれない機能を先回りして実装しない
+- 現在の要求を満たす最小限の実装に留める
+- 過度な抽象化や汎用化を避ける
+- 実際に必要になった時点で機能を追加する
+
+**KISS (Keep It Simple, Stupid) 原則:**
+- 可能な限りシンプルで理解しやすいコードを書く
+- 複雑な設計パターンは本当に必要な場合のみ使用
+- 1つのクラス・メソッドには1つの責任のみを持たせる
+- 誰でも理解できる明快な実装を優先する
+
+**実装例:**
+```csharp
+// ❌ YAGNI/KISS違反：将来の拡張を見越した過度な抽象化
+public interface ICardEffectProcessor
+{
+    void ProcessEffect(CardData card, IEffectContext context);
+}
+public class ComplexCardEffectSystem : ICardEffectProcessor { ... }
+
+// ✅ YAGNI/KISS準拠：現在必要な機能のみをシンプルに実装
+public void ApplyCardEffect(CardData card)
+{
+    // 直接的で理解しやすい実装
+    if (card.HasDamageEffect)
+    {
+        enemy.TakeDamage(card.DamageAmount);
+    }
+}
+```
+
 ## Response Guidelines
 
 - プログラム内の全てのコメントは日本語で記述してください (from user's CLAUDE.md)
 - Respond in Japanese and avoid excessive comments
 - When refactoring, implement clean replacements rather than maintaining backward compatibility
+- Always follow YAGNI and KISS principles - implement only what is needed now, keep it simple

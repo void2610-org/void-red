@@ -111,6 +111,10 @@ public class GameManager: IStartable, IDisposable
             await UniTask.Delay(300);
         }
         
+        // 敵を初期化して表示
+        _uiPresenter.InitializeEnemy(currentEnemyData);
+        await _uiPresenter.ShowEnemy();
+        
         // 敵情報をアナウンス
         await _uiPresenter.ShowAnnouncement($"敵: {currentEnemyData.EnemyName}", 1.5f);
         

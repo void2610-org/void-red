@@ -13,8 +13,8 @@ public class UIPresenter : IStartable, System.IDisposable
     [Inject] private readonly ThemeService _themeService;
     
     public Observable<Unit> PlayButtonClicked => _playButtonView.PlayButtonClicked;
-    public Observable<Unit> RetryButtonClicked => _gameOverView?.OnRetryClicked ?? Observable.Empty<Unit>();
-    public Observable<Unit> TitleButtonClicked => _gameOverView?.OnTitleClicked ?? Observable.Empty<Unit>();
+    public Observable<Unit> RetryButtonClicked => _gameOverView.OnRetryClicked;
+    public Observable<Unit> TitleButtonClicked => _gameOverView.OnTitleClicked;
     
     
     private readonly ThemeView _themeView;
@@ -26,6 +26,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly MentalBetView _mentalBetView;
     private readonly GameOverView _gameOverView;
     private readonly ConfirmationDialogView _confirmationDialogView;
+    private readonly EnemyView _enemyView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
@@ -42,6 +43,9 @@ public class UIPresenter : IStartable, System.IDisposable
         => await _confirmationDialogView.ShowDialog(message, confirmText, cancelText);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
+    public void InitializeEnemy(EnemyData enemyData) => _enemyView.Initialize(enemyData);
+    public async UniTask ShowEnemy() => await _enemyView.Show();
+    public async UniTask HideEnemy() => await _enemyView.Hide();
     
     public UIPresenter(Player player)
     {
@@ -62,6 +66,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
         _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
         _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
+        _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
@@ -106,6 +111,15 @@ public class UIPresenter : IStartable, System.IDisposable
     {
         // プレイヤーの精神力変化を監視
         _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
+        
+        // プレイヤーのカード選択を監視して敵のSpriteを更新
+        _player.SelectedCard.Subscribe(cardData => 
+        {
+            if (cardData)
+            {
+                _enemyView.UpdateSpriteForAttribute(cardData.Attribute).Forget();
+            }
+        }).AddTo(_disposables);
         
         // Viewイベントの設定
         SetupViewEvents();
