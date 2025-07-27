@@ -48,10 +48,19 @@ namespace Void2610.UnityTemplate
 
         /// <summary>
         /// Unityがオブジェクトをシリアライズする前に呼ばれる
-        /// 辞書をシリアライズ可能なリストに変換する
+        /// エディタ時はInspectorでの編集を優先し、ランタイム時のみ辞書の内容をシリアライズ
         /// </summary>
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
+#if UNITY_EDITOR
+            // エディタ時はInspectorでの編集を優先するため、辞書の内容でserializedListを上書きしない
+            if (!UnityEditor.EditorApplication.isPlaying)
+            {
+                return;
+            }
+#endif
+            
+            // ランタイム時は辞書の内容をserializedListに保存
             serializedList.Clear();
             
             foreach (var kvp in this)
