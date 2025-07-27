@@ -31,7 +31,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
     private readonly Player _player;
-    private bool _isEnemySpriteManualMode = false;
+    private bool _isEnemySpriteManualMode;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
@@ -129,16 +129,8 @@ public class UIPresenter : IStartable, System.IDisposable
         {
             // 手動制御モード中は自動更新をスキップ
             if (_isEnemySpriteManualMode) return;
-            
-            if (cardData)
-            {
-                _enemyView.UpdateSpriteForAttribute(cardData.Attribute).Forget();
-            }
-            else
-            {
-                // カード未選択時はデフォルトスプライトに戻す
-                _enemyView.ResetToDefaultSprite().Forget();
-            }
+            if (cardData) _enemyView.UpdateSpriteForAttribute(cardData.Attribute).Forget();
+            else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
         
         // Viewイベントの設定

@@ -195,8 +195,6 @@ public class GameManager: IStartable, IDisposable
     /// </summary>
     private void HandlePlayerCardSelection()
     {
-        _uiPresenter.ShowAnnouncement("プレイヤーのカード選択を待機中...", 0.5f).Forget();
-        
         // プレイヤーの操作を待つ（カード選択とプレイボタン）
         WaitForPlayerActionAsync().Forget();
     }
@@ -238,25 +236,22 @@ public class GameManager: IStartable, IDisposable
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
         if (!finalSelectedCard) return;
         
+        _uiPresenter.UpdateEnemySprite(finalSelectedCard.Attribute).Forget();
+        
         // プレイヤーの手を作成
         var playStyle = _uiPresenter.GetSelectedPlayStyle();
         
         // カードプレイ前のナレーションを表示（実際の語り内容）
         var narrationContent = _cardNarrationService.GetNarration(finalSelectedCard, NarrationType.PrePlay, playStyle);
         var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
-        await _uiPresenter.ShowNarration(displayContent, 3f);
-        var mentalBet = _uiPresenter.GetMentalBetValue();
+        await _uiPresenter.ShowNarration(displayContent);
         
         // 精神力を消費
+        var mentalBet = _uiPresenter.GetMentalBetValue();
         _player.ConsumeMentalPower(mentalBet);
         _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
         
-        await _uiPresenter.UpdateEnemySprite(finalSelectedCard.Attribute);
-        
-        // プレイヤーの選択を表示
         await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
-        
-        // 少し間を置いてから敵フェーズに移行
         await UniTask.Delay(500);
         ChangeState(GameState.EnemyCardSelection);
     }
@@ -419,7 +414,7 @@ public class GameManager: IStartable, IDisposable
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
         var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, playerNarrationType, _playerMove.PlayStyle);
         var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
-        await _uiPresenter.ShowNarration(displayNarration, 3f);
+        await _uiPresenter.ShowNarration(displayNarration);
         
         // 敵の勝敗確定後のナレーション
         var enemyNarrationType = playerScore > npcScore ? NarrationType.PostBattleLoseEnemy : NarrationType.PostBattleWinEnemy;
