@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using Cysharp.Threading.Tasks;
 using LitMotion;
-using LitMotion.Extensions;
 
 /// <summary>
 /// 敵の表示を担当するViewクラス
@@ -21,7 +19,6 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private float crossFadeDuration = 0.4f;
     
     private EnemyData _enemyData;
-    private RectTransform _rectTransform;
     
     /// <summary>
     /// 初期化処理
@@ -142,16 +139,9 @@ public class EnemyView : MonoBehaviour
         );
         
         // アニメーション完了後、前面と背面を入れ替え
-        var tempSprite = enemyImage.sprite;
-        enemyImage.sprite = enemyImageBack.sprite;
-        enemyImageBack.sprite = tempSprite;
-        
+        (enemyImage.sprite, enemyImageBack.sprite) = (enemyImageBack.sprite, enemyImage.sprite);
+
         enemyImage.color = new Color(1f, 1f, 1f, 1f);
         enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
-    }
-    
-    private void Awake()
-    {
-        _rectTransform = this.GetComponent<RectTransform>();
     }
 }
