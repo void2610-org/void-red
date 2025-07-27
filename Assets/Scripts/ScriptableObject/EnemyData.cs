@@ -13,6 +13,9 @@ public class EnemyData : ScriptableObject
     [SerializeField] private string enemyName;
     [SerializeField, TextArea(3, 5)] private string description;
     
+    [Header("敵画像")]
+    [SerializeField] private Sprite defaultSprite;
+    
     [Header("属性別画像")]
     [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
     
@@ -27,6 +30,7 @@ public class EnemyData : ScriptableObject
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
     public string Description => description;
+    public Sprite DefaultSprite => defaultSprite;
     public int MaxMentalPower => maxMentalPower;
     public int InitialMentalPower => initialMentalPower;
     public List<CardData> InitialDeck => initialDeck;

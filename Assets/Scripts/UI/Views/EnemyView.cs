@@ -14,10 +14,11 @@ public class EnemyView : MonoBehaviour
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Image enemyImage;
+    [SerializeField] private Image enemyImageBack;
     
     [Header("アニメーション設定")]
     [SerializeField] private float fadeDuration = 0.3f;
-    [SerializeField] private float scaleDuration = 0.2f;
+    [SerializeField] private float crossFadeDuration = 0.4f;
     
     private EnemyData _enemyData;
     private RectTransform _rectTransform;
@@ -28,6 +29,20 @@ public class EnemyView : MonoBehaviour
     public void Initialize(EnemyData enemyData)
     {
         _enemyData = enemyData;
+        
+        // デフォルトスプライトを設定
+        if (enemyImage && _enemyData.DefaultSprite)
+        {
+            enemyImage.sprite = _enemyData.DefaultSprite;
+            enemyImage.color = new Color(1f, 1f, 1f, 1f);
+        }
+        
+        // 背面画像を透明に初期化
+        if (enemyImageBack)
+        {
+            enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
+        }
+        
         // 初期状態では非表示
         gameObject.SetActive(false);
     }
@@ -44,6 +59,17 @@ public class EnemyView : MonoBehaviour
         
         // スプライト切り替えアニメーション
         await PlaySpriteChangeAnimation(newSprite);
+    }
+    
+    /// <summary>
+    /// デフォルトスプライトに戻す（カード未選択時）
+    /// </summary>
+    public async UniTask ResetToDefaultSprite()
+    {
+        if (!_enemyData || !_enemyData.DefaultSprite) return;
+        
+        // デフォルトスプライトに切り替え
+        await PlaySpriteChangeAnimation(_enemyData.DefaultSprite);
     }
     
     /// <summary>
@@ -87,43 +113,41 @@ public class EnemyView : MonoBehaviour
     }
     
     /// <summary>
-    /// スプライト変更時のアニメーション
+    /// 2枚の画像を使った真のクロスフェードアニメーション
     /// </summary>
     private async UniTask PlaySpriteChangeAnimation(Sprite newSprite)
     {
-        if (!enemyImage) return;
+        if (!enemyImage || !enemyImageBack) return;
         
-        // スケールを小さくしながらフェードアウト
-        var scaleMotion = LMotion.Create(Vector3.one, Vector3.one * 0.8f, scaleDuration / 2)
-            .WithEase(Ease.InQuad)
-            .BindToLocalScale(_rectTransform);
+        // 現在のスプライトと同じ場合はアニメーションをスキップ
+        if (enemyImage.sprite == newSprite) return;
+        
+        // 背面画像に新しいスプライトを設定
+        enemyImageBack.sprite = newSprite;
+        enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
+        
+        // 同時進行のクロスフェード
+        var fadeOutFront = LMotion.Create(1f, 0f, crossFadeDuration)
+            .WithEase(Ease.InOutQuad)
+            .Bind(alpha => enemyImage.color = new Color(1f, 1f, 1f, alpha));
             
-        var canvasGroup = GetComponent<CanvasGroup>();
-        var fadeOutMotion = LMotion.Create(1f, 0f, scaleDuration / 2)
-            .WithEase(Ease.InQuad)
-            .Bind(alpha => canvasGroup.alpha = alpha);
-            
+        var fadeInBack = LMotion.Create(0f, 1f, crossFadeDuration)
+            .WithEase(Ease.InOutQuad)
+            .Bind(alpha => enemyImageBack.color = new Color(1f, 1f, 1f, alpha));
+        
+        // 両方のアニメーションを同時実行
         await UniTask.WhenAll(
-            scaleMotion.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy()),
-            fadeOutMotion.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy())
+            fadeOutFront.AddTo(gameObject).ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy()),
+            fadeInBack.AddTo(gameObject).ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy())
         );
         
-        // スプライトを変更
-        enemyImage.sprite = newSprite;
+        // アニメーション完了後、前面と背面を入れ替え
+        var tempSprite = enemyImage.sprite;
+        enemyImage.sprite = enemyImageBack.sprite;
+        enemyImageBack.sprite = tempSprite;
         
-        // スケールを戻しながらフェードイン
-        var scaleBackMotion = LMotion.Create(Vector3.one * 0.8f, Vector3.one, scaleDuration / 2)
-            .WithEase(Ease.OutQuad)
-            .BindToLocalScale(_rectTransform);
-            
-        var fadeInMotion = LMotion.Create(0f, 1f, scaleDuration / 2)
-            .WithEase(Ease.OutQuad)
-            .Bind(alpha => canvasGroup.alpha = alpha);
-            
-        await UniTask.WhenAll(
-            scaleBackMotion.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy()),
-            fadeInMotion.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy())
-        );
+        enemyImage.color = new Color(1f, 1f, 1f, 1f);
+        enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
     }
     
     private void Awake()

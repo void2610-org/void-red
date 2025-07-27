@@ -184,7 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1cef07666c8c4bf5ac49769a9da4e10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableFastMode: 1
+  enableFastMode: 0
   timeScale: 10
   showSaveInfo: 0
   startWithFreshData: 1
@@ -6833,7 +6833,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2273292717293733431, guid: 158506b5472594e029311790d1866e41, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 250
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 2273292717293733431, guid: 158506b5472594e029311790d1866e41, type: 3}
       propertyPath: m_AnchoredPosition.y

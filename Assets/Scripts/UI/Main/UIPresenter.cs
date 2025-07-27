@@ -119,6 +119,11 @@ public class UIPresenter : IStartable, System.IDisposable
             {
                 _enemyView.UpdateSpriteForAttribute(cardData.Attribute).Forget();
             }
+            else
+            {
+                // カード未選択時はデフォルトスプライトに戻す
+                _enemyView.ResetToDefaultSprite().Forget();
+            }
         }).AddTo(_disposables);
         
         // Viewイベントの設定
