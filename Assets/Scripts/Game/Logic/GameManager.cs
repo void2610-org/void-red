@@ -33,6 +33,9 @@ public class GameManager: IStartable, IDisposable
     // 崩壊判定用メンバー変数
     private bool _playerCollapse;
     private bool _npcCollapse;
+    
+    // 現在の敵データ
+    private EnemyData _currentEnemyData;
 
     /// <summary>
     /// コンストラクタ（依存性注入）
@@ -85,7 +88,7 @@ public class GameManager: IStartable, IDisposable
         
         // 現在のチャプターに基づいて敵データを取得
         var currentChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
-        var currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
+        _currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
         
         // プレイヤーの精神力を復元（最初の起動時のみ）
         if (isInitialStart)
@@ -112,15 +115,15 @@ public class GameManager: IStartable, IDisposable
         }
         
         // 敵を初期化して表示
-        _uiPresenter.InitializeEnemy(currentEnemyData);
+        _uiPresenter.InitializeEnemy(_currentEnemyData);
         await _uiPresenter.ShowEnemy();
         
         // 敵情報をアナウンス
-        await _uiPresenter.ShowAnnouncement($"敵: {currentEnemyData.EnemyName}", 1.5f);
+        await _uiPresenter.ShowAnnouncement($"敵: {_currentEnemyData.EnemyName}", 1.5f);
         
         // カードデッキを初期化
         var playerDeck = _cardPoolService.GetRandomCards(5);
-        var enemyDeck = new List<CardData>(currentEnemyData.InitialDeck);
+        var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);
         
         _player.InitializeDeck(playerDeck);
         _enemy.InitializeDeck(enemyDeck);
@@ -458,6 +461,13 @@ public class GameManager: IStartable, IDisposable
                 {
                     await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！");
                 }
+                
+                // 共鳴チェック
+                if (_currentEnemyData && _currentEnemyData.ResonanceCard && playerCard == _currentEnemyData.ResonanceCard)
+                {
+                    await _uiPresenter.ShowAnnouncement($"共鳴発生: {playerCard.CardName}");
+                }
+                
                 // 進化後のカードをデッキに戻す
                 _player.ReturnCardToDeck(playerCardAfterEvolution);
             }
