@@ -26,6 +26,9 @@ public class EnemyData : ScriptableObject
     [Header("デッキ構成")]
     [SerializeField] private List<CardData> initialDeck = new ();
     
+    [Header("共鳴システム")]
+    [SerializeField] private CardData resonanceCard;
+    
     // プロパティ
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
@@ -34,6 +37,7 @@ public class EnemyData : ScriptableObject
     public int MaxMentalPower => maxMentalPower;
     public int InitialMentalPower => initialMentalPower;
     public List<CardData> InitialDeck => initialDeck;
+    public CardData ResonanceCard => resonanceCard;
     
     /// <summary>
     /// 指定された属性に対応するSpriteを取得
