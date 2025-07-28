@@ -38,3 +38,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 96418a77f5ef94e20bf72ebde966a197, type: 2}
   - {fileID: 11400000, guid: 5ecb5aa2c56fa41448a2e55ccf2af044, type: 2}
   - {fileID: 11400000, guid: 340062878b38c4d26abf33d3bf2cc4d3, type: 2}
+  resonanceCard: {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
