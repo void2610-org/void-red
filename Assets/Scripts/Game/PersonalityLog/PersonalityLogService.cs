@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using Game.PersonalityLog;
 
@@ -10,7 +8,7 @@ using Game.PersonalityLog;
 public class PersonalityLogService
 {
     private PersonalityLogData _logData;
-    private const string PERSONALITY_LOG_FILE = "personality_log.json";
+    private const string PERSONALITY_LOG_KEY = "personality_log";
     
     // 現在のログ状態
     private ChapterLog _currentChapter;
@@ -118,24 +116,15 @@ public class PersonalityLogService
     /// </summary>
     private void LoadPersonalityLog()
     {
-        try
+        var json = DataPersistence.LoadData(PERSONALITY_LOG_KEY);
+        
+        if (string.IsNullOrEmpty(json))
         {
-            var filePath = Path.Combine(Application.persistentDataPath, PERSONALITY_LOG_FILE);
-            
-            if (File.Exists(filePath))
-            {
-                var json = File.ReadAllText(filePath);
-                _logData = JsonUtility.FromJson<PersonalityLogData>(json);
-            }
-            else
-            {
-                _logData = new PersonalityLogData();
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[PersonalityLog] Failed to load: {e.Message}");
             _logData = new PersonalityLogData();
+        }
+        else
+        {
+            _logData = JsonUtility.FromJson<PersonalityLogData>(json) ?? new PersonalityLogData();
         }
     }
     
@@ -144,15 +133,7 @@ public class PersonalityLogService
     /// </summary>
     public void SavePersonalityLog()
     {
-        try
-        {
-            var json = JsonUtility.ToJson(_logData, true);
-            var filePath = Path.Combine(Application.persistentDataPath, PERSONALITY_LOG_FILE);
-            File.WriteAllText(filePath, json);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[PersonalityLog] Failed to save: {e.Message}");
-        }
+        var json = JsonUtility.ToJson(_logData, true);
+        DataPersistence.SaveData(PERSONALITY_LOG_KEY, json);
     }
 }
