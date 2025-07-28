@@ -7,6 +7,23 @@ using UnityEngine;
 public static class CollapseJudge
 {
     /// <summary>
+    /// ベット額による崩壊確率補正倍率を取得
+    /// </summary>
+    /// <param name="mentalBet">精神ベット値</param>
+    /// <returns>崩壊確率補正倍率</returns>
+    private static float GetBetCollapseMultiplier(int mentalBet)
+    {
+        return mentalBet switch
+        {
+            >= 1 and <= 5 => 0.8f,
+            >= 6 and <= 10 => 1.0f,
+            >= 11 and <= 15 => 1.4f,
+            >= 16 and <= 20 => 1.8f,
+            _ => 1.0f // デフォルト値
+        };
+    }
+
+    /// <summary>
     /// カードの崩壊確率を計算
     /// </summary>
     /// <param name="move">プレイヤーの手</param>
@@ -14,17 +31,20 @@ public static class CollapseJudge
     private static float CalculateCollapseChance(PlayerMove move)
     {
         if (move == null || !move.SelectedCard) return 0f;
-        
+
         var threshold = move.SelectedCard.CollapseThreshold;
         if (move.MentalBet < threshold) return 0f; // 閾値未満では崩壊しない
-        
+
         // 基本崩壊確率を計算
         var baseChance = (move.MentalBet - threshold) * 0.2f;
-        
+
         // プレイスタイルによる倍率を適用
         var playStyleMultiplier = move.PlayStyle.GetCollapseMultiplier();
-        
-        return baseChance * playStyleMultiplier;
+
+        // ベット額による崩壊確率補正倍率を取得
+        var betCollapseMultiplier = GetBetCollapseMultiplier(move.MentalBet);
+
+        return baseChance * playStyleMultiplier * betCollapseMultiplier;
     }
     
     /// <summary>
