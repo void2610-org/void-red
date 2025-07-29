@@ -10,8 +10,8 @@ namespace Game.PersonalityLog
     [Serializable]
     public class ChapterLog
     {
-        [SerializeField] private EnemyData enemyData;
-        [SerializeField] private List<TurnLog> turns = new();
+        [SerializeField] public EnemyData enemyData;
+        [SerializeField] public List<TurnLog> turns = new();
         
         public ChapterLog(EnemyData enemyData)
         {

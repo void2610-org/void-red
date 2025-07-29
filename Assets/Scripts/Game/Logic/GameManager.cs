@@ -18,6 +18,7 @@ public class GameManager: IStartable, IDisposable
     private readonly SaveDataManager _saveDataManager;
     private readonly EnemyProgressService _enemyProgressService;
     private readonly CardNarrationService _cardNarrationService;
+    private readonly PersonalityLogService _personalityLogService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private readonly CompositeDisposable _disposables = new();
@@ -49,7 +50,8 @@ public class GameManager: IStartable, IDisposable
         GameStatsService gameStatsService,
         SaveDataManager saveDataManager,
         EnemyProgressService enemyProgressService,
-        CardNarrationService cardNarrationService)
+        CardNarrationService cardNarrationService,
+        PersonalityLogService personalityLogService)
     {
         _cardPoolService = cardPoolService;
         _themeService = themeService;
@@ -60,6 +62,7 @@ public class GameManager: IStartable, IDisposable
         _saveDataManager = saveDataManager;
         _enemyProgressService = enemyProgressService;
         _cardNarrationService = cardNarrationService;
+        _personalityLogService = personalityLogService;
 
         // 崩壊フラグを初期化
         _playerCollapse = false;
@@ -89,6 +92,9 @@ public class GameManager: IStartable, IDisposable
         // 現在のチャプターに基づいて敵データを取得
         var currentChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
         _currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
+        
+        // 人格ログ: チャプター開始
+        _personalityLogService.StartChapter(_currentEnemyData);
         
         // プレイヤーの精神力を復元（最初の起動時のみ）
         if (isInitialStart)
@@ -185,6 +191,8 @@ public class GameManager: IStartable, IDisposable
     /// </summary>
     private void HandleThemeAnnouncement()
     {
+        // 人格ログ: ターン開始
+        _personalityLogService.StartTurn();
         
         // ランダムなお題を選択
         _currentTheme.Value = _themeService.GetRandomTheme();
@@ -254,6 +262,9 @@ public class GameManager: IStartable, IDisposable
         _player.ConsumeMentalPower(mentalBet);
         _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
         
+        // 人格ログ: プレイヤームーブ記録
+        _personalityLogService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
+        
         await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
         await UniTask.Delay(500);
         ChangeState(GameState.EnemyCardSelection);
@@ -285,6 +296,9 @@ public class GameManager: IStartable, IDisposable
         // NPCの精神力を消費
         _enemy.ConsumeMentalPower(npcMentalBet);
         _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
+        
+        // 人格ログ: 敵ムーブ記録
+        _personalityLogService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
         
         // NPCの選択を表示
         await _uiPresenter.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
@@ -447,6 +461,10 @@ public class GameManager: IStartable, IDisposable
         // 使用したカードをプレイ
         if (_playerCollapse)
         {
+            var playerCollapseCard = _player.SelectedCard.CurrentValue;
+            // 人格ログ: プレイヤーカード崩壊イベント記録
+            if (playerCollapseCard)
+                _personalityLogService.LogCardCollapse("player", playerCollapseCard);
             _player.CollapseSelectedCard();
         }
         else
@@ -459,12 +477,16 @@ public class GameManager: IStartable, IDisposable
                 var playerCardAfterEvolution = _gameStatsService.PlayerSaveData.CheckCardEvolution(playerCard);
                 if (playerCardAfterEvolution != playerCard)
                 {
+                    // 人格ログ: プレイヤーカード進化イベント記録
+                    _personalityLogService.LogCardEvolution("player", playerCard, playerCardAfterEvolution);
                     await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！");
                 }
                 
                 // 共鳴チェック
                 if (_currentEnemyData && _currentEnemyData.ResonanceCard && playerCard == _currentEnemyData.ResonanceCard)
                 {
+                    // 人格ログ: 共鳴イベント記録
+                    _personalityLogService.LogResonance(playerCard);
                     await _uiPresenter.ShowAnnouncement($"共鳴発生: {playerCard.CardName}");
                 }
                 
@@ -475,6 +497,10 @@ public class GameManager: IStartable, IDisposable
 
         if (_npcCollapse)
         {
+            var npcCollapseCard = _enemy.SelectedCard.CurrentValue;
+            // 人格ログ: NPCカード崩壊イベント記録
+            if (npcCollapseCard)
+                _personalityLogService.LogCardCollapse("enemy", npcCollapseCard);
             _enemy.CollapseSelectedCard();
         }
         else
@@ -488,6 +514,8 @@ public class GameManager: IStartable, IDisposable
                 // 進化結果をアナウンス
                 if (npcCardAfterEvolution != npcCard)
                 {
+                    // 人格ログ: NPCカード進化イベント記録
+                    _personalityLogService.LogCardEvolution("enemy", npcCard, npcCardAfterEvolution);
                     await _uiPresenter.ShowAnnouncement($"NPCの {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化しました！");
                 }
                 // 進化後のカードをデッキに戻す
@@ -508,6 +536,10 @@ public class GameManager: IStartable, IDisposable
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
+        
+        // 人格ログ: ターン終了
+        _personalityLogService.EndTurn();
+        
         _isProcessing = false;
         
         // ゲームオーバー条件をチェック
@@ -572,6 +604,9 @@ public class GameManager: IStartable, IDisposable
             battleResult = $"バトルに敗北しました... ({_playerWins}-{_enemyWins})";
         
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
+        
+        // 人格ログ: チャプター完了
+        _personalityLogService.CompleteChapter();
         
         // 現在の精神力をセーブデータに反映
         _gameStatsService.PlayerSaveData.UpdateMentalPower(_player.MentalPower.CurrentValue);

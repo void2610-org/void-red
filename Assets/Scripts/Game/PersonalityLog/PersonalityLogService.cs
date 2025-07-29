@@ -136,4 +136,12 @@ public class PersonalityLogService
         var json = JsonUtility.ToJson(_logData, true);
         DataPersistence.SaveData(PERSONALITY_LOG_KEY, json);
     }
+    
+    /// <summary>
+    /// ログデータを取得
+    /// </summary>
+    public PersonalityLogData GetLogData()
+    {
+        return _logData;
+    }
 }

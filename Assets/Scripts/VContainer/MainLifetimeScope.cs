@@ -46,6 +46,7 @@ public class MainLifetimeScope : LifetimeScope
         builder.Register<EnemyProgressService>(Lifetime.Singleton);
         builder.Register<GameStatsService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
+        builder.Register<PersonalityLogService>(Lifetime.Singleton);
         
         // SaveDataManager, SettingsManagerはRootLifetimeScopeで登録済み
         
