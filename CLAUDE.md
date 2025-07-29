@@ -436,6 +436,7 @@ public void ApplyCardEffect(CardData card)
 
 ## Response Guidelines
 
+- SerializeFieldで設定されるべきコンポーネントのnullチェックは不要。コンポーネントが正しく設定されていることを前提としたコードを記述する。
 - プログラム内の全てのコメントは日本語で記述してください (from user's CLAUDE.md)
 - Respond in Japanese and avoid excessive comments
 - When refactoring, implement clean replacements rather than maintaining backward compatibility

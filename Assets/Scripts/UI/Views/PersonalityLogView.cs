@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Text;
 using Game.PersonalityLog;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// 人格ログを表示するViewコンポーネント
@@ -16,18 +17,17 @@ public class PersonalityLogView : MonoBehaviour
     [SerializeField] private Button closeButton;
     
     private PersonalityLogService _personalityLogService;
+    private RectTransform _scrollContent;
     
     /// <summary>
     /// 初期化
     /// </summary>
     public void Initialize(PersonalityLogService personalityLogService)
     {
+        _scrollContent = scrollRect.content;
         _personalityLogService = personalityLogService;
-        
-        // 閉じるボタンのイベント設定
         closeButton.onClick.AddListener(HideLog);
         
-        // 初期状態では非表示
         HideLog();
     }
     
@@ -37,7 +37,7 @@ public class PersonalityLogView : MonoBehaviour
     public void ShowLog()
     {
         logPanel.SetActive(true);
-        UpdateLogDisplay();
+        UpdateLogDisplayAsync().Forget();
     }
     
     /// <summary>
@@ -49,18 +49,51 @@ public class PersonalityLogView : MonoBehaviour
     }
     
     /// <summary>
-    /// ログ表示を更新
+    /// ログ表示を更新（UniTask版）
     /// </summary>
-    private void UpdateLogDisplay()
+    private async UniTaskVoid UpdateLogDisplayAsync()
     {
         var logData = _personalityLogService.GetLogData();
         var displayText = FormatLogData(logData);
         
+        // テキストを設定
         logText.text = displayText;
         
+        // 1フレーム待ってからレイアウト更新
+        await UniTask.Yield();
+        
+        // レイアウトを段階的に更新
+        await UpdateLayoutAsync();
+        
         // スクロールを一番上に移動
-        Canvas.ForceUpdateCanvases();
         scrollRect.verticalNormalizedPosition = 1f;
+    }
+    
+    /// <summary>
+    /// レイアウトを更新
+    /// </summary>
+    private async UniTask UpdateLayoutAsync()
+    {
+        // Phase 1: TMProのテキスト情報を更新
+        logText.ForceMeshUpdate();
+        await UniTask.Yield();
+        
+        // Phase 2: 初回Canvas更新
+        Canvas.ForceUpdateCanvases();
+        await UniTask.Yield();
+        
+        // Phase 3: ContentSizeFitterのレイアウトを更新
+        LayoutRebuilder.ForceRebuildLayoutImmediate(logText.rectTransform);
+        await UniTask.Yield();
+        
+        // Phase 4: ScrollRectのContentサイズを調整
+        var textHeight = logText.preferredHeight;
+        var currentSize = _scrollContent.sizeDelta;
+        _scrollContent.sizeDelta = new Vector2(currentSize.x, Mathf.Max(textHeight, 100f));
+        await UniTask.Yield();
+        
+        // Phase 5: 最終Canvas更新でレイアウトを確定
+        Canvas.ForceUpdateCanvases();
     }
     
     /// <summary>
@@ -76,7 +109,7 @@ public class PersonalityLogView : MonoBehaviour
         var sb = new StringBuilder();
         sb.AppendLine("=== 人格ログ ===\n");
         
-        for (int chapterIndex = 0; chapterIndex < logData.chapters.Count; chapterIndex++)
+        for (var chapterIndex = 0; chapterIndex < logData.chapters.Count; chapterIndex++)
         {
             var chapter = logData.chapters[chapterIndex];
             sb.AppendLine($"【Chapter {chapterIndex + 1}: {chapter.enemyData?.EnemyName ?? "不明な敵"}】");
