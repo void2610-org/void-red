@@ -1,22 +1,24 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using R3;
 using Game.PersonalityLog;
 
 /// <summary>
 /// 人格ログの管理を行うサービスクラス
 /// </summary>
-public class PersonalityLogService
+public class PersonalityLogService : IDisposable
 {
-    private PersonalityLogData _logData;
     private const string PERSONALITY_LOG_KEY = "personality_log";
     
-    // 現在のログ状態
-    private ChapterLog _currentChapter;
+    public Observable<Unit> OnLogUpdated => _onLogUpdated;
     
-    // ターン構築用の一時データ
     private MoveLog _currentPlayerMove;
     private MoveLog _currentEnemyMove;
     private List<TurnEvent> _currentEvents;
+    private ChapterLog _currentChapter;
+    private PersonalityLogData _logData;
+    private readonly Subject<Unit> _onLogUpdated = new();
     
     /// <summary>
     /// コンストラクタ
@@ -65,6 +67,7 @@ public class PersonalityLogService
         {
             var turnLog = new TurnLog(_currentPlayerMove, _currentEnemyMove, _currentEvents);
             _currentChapter.AddTurn(turnLog);
+            _onLogUpdated.OnNext(Unit.Default);
         }
     }
     
@@ -143,5 +146,13 @@ public class PersonalityLogService
     public PersonalityLogData GetLogData()
     {
         return _logData;
+    }
+    
+    /// <summary>
+    /// リソース解放
+    /// </summary>
+    public void Dispose()
+    {
+        _onLogUpdated?.Dispose();
     }
 }

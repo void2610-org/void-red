@@ -62,46 +62,6 @@ public class UIPresenter : IStartable, System.IDisposable
         await _enemyView.UpdateSpriteForAttribute(attribute);
     }
     
-    /// <summary>
-    /// 人格ログを表示
-    /// </summary>
-    public void ShowPersonalityLog()
-    {
-        _personalityLogView.ShowLog();
-    }
-    
-    /// <summary>
-    /// 人格ログを非表示
-    /// </summary>
-    public void HidePersonalityLog()
-    {
-        _personalityLogView.HideLog();
-    }
-    
-    /// <summary>
-    /// 人格ログボタンを表示
-    /// </summary>
-    public void ShowPersonalityLogButton()
-    {
-        _personalityLogButtonView?.Show();
-    }
-    
-    /// <summary>
-    /// 人格ログボタンを非表示
-    /// </summary>
-    public void HidePersonalityLogButton()
-    {
-        _personalityLogButtonView?.Hide();
-    }
-    
-    /// <summary>
-    /// 人格ログボタンの有効/無効を設定
-    /// </summary>
-    public void SetPersonalityLogButtonInteractable(bool interactable)
-    {
-        _personalityLogButtonView?.SetInteractable(interactable);
-    }
-    
     public UIPresenter(Player player)
     {
         _player = player;
@@ -168,6 +128,7 @@ public class UIPresenter : IStartable, System.IDisposable
     {
         // PersonalityLogViewを初期化
         _personalityLogView?.Initialize(_personalityLogService);
+        _personalityLogService.OnLogUpdated.Subscribe(_ => _personalityLogView?.UpdateLogDisplay()).AddTo(_disposables);
         
         // プレイヤーの精神力変化を監視
         _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
@@ -185,7 +146,7 @@ public class UIPresenter : IStartable, System.IDisposable
         SetupViewEvents();
         
         // PersonalityLogButtonのイベント設定
-        _personalityLogButtonView?.OnButtonClicked.Subscribe(_ => ShowPersonalityLog()).AddTo(_disposables);
+        _personalityLogButtonView?.OnButtonClicked.Subscribe(_ => _personalityLogView.ShowLog()).AddTo(_disposables);
         
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
