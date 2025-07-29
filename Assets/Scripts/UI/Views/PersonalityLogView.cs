@@ -37,7 +37,7 @@ public class PersonalityLogView : MonoBehaviour
     public void ShowLog()
     {
         logPanel.SetActive(true);
-        UpdateLogDisplayAsync().Forget();
+        UpdateLogDisplay();
     }
     
     /// <summary>
@@ -49,14 +49,9 @@ public class PersonalityLogView : MonoBehaviour
     }
     
     /// <summary>
-    /// ログを更新（外部から呼び出し可能）
-    /// </summary>
-    public void UpdateLogDisplay() => UpdateLogDisplayAsync().Forget();
-    
-    /// <summary>
     /// ログ表示を更新（UniTask版）
     /// </summary>
-    private async UniTaskVoid UpdateLogDisplayAsync()
+    public void UpdateLogDisplay()
     {
         var logData = _personalityLogService.GetLogData();
         var displayText = FormatLogData(logData);
@@ -64,42 +59,22 @@ public class PersonalityLogView : MonoBehaviour
         // テキストを設定
         logText.text = displayText;
         
-        // 1フレーム待ってからレイアウト更新
-        await UniTask.Yield();
-        
         // レイアウトを段階的に更新
-        await UpdateLayoutAsync();
+        logText.ForceMeshUpdate();
+        Canvas.ForceUpdateCanvases();
+        
+        LayoutRebuilder.ForceRebuildLayoutImmediate(logText.rectTransform);
+        
+        var textHeight = logText.preferredHeight;
+        var currentSize = _scrollContent.sizeDelta;
+        _scrollContent.sizeDelta = new Vector2(currentSize.x, Mathf.Max(textHeight, 100f));
+        
+        Canvas.ForceUpdateCanvases();
         
         // スクロールを一番上に移動
         scrollRect.verticalNormalizedPosition = 1f;
     }
     
-    /// <summary>
-    /// レイアウトを更新
-    /// </summary>
-    private async UniTask UpdateLayoutAsync()
-    {
-        // Phase 1: TMProのテキスト情報を更新
-        logText.ForceMeshUpdate();
-        await UniTask.Yield();
-        
-        // Phase 2: 初回Canvas更新
-        Canvas.ForceUpdateCanvases();
-        await UniTask.Yield();
-        
-        // Phase 3: ContentSizeFitterのレイアウトを更新
-        LayoutRebuilder.ForceRebuildLayoutImmediate(logText.rectTransform);
-        await UniTask.Yield();
-        
-        // Phase 4: ScrollRectのContentサイズを調整
-        var textHeight = logText.preferredHeight;
-        var currentSize = _scrollContent.sizeDelta;
-        _scrollContent.sizeDelta = new Vector2(currentSize.x, Mathf.Max(textHeight, 100f));
-        await UniTask.Yield();
-        
-        // Phase 5: 最終Canvas更新でレイアウトを確定
-        Canvas.ForceUpdateCanvases();
-    }
     
     /// <summary>
     /// ログデータをテキスト形式に変換
