@@ -5486,25 +5486,6 @@ MonoBehaviour:
   allEnemyData: {fileID: 11400000, guid: d06109f2e0651496d82b4c003034f36c, type: 2}
   playerHandView: {fileID: 359829454}
   enemyHandView: {fileID: 696993724}
---- !u!1 &880413688 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2433167700380238986, guid: 36760557ee03c4895bde1db15ad018bd, type: 3}
-  m_PrefabInstance: {fileID: 4728275166729805916}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &880413692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 880413688}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!1 &1051276007
 GameObject:
   m_ObjectHideFlags: 0
@@ -6751,17 +6732,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7650928475808893805, guid: 36760557ee03c4895bde1db15ad018bd, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2433167700380238986, guid: 36760557ee03c4895bde1db15ad018bd, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 880413692}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36760557ee03c4895bde1db15ad018bd, type: 3}
 --- !u!1001 &6657031477619847183
 PrefabInstance:
