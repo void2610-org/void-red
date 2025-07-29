@@ -23,7 +23,7 @@ namespace Game.PersonalityLog
     [Serializable]
     public class ResonanceEvent : TurnEvent
     {
-        [SerializeField] private CardData resonanceCard;
+        [SerializeField] public CardData resonanceCard;
         
         public ResonanceEvent(CardData resonanceCard)
         {
@@ -37,9 +37,9 @@ namespace Game.PersonalityLog
     [Serializable]
     public class CardEvolutionEvent : TurnEvent
     {
-        [SerializeField] private string actorId;
-        [SerializeField] private CardData fromCard;
-        [SerializeField] private CardData toCard;
+        [SerializeField] public string actorId;
+        [SerializeField] public CardData fromCard;
+        [SerializeField] public CardData toCard;
         
         public CardEvolutionEvent(string actorId, CardData fromCard, CardData toCard)
         {
@@ -55,8 +55,8 @@ namespace Game.PersonalityLog
     [Serializable]
     public class CardCollapseEvent : TurnEvent
     {
-        [SerializeField] private string actorId;
-        [SerializeField] private CardData collapseCard;
+        [SerializeField] public string actorId;
+        [SerializeField] public CardData collapseCard;
         
         public CardCollapseEvent(string actorId, CardData collapseCard)
         {

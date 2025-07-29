@@ -9,14 +9,14 @@ namespace Game.PersonalityLog
     [Serializable]
     public class MoveLog
     {
-        [SerializeField] private CardData selectedCard;
-        [SerializeField] private PlayStyle playStyle;
-        [SerializeField] private int mentalBet;
-        [SerializeField] private int currentMentalPower;
+        [SerializeField] public CardData card;
+        [SerializeField] public PlayStyle playStyle;
+        [SerializeField] public int mentalBet;
+        [SerializeField] public int currentMentalPower;
         
         public MoveLog(PlayerMove move, int currentMentalPower)
         {
-            this.selectedCard = move.SelectedCard;
+            this.card = move.SelectedCard;
             this.playStyle = move.PlayStyle;
             this.mentalBet = move.MentalBet;
             this.currentMentalPower = currentMentalPower;

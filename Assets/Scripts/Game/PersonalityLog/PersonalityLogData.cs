@@ -10,7 +10,7 @@ namespace Game.PersonalityLog
     [Serializable]
     public class PersonalityLogData
     {
-        [SerializeField] private List<ChapterLog> chapters = new();
+        [SerializeField] public List<ChapterLog> chapters = new();
         
         private ChapterLog _currentChapter;
         

@@ -10,12 +10,9 @@ namespace Game.PersonalityLog
     [Serializable]
     public class TurnLog
     {
-        [SerializeField] private MoveLog playerMove;
-        [SerializeField] private MoveLog enemyMove;
-        [SerializeField, SerializeReference] private List<TurnEvent> events;
-        
-        public MoveLog PlayerMove => playerMove;
-        public MoveLog EnemyMove => enemyMove;
+        [SerializeField] public MoveLog playerMove;
+        [SerializeField] public MoveLog enemyMove;
+        [SerializeField, SerializeReference] public List<TurnEvent> events;
         
         public TurnLog(MoveLog playerMove, MoveLog enemyMove, List<TurnEvent> events)
         {
