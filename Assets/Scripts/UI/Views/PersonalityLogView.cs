@@ -49,6 +49,11 @@ public class PersonalityLogView : MonoBehaviour
     }
     
     /// <summary>
+    /// ログを更新（外部から呼び出し可能）
+    /// </summary>
+    public void UpdateLogDisplay() => UpdateLogDisplayAsync().Forget();
+    
+    /// <summary>
     /// ログ表示を更新（UniTask版）
     /// </summary>
     private async UniTaskVoid UpdateLogDisplayAsync()
