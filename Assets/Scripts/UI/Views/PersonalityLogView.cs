@@ -25,10 +25,7 @@ public class PersonalityLogView : MonoBehaviour
         _personalityLogService = personalityLogService;
         
         // 閉じるボタンのイベント設定
-        if (closeButton)
-        {
-            closeButton.onClick.AddListener(HideLog);
-        }
+        closeButton.onClick.AddListener(HideLog);
         
         // 初期状態では非表示
         HideLog();
@@ -39,8 +36,6 @@ public class PersonalityLogView : MonoBehaviour
     /// </summary>
     public void ShowLog()
     {
-        if (!logPanel) return;
-        
         logPanel.SetActive(true);
         UpdateLogDisplay();
     }
@@ -50,8 +45,6 @@ public class PersonalityLogView : MonoBehaviour
     /// </summary>
     public void HideLog()
     {
-        if (!logPanel) return;
-        
         logPanel.SetActive(false);
     }
     
@@ -60,19 +53,14 @@ public class PersonalityLogView : MonoBehaviour
     /// </summary>
     private void UpdateLogDisplay()
     {
-        if (!logText || _personalityLogService == null) return;
-        
         var logData = _personalityLogService.GetLogData();
         var displayText = FormatLogData(logData);
         
         logText.text = displayText;
         
         // スクロールを一番上に移動
-        if (scrollRect)
-        {
-            Canvas.ForceUpdateCanvases();
-            scrollRect.verticalNormalizedPosition = 1f;
-        }
+        Canvas.ForceUpdateCanvases();
+        scrollRect.verticalNormalizedPosition = 1f;
     }
     
     /// <summary>
