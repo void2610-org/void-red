@@ -11,6 +11,7 @@ public class RootLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         // 設定管理とセーブデータ管理
+        builder.Register<PersonalityLogService>(Lifetime.Singleton);
         builder.Register<SaveDataManager>(Lifetime.Singleton);
         builder.Register<SettingsManager>(Lifetime.Singleton);
     }

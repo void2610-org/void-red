@@ -134,10 +134,11 @@ public class PersonalityLogService : IDisposable
     /// <summary>
     /// 人格ログをセーブ
     /// </summary>
-    public void SavePersonalityLog()
+    /// <returns>保存が成功したかどうか</returns>
+    public bool SavePersonalityLog()
     {
         var json = JsonUtility.ToJson(_logData, true);
-        DataPersistence.SaveData(PERSONALITY_LOG_KEY, json);
+        return DataPersistence.SaveData(PERSONALITY_LOG_KEY, json);
     }
     
     /// <summary>
@@ -146,6 +147,24 @@ public class PersonalityLogService : IDisposable
     public PersonalityLogData GetLogData()
     {
         return _logData;
+    }
+    
+    /// <summary>
+    /// 人格ログファイルを削除（デバッグ用）
+    /// </summary>
+    /// <returns>削除が成功したかどうか</returns>
+    public bool DeletePersonalityLog()
+    {
+        return DataPersistence.DeleteData(PERSONALITY_LOG_KEY);
+    }
+    
+    /// <summary>
+    /// 人格ログデータを再読み込み（デバッグ用）
+    /// </summary>
+    public void ReloadPersonalityLog()
+    {
+        LoadPersonalityLog();
+        _onLogUpdated.OnNext(Unit.Default);
     }
     
     /// <summary>
