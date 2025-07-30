@@ -73,7 +73,7 @@ public class SettingsManager : IDisposable
             true, 
             "本当にセーブデータを削除しますか？この操作は元に戻せません。"
         );
-        deleteDataSetting.ButtonAction = () => _saveDataManager.DeleteSaveFile();
+        deleteDataSetting.ButtonAction = () => _saveDataManager.DeleteAllSaveFiles();
         _settings.Add(deleteDataSetting);
     }
     

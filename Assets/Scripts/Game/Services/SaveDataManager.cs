@@ -7,21 +7,25 @@ using UnityEngine;
 public class SaveDataManager
 {
     private const string SAVE_DATA_KEY = "player_save_data";
+    private readonly PersonalityLogService _personalityLogService;
+    
+    /// <summary>
+    /// コンストラクタ（依存性注入）
+    /// </summary>
+    public SaveDataManager(PersonalityLogService personalityLogService)
+    {
+        _personalityLogService = personalityLogService;
+    }
 
     /// <summary>
     /// PlayerSaveDataをファイルに保存
     /// </summary>
     /// <param name="saveData">保存するデータ</param>
     /// <returns>保存が成功したかどうか</returns>
-    public bool SavePlayerData(PlayerSaveData saveData)
+    private bool SavePlayerData(PlayerSaveData saveData)
     {
         var json = JsonUtility.ToJson(saveData, true);
         var success = DataPersistence.SaveData(SAVE_DATA_KEY, json);
-        
-        if (success)
-        {
-            Debug.Log($"プレイヤーデータを保存しました: {saveData.GetStatsString()}");
-        }
         
         return success;
     }
@@ -53,11 +57,46 @@ public class SaveDataManager
     }
     
     /// <summary>
-    /// セーブファイルを削除（デバッグ用）
+    /// すべてのデータを統合して保存
+    /// </summary>
+    /// <param name="playerData">プレイヤーセーブデータ</param>
+    /// <returns>すべての保存が成功したかどうか</returns>
+    public bool SaveAllData(PlayerSaveData playerData)
+    {
+        var playerSaveSuccess = SavePlayerData(playerData);
+        var personalityLogSuccess = _personalityLogService.SavePersonalityLog();
+        
+        if (playerSaveSuccess && personalityLogSuccess)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// すべてのセーブファイルを削除（デバッグ用）
+    /// </summary>
+    /// <returns>すべての削除が成功したかどうか</returns>
+    public bool DeleteAllSaveFiles()
+    {
+        var playerDataDeleted = DataPersistence.DeleteData(SAVE_DATA_KEY);
+        var personalityLogDeleted = _personalityLogService.DeletePersonalityLog();
+        
+        return playerDataDeleted && personalityLogDeleted;
+    }
+    
+    /// <summary>
+    /// すべてのセーブファイルを削除し、データを再読み込み（デバッグ用）
     /// </summary>
     /// <returns>削除が成功したかどうか</returns>
-    public bool DeleteSaveFile()
+    public bool DeleteAllSaveFilesAndReload()
     {
-        return DataPersistence.DeleteData(SAVE_DATA_KEY);
+        var success = DeleteAllSaveFiles();
+        if (success)
+        {
+            _personalityLogService.ReloadPersonalityLog();
+        }
+        return success;
     }
 }

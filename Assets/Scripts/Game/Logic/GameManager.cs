@@ -616,7 +616,7 @@ public class GameManager: IStartable, IDisposable
         var nextEnemy = _enemyProgressService.GetEnemyByChapter(nextChapter);
         
         // セーブデータを保存
-        _saveDataManager.SavePlayerData(_gameStatsService.PlayerSaveData);
+        _saveDataManager.SaveAllData(_gameStatsService.PlayerSaveData);
         
         if (!nextEnemy)
         {
