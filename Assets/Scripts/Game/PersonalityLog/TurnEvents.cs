@@ -9,11 +9,11 @@ namespace Game.PersonalityLog
     [Serializable]
     public abstract class TurnEvent
     {
-        [SerializeField] private string timestamp;
+        [SerializeField] public string actorId;
         
-        protected TurnEvent()
+        protected TurnEvent(string actorId)
         {
-            timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            this.actorId = actorId;
         }
     }
     
@@ -25,7 +25,7 @@ namespace Game.PersonalityLog
     {
         [SerializeField] public CardData resonanceCard;
         
-        public ResonanceEvent(CardData resonanceCard)
+        public ResonanceEvent(string actorId, CardData resonanceCard) : base(actorId)
         {
             this.resonanceCard = resonanceCard;
         }
@@ -37,13 +37,11 @@ namespace Game.PersonalityLog
     [Serializable]
     public class CardEvolutionEvent : TurnEvent
     {
-        [SerializeField] public string actorId;
         [SerializeField] public CardData fromCard;
         [SerializeField] public CardData toCard;
         
-        public CardEvolutionEvent(string actorId, CardData fromCard, CardData toCard)
+        public CardEvolutionEvent(string actorId, CardData fromCard, CardData toCard) : base(actorId)
         {
-            this.actorId = actorId;
             this.fromCard = fromCard;
             this.toCard = toCard;
         }
@@ -55,12 +53,10 @@ namespace Game.PersonalityLog
     [Serializable]
     public class CardCollapseEvent : TurnEvent
     {
-        [SerializeField] public string actorId;
         [SerializeField] public CardData collapseCard;
         
-        public CardCollapseEvent(string actorId, CardData collapseCard)
+        public CardCollapseEvent(string actorId, CardData collapseCard) : base(actorId)
         {
-            this.actorId = actorId;
             this.collapseCard = collapseCard;
         }
     }
