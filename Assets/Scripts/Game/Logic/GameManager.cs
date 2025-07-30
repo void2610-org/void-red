@@ -486,7 +486,7 @@ public class GameManager: IStartable, IDisposable
                 if (_currentEnemyData && _currentEnemyData.ResonanceCard && playerCard == _currentEnemyData.ResonanceCard)
                 {
                     // 人格ログ: 共鳴イベント記録
-                    _personalityLogService.LogResonance(playerCard);
+                    _personalityLogService.LogResonance("Player", playerCard);
                     await _uiPresenter.ShowAnnouncement($"共鳴発生: {playerCard.CardName}");
                 }
                 

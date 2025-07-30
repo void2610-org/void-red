@@ -90,9 +90,9 @@ public class PersonalityLogService : IDisposable
     /// <summary>
     /// 共鳴イベントを記録
     /// </summary>
-    public void LogResonance(CardData resonanceCard)
+    public void LogResonance(string actorId, CardData resonanceCard)
     {
-        var resonanceEvent = new ResonanceEvent(resonanceCard);
+        var resonanceEvent = new ResonanceEvent(actorId, resonanceCard);
         _currentEvents.Add(resonanceEvent);
     }
     
