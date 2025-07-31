@@ -45,10 +45,9 @@ public class DebugController : MonoBehaviour
             .Subscribe(scale => Time.timeScale = scale)
             .AddTo(this);
         
-        // 新しいセーブデータで始めるフラグがtrueの場合、セーブファイルを削除
         if (startWithFreshData && _saveDataManager != null)
         {
-            var success = _saveDataManager.DeleteSaveFile();
+            var success = _saveDataManager.DeleteAllSaveFilesAndReload();
             if (success) _gameStatsService.ReloadPlayerSaveData();
         }
     }
@@ -83,9 +82,9 @@ public class DebugController : MonoBehaviour
         var playerData = _gameStatsService.PlayerSaveData;
         GUILayout.Label($"統計: {playerData.GetStatsString()}");
         
-        if (GUILayout.Button("セーブファイル削除"))
+        if (GUILayout.Button("すべてのセーブファイル削除"))
         {
-            var success = _saveDataManager.DeleteSaveFile();
+            var success = _saveDataManager.DeleteAllSaveFilesAndReload();
             if (success) _gameStatsService.ReloadPlayerSaveData();
         }
         

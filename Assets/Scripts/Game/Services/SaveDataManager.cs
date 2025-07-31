@@ -1,45 +1,33 @@
 using System;
-using System.IO;
 using UnityEngine;
-using UnityEngine.Networking;
-using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// セーブデータの管理を行うサービスクラス
 /// </summary>
 public class SaveDataManager
 {
-    private const string SAVE_FILE_NAME = "player_save_data.json";
-    private static string SaveFilePath => Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME);
+    private const string SAVE_DATA_KEY = "player_save_data";
+    private readonly PersonalityLogService _personalityLogService;
+    
+    /// <summary>
+    /// コンストラクタ（依存性注入）
+    /// </summary>
+    public SaveDataManager(PersonalityLogService personalityLogService)
+    {
+        _personalityLogService = personalityLogService;
+    }
 
     /// <summary>
     /// PlayerSaveDataをファイルに保存
     /// </summary>
     /// <param name="saveData">保存するデータ</param>
     /// <returns>保存が成功したかどうか</returns>
-    public bool SavePlayerData(PlayerSaveData saveData)
+    private bool SavePlayerData(PlayerSaveData saveData)
     {
-        try
-        {
-            var json = JsonUtility.ToJson(saveData, true);
-            
-#if UNITY_WEBGL && !UNITY_EDITOR
-            // WebGL環境ではPlayerPrefsに保存
-            PlayerPrefs.SetString("SaveData", json);
-            PlayerPrefs.Save();
-#else
-            // その他の環境では従来通りファイルに保存
-            File.WriteAllText(SaveFilePath, json);
-#endif
-            
-            Debug.Log($"プレイヤーデータを保存しました: {saveData.GetStatsString()}");
-            return true;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"セーブデータの保存に失敗しました: {e.Message}");
-            return false;
-        }
+        var json = JsonUtility.ToJson(saveData, true);
+        var success = DataPersistence.SaveData(SAVE_DATA_KEY, json);
+        
+        return success;
     }
     
     /// <summary>
@@ -48,29 +36,15 @@ public class SaveDataManager
     /// <returns>読み込んだデータ（存在しない場合や失敗時は新規データ）</returns>
     public PlayerSaveData LoadPlayerData()
     {
-        try
+        var json = DataPersistence.LoadData(SAVE_DATA_KEY);
+        
+        if (string.IsNullOrEmpty(json))
         {
-            string json;
-            
-#if UNITY_WEBGL && !UNITY_EDITOR
-            json = PlayerPrefs.GetString("SaveData", "");
-            if (string.IsNullOrEmpty(json)) return new PlayerSaveData();
-#else
-            if (!File.Exists(SaveFilePath)) return new PlayerSaveData();
-            json = File.ReadAllText(SaveFilePath);
-#endif
-            
-            var saveData = JsonUtility.FromJson<PlayerSaveData>(json);
-            if (saveData == null) return new PlayerSaveData();
-            
-            return saveData;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"セーブデータの読み込みに失敗しました: {e.Message}");
-            Debug.Log("新規データを作成します。");
             return new PlayerSaveData();
         }
+        
+        var saveData = JsonUtility.FromJson<PlayerSaveData>(json);
+        return saveData ?? new PlayerSaveData();
     }
     
     /// <summary>
@@ -79,44 +53,50 @@ public class SaveDataManager
     /// <returns>セーブファイルの存在有無</returns>
     public bool IsSaveFileExists()
     {
-#if UNITY_WEBGL && !UNITY_EDITOR
-        return PlayerPrefs.HasKey("SaveData") && !string.IsNullOrEmpty(PlayerPrefs.GetString("SaveData", ""));
-#else
-        return File.Exists(SaveFilePath);
-#endif
+        return DataPersistence.DataExists(SAVE_DATA_KEY);
     }
     
     /// <summary>
-    /// セーブファイルを削除（デバッグ用）
+    /// すべてのデータを統合して保存
+    /// </summary>
+    /// <param name="playerData">プレイヤーセーブデータ</param>
+    /// <returns>すべての保存が成功したかどうか</returns>
+    public bool SaveAllData(PlayerSaveData playerData)
+    {
+        var playerSaveSuccess = SavePlayerData(playerData);
+        var personalityLogSuccess = _personalityLogService.SavePersonalityLog();
+        
+        if (playerSaveSuccess && personalityLogSuccess)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// すべてのセーブファイルを削除（デバッグ用）
+    /// </summary>
+    /// <returns>すべての削除が成功したかどうか</returns>
+    public bool DeleteAllSaveFiles()
+    {
+        var playerDataDeleted = DataPersistence.DeleteData(SAVE_DATA_KEY);
+        var personalityLogDeleted = _personalityLogService.DeletePersonalityLog();
+        
+        return playerDataDeleted && personalityLogDeleted;
+    }
+    
+    /// <summary>
+    /// すべてのセーブファイルを削除し、データを再読み込み（デバッグ用）
     /// </summary>
     /// <returns>削除が成功したかどうか</returns>
-    public bool DeleteSaveFile()
+    public bool DeleteAllSaveFilesAndReload()
     {
-        try
+        var success = DeleteAllSaveFiles();
+        if (success)
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
-            if (PlayerPrefs.HasKey("SaveData"))
-            {
-                PlayerPrefs.DeleteKey("SaveData");
-                PlayerPrefs.Save();
-                return true;
-            }
-            
-            return false;
-#else
-            if (File.Exists(SaveFilePath))
-            {
-                File.Delete(SaveFilePath);
-                return true;
-            }
-            
-            return false;
-#endif
+            _personalityLogService.ReloadPersonalityLog();
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"セーブファイルの削除に失敗しました: {e.Message}");
-            return false;
-        }
+        return success;
     }
 }
