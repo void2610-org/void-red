@@ -47,7 +47,6 @@ public class MainLifetimeScope : LifetimeScope
         builder.Register<GameStatsService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
         
-        // SaveDataManager, SettingsManagerはRootLifetimeScopeで登録済み
         
         // === エントリーポイントとPresenterの登録 ===
         

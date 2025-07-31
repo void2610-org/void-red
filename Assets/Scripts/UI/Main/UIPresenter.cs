@@ -11,6 +11,7 @@ public class UIPresenter : IStartable, System.IDisposable
 {
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly ThemeService _themeService;
+    [Inject] private readonly PersonalityLogService _personalityLogService;
     
     public Observable<Unit> PlayButtonClicked => _playButtonView.PlayButtonClicked;
     public Observable<Unit> RetryButtonClicked => _gameOverView.OnRetryClicked;
@@ -27,6 +28,8 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly GameOverView _gameOverView;
     private readonly ConfirmationDialogView _confirmationDialogView;
     private readonly EnemyView _enemyView;
+    private readonly PersonalityLogView _personalityLogView;
+    private readonly PersonalityLogButtonView _personalityLogButtonView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
@@ -79,6 +82,8 @@ public class UIPresenter : IStartable, System.IDisposable
         _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
         _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
         _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
+        _personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
+        _personalityLogButtonView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogButtonView>();
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
@@ -121,6 +126,10 @@ public class UIPresenter : IStartable, System.IDisposable
     
     public void Start()
     {
+        // PersonalityLogViewを初期化
+        _personalityLogView?.Initialize(_personalityLogService);
+        _personalityLogService.OnLogUpdated.Subscribe(_ => _personalityLogView?.UpdateLogDisplay()).AddTo(_disposables);
+        
         // プレイヤーの精神力変化を監視
         _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
         
@@ -135,6 +144,9 @@ public class UIPresenter : IStartable, System.IDisposable
         
         // Viewイベントの設定
         SetupViewEvents();
+        
+        // PersonalityLogButtonのイベント設定
+        _personalityLogButtonView?.OnButtonClicked.Subscribe(_ => _personalityLogView.ShowLog()).AddTo(_disposables);
         
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);

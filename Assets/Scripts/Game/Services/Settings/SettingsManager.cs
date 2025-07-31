@@ -16,7 +16,7 @@ public class SettingsManager : IDisposable
     private readonly CompositeDisposable _disposables = new();
     private readonly SaveDataManager _saveDataManager;
     
-    private static string SettingsFilePath => System.IO.Path.Combine(Application.persistentDataPath, "game_settings.json");
+    private const string SETTINGS_KEY = "game_settings";
     
     /// <summary>
     /// 全ての設定項目の読み取り専用リスト
@@ -73,7 +73,7 @@ public class SettingsManager : IDisposable
             true, 
             "本当にセーブデータを削除しますか？この操作は元に戻せません。"
         );
-        deleteDataSetting.ButtonAction = () => _saveDataManager.DeleteSaveFile();
+        deleteDataSetting.ButtonAction = () => _saveDataManager.DeleteAllSaveFiles();
         _settings.Add(deleteDataSetting);
     }
     
@@ -127,13 +127,7 @@ public class SettingsManager : IDisposable
             }
             
             var json = JsonUtility.ToJson(settingsData, true);
-            
-#if UNITY_WEBGL && !UNITY_EDITOR
-            PlayerPrefs.SetString("GameSettings", json);
-            PlayerPrefs.Save();
-#else
-            System.IO.File.WriteAllText(SettingsFilePath, json);
-#endif
+            DataPersistence.SaveData(SETTINGS_KEY, json);
         }
         catch (Exception e)
         {
@@ -148,16 +142,8 @@ public class SettingsManager : IDisposable
     {
         try
         {
-            string json;
-            
-#if UNITY_WEBGL && !UNITY_EDITOR
-            json = PlayerPrefs.GetString("GameSettings", "");
+            var json = DataPersistence.LoadData(SETTINGS_KEY);
             if (string.IsNullOrEmpty(json)) return;
-#else
-            var filePath = SettingsFilePath;
-            if (!System.IO.File.Exists(filePath)) return;
-            json = System.IO.File.ReadAllText(filePath);
-#endif
             
             var settingsData = JsonUtility.FromJson<SettingsData>(json);
             
