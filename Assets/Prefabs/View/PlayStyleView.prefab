@@ -348,7 +348,7 @@ MonoBehaviour:
   wheelContainer: {fileID: 3797397562688792935}
   wheelButton: {fileID: 6195501658399185602}
   selectLight: {fileID: 5150561513657495068}
-  selectLightOriginalWorldPosition: {x: -5.35, y: -1.45, z: 0}
+  selectLightOriginalWorldPosition: {x: -6.38, y: -3.1, z: 0}
   hesitationImage: {fileID: 4080735455577810520}
   impulseImage: {fileID: 5178409338305045725}
   convictionImage: {fileID: 9026211471975046524}
