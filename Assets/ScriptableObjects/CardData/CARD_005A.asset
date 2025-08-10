@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardId: CARD_005A
   cardName: "\u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5"
-  attribute: 4
-  image: {fileID: 3282445745578411008, guid: b6e5e816a7c054f3c83538393f7440ad, type: 3}
+  attribute: 3
+  image: {fileID: 21300000, guid: 70e4e4913c3e143268f67644613d2b57, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
   evolutionConditionGroups:
@@ -27,17 +27,6 @@ MonoBehaviour:
   - conditions:
     - rid: 8005200165294309484
   degradationTarget: {fileID: 11400000, guid: 49cdb945655a048a09f967ca7e3420b9, type: 2}
-  narrationByPlayStyle:
-    _serializedList:
-    - key: 0
-      value: "\u8A9E\u308A\u6587 \u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5
-        \u8FF7\u3044"
-    - key: 1
-      value: "\u8A9E\u308A\u6587 \u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5
-        \u885D\u52D5"
-    - key: 2
-      value: "\u8A9E\u308A\u6587 \u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5
-        \u78BA\u4FE1"
   references:
     version: 2
     RefIds:
