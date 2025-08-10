@@ -396,12 +396,12 @@ public class GameManager: IStartable, IDisposable
         }
         else if (_playerCollapse)
         {
-            result = "NPCの勝利（プレイヤーカード崩壊）";
+            result = "対戦相手の勝利（プレイヤーカード崩壊）";
             playerWon = false;
         }
         else if (_npcCollapse)
         {
-            result = "プレイヤーの勝利（NPCカード崩壊）";
+            result = "プレイヤーの勝利（対戦相手カード崩壊）";
             playerWon = true;
         }
         else
@@ -409,17 +409,17 @@ public class GameManager: IStartable, IDisposable
             // 崩壊がない場合は従来のスコア比較
             if (playerScore > npcScore)
             {
-                result = "プレイヤーの勝利!";
+                result = "プレイヤーの勝利";
                 playerWon = true;
             }
             else if (npcScore > playerScore)
             {
-                result = "NPCの勝利!";
+                result = "対戦相手の勝利";
                 playerWon = false;
             }
             else
             {
-                result = "引き分け!";
+                result = "引き分け";
                 playerWon = false; // 引き分けとして扱う
             }
         }

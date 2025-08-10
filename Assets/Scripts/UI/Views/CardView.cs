@@ -16,7 +16,6 @@ public class CardView : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
-    [SerializeField] private TextMeshProUGUI attributeText;
     [SerializeField] private Button cardButton;
     
     public CardData CardData { get; private set; }
@@ -242,10 +241,10 @@ public class CardView : MonoBehaviour
         cardNameText.text = CardData.CardName;
         
         // カード画像を設定
-        cardImage.sprite = CardData.CardImage;
-        
-        // 属性を設定
-        attributeText.text = CardData.Attribute.ToJapaneseName();
+        if (CardData.CardImage)
+            cardImage.sprite = CardData.CardImage;
+        else
+            cardImage.color = Color.clear;
     }
     
     /// <summary>
