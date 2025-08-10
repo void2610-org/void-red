@@ -125,7 +125,7 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowEnemy();
         
         // 敵情報をアナウンス
-        await _uiPresenter.ShowAnnouncement($"敵: {_currentEnemyData.EnemyName}", 1.5f);
+        await _uiPresenter.ShowAnnouncement($"第{currentChapter + 1}章: {_currentEnemyData.EnemyName}", 1.5f);
         
         // カードデッキを初期化
         var playerDeck = _cardPoolService.GetRandomCards(5);
