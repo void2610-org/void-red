@@ -52,6 +52,7 @@ MonoBehaviour:
   settingsPanel: {fileID: 7750697071370101890}
   settingsContainer: {fileID: 5747753833711844342}
   closeButton: {fileID: 9011169663253204021}
+  confirmationDialog: {fileID: 0}
   settingsContentContainerPrefab: {fileID: 7225325487053053027, guid: 900fe155ca4c242cbb5e4864027fad36, type: 3}
   titleTextPrefab: {fileID: 4424128005466119772, guid: 8d8b7750925fd4f768c86fb8130c0b1f, type: 3}
   sliderSettingPrefab: {fileID: 7030880041223794483, guid: fadfad5c893fa4c0bac5fc50324f17c3, type: 3}
@@ -124,8 +125,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Settings
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: cc7809dc519f441a38d7eaca904eb208, type: 2}
-  m_sharedMaterial: {fileID: -6009432453970258612, guid: cc7809dc519f441a38d7eaca904eb208, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
+  m_sharedMaterial: {fileID: 1947302341603136683, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -349,6 +350,14 @@ PrefabInstance:
       propertyPath: m_text
       value: Close
       objectReference: {fileID: 0}
+    - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
+    - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 1947302341603136683, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
     - target: {fileID: 9037413902010202566, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

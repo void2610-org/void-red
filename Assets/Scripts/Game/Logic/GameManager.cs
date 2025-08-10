@@ -301,7 +301,7 @@ public class GameManager: IStartable, IDisposable
         _personalityLogService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
         
         // NPCの選択を表示
-        await _uiPresenter.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
+        await _uiPresenter.ShowAnnouncement($"対戦相手が {_npcMove.SelectedCard.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
         
@@ -335,7 +335,7 @@ public class GameManager: IStartable, IDisposable
         // 評価結果を順次表示
         await _uiPresenter.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
         await UniTask.Delay(300);
-        await _uiPresenter.ShowAnnouncement($"NPCのスコア: {npcScore:F2}", 1f);
+        await _uiPresenter.ShowAnnouncement($"対戦相手のスコア: {npcScore:F2}", 1f);
         
         // 崩壊判定を追加
         await UniTask.Delay(500);
@@ -349,11 +349,11 @@ public class GameManager: IStartable, IDisposable
         {
             string collapseMessage;
             if (_playerCollapse && _npcCollapse)
-                collapseMessage = "プレイヤーとNPCのカードが崩壊した！";
+                collapseMessage = "プレイヤーとNPCのカードが崩壊した";
             else if (_playerCollapse)
-                collapseMessage = "プレイヤーのカードが崩壊した！";
+                collapseMessage = "プレイヤーのカードが崩壊した";
             else
-                collapseMessage = "NPCのカードが崩壊した！";
+                collapseMessage = "対戦相手のカードが崩壊した";
                 
             await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
         }
@@ -479,7 +479,7 @@ public class GameManager: IStartable, IDisposable
                 {
                     // 人格ログ: プレイヤーカード進化イベント記録
                     _personalityLogService.LogCardEvolution("player", playerCard, playerCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化しました！");
+                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化");
                 }
                 
                 // 共鳴チェック
@@ -516,7 +516,7 @@ public class GameManager: IStartable, IDisposable
                 {
                     // 人格ログ: NPCカード進化イベント記録
                     _personalityLogService.LogCardEvolution("enemy", npcCard, npcCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"NPCの {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化しました！");
+                    await _uiPresenter.ShowAnnouncement($"対戦相手の {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化");
                 }
                 // 進化後のカードをデッキに戻す
                 _enemy.ReturnCardToDeck(npcCardAfterEvolution);
@@ -661,9 +661,9 @@ public class GameManager: IStartable, IDisposable
         // ゲームオーバーの理由を判定
         var gameOverReason = "";
         if (_player.MentalPower.CurrentValue <= 0)
-            gameOverReason = "精神力が0になりました！";
+            gameOverReason = "精神力が0になりました";
         else if (_player.IsAllCardsCollapsed)
-            gameOverReason = "すべてのカードが崩壊しました！";
+            gameOverReason = "すべてのカードが崩壊しました";
         
         // ゲームオーバー画面を表示
         await _uiPresenter.ShowGameOverScreen(gameOverReason);
