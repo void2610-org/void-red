@@ -298,10 +298,6 @@ MonoBehaviour:
   playerScoreBackground: {fileID: 7217135314528377119}
   playerScoreText: {fileID: 5563868030706356225}
   playerContainer: {fileID: 9047737323181814634}
-  slideInDuration: 0.5
-  fadeOutDuration: 0.3
-  displayDuration: 2
-  slideDistance: 300
 --- !u!1 &4226195129005877095
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,7 +702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.9019608}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.9490196}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
