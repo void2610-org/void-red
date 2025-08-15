@@ -265,7 +265,6 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: プレイヤームーブ記録
         _personalityLogService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
         
-        await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
         await UniTask.Delay(500);
         ChangeState(GameState.EnemyCardSelection);
     }
@@ -300,8 +299,6 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: 敵ムーブ記録
         _personalityLogService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
         
-        // NPCの選択を表示
-        await _uiPresenter.ShowAnnouncement($"対戦相手が {_npcMove.SelectedCard.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
         

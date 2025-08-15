@@ -44,10 +44,6 @@ public class NarrationView : MonoBehaviour
         
         try
         {
-            // テキストの位置をリセット（前回のアニメーションの影響を除去）
-            var textRect = narrationText.rectTransform;
-            textRect.anchoredPosition = Vector2.zero;
-            
             // メッセージを空で初期化（後で1文字ずつ表示）
             narrationText.text = "";
             
@@ -110,7 +106,6 @@ public class NarrationView : MonoBehaviour
             {
                 narrationBackground.gameObject.SetActive(false);
                 narrationText.gameObject.SetActive(false);
-                textRect.anchoredPosition = Vector2.zero;
             }
         }
         catch (System.OperationCanceledException)
@@ -120,11 +115,6 @@ public class NarrationView : MonoBehaviour
             {
                 narrationBackground.gameObject.SetActive(false);
                 narrationText.gameObject.SetActive(false);
-                var textRect = narrationText.rectTransform;
-                if (textRect)
-                {
-                    textRect.anchoredPosition = Vector2.zero;
-                }
             }
         }
         finally
@@ -165,10 +155,7 @@ public class NarrationView : MonoBehaviour
             .ToUniTask(cancellationToken);
         
         // 最終的に全文を表示（念のため）
-        if (narrationText)
-        {
-            narrationText.text = message;
-        }
+        narrationText.text = message;
     }
     
     private void OnDestroy()
