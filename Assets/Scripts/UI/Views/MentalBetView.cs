@@ -12,7 +12,12 @@ public class MentalBetView : MonoBehaviour
     [SerializeField] private Button mentalBetPlusButton;
     [SerializeField] private Button mentalBetMinusButton;
     [SerializeField] private TextMeshProUGUI mentalBetValueText;
-    [SerializeField] private TextMeshProUGUI mentalPowerText;
+    [SerializeField] private Image betStateImage;
+    
+    [Header("ベット状態スプライト")]
+    [SerializeField] private Sprite lowBetSprite;    // 低ベット時のスプライト（1-3）
+    [SerializeField] private Sprite midBetSprite;    // 中ベット時のスプライト（4-7）
+    [SerializeField] private Sprite highBetSprite;   // 高ベット時のスプライト（8-10）
     
     public Observable<int> MentalBetChanged => _mentalBetChanged;
     
@@ -22,15 +27,38 @@ public class MentalBetView : MonoBehaviour
     /// <summary>
     /// 精神ベット表示を更新
     /// </summary>
-    public void UpdateDisplay(int betValue, int currentMentalPower, int maxMentalPower, int minBet, int maxBet)
+    public void UpdateDisplay(int betValue, int currentMentalPower, int minBet, int maxBet)
     {
         _currentBetValue = betValue;
         mentalBetValueText.text = betValue.ToString();
-        mentalPowerText.text = $"{currentMentalPower} / {maxMentalPower}";
         
         // ボタンの有効/無効を切り替え
         mentalBetPlusButton.interactable = (betValue < maxBet && betValue < currentMentalPower);
         mentalBetMinusButton.interactable = (betValue > minBet);
+        
+        // ベット値に応じてスプライトを変更
+        UpdateBetSprite(betValue);
+    }
+    
+    /// <summary>
+    /// ベット値に応じてスプライトを更新
+    /// </summary>
+    private void UpdateBetSprite(int betValue)
+    {
+        if (!betStateImage) return;
+        
+        if (betValue <= 3)
+        {
+            betStateImage.sprite = lowBetSprite;
+        }
+        else if (betValue <= 5)
+        {
+            betStateImage.sprite = midBetSprite;
+        }
+        else
+        {
+            betStateImage.sprite = highBetSprite;
+        }
     }
     
     /// <summary>

@@ -5,10 +5,12 @@ using UnityEngine.UI;
 using LitMotion;
 using LitMotion.Extensions;
 using System.Threading;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// アナウンスメント表示を担当するViewクラス
 /// </summary>
+[RequireComponent(typeof(CanvasGroup))]
 public class AnnouncementView : MonoBehaviour
 {
     [SerializeField] private Image announcementBackground;
@@ -18,6 +20,7 @@ public class AnnouncementView : MonoBehaviour
     private const float FADE_OUT_DURATION = 0.3f;
     private const float SLIDE_DISTANCE = 350f;
     
+    private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentAnnouncementCts;
 
     /// <summary>
@@ -38,6 +41,8 @@ public class AnnouncementView : MonoBehaviour
             this.GetCancellationTokenOnDestroy(), 
             Application.exitCancellationToken
         ).Token;
+        
+        _canvasGroup.alpha = 1f;
         
         try
         {
@@ -78,10 +83,7 @@ public class AnnouncementView : MonoBehaviour
                 .ToUniTask(cancellationToken);
             
             // テキストのスライドインアニメーション
-            fadeInTasks[2] = LMotion.Create(new Vector2(originalPosition.x - SLIDE_DISTANCE, originalPosition.y), originalPosition, FADE_IN_DURATION)
-                .WithEase(Ease.OutCubic)
-                .BindToAnchoredPosition(textRect)
-                .AddTo(gameObject)
+            fadeInTasks[2] = textRect.MoveToAnchored(originalPosition, FADE_IN_DURATION, Ease.OutCubic)
                 .ToUniTask(cancellationToken);
             
             await UniTask.WhenAll(fadeInTasks);
@@ -109,10 +111,7 @@ public class AnnouncementView : MonoBehaviour
                 .ToUniTask(cancellationToken);
             
             // テキストのスライドアウトアニメーション
-            fadeOutTasks[2] = LMotion.Create(originalPosition, new Vector2(originalPosition.x + SLIDE_DISTANCE, originalPosition.y), FADE_OUT_DURATION)
-                .WithEase(Ease.InCubic)
-                .BindToAnchoredPosition(textRect)
-                .AddTo(gameObject)
+            fadeOutTasks[2] = textRect.MoveToAnchored(new Vector2(originalPosition.x + SLIDE_DISTANCE, originalPosition.y), FADE_OUT_DURATION, Ease.InCubic)
                 .ToUniTask(cancellationToken);
             
             await UniTask.WhenAll(fadeOutTasks);
@@ -139,13 +138,17 @@ public class AnnouncementView : MonoBehaviour
                 }
             }
         }
+        finally
+        {
+            _canvasGroup.alpha = 0f;
+        }
     }
     
     private void Awake()
     {
         // 初期状態の設定
-        announcementBackground.gameObject.SetActive(false);
-        announcementText.gameObject.SetActive(false);
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.alpha = 0f;
     }
     
     private void OnDestroy()

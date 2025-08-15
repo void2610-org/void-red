@@ -16,7 +16,6 @@ public class CardView : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
-    [SerializeField] private TextMeshProUGUI attributeText;
     [SerializeField] private Button cardButton;
     
     public CardData CardData { get; private set; }
@@ -50,19 +49,10 @@ public class CardView : MonoBehaviour
         _rectTransform.localScale = Vector3.one * 0.1f;
         
         // 移動とスケールのアニメーション
-        var moveTask = LMotion.Create(startPosition, _originalPosition, 0.5f)
-            .WithEase(Ease.OutBack)
-            .BindToAnchoredPosition(_rectTransform)
-            .AddTo(gameObject)
-            .ToUniTask();
-            
-        var scaleTask = LMotion.Create(Vector3.one * 0.1f, Vector3.one, 0.5f)
-            .WithEase(Ease.OutBack)
-            .BindToLocalScale(_rectTransform)
-            .AddTo(gameObject)
-            .ToUniTask();
+        var moveTask = _rectTransform.MoveToAnchored(_originalPosition, 0.5f, Ease.OutBack);
+        var scaleTask = _rectTransform.ScaleTo(Vector3.one, 0.5f, Ease.OutBack);
         
-        await UniTask.WhenAll(moveTask, scaleTask);
+        await UniTask.WhenAll(moveTask.ToUniTask(), scaleTask.ToUniTask());
     }
     
     /// <summary>
@@ -79,48 +69,24 @@ public class CardView : MonoBehaviour
             );
             var currentPos = _rectTransform.anchoredPosition;
             var targetPos = currentPos + randomDirection;
-            
-            var moveTask = LMotion.Create(currentPos, targetPos, 0.5f)
-                .WithEase(Ease.OutCubic)
-                .BindToAnchoredPosition(_rectTransform)
-                .AddTo(gameObject)
-                .ToUniTask();
-                
-            var startRotation = _rectTransform.rotation;
+
+            var moveTask = _rectTransform.MoveToAnchored(targetPos, 0.5f, Ease.OutCubic);
             var targetRotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-360f, 360f));
-            var rotateTask = LMotion.Create(startRotation, targetRotation, 0.5f)
-                .WithEase(Ease.OutCubic)
-                .BindToRotation(_rectTransform)
-                .AddTo(gameObject)
-                .ToUniTask();
+            var rotateTask = _rectTransform.RotateTo(targetRotation, 0.5f, Ease.OutCubic);
+            var scaleTask = _rectTransform.ScaleTo(Vector3.zero, 0.5f, Ease.InCubic);
                 
-            var scaleTask = LMotion.Create(Vector3.one, Vector3.zero, 0.5f)
-                .WithEase(Ease.InCubic)
-                .BindToLocalScale(_rectTransform)
-                .AddTo(gameObject)
-                .ToUniTask();
-                
-            await UniTask.WhenAll(moveTask, rotateTask, scaleTask);
+            await UniTask.WhenAll(moveTask.ToUniTask(), rotateTask.ToUniTask(), scaleTask.ToUniTask());
         }
         else
         {
             // 通常の削除アニメーション：上に移動しながらスケール縮小
             var currentPos = _rectTransform.anchoredPosition;
             var targetPos = new Vector2(currentPos.x, currentPos.y + 100f);
-            
-            var moveTask = LMotion.Create(currentPos, targetPos, 0.3f)
-                .WithEase(Ease.InCubic)
-                .BindToAnchoredPosition(_rectTransform)
-                .AddTo(gameObject)
-                .ToUniTask();
+
+            var moveTask = _rectTransform.MoveToAnchored(targetPos, 0.3f, Ease.InCubic);
+            var scaleTask = _rectTransform.ScaleTo(Vector3.one * 0.5f, 0.3f, Ease.InCubic);
                 
-            var scaleTask = LMotion.Create(Vector3.one, Vector3.one * 0.5f, 0.3f)
-                .WithEase(Ease.InCubic)
-                .BindToLocalScale(_rectTransform)
-                .AddTo(gameObject)
-                .ToUniTask();
-                
-            await UniTask.WhenAll(moveTask, scaleTask);
+            await UniTask.WhenAll(moveTask.ToUniTask(), scaleTask.ToUniTask());
         }
     }
     
@@ -146,20 +112,11 @@ public class CardView : MonoBehaviour
         _originalPosition = targetPosition;
         
         // 位置のアニメーション
-        var moveTask = LMotion.Create(_rectTransform.anchoredPosition, targetPosition, 0.3f)
-            .WithEase(Ease.OutCubic)
-            .BindToAnchoredPosition(_rectTransform)
-            .AddTo(gameObject)
-            .ToUniTask();
-        
+        var moveTask = _rectTransform.MoveToAnchored(targetPosition, 0.3f, Ease.OutCubic);
         // 回転のアニメーション
-        var rotateTask = LMotion.Create(_rectTransform.rotation, targetRotation, 0.3f)
-            .WithEase(Ease.OutCubic)
-            .BindToRotation(_rectTransform)
-            .AddTo(gameObject)
-            .ToUniTask();
+        var rotateTask = _rectTransform.RotateTo(targetRotation, 0.3f, Ease.OutCubic);
         
-        await UniTask.WhenAll(moveTask, rotateTask);
+        await UniTask.WhenAll(moveTask.ToUniTask(), rotateTask.ToUniTask());
     }
     
     /// <summary>
@@ -167,30 +124,12 @@ public class CardView : MonoBehaviour
     /// </summary>
     public async UniTask PlayReturnToDeckAnimation(Vector2 deckPosition)
     {
-        var currentPos = _rectTransform.anchoredPosition;
-        var currentScale = _rectTransform.localScale;
-        var currentRotation = _rectTransform.rotation;
-        
         // 移動、スケール、回転のアニメーション
-        var moveTask = LMotion.Create(currentPos, deckPosition, 0.4f)
-            .WithEase(Ease.InCubic)
-            .BindToAnchoredPosition(_rectTransform)
-            .AddTo(gameObject)
-            .ToUniTask();
-            
-        var scaleTask = LMotion.Create(currentScale, Vector3.one * 0.1f, 0.4f)
-            .WithEase(Ease.InCubic)
-            .BindToLocalScale(_rectTransform)
-            .AddTo(gameObject)
-            .ToUniTask();
-            
-        var rotateTask = LMotion.Create(currentRotation, Quaternion.identity, 0.4f)
-            .WithEase(Ease.InCubic)
-            .BindToRotation(_rectTransform)
-            .AddTo(gameObject)
-            .ToUniTask();
+        var moveTask = _rectTransform.MoveToAnchored(deckPosition, 0.4f, Ease.InCubic);
+        var scaleTask = _rectTransform.ScaleTo(Vector3.one * 0.1f, 0.4f, Ease.InCubic);
+        var rotateTask = _rectTransform.RotateTo(Quaternion.identity, 0.4f, Ease.InCubic);
         
-        await UniTask.WhenAll(moveTask, scaleTask, rotateTask);
+        await UniTask.WhenAll(moveTask.ToUniTask(), scaleTask.ToUniTask(), rotateTask.ToUniTask());
     }
     
     /// <summary>
@@ -223,10 +162,7 @@ public class CardView : MonoBehaviour
         var targetPos = new Vector2(currentPos.x, highlight ? _originalPosition.y + 30f : _originalPosition.y);
         
         // 位置のアニメーション
-        LMotion.Create(currentPos, targetPos, 0.2f)
-            .WithEase(Ease.OutCubic)
-            .BindToAnchoredPosition(_rectTransform)
-            .AddTo(gameObject);
+        _rectTransform.MoveToAnchored(targetPos, 0.2f, Ease.OutCubic);
         
         if (highlight) SeManager.Instance.PlaySe("Card");
     }
@@ -242,10 +178,10 @@ public class CardView : MonoBehaviour
         cardNameText.text = CardData.CardName;
         
         // カード画像を設定
-        cardImage.sprite = CardData.CardImage;
-        
-        // 属性を設定
-        attributeText.text = CardData.Attribute.ToJapaneseName();
+        if (CardData.CardImage)
+            cardImage.sprite = CardData.CardImage;
+        else
+            cardImage.color = Color.clear;
     }
     
     /// <summary>
