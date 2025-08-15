@@ -55,3 +55,9 @@ MonoBehaviour:
   - name: Gavel
     audioClip: {fileID: 8300000, guid: 28480b2adbae346f2ba3a4ad3cd0a498, type: 3}
     volume: 1
+  - name: Envelope
+    audioClip: {fileID: 8300000, guid: e7389f7b1072047979cf037cd552b3dd, type: 3}
+    volume: 1
+  - name: Wheel
+    audioClip: {fileID: 8300000, guid: 3127a9de5a79a4f349fc861185b31ae3, type: 3}
+    volume: 1

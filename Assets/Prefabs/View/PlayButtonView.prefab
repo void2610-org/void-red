@@ -279,6 +279,7 @@ MonoBehaviour:
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
+  isImportantButton: 1
 --- !u!114 &4975205385610111490
 MonoBehaviour:
   m_ObjectHideFlags: 0
