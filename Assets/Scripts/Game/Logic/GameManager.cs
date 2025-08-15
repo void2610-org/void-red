@@ -332,13 +332,8 @@ public class GameManager: IStartable, IDisposable
         var playerScore = ScoreCalculator.CalculateScore(playerMove, currentTheme);
         var npcScore = ScoreCalculator.CalculateScore(npcMove, currentTheme);
         
-        // 評価結果を順次表示
-        await _uiPresenter.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
-        await UniTask.Delay(300);
-        await _uiPresenter.ShowAnnouncement($"対戦相手のスコア: {npcScore:F2}", 1f);
-        
-        // 崩壊判定を追加
-        await UniTask.Delay(500);
+        // 評価結果をスコア専用Viewで同時表示
+        await _uiPresenter.ShowScores(playerScore, npcScore);
         
         // カード崩壊判定
         _playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
