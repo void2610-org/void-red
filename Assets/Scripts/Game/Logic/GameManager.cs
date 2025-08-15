@@ -134,11 +134,9 @@ public class GameManager: IStartable, IDisposable
         _player.InitializeDeck(playerDeck);
         _enemy.InitializeDeck(enemyDeck);
         
-        // 手札を配る
-        _player.DrawCard(3);
+        _player.DrawCardsWithDelay(3, 300).Forget();
         await UniTask.Delay(200);
-        _enemy.DrawCard(3);
-        await UniTask.Delay(200);
+        await _enemy.DrawCardsWithDelay(3, 300);
         
         // エネミーのカードを非インタラクティブに設定
         _enemy.SetHandInteractable(false);
@@ -526,10 +524,9 @@ public class GameManager: IStartable, IDisposable
         // 両プレイヤーの手札をデッキに戻す
         await UniTask.WhenAll(_player.ReturnHandToDeck(), _enemy.ReturnHandToDeck());
         
-        // 手札を3枚ずつ配る
-        _player.DrawCard(3);
-        await UniTask.Delay(500);
-        _enemy.DrawCard(3);
+        _player.DrawCardsWithDelay(3, 300).Forget();
+        await UniTask.Delay(200);
+        await _enemy.DrawCardsWithDelay(3, 300);
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
