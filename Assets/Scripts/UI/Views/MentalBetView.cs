@@ -12,7 +12,6 @@ public class MentalBetView : MonoBehaviour
     [SerializeField] private Button mentalBetPlusButton;
     [SerializeField] private Button mentalBetMinusButton;
     [SerializeField] private TextMeshProUGUI mentalBetValueText;
-    [SerializeField] private TextMeshProUGUI mentalPowerText;
     
     public Observable<int> MentalBetChanged => _mentalBetChanged;
     
@@ -22,11 +21,10 @@ public class MentalBetView : MonoBehaviour
     /// <summary>
     /// 精神ベット表示を更新
     /// </summary>
-    public void UpdateDisplay(int betValue, int currentMentalPower, int maxMentalPower, int minBet, int maxBet)
+    public void UpdateDisplay(int betValue, int currentMentalPower, int minBet, int maxBet)
     {
         _currentBetValue = betValue;
         mentalBetValueText.text = betValue.ToString();
-        mentalPowerText.text = $"{currentMentalPower} / {maxMentalPower}";
         
         // ボタンの有効/無効を切り替え
         mentalBetPlusButton.interactable = (betValue < maxBet && betValue < currentMentalPower);

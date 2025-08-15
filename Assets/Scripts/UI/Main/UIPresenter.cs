@@ -25,6 +25,8 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly PlayButtonView _playButtonView;
     private readonly PlayStyleView _playStyleView;
     private readonly MentalBetView _mentalBetView;
+    private readonly MentalPowerView _playerMentalPowerView;
+    private readonly MentalPowerView _enemyMentalPowerView;
     private readonly GameOverView _gameOverView;
     private readonly ConfirmationDialogView _confirmationDialogView;
     private readonly EnemyView _enemyView;
@@ -34,6 +36,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
     private readonly Player _player;
+    private readonly Enemy _enemy;
     private bool _isEnemySpriteManualMode;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
@@ -62,9 +65,10 @@ public class UIPresenter : IStartable, System.IDisposable
         await _enemyView.UpdateSpriteForAttribute(attribute);
     }
     
-    public UIPresenter(Player player)
+    public UIPresenter(Player player, Enemy enemy)
     {
         _player = player;
+        _enemy = enemy;
         
         // 初期化
         _themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
@@ -79,6 +83,12 @@ public class UIPresenter : IStartable, System.IDisposable
         _playButtonView = UnityEngine.Object.FindFirstObjectByType<PlayButtonView>();
         _playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
+        
+        var mentalPowerViews = UnityEngine.Object.FindObjectsByType<MentalPowerView>(UnityEngine.FindObjectsSortMode.None);
+        // Y座標が低い方をプレイヤー、高い方を敵とする
+        _playerMentalPowerView = mentalPowerViews[0].transform.position.y < mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
+        _enemyMentalPowerView = mentalPowerViews[0].transform.position.y > mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
+        
         _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
         _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
         _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
@@ -113,7 +123,10 @@ public class UIPresenter : IStartable, System.IDisposable
             _mentalBetValue = GameConstants.MIN_MENTAL_BET;
         
         // MentalBetViewに表示を委譲
-        _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, GameConstants.MAX_MENTAL_POWER, GameConstants.MIN_MENTAL_BET, GameConstants.MAX_MENTAL_BET);
+        _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, GameConstants.MIN_MENTAL_BET, GameConstants.MAX_MENTAL_BET);
+        
+        // MentalPowerViewに精神力表示を委譲
+        _playerMentalPowerView.UpdateDisplay(currentMentalPower, GameConstants.MAX_MENTAL_POWER);
     }
     
     private void SetupViewEvents()
@@ -132,6 +145,12 @@ public class UIPresenter : IStartable, System.IDisposable
         
         // プレイヤーの精神力変化を監視
         _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
+        
+        // 敵の精神力変化を監視
+        _enemy.MentalPower.Subscribe(mentalPower => 
+        {
+            _enemyMentalPowerView.UpdateDisplay(mentalPower, GameConstants.MAX_MENTAL_POWER);
+        }).AddTo(_disposables);
         
         // プレイヤーのカード選択を監視して敵のSpriteを更新
         _player.SelectedCard.Subscribe(cardData => 
