@@ -11,7 +11,6 @@ using System.Threading;
 /// </summary>
 public class NarrationView : MonoBehaviour
 {
-    [SerializeField] private Image narrationBackground;
     [SerializeField] private TextMeshProUGUI narrationText;
     
     private const float FADE_IN_DURATION = 0.3f;
@@ -48,31 +47,16 @@ public class NarrationView : MonoBehaviour
             narrationText.text = "";
             
             // 初期状態を設定
-            narrationBackground.gameObject.SetActive(true);
             narrationText.gameObject.SetActive(true);
-            narrationBackground.color = new Color(narrationBackground.color.r, narrationBackground.color.g, narrationBackground.color.b, 0f);
             narrationText.color = new Color(narrationText.color.r, narrationText.color.g, narrationText.color.b, 0f);
             
-            // フェードインアニメーション
-            var fadeInTasks = new UniTask[2];
-            
-            // 背景のフェードイン
-            var bgColor = narrationBackground.color;
-            fadeInTasks[0] = LMotion.Create(new Color(bgColor.r, bgColor.g, bgColor.b, 0f), new Color(bgColor.r, bgColor.g, bgColor.b, 0.95f), FADE_IN_DURATION)
-                .WithEase(Ease.OutQuart)
-                .BindToColor(narrationBackground)
-                .AddTo(gameObject)
-                .ToUniTask(cancellationToken);
-            
-            // テキストのフェードイン
+            // テキストのフェードインアニメーション
             var textColor = narrationText.color;
-            fadeInTasks[1] = LMotion.Create(new Color(textColor.r, textColor.g, textColor.b, 0f), new Color(textColor.r, textColor.g, textColor.b, 1f), FADE_IN_DURATION)
+            await LMotion.Create(new Color(textColor.r, textColor.g, textColor.b, 0f), new Color(textColor.r, textColor.g, textColor.b, 1f), FADE_IN_DURATION)
                 .WithEase(Ease.OutQuart)
                 .BindToColor(narrationText)
                 .AddTo(gameObject)
                 .ToUniTask(cancellationToken);
-            
-            await UniTask.WhenAll(fadeInTasks);
             
             // 1文字ずつ表示するアニメーション
             await TypewriterAnimation(message, cancellationToken);
@@ -80,40 +64,25 @@ public class NarrationView : MonoBehaviour
             // 表示時間を待つ
             await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
             
-            // フェードアウトアニメーション
-            var fadeOutTasks = new UniTask[2];
-            
-            // 背景のフェードアウト
-            var bgColorOut = narrationBackground.color;
-            fadeOutTasks[0] = LMotion.Create(new Color(bgColorOut.r, bgColorOut.g, bgColorOut.b, 0.95f), new Color(bgColorOut.r, bgColorOut.g, bgColorOut.b, 0f), FADE_OUT_DURATION)
-                .WithEase(Ease.InQuart)
-                .BindToColor(narrationBackground)
-                .AddTo(gameObject)
-                .ToUniTask(cancellationToken);
-            
-            // テキストのフェードアウト
+            // テキストのフェードアウトアニメーション
             var textColorOut = narrationText.color;
-            fadeOutTasks[1] = LMotion.Create(new Color(textColorOut.r, textColorOut.g, textColorOut.b, 1f), new Color(textColorOut.r, textColorOut.g, textColorOut.b, 0f), FADE_OUT_DURATION)
+            await LMotion.Create(new Color(textColorOut.r, textColorOut.g, textColorOut.b, 1f), new Color(textColorOut.r, textColorOut.g, textColorOut.b, 0f), FADE_OUT_DURATION)
                 .WithEase(Ease.InQuart)
                 .BindToColor(narrationText)
                 .AddTo(gameObject)
                 .ToUniTask(cancellationToken);
             
-            await UniTask.WhenAll(fadeOutTasks);
-            
             // 最終クリーンアップ
-            if (narrationBackground && narrationText)
+            if (narrationText)
             {
-                narrationBackground.gameObject.SetActive(false);
                 narrationText.gameObject.SetActive(false);
             }
         }
         catch (System.OperationCanceledException)
         {
             // キャンセルされた場合のクリーンアップ
-            if (narrationBackground && narrationText)
+            if (narrationText)
             {
-                narrationBackground.gameObject.SetActive(false);
                 narrationText.gameObject.SetActive(false);
             }
         }
@@ -127,7 +96,6 @@ public class NarrationView : MonoBehaviour
     {
         // 初期状態の設定
         _canvasGroup = GetComponent<CanvasGroup>();
-        narrationBackground.gameObject.SetActive(false);
         narrationText.gameObject.SetActive(false);
     }
     

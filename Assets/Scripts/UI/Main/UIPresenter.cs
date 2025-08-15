@@ -34,6 +34,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly PersonalityLogButtonView _personalityLogButtonView;
     private readonly ScoreView _scoreView;
     private readonly ResultView _resultView;
+    private readonly BlackOverlayView _blackOverlayView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
@@ -70,6 +71,9 @@ public class UIPresenter : IStartable, System.IDisposable
     public async UniTask ShowScores(float playerScore, float enemyScore) => await _scoreView.ShowScores(playerScore, enemyScore);
     public async UniTask ShowWinLoseResult(string result, bool isPlayerWin) => await _resultView.ShowWinLoseResult(result, isPlayerWin);
     
+    public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
+    public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
+    
     public UIPresenter(Player player, Enemy enemy)
     {
         _player = player;
@@ -101,6 +105,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _personalityLogButtonView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogButtonView>();
         _scoreView = UnityEngine.Object.FindFirstObjectByType<ScoreView>();
         _resultView = UnityEngine.Object.FindFirstObjectByType<ResultView>();
+        _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
