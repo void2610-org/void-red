@@ -258,6 +258,17 @@ namespace Void2610.UnityTemplate
                 .AddTo(canvasGroup.gameObject);
         }
         
+        /// <summary>
+        /// TransformをLitMotionで指定位置に移動
+        /// </summary>
+        public static MotionHandle MoveTo(this Transform transform, Vector3 targetPosition, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(transform.localPosition, targetPosition, duration)
+                .WithEase(ease)
+                .BindToLocalPosition(transform)
+                .AddTo(transform.gameObject);
+        }
+        
 #if UNITY_EDITOR
         /// <summary>
         /// 指定したScriptableObjectと同じディレクトリ内の指定した型のアセットを一括登録

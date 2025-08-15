@@ -67,7 +67,7 @@ public class ScoreView : MonoBehaviour
         await SlideInFromLeft();
         
         // 指定時間待機
-        await UniTask.Delay(3000);
+        await UniTask.Delay(2500);
         
         // 全体フェードアウト（背景とコンテンツを同時に）
         await LMotion.Create(1f, 0f, FADE_OUT_DURATION)
