@@ -252,11 +252,6 @@ public class GameManager: IStartable, IDisposable
         // プレイヤーの手を作成
         var playStyle = _uiPresenter.GetSelectedPlayStyle();
         
-        // カードプレイ前のナレーションを表示（実際の語り内容）
-        var narrationContent = _cardNarrationService.GetNarration(finalSelectedCard, NarrationType.PrePlay, playStyle);
-        var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
-        await _uiPresenter.ShowNarration(displayContent);
-        
         // 精神力を消費
         var mentalBet = _uiPresenter.GetMentalBetValue();
         _player.ConsumeMentalPower(mentalBet);
@@ -298,6 +293,14 @@ public class GameManager: IStartable, IDisposable
         
         // 人格ログ: 敵ムーブ記録
         _personalityLogService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
+        
+        // 結果表示の背景を表示
+        await _uiPresenter.ShowBlackOverlay();
+        
+        // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
+        var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
+        var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
+        await _uiPresenter.ShowNarration(displayContent);
         
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
@@ -434,6 +437,8 @@ public class GameManager: IStartable, IDisposable
         // ゲーム結果を統計に記録（進化チェック前に実行）
         _gameStatsService.PlayerSaveData.RecordGameResult(playerWon, _playerMove, _playerCollapse);
         _gameStatsService.EnemyStats.RecordGameResult(!playerWon, _npcMove, _npcCollapse);
+        
+        await _uiPresenter.HideBlackOverlay();
 
         // 引き分けでない場合、勝利数を更新してバトル終了チェック
         // 崩壊による引き分けも考慮
