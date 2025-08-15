@@ -417,7 +417,7 @@ public class GameManager: IStartable, IDisposable
         }
         
         // 結果を表示
-        await _uiPresenter.ShowAnnouncement(result);
+        await _uiPresenter.ShowWinLoseResult(result, playerWon);
         
         // 勝敗確定後のナレーション（プレイヤーの勝敗に基づく）
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;

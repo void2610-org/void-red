@@ -52,3 +52,6 @@ MonoBehaviour:
   - name: Test
     audioClip: {fileID: 8300000, guid: 9d8989d9447d6455ba208d9aef4891f3, type: 3}
     volume: 1
+  - name: Gavel
+    audioClip: {fileID: 8300000, guid: 28480b2adbae346f2ba3a4ad3cd0a498, type: 3}
+    volume: 1
