@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// スコア表示を担当するViewクラス（プレイヤーと敵のスコアを同時表示）
@@ -55,10 +56,7 @@ public class ScoreView : MonoBehaviour
         SetupInitialPositions();
         
         // 表示開始
-        await LMotion.Create(0f, 1f, FADE_OUT_DURATION)
-            .WithEase(Ease.InQuad)
-            .Bind(alpha => _canvasGroup.alpha = alpha)
-            .AddTo(gameObject); 
+        await _canvasGroup.FadeIn(FADE_OUT_DURATION, Ease.InQuad); 
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
         
@@ -70,11 +68,7 @@ public class ScoreView : MonoBehaviour
         await UniTask.Delay(2500);
         
         // 全体フェードアウト（背景とコンテンツを同時に）
-        await LMotion.Create(1f, 0f, FADE_OUT_DURATION)
-            .WithEase(Ease.InQuad)
-            .Bind(alpha => _canvasGroup.alpha = alpha)
-            .AddTo(gameObject)
-            .ToUniTask();
+        await _canvasGroup.FadeOut(FADE_OUT_DURATION, Ease.InQuad).ToUniTask();
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
     }
@@ -106,12 +100,7 @@ public class ScoreView : MonoBehaviour
     {
         if (!enemyContainer) return;
         
-        var startPos = enemyContainer.localPosition;
-        await LMotion.Create(startPos, _enemyOriginalPosition, SLIDE_IN_DURATION)
-            .WithEase(Ease.OutQuart)
-            .Bind(pos => enemyContainer.localPosition = pos)
-            .AddTo(gameObject)
-            .ToUniTask();
+        await enemyContainer.MoveTo(_enemyOriginalPosition, SLIDE_IN_DURATION, Ease.OutQuart);
     }
     
     /// <summary>
@@ -121,11 +110,6 @@ public class ScoreView : MonoBehaviour
     {
         if (!playerContainer) return;
         
-        var startPos = playerContainer.localPosition;
-        await LMotion.Create(startPos, _playerOriginalPosition, SLIDE_IN_DURATION)
-            .WithEase(Ease.OutQuart)
-            .Bind(pos => playerContainer.localPosition = pos)
-            .AddTo(gameObject)
-            .ToUniTask();
+        await playerContainer.MoveTo(_playerOriginalPosition, SLIDE_IN_DURATION, Ease.OutQuart);
     }
 }
