@@ -22,11 +22,12 @@ public class ResultView : MonoBehaviour
     [SerializeField] private Color enemyWinColor;
     
     private CanvasGroup _canvasGroup;
-    private readonly Vector3 _textMoveStartPosition = new(-1000f, 0f, 0f); // テキストの初期位置
+    private CanvasGroup _textBackgroundCanvasGroup;
     
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
+        _textBackgroundCanvasGroup = textBackgroundImage.GetComponent<CanvasGroup>();
         
         // 初期状態は非表示
         _canvasGroup.alpha = 0f;
@@ -34,7 +35,7 @@ public class ResultView : MonoBehaviour
         _canvasGroup.blocksRaycasts = false;
         
         gavelImage.color = new Color(1f, 1f, 1f, 0f);
-        textBackgroundImage.transform.localPosition = _textMoveStartPosition;
+        _textBackgroundCanvasGroup.alpha = 0f;
     }
     
     /// <summary>
@@ -55,12 +56,12 @@ public class ResultView : MonoBehaviour
         // テキストのアニメーション
         resultText.text = result;
         textBackgroundImage.color = isPlayerWin ? playerWinColor : enemyWinColor;
-        await textBackgroundImage.transform.MoveTo(Vector3.zero, 0.75f, Ease.InOutBack);
+        await _textBackgroundCanvasGroup.FadeIn( 0.5f);
         await UniTask.Delay(3000); // 結果表示を2秒間維持
         
         await _canvasGroup.FadeOut(0.3f);
         
         // 結果表示後の状態をリセット
-        textBackgroundImage.transform.localPosition = _textMoveStartPosition;
+        _textBackgroundCanvasGroup.alpha = 0f;
     }
 }

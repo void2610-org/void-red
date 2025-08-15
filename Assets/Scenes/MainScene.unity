@@ -7748,6 +7748,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 595253103}
     m_Modifications:
+    - target: {fileID: 2081486224466243181, guid: 242dec96d84824acc8c84af4c42cada4, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2996610136729064692, guid: 242dec96d84824acc8c84af4c42cada4, type: 3}
       propertyPath: m_Name
       value: ScoreView
