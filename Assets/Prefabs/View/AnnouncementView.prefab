@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5190302097875085178}
   - component: {fileID: 4070071394810746145}
+  - component: {fileID: 8851443927260722080}
   m_Layer: 5
   m_Name: AnnouncementView
   m_TagString: Untagged
@@ -52,6 +53,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   announcementBackground: {fileID: 2415124807366273530}
   announcementText: {fileID: 530727964742923848}
+--- !u!225 &8851443927260722080
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3753492902847052563}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7430018675885057520
 GameObject:
   m_ObjectHideFlags: 0

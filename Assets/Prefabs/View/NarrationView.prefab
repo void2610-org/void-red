@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7699951931037805012}
   - component: {fileID: 3857931243196412601}
+  - component: {fileID: 4747917593038573294}
   m_Layer: 5
   m_Name: NarrationView
   m_TagString: Untagged
@@ -127,6 +128,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   narrationBackground: {fileID: 5075683059536442652}
   narrationText: {fileID: 8149746649642998489}
+--- !u!225 &4747917593038573294
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5082526181909872633}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &7189136821816642082
 GameObject:
   m_ObjectHideFlags: 0

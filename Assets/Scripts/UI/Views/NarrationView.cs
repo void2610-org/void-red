@@ -18,6 +18,7 @@ public class NarrationView : MonoBehaviour
     private const float FADE_OUT_DURATION = 0.3f;
     private const float CHARACTER_DISPLAY_INTERVAL = 0.05f; // 1文字あたりの表示間隔
     
+    private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentNarrationCts;
 
     /// <summary>
@@ -38,6 +39,8 @@ public class NarrationView : MonoBehaviour
             this.GetCancellationTokenOnDestroy(), 
             Application.exitCancellationToken
         ).Token;
+        
+        _canvasGroup.alpha = 1f;
         
         try
         {
@@ -124,11 +127,16 @@ public class NarrationView : MonoBehaviour
                 }
             }
         }
+        finally
+        {
+            _canvasGroup.alpha = 0f;
+        }
     }
     
     private void Awake()
     {
         // 初期状態の設定
+        _canvasGroup = GetComponent<CanvasGroup>();
         narrationBackground.gameObject.SetActive(false);
         narrationText.gameObject.SetActive(false);
     }
