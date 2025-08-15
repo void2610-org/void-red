@@ -62,9 +62,9 @@ public class ScoreView : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
         
-        await SlideInFromLeft();
-        await UniTask.Delay(500);
         await SlideInFromRight();
+        await UniTask.Delay(500);
+        await SlideInFromLeft();
         
         // 指定時間待機
         await UniTask.Delay(3000);

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using LitMotion;
+using LitMotion.Extensions;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -205,11 +207,55 @@ namespace Void2610.UnityTemplate
         /// </summary>
         public static void ResetTransform(this Transform transform)
         {
-            if (transform == null) return;
+            if (!transform) return;
 
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
+        }
+        
+        /// <summary>
+        /// Imageの透明度をLitMotionでフェードインさせる
+        /// </summary>
+        public static MotionHandle FadeIn(this Image image, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(0f, 1f, duration)
+                .WithEase(ease)
+                .BindToColorA(image)
+                .AddTo(image.gameObject);
+        }
+        
+        /// <summary>
+        /// Imageの透明度をLitMotionでフェードアウトさせる
+        /// </summary>
+        public static MotionHandle FadeOut(this Image image, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(1f, 0f, duration)
+                .WithEase(ease)
+                .BindToColorA(image)
+                .AddTo(image.gameObject);
+        }
+        
+        /// <summary>
+        /// CanvasGroupの透明度をLitMotionでフェードインさせる
+        /// </summary>
+        public static MotionHandle FadeIn(this CanvasGroup canvasGroup, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(0f, 1f, duration)
+                .WithEase(ease)
+                .BindToAlpha(canvasGroup)
+                .AddTo(canvasGroup.gameObject);
+        }
+        
+        /// <summary>
+        /// CanvasGroupの透明度をLitMotionでフェードアウトさせる
+        /// </summary>
+        public static MotionHandle FadeOut(this CanvasGroup canvasGroup, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(1f, 0f, duration)
+                .WithEase(ease)
+                .BindToAlpha(canvasGroup)
+                .AddTo(canvasGroup.gameObject);
         }
         
 #if UNITY_EDITOR
