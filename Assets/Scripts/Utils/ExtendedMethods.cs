@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using LitMotion;
+using LitMotion.Extensions;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -205,11 +207,99 @@ namespace Void2610.UnityTemplate
         /// </summary>
         public static void ResetTransform(this Transform transform)
         {
-            if (transform == null) return;
+            if (!transform) return;
 
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
+        }
+        
+        /// <summary>
+        /// Imageの透明度をLitMotionでフェードインさせる
+        /// </summary>
+        public static MotionHandle FadeIn(this Image image, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(0f, 1f, duration)
+                .WithEase(ease)
+                .BindToColorA(image)
+                .AddTo(image.gameObject);
+        }
+        
+        /// <summary>
+        /// Imageの透明度をLitMotionでフェードアウトさせる
+        /// </summary>
+        public static MotionHandle FadeOut(this Image image, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(1f, 0f, duration)
+                .WithEase(ease)
+                .BindToColorA(image)
+                .AddTo(image.gameObject);
+        }
+        
+        /// <summary>
+        /// CanvasGroupの透明度をLitMotionでフェードインさせる
+        /// </summary>
+        public static MotionHandle FadeIn(this CanvasGroup canvasGroup, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(0f, 1f, duration)
+                .WithEase(ease)
+                .BindToAlpha(canvasGroup)
+                .AddTo(canvasGroup.gameObject);
+        }
+        
+        /// <summary>
+        /// CanvasGroupの透明度をLitMotionでフェードアウトさせる
+        /// </summary>
+        public static MotionHandle FadeOut(this CanvasGroup canvasGroup, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(1f, 0f, duration)
+                .WithEase(ease)
+                .BindToAlpha(canvasGroup)
+                .AddTo(canvasGroup.gameObject);
+        }
+        
+        /// <summary>
+        /// TransformをLitMotionで指定位置に移動
+        /// </summary>
+        public static MotionHandle MoveTo(this Transform transform, Vector3 targetPosition, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(transform.localPosition, targetPosition, duration)
+                .WithEase(ease)
+                .BindToLocalPosition(transform)
+                .AddTo(transform.gameObject);
+        }
+        
+        /// <summary>
+        /// TransformをLitMotionで指定スケールに変更
+        /// </summary>
+        public static MotionHandle ScaleTo(this Transform transform, Vector3 targetScale, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(transform.localScale, targetScale, duration)
+                .WithEase(ease)
+                .BindToLocalScale(transform)
+                .AddTo(transform.gameObject);
+        }
+        
+        /// <summary>
+        /// RectTransformをLitMotionで指定位置に移動（anchoredPosition）
+        /// </summary>
+        public static MotionHandle MoveToAnchored(this RectTransform rectTransform, Vector2 targetPosition, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(rectTransform.anchoredPosition, targetPosition, duration)
+                .WithEase(ease)
+                .BindToAnchoredPosition(rectTransform)
+                .AddTo(rectTransform.gameObject);
+        }
+        
+        /// <summary>
+        /// TransformをLitMotionで指定回転に変更
+        /// </summary>
+        public static MotionHandle RotateTo(this Transform transform, Quaternion targetRotation, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(transform.rotation, targetRotation, duration)
+                .WithEase(ease)
+                .BindToRotation(transform)
+                .AddTo(transform.gameObject);
         }
         
 #if UNITY_EDITOR

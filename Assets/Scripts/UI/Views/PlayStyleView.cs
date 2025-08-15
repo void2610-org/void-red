@@ -3,79 +3,153 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using R3;
+using LitMotion;
+using LitMotion.Extensions;
+using Cysharp.Threading.Tasks;
+using Void2610.UnityTemplate;
 
 /// <summary>
-/// プレイスタイル選択を担当するViewクラス
+/// プレイスタイル選択を担当するViewクラス（車輪UI）
 /// </summary>
 public class PlayStyleView : MonoBehaviour
 {
-    [SerializeField] private Button hesitationButton;
-    [SerializeField] private Button impulseButton;
-    [SerializeField] private Button convictionButton;
-    [SerializeField] private TextMeshProUGUI playStyleSelectedText;
+    [Header("車輪UI要素")]
+    [SerializeField] private Transform wheelContainer;
+    [SerializeField] private Button wheelButton;
+    [SerializeField] private Image selectLight;
+    
+    [Header("プレイスタイル画像")]
+    [SerializeField] private Image hesitationImage;
+    [SerializeField] private Image impulseImage;
+    [SerializeField] private Image convictionImage;
+    
+    private const int PLAYSTYLE_COUNT = 3;
+    private const float ROTATION_DURATION = 1f;
+    private const Ease ROTATION_EASE = Ease.OutBack;
     
     public Observable<PlayStyle> PlayStyleSelected => _playStyleSelected;
     
     private readonly Subject<PlayStyle> _playStyleSelected = new();
-    private PlayStyle _currentPlayStyle = PlayStyle.Hesitation;
+    private readonly (PlayStyle style, float angle)[] _styleConfigs = 
+    {
+        (PlayStyle.Impulse, 0f),
+        (PlayStyle.Hesitation, 45f),
+        (PlayStyle.Conviction, -45f)
+    };
+    private Vector3 _selectLightOriginalWorldPosition;
+    private Quaternion _selectLightOriginalWorldRotation;
+    private PlayStyle _currentPlayStyle = PlayStyle.Impulse;
+    private bool _isRotating;
+    private int _currentIndex;
     
     /// <summary>
-    /// プレイスタイル表示を更新
+    /// 車輪を回転させて次のプレイスタイルを選択
     /// </summary>
-    private void UpdateDisplay(PlayStyle playStyle)
+    private void RotateWheel()
     {
-        _currentPlayStyle = playStyle;
-        playStyleSelectedText.text = $"出し方: {playStyle.ToJapaneseString()}";
-        UpdateButtonColors(playStyle);
+        if (_isRotating) return;
+
+        SeManager.Instance.PlaySe("Wheel");
+        
+        _isRotating = true;
+        var previousIndex = _currentIndex;
+        _currentIndex = (_currentIndex + 1) % PLAYSTYLE_COUNT;
+        _currentPlayStyle = _styleConfigs[_currentIndex].style;
+        UpdateImageHighlight();
+        
+        // 車輪を回転
+        var currentAngle = _styleConfigs[previousIndex].angle;
+        var targetAngle = _styleConfigs[_currentIndex].angle;
+        
+        LMotion.Create(currentAngle, targetAngle, ROTATION_DURATION)
+            .WithEase(ROTATION_EASE)
+            .BindToLocalEulerAnglesZ(wheelContainer)
+            .AddTo(gameObject)
+            .ToUniTask()
+            .ContinueWith(() =>
+            {
+                _isRotating = false;
+                _playStyleSelected.OnNext(_currentPlayStyle);
+                
+                // selectLightの位置と回転を補正
+                MaintainSelectLightTransform();
+            }).Forget();
     }
     
     /// <summary>
-    /// プレイスタイルボタンの色を更新
+    /// 選択されているプレイスタイルの画像をハイライト
     /// </summary>
-    private void UpdateButtonColors(PlayStyle playStyle)
+    private void UpdateImageHighlight()
     {
-        // 全ボタンをデフォルト色にリセット
-        hesitationButton.GetComponent<Image>().color = Color.white;
-        impulseButton.GetComponent<Image>().color = Color.white;
-        convictionButton.GetComponent<Image>().color = Color.white;
+        // 全ての画像を透明に
+        SetImageAlpha(hesitationImage, false);
+        SetImageAlpha(impulseImage, false);
+        SetImageAlpha(convictionImage, false);
         
-        // 選択されたボタンをハイライト
-        var selectedButton = playStyle switch
+        // 選択中の画像を不透明に
+        SetImageAlpha(GetImageForPlayStyle(_currentPlayStyle),true);
+    }
+    
+    /// <summary>
+    /// プレイスタイルに対応する画像を取得
+    /// </summary>
+    private Image GetImageForPlayStyle(PlayStyle playStyle)
+    {
+        return playStyle switch
         {
-            PlayStyle.Hesitation => hesitationButton,
-            PlayStyle.Impulse => impulseButton,
-            PlayStyle.Conviction => convictionButton,
-            _ => hesitationButton
+            PlayStyle.Hesitation => hesitationImage,
+            PlayStyle.Impulse => impulseImage,
+            PlayStyle.Conviction => convictionImage,
+            _ => impulseImage
         };
-        
-        selectedButton.GetComponent<Image>().color = new Color(0.8f, 1f, 0.8f, 1f); // 淡い緑
     }
     
     /// <summary>
-    /// プレイスタイルが選択された時の処理
+    /// 画像の透明度を設定
     /// </summary>
-    private void OnPlayStyleSelected(PlayStyle playStyle)
+    private void SetImageAlpha(Image image, bool isSelected)
     {
-        UpdateDisplay(playStyle);
-        _playStyleSelected.OnNext(playStyle);
+        if (!image) return;
+        var color = image.color;
+        color.a = isSelected ? 1.0f : 0.3f;
+        image.color = color;
+    }
+    
+    /// <summary>
+    /// selectLightのワールド座標を維持
+    /// </summary>
+    private void MaintainSelectLightTransform()
+    {
+        selectLight.transform.position = _selectLightOriginalWorldPosition;
+        selectLight.transform.rotation = _selectLightOriginalWorldRotation;
     }
     
     private void Awake()
     {
         // ボタンイベントの設定
-        hesitationButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Hesitation));
-        impulseButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Impulse));
-        convictionButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Conviction));
+        wheelButton.onClick.AddListener(RotateWheel);
         
-        // 初期表示
-        UpdateDisplay(_currentPlayStyle);
+        // 初期状態を設定
+        UpdateImageHighlight();
+        wheelContainer.localRotation = Quaternion.Euler(0, 0, _styleConfigs[0].angle);
+    }
+    
+    private void Start()
+    {
+        // selectLightの初期位置を保存（親の回転が適用された後）
+        _selectLightOriginalWorldPosition = selectLight.transform.position;
+        _selectLightOriginalWorldRotation = selectLight.transform.rotation;
+    }
+    
+    private void Update()
+    {
+        // selectLightの位置と回転を毎フレーム固定
+        MaintainSelectLightTransform();
     }
     
     private void OnDestroy()
     {
         _playStyleSelected?.Dispose();
-        hesitationButton.onClick.RemoveAllListeners();
-        impulseButton.onClick.RemoveAllListeners();
-        convictionButton.onClick.RemoveAllListeners();
+        wheelButton.onClick.RemoveAllListeners();
     }
 }
