@@ -255,7 +255,6 @@ public class HandView : MonoBehaviour
         await cardView.PlayDrawAnimation(deckLocalPos);
     }
     
-    
     /// <summary>
     /// 手札をデッキに戻す（アニメーション付き）
     /// </summary>

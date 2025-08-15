@@ -59,9 +59,11 @@ public class ScoreView : MonoBehaviour
         await _canvasGroup.FadeIn(FADE_OUT_DURATION, Ease.InQuad); 
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
-        
+       
+        SeManager.Instance.PlaySe("Envelope");
         await SlideInFromRight();
         await UniTask.Delay(500);
+        SeManager.Instance.PlaySe("Envelope");
         await SlideInFromLeft();
         
         // 指定時間待機

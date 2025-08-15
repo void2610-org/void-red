@@ -6,6 +6,7 @@ using R3;
 using LitMotion;
 using LitMotion.Extensions;
 using Cysharp.Threading.Tasks;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// プレイスタイル選択を担当するViewクラス（車輪UI）
@@ -47,6 +48,8 @@ public class PlayStyleView : MonoBehaviour
     private void RotateWheel()
     {
         if (_isRotating) return;
+
+        SeManager.Instance.PlaySe("Wheel");
         
         _isRotating = true;
         var previousIndex = _currentIndex;
