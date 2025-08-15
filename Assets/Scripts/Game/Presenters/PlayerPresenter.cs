@@ -64,57 +64,37 @@ public abstract class PlayerPresenter : IDisposable
     /// </summary>
     public bool IsAllCardsCollapsed => _deckModel?.IsActiveCardsEmpty ?? true;
     
-    /// <summary>
-    /// カードを引く
-    /// </summary>
-    public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
-    
-    /// <summary>
-    /// カードを引く（待機可能）
-    /// </summary>
-    private async UniTask DrawCardAsync(int count = 1)
+    public async UniTask DrawCardsWithDelay(int count, int intervalMs)
     {
-        // 複数枚を一度に引く（1回のUpdateCardViewsで配置が決定される）
-        var drawnCount = DrawCards(count);
-        
-        // 引いたカードがある場合はアニメーション完了まで待機
-        if (drawnCount > 0)
+        for (var i = 0; i < count; i++)
         {
-            // HandView側のドローアニメーション間隔: drawnCount * 150ms + 最終カードアニメーション500ms
-            var animationTime = drawnCount * 150 + 500;
-            await UniTask.Delay(animationTime);
+            DrawCard();
+            // 最後のカード以外は間隔を挟む
+            if (i < count - 1) await UniTask.Delay(intervalMs);
         }
+        
+        // 最後のカードのアニメーション完了を待つ
+        await UniTask.Delay(500);
     }
     
     /// <summary>
-    /// カードを引く（複数枚）
+    /// カードを引く（1枚ずつの処理に最適化）
     /// </summary>
-    /// <param name="count">引く枚数</param>
-    /// <returns>実際に引けた枚数</returns>
-    private int DrawCards(int count = 1)
+    public void DrawCard(int count = 1)
     {
-        var drawnCount = 0;
-        
         for (var i = 0; i < count; i++)
         {
             if (IsDeckEmpty || HandCount >= MaxHandSize)
                 break;
-            
+                
             var cardData = _deckModel?.DrawCard();
-            if (cardData && _handModel.TryAddCard(cardData))
-            {
-                drawnCount++;
-            }
-            else
+            if (!cardData || !_handModel.TryAddCard(cardData))
             {
                 // 手札に追加できなかった場合はデッキに戻す
-                if (cardData)
-                    _deckModel?.ReturnCard(cardData);
+                if (cardData) _deckModel?.ReturnCard(cardData);
                 break;
             }
         }
-        
-        return drawnCount;
     }
     
     /// <summary>
