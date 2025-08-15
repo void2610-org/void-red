@@ -6,6 +6,7 @@ using System;
 using LitMotion;
 using LitMotion.Extensions;
 using Cysharp.Threading.Tasks;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// ゲームオーバー画面を管理するViewクラス
@@ -46,19 +47,11 @@ public class GameOverView : MonoBehaviour
         transform.localScale = Vector3.one * 0.8f;
         
         // フェードイン + スケールアニメーション
-        var fadeTask = LMotion.Create(0f, 1f, FADE_IN_DURATION)
-            .WithEase(Ease.OutQuart)
-            .Bind(alpha => _canvasGroup.alpha = alpha)
-            .AddTo(gameObject)
-            .ToUniTask();
+        var fadeTask = _canvasGroup.FadeIn(FADE_IN_DURATION, Ease.OutQuart);
+
+        var scaleTask = transform.ScaleTo(Vector3.one, SCALE_ANIMATION_DURATION, Ease.OutBack);
             
-        var scaleTask = LMotion.Create(Vector3.one * 0.8f, Vector3.one, SCALE_ANIMATION_DURATION)
-            .WithEase(Ease.OutBack)
-            .BindToLocalScale(transform)
-            .AddTo(gameObject)
-            .ToUniTask();
-            
-        await UniTask.WhenAll(fadeTask, scaleTask);
+        await UniTask.WhenAll(fadeTask.ToUniTask(), scaleTask.ToUniTask());
         
         _canvasGroup.alpha = 1f;
         _canvasGroup.interactable = true;
@@ -71,19 +64,11 @@ public class GameOverView : MonoBehaviour
     public async UniTask HideGameOverScreen()
     {
         // フェードアウト + スケールアニメーション
-        var fadeTask = LMotion.Create(1f, 0f, FADE_OUT_DURATION)
-            .WithEase(Ease.InQuart)
-            .Bind(alpha => _canvasGroup.alpha = alpha)
-            .AddTo(gameObject)
-            .ToUniTask();
+        var fadeTask = _canvasGroup.FadeOut(FADE_OUT_DURATION, Ease.InQuart);
+
+        var scaleTask = transform.ScaleTo(Vector3.one * 0.8f, FADE_OUT_DURATION, Ease.InBack);
             
-        var scaleTask = LMotion.Create(Vector3.one, Vector3.one * 0.8f, FADE_OUT_DURATION)
-            .WithEase(Ease.InBack)
-            .BindToLocalScale(transform)
-            .AddTo(gameObject)
-            .ToUniTask();
-            
-        await UniTask.WhenAll(fadeTask, scaleTask);
+        await UniTask.WhenAll(fadeTask.ToUniTask(), scaleTask.ToUniTask());
         
         _canvasGroup.alpha = 0f;
         _canvasGroup.interactable = false;

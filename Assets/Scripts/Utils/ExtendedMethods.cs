@@ -269,6 +269,39 @@ namespace Void2610.UnityTemplate
                 .AddTo(transform.gameObject);
         }
         
+        /// <summary>
+        /// TransformをLitMotionで指定スケールに変更
+        /// </summary>
+        public static MotionHandle ScaleTo(this Transform transform, Vector3 targetScale, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(transform.localScale, targetScale, duration)
+                .WithEase(ease)
+                .BindToLocalScale(transform)
+                .AddTo(transform.gameObject);
+        }
+        
+        /// <summary>
+        /// RectTransformをLitMotionで指定位置に移動（anchoredPosition）
+        /// </summary>
+        public static MotionHandle MoveToAnchored(this RectTransform rectTransform, Vector2 targetPosition, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(rectTransform.anchoredPosition, targetPosition, duration)
+                .WithEase(ease)
+                .BindToAnchoredPosition(rectTransform)
+                .AddTo(rectTransform.gameObject);
+        }
+        
+        /// <summary>
+        /// TransformをLitMotionで指定回転に変更
+        /// </summary>
+        public static MotionHandle RotateTo(this Transform transform, Quaternion targetRotation, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(transform.rotation, targetRotation, duration)
+                .WithEase(ease)
+                .BindToRotation(transform)
+                .AddTo(transform.gameObject);
+        }
+        
 #if UNITY_EDITOR
         /// <summary>
         /// 指定したScriptableObjectと同じディレクトリ内の指定した型のアセットを一括登録

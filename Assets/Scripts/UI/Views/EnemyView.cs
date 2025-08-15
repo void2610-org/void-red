@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 敵の表示を担当するViewクラス
@@ -83,10 +84,7 @@ public class EnemyView : MonoBehaviour
         var canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup)
         {
-            await LMotion.Create(0f, 1f, fadeDuration)
-                .WithEase(Ease.OutQuad)
-                .Bind(alpha => canvasGroup.alpha = alpha)
-                .AddTo(gameObject)
+            await canvasGroup.FadeIn(fadeDuration, Ease.OutQuad)
                 .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
         }
     }
@@ -99,10 +97,7 @@ public class EnemyView : MonoBehaviour
         var canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup)
         {
-            await LMotion.Create(1f, 0f, fadeDuration)
-                .WithEase(Ease.InQuad)
-                .Bind(alpha => canvasGroup.alpha = alpha)
-                .AddTo(gameObject)
+            await canvasGroup.FadeOut(fadeDuration, Ease.InQuad)
                 .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
         }
         
@@ -124,13 +119,9 @@ public class EnemyView : MonoBehaviour
         enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
         
         // 同時進行のクロスフェード
-        var fadeOutFront = LMotion.Create(1f, 0f, crossFadeDuration)
-            .WithEase(Ease.InOutQuad)
-            .Bind(alpha => enemyImage.color = new Color(1f, 1f, 1f, alpha));
+        var fadeOutFront = enemyImage.FadeOut(crossFadeDuration, Ease.InOutQuad);
             
-        var fadeInBack = LMotion.Create(0f, 1f, crossFadeDuration)
-            .WithEase(Ease.InOutQuad)
-            .Bind(alpha => enemyImageBack.color = new Color(1f, 1f, 1f, alpha));
+        var fadeInBack = enemyImageBack.FadeIn(crossFadeDuration, Ease.InOutQuad);
         
         // 両方のアニメーションを同時実行
         await UniTask.WhenAll(

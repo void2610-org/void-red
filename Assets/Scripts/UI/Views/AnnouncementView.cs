@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using LitMotion;
 using LitMotion.Extensions;
 using System.Threading;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// アナウンスメント表示を担当するViewクラス
@@ -82,10 +83,7 @@ public class AnnouncementView : MonoBehaviour
                 .ToUniTask(cancellationToken);
             
             // テキストのスライドインアニメーション
-            fadeInTasks[2] = LMotion.Create(new Vector2(originalPosition.x - SLIDE_DISTANCE, originalPosition.y), originalPosition, FADE_IN_DURATION)
-                .WithEase(Ease.OutCubic)
-                .BindToAnchoredPosition(textRect)
-                .AddTo(gameObject)
+            fadeInTasks[2] = textRect.MoveToAnchored(originalPosition, FADE_IN_DURATION, Ease.OutCubic)
                 .ToUniTask(cancellationToken);
             
             await UniTask.WhenAll(fadeInTasks);
@@ -113,10 +111,7 @@ public class AnnouncementView : MonoBehaviour
                 .ToUniTask(cancellationToken);
             
             // テキストのスライドアウトアニメーション
-            fadeOutTasks[2] = LMotion.Create(originalPosition, new Vector2(originalPosition.x + SLIDE_DISTANCE, originalPosition.y), FADE_OUT_DURATION)
-                .WithEase(Ease.InCubic)
-                .BindToAnchoredPosition(textRect)
-                .AddTo(gameObject)
+            fadeOutTasks[2] = textRect.MoveToAnchored(new Vector2(originalPosition.x + SLIDE_DISTANCE, originalPosition.y), FADE_OUT_DURATION, Ease.InCubic)
                 .ToUniTask(cancellationToken);
             
             await UniTask.WhenAll(fadeOutTasks);
