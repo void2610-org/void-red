@@ -350,12 +350,12 @@ public class GameManager: IStartable, IDisposable
 
             await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
             // 崩壊演出を実行
-            //var tasks = new List<UniTask> { _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f) };
-            //if (_playerCollapse) tasks.Add(UniTask.Create(async () => _player.CollapseSelectedCard()));
-            //if (_npcCollapse) tasks.Add(UniTask.Create(async () => _enemy.CollapseSelectedCard()));
-            //await UniTask.WhenAll(tasks);
-            if (_playerCollapse) _player.CollapseSelectedCard();
-            if (_npcCollapse) _enemy.CollapseSelectedCard();
+            var tasks = new List<UniTask> { _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f) };
+
+            if (_playerCollapse) tasks.Add(_player.CollapseSelectedCard());
+            if (_npcCollapse) tasks.Add(_enemy.CollapseSelectedCard());
+
+            await UniTask.WhenAll(tasks);
         }
         
         // 結果表示フェーズに移行
