@@ -391,8 +391,9 @@ public class GameManager: IStartable, IDisposable
 
         if (_playerCollapse && _npcCollapse)
         {
-            result = "引き分け（両者カード崩壊）";
-            playerWon = false; // 引き分けとして扱う
+            // ランダムで勝敗を決定
+            playerWon = UnityEngine.Random.Range(0, 2) == 0;
+            result = playerWon ? "あなたの勝利\n（引き分け→ランダム決着）" : "相手の勝利\n（引き分け→ランダム決着）";
         }
         else if (_playerCollapse)
         {
@@ -419,8 +420,9 @@ public class GameManager: IStartable, IDisposable
             }
             else
             {
-                result = "引き分け";
-                playerWon = false; // 引き分けとして扱う
+                // スコア引き分けもランダム決着
+                playerWon = UnityEngine.Random.Range(0, 2) == 0;
+                result = playerWon ? "あなたの勝利\n（引き分け→ランダム決着）" : "相手の勝利\n（引き分け→ランダム決着）";
             }
         }
         
@@ -445,19 +447,13 @@ public class GameManager: IStartable, IDisposable
         
         await _uiPresenter.HideBlackOverlay();
 
-        // 引き分けでない場合、勝利数を更新してバトル終了チェック
-        // 崩壊による引き分けも考慮
-        var isDrawByCollapse = _playerCollapse && _npcCollapse;
-        var isScoreTie = Mathf.Approximately(playerScore, npcScore);
-        if (!isDrawByCollapse && !isScoreTie)
+        // すべての場合で勝利数をカウントするように変更
+        if (UpdateWinsAndCheckBattleEnd(playerWon))
         {
-            if (UpdateWinsAndCheckBattleEnd(playerWon))
-            {
-                // 3勝に達した場合、カード処理をスキップしてバトル終了へ
-                _isProcessing = false;
-                ChangeState(GameState.BattleEnd);
-                return;
-            }
+            // 3勝に達した場合、カード処理をスキップしてバトル終了へ
+            _isProcessing = false;
+            ChangeState(GameState.BattleEnd);
+            return;
         }
         
         // 使用したカードをプレイ
