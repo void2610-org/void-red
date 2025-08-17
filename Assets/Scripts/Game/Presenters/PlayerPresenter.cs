@@ -222,7 +222,7 @@ public abstract class PlayerPresenter : IDisposable
     /// <summary>
     /// 選択したカードを崩壊させる（UI制御付き）
     /// </summary>
-    public void CollapseSelectedCard()
+    public async UniTask CollapseSelectedCard()
     {
         var selectedIndex = SelectedIndex.CurrentValue;
         
@@ -232,7 +232,7 @@ public abstract class PlayerPresenter : IDisposable
             // 崩壊アニメーションを再生
             if (selectedIndex >= 0)
             {
-                _handView.PlayCollapseAnimation(selectedIndex).Forget();
+                await _handView.PlayCollapseAnimation(selectedIndex); // awaitで待機
             }
         }
     }

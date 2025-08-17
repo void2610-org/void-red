@@ -336,7 +336,7 @@ public class GameManager: IStartable, IDisposable
         // カード崩壊判定
         _playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
         _npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);
-        
+
         // 崩壊結果を表示
         if (_playerCollapse || _npcCollapse)
         {
@@ -347,8 +347,14 @@ public class GameManager: IStartable, IDisposable
                 collapseMessage = "プレイヤーのカードが崩壊した";
             else
                 collapseMessage = "対戦相手のカードが崩壊した";
-                
-            await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
+
+            // 崩壊演出を実行
+            var tasks = new List<UniTask> { _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f) };
+
+            if (_playerCollapse) tasks.Add(_player.CollapseSelectedCard());
+            if (_npcCollapse) tasks.Add(_enemy.CollapseSelectedCard());
+
+            await UniTask.WhenAll(tasks);
         }
         
         // 結果表示フェーズに移行
@@ -390,7 +396,7 @@ public class GameManager: IStartable, IDisposable
         }
         else if (_playerCollapse)
         {
-            result = "対戦の勝利（あなたのカード崩壊）";
+            result = "相手の勝利（あなたのカード崩壊）";
             playerWon = false;
         }
         else if (_npcCollapse)
@@ -456,7 +462,6 @@ public class GameManager: IStartable, IDisposable
             // 人格ログ: プレイヤーカード崩壊イベント記録
             if (playerCollapseCard)
                 _personalityLogService.LogCardCollapse("player", playerCollapseCard);
-            _player.CollapseSelectedCard();
         }
         else
         {
@@ -492,7 +497,6 @@ public class GameManager: IStartable, IDisposable
             // 人格ログ: NPCカード崩壊イベント記録
             if (npcCollapseCard)
                 _personalityLogService.LogCardCollapse("enemy", npcCollapseCard);
-            _enemy.CollapseSelectedCard();
         }
         else
         {
