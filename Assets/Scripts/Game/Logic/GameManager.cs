@@ -348,7 +348,6 @@ public class GameManager: IStartable, IDisposable
             else
                 collapseMessage = "対戦相手のカードが崩壊した";
 
-            await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
             // 崩壊演出を実行
             var tasks = new List<UniTask> { _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f) };
 
@@ -397,7 +396,7 @@ public class GameManager: IStartable, IDisposable
         }
         else if (_playerCollapse)
         {
-            result = "対戦の勝利（あなたのカード崩壊）";
+            result = "相手の勝利（あなたのカード崩壊）";
             playerWon = false;
         }
         else if (_npcCollapse)
