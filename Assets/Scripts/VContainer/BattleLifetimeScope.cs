@@ -2,7 +2,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class MainLifetimeScope : LifetimeScope
+public class BattleLifetimeScope : LifetimeScope
 {
     [SerializeField] private AllCardData allCardData;
     [SerializeField] private AllThemeData allThemeData;

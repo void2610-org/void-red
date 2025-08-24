@@ -5709,7 +5709,7 @@ GameObject:
   - component: {fileID: 782623187}
   - component: {fileID: 782623188}
   m_Layer: 0
-  m_Name: MainLifetimeScope
+  m_Name: BattleLifetimeScope
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
