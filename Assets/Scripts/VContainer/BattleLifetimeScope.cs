@@ -43,7 +43,6 @@ public class BattleLifetimeScope : LifetimeScope
         
         builder.Register<CardPoolService>(Lifetime.Singleton);
         builder.Register<ThemeService>(Lifetime.Singleton);
-        builder.Register<EnemyProgressService>(Lifetime.Singleton);
         builder.Register<GameStatsService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
         
