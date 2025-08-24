@@ -714,6 +714,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   titleButton: {fileID: 2099177952}
   battleButton: {fileID: 7693411691848301352}
+  testEnemyData: {fileID: 11400000, guid: 05253626a6a1247328c0b42a6ff41804, type: 2}
 --- !u!4 &1993237500
 Transform:
   m_ObjectHideFlags: 0
