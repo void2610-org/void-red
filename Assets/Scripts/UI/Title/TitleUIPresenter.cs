@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using R3;
 using VContainer;
+using Cysharp.Threading.Tasks;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -15,11 +15,13 @@ public class TitleUIPresenter : MonoBehaviour
     [SerializeField] private Button settingsButton;
     
     private SettingsPresenter _settingsPresenter;
+    private SceneTransitionService _sceneTransitionService;
     
     [Inject]
-    public void Construct(SettingsPresenter settingsPresenter)
+    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionService sceneTransitionService)
     {
         _settingsPresenter = settingsPresenter;
+        _sceneTransitionService = sceneTransitionService;
     }
 
     private void Start()
@@ -35,7 +37,7 @@ public class TitleUIPresenter : MonoBehaviour
     /// </summary>
     private void OnStartButtonClicked()
     {
-        SceneManager.LoadScene("MainScene");
+        _sceneTransitionService.TransitionToScene(SceneType.Home).Forget();
     }
 
     /// <summary>

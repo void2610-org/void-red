@@ -3,6 +3,7 @@ using UnityEngine;
 public enum BgmType
 {
     Title, // タイトルBGM
+    Home,  // ホームBGM
     Battle, // バトルBGM
 }
 

@@ -2,7 +2,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class MainLifetimeScope : LifetimeScope
+public class BattleLifetimeScope : LifetimeScope
 {
     [SerializeField] private AllCardData allCardData;
     [SerializeField] private AllThemeData allThemeData;
@@ -43,7 +43,6 @@ public class MainLifetimeScope : LifetimeScope
         
         builder.Register<CardPoolService>(Lifetime.Singleton);
         builder.Register<ThemeService>(Lifetime.Singleton);
-        builder.Register<EnemyProgressService>(Lifetime.Singleton);
         builder.Register<GameStatsService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
         
