@@ -14,6 +14,7 @@ public class HomeUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Button titleButton;
     [SerializeField] private Button battleButton;
+    [SerializeField] private Button novelButton;
     
     [Header("テスト用敵データ")]
     [SerializeField] private EnemyData testEnemyData;
@@ -31,6 +32,7 @@ public class HomeUIPresenter : MonoBehaviour
         // ボタンイベントの設定
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         battleButton.OnClickAsObservable().Subscribe(_ => OnBattleButtonClicked()).AddTo(this);
+        novelButton.OnClickAsObservable().Subscribe(_ => OnNovelButtonClicked()).AddTo(this);
         
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
@@ -53,6 +55,14 @@ public class HomeUIPresenter : MonoBehaviour
     }
 
     /// <summary>
+    /// ノベルボタンがクリックされた時の処理
+    /// </summary>
+    private void OnNovelButtonClicked()
+    {
+        StartNovelAsync().Forget();
+    }
+
+    /// <summary>
     /// バトル開始処理
     /// </summary>
     private async UniTask StartBattleAsync()
@@ -65,5 +75,23 @@ public class HomeUIPresenter : MonoBehaviour
         };
         // バトルシーンに遷移
         await _sceneTransitionService.TransitionToScene(battleData);
+    }
+    
+    /// <summary>
+    /// ノベル開始処理
+    /// </summary>
+    private async UniTask StartNovelAsync()
+    {
+        // テスト用ノベルデータ
+        var novelData = new NovelTransitionData
+        {
+            ScenarioId = "test_scenario_001",
+            ReturnScene = SceneType.Home
+        };
+        
+        Debug.Log($"[HomeUI] ノベル開始: {novelData.ScenarioId}");
+        
+        // ノベルシーンに遷移
+        await _sceneTransitionService.TransitionToScene(novelData);
     }
 }

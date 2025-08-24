@@ -1,9 +1,14 @@
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// ノベルシーン用のLifetimeScope
+/// ノベルシーン固有のコンポーネントを登録
+/// </summary>
 public class NovelLifetimeScope : LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
+        builder.RegisterComponentInHierarchy<NovelUIPresenter>();
     }
 }
