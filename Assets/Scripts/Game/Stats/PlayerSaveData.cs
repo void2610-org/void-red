@@ -46,14 +46,6 @@ public class PlayerSaveData : IEvolutionStatsData
     }
     
     /// <summary>
-    /// 次のチャプターに進行
-    /// </summary>
-    public void AdvanceToNextChapter()
-    {
-        currentChapter++;
-    }
-    
-    /// <summary>
     /// 現在の精神力を更新
     /// </summary>
     /// <param name="mentalPower">新しい精神力の値</param>

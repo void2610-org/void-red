@@ -16,7 +16,7 @@ public class GameManager: IStartable, IDisposable
     private readonly Enemy _enemy;
     private readonly GameStatsService _gameStatsService;
     private readonly SaveDataManager _saveDataManager;
-    private readonly EnemyProgressService _enemyProgressService;
+    private readonly SceneTransitionService _sceneTransitionService;
     private readonly CardNarrationService _cardNarrationService;
     private readonly PersonalityLogService _personalityLogService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
@@ -49,7 +49,7 @@ public class GameManager: IStartable, IDisposable
         Enemy enemy,
         GameStatsService gameStatsService,
         SaveDataManager saveDataManager,
-        EnemyProgressService enemyProgressService,
+        SceneTransitionService sceneTransitionService,
         CardNarrationService cardNarrationService,
         PersonalityLogService personalityLogService)
     {
@@ -60,7 +60,7 @@ public class GameManager: IStartable, IDisposable
         _enemy = enemy;
         _gameStatsService = gameStatsService;
         _saveDataManager = saveDataManager;
-        _enemyProgressService = enemyProgressService;
+        _sceneTransitionService = sceneTransitionService;
         _cardNarrationService = cardNarrationService;
         _personalityLogService = personalityLogService;
 
@@ -89,9 +89,14 @@ public class GameManager: IStartable, IDisposable
         // 敵の統計をリセット
         _gameStatsService.ResetEnemyStats();
         
-        // 現在のチャプターに基づいて敵データを取得
-        var currentChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
-        _currentEnemyData = _enemyProgressService.GetEnemyByChapter(currentChapter);
+        // 遷移データから敵データを取得
+        var battleData = _sceneTransitionService.GetTransitionData<BattleTransitionData>();
+        if (battleData?.TargetEnemy == null)
+        {
+            Debug.LogError("[GameManager] BattleTransitionDataまたはTargetEnemyが存在しません");
+            return;
+        }
+        _currentEnemyData = battleData.TargetEnemy;
         
         // 人格ログ: チャプター開始
         _personalityLogService.StartChapter(_currentEnemyData);
@@ -125,7 +130,7 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowEnemy();
         
         // 敵情報をアナウンス
-        await _uiPresenter.ShowAnnouncement($"第{currentChapter + 1}章: {_currentEnemyData.EnemyName}", 1.5f);
+        await _uiPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
         
         // カードデッキを初期化
         var playerDeck = _cardPoolService.GetRandomCards(5);
@@ -604,27 +609,18 @@ public class GameManager: IStartable, IDisposable
         
         // 現在の精神力をセーブデータに反映
         _gameStatsService.PlayerSaveData.UpdateMentalPower(_player.MentalPower.CurrentValue);
-        // チャプター進行処理
-        _gameStatsService.PlayerSaveData.AdvanceToNextChapter();
-        var nextChapter = _gameStatsService.PlayerSaveData.CurrentChapter;
-        var nextEnemy = _enemyProgressService.GetEnemyByChapter(nextChapter);
         
         // セーブデータを保存
         _saveDataManager.SaveAllData(_gameStatsService.PlayerSaveData);
         
-        if (!nextEnemy)
-        {
-            // 全ての敵を倒した場合
-            await _uiPresenter.ShowAnnouncement("ゲームクリア！", 3f);
-            _isProcessing = false;
-            ChangeState(GameState.GameOver);
-        }
-        else
-        {
-            // 次の敵がいる場合
-            _isProcessing = false;
-            InitializeGame(isInitialStart: false).Forget();
-        }
+        // バトル完了後はHomeSceneに戻る
+        await UniTask.Delay(1000);
+        
+        // 遷移データをクリアしてHomeSceneに戻る
+        _sceneTransitionService.ClearTransitionData();
+        await _sceneTransitionService.TransitionToScene(SceneType.Home);
+        
+        _isProcessing = false;
     }
     
     /// <summary>

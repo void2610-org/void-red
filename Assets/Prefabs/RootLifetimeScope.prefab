@@ -48,3 +48,5 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
+  bgmManager: {fileID: 8376210248285478965, guid: 262d095b94f0c4909bb9734d0d23be9e, type: 3}
+  seManager: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
