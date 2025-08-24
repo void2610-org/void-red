@@ -6,8 +6,10 @@ using UnityEditor.SceneManagement;
 [InitializeOnLoad]
 public class SceneSwitchLeftButton
 {
-    public const string TITLE_SCENE_PATH = "Assets/Scenes/TitleScene.unity";
-    public const string MAIN_SCENE_PATH = "Assets/Scenes/MainScene.unity";
+    private const string TITLE_SCENE_PATH = "Assets/Scenes/TitleScene.unity";
+    private const string HOME_SCENE_PATH = "Assets/Scenes/HomeScene.unity";
+    private const string BATTLE_SCENE_PATH = "Assets/Scenes/BattleScene.unity";
+    private const string NOVEL_SCENE_PATH = "Assets/Scenes/NovelScene.unity";
 	
     static SceneSwitchLeftButton()
     {
@@ -20,7 +22,11 @@ public class SceneSwitchLeftButton
 
         if (GUILayout.Button(new GUIContent("TITLE", "")))
             EditorSceneManager.OpenScene(TITLE_SCENE_PATH, OpenSceneMode.Single);
-        if (GUILayout.Button(new GUIContent("MAIN", "")))
-        	EditorSceneManager.OpenScene(MAIN_SCENE_PATH, OpenSceneMode.Single);
+        if (GUILayout.Button(new GUIContent("HOME", "")))
+            EditorSceneManager.OpenScene(HOME_SCENE_PATH, OpenSceneMode.Single);
+        if (GUILayout.Button(new GUIContent("BATTLE", "")))
+        	EditorSceneManager.OpenScene(BATTLE_SCENE_PATH, OpenSceneMode.Single);
+        if (GUILayout.Button(new GUIContent("NOVEL", "")))
+            EditorSceneManager.OpenScene(NOVEL_SCENE_PATH, OpenSceneMode.Single);
     }
 }
