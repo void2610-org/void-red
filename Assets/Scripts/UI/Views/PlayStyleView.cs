@@ -16,7 +16,6 @@ public class PlayStyleView : MonoBehaviour
     [Header("車輪UI要素")]
     [SerializeField] private Transform wheelContainer;
     [SerializeField] private Button wheelButton;
-    [SerializeField] private Image selectLight;
     
     [Header("プレイスタイル画像")]
     [SerializeField] private Image hesitationImage;
@@ -36,8 +35,6 @@ public class PlayStyleView : MonoBehaviour
         (PlayStyle.Hesitation, 45f),
         (PlayStyle.Conviction, -45f)
     };
-    private Vector3 _selectLightOriginalWorldPosition;
-    private Quaternion _selectLightOriginalWorldRotation;
     private PlayStyle _currentPlayStyle = PlayStyle.Impulse;
     private bool _isRotating;
     private int _currentIndex;
@@ -70,9 +67,6 @@ public class PlayStyleView : MonoBehaviour
             {
                 _isRotating = false;
                 _playStyleSelected.OnNext(_currentPlayStyle);
-                
-                // selectLightの位置と回転を補正
-                MaintainSelectLightTransform();
             }).Forget();
     }
     
@@ -114,16 +108,7 @@ public class PlayStyleView : MonoBehaviour
         color.a = isSelected ? 1.0f : 0.3f;
         image.color = color;
     }
-    
-    /// <summary>
-    /// selectLightのワールド座標を維持
-    /// </summary>
-    private void MaintainSelectLightTransform()
-    {
-        selectLight.transform.position = _selectLightOriginalWorldPosition;
-        selectLight.transform.rotation = _selectLightOriginalWorldRotation;
-    }
-    
+
     private void Awake()
     {
         // ボタンイベントの設定
@@ -132,19 +117,6 @@ public class PlayStyleView : MonoBehaviour
         // 初期状態を設定
         UpdateImageHighlight();
         wheelContainer.localRotation = Quaternion.Euler(0, 0, _styleConfigs[0].angle);
-    }
-    
-    private void Start()
-    {
-        // selectLightの初期位置を保存（親の回転が適用された後）
-        _selectLightOriginalWorldPosition = selectLight.transform.position;
-        _selectLightOriginalWorldRotation = selectLight.transform.rotation;
-    }
-    
-    private void Update()
-    {
-        // selectLightの位置と回転を毎フレーム固定
-        MaintainSelectLightTransform();
     }
     
     private void OnDestroy()
