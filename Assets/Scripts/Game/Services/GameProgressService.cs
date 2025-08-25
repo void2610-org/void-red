@@ -1,22 +1,25 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// ゲーム全体の進行度を管理し、次のイベントを決定するサービス
-/// ストーリーの分岐ロジックを内部に含む
+/// ストーリーの分岐ロジック、結果管理、シーン遷移を統合管理
 /// </summary>
 public class GameProgressService
 {
-    /// <summary>
-    /// 現在のストーリーステップ（簡易版）
-    /// </summary>
-    private int _currentStep = 0;
     
     /// <summary>
-    /// コンストラクタ（依存性注入）
+    /// バトル結果やノベル選択結果を管理する辞書
     /// </summary>
+    private readonly Dictionary<string, string> _results = new();
+    
+    private StoryNode _currentStoryNode;
+    private int _currentStep;
+    
     public GameProgressService()
     {
-        Debug.Log("[GameProgressService] 初期化完了（簡易版）");
     }
     
     /// <summary>
@@ -29,30 +32,30 @@ public class GameProgressService
     }
     
     /// <summary>
-    /// 次に発生するストーリーノードを決定
+    /// 次に発生するストーリーノードを決定（結果辞書による分岐対応）
     /// </summary>
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
-        Debug.Log($"[GameProgressService] 次のノード取得: Step {_currentStep}");
-        
-        // 固定進行ロジック（テスト用の簡単な実装）
+        // 結果辞書を使用したストーリー分岐ロジック
         return _currentStep switch
         {
             // 導入ノベル
             0 => new NovelNode("intro_001"),
             // 最初のバトル
             1 => new BattleNode("enemy_001"),
-            // 最初のバトル後ノベル
-            2 => new NovelNode("first_victory"),
+            // 最初のバトル結果に応じた分岐
+            2 => GetResult("1") == "win" 
+                ? new NovelNode("first_victory") 
+                : new NovelNode("first_defeat"),
             // 2番目のバトル
             3 => new BattleNode("enemy_002"),
-            // 2番目のバトル後ノベル
-            4 => new NovelNode("second_victory"),
+            // 2番目のバトル結果に応じた分岐
+            4 => GetResult("3") == "win"
+                ? new NovelNode("second_victory")
+                : new NovelNode("second_defeat"),
             // 最終バトル
             5 => new BattleNode("enemy_003"),
-            // エンディング
-            6 => new NovelNode("perfect_ending"),
             // ゲーム終了
             _ => new EndingNode()
         };
@@ -68,11 +71,32 @@ public class GameProgressService
     }
     
     /// <summary>
-    /// ストーリーをリセット
+    /// 結果を取得
     /// </summary>
-    public void ResetStory()
+    /// <param name="id">結果のID</param>
+    /// <returns>結果の値（存在しない場合は空文字）</returns>
+    private string GetResult(string id)
     {
-        _currentStep = 0;
-        Debug.Log("[GameProgressService] ストーリーリセット");
+        return _results.TryGetValue(id, out var value) ? value : "";
+    }
+    
+    /// <summary>
+    /// 現在のバトル結果を記録
+    /// </summary>
+    public void RecordCurrentBattleResult(bool isPlayerWin)
+    {
+        _results[_currentStep.ToString()] = isPlayerWin ? "win" : "lose";
+    }
+    
+    /// <summary>
+    /// 指定したシーンに遷移
+    /// </summary>
+    /// <param name="targetScene">遷移先のシーンタイプ</param>
+    /// <returns>遷移完了のUniTask</returns>
+    public async UniTask TransitionToScene(SceneType targetScene)
+    {
+        var sceneName = targetScene.ToSceneName();
+        var asyncOperation = SceneManager.LoadSceneAsync(sceneName);
+        await UniTask.WaitUntil(() => asyncOperation.isDone);
     }
 }

@@ -16,7 +16,6 @@ public class GameManager: IStartable, IDisposable
     private readonly Enemy _enemy;
     private readonly GameStatsService _gameStatsService;
     private readonly SaveDataManager _saveDataManager;
-    private readonly SceneTransitionService _sceneTransitionService;
     private readonly CardNarrationService _cardNarrationService;
     private readonly PersonalityLogService _personalityLogService;
     private readonly GameProgressService _gameProgressService;
@@ -51,7 +50,6 @@ public class GameManager: IStartable, IDisposable
         Enemy enemy,
         GameStatsService gameStatsService,
         SaveDataManager saveDataManager,
-        SceneTransitionService sceneTransitionService,
         CardNarrationService cardNarrationService,
         PersonalityLogService personalityLogService,
         GameProgressService gameProgressService,
@@ -64,7 +62,6 @@ public class GameManager: IStartable, IDisposable
         _enemy = enemy;
         _gameStatsService = gameStatsService;
         _saveDataManager = saveDataManager;
-        _sceneTransitionService = sceneTransitionService;
         _cardNarrationService = cardNarrationService;
         _personalityLogService = personalityLogService;
         _gameProgressService = gameProgressService;
@@ -622,15 +619,18 @@ public class GameManager: IStartable, IDisposable
         
         // バトル結果をGameProgressServiceに報告してストーリー進行
         var playerWon = _playerWins >= WINS_TO_VICTORY;
+        
+        // 現在のバトル結果を記録
+        _gameProgressService.RecordCurrentBattleResult(playerWon);
+        
         _gameProgressService.AdvanceStory();
         Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
         
         // バトル完了後はHomeSceneに戻る
         await UniTask.Delay(1000);
         
-        // 遷移データをクリアしてHomeSceneに戻る
-        _sceneTransitionService.ClearTransitionData();
-        await _sceneTransitionService.TransitionToScene(SceneType.Home);
+        // HomeSceneに戻る
+        await _gameProgressService.TransitionToScene(SceneType.Home);
         
         _isProcessing = false;
     }
