@@ -47,8 +47,11 @@ public class DebugController : MonoBehaviour
         
         if (startWithFreshData && _saveDataManager != null)
         {
-            var success = _saveDataManager.DeleteAllSaveFilesAndReload();
-            if (success) _gameStatsService.ReloadPlayerSaveData();
+            var success = _saveDataManager.DeleteSaveFile();
+            if (success) 
+            {
+                Debug.Log("[Debug] セーブファイル削除完了");
+            }
         }
     }
     
@@ -72,20 +75,23 @@ public class DebugController : MonoBehaviour
         GUILayout.Label("=== セーブデータ情報 ===");
         
         // セーブファイル存在確認
-        var saveExists = _saveDataManager.IsSaveFileExists();
+        var saveExists = _saveDataManager.SaveFileExists();
         GUILayout.Label($"セーブファイル: {(saveExists ? "存在" : "なし")}");
         
         // フラグ状態表示
         GUILayout.Label($"新データ開始: {(startWithFreshData ? "ON" : "OFF")}");
         
         // プレイヤー統計情報表示
-        var playerData = _gameStatsService.PlayerSaveData;
-        GUILayout.Label($"統計: {playerData.GetStatsString()}");
+        var saveData = _gameStatsService.CurrentSaveData;
+        GUILayout.Label($"統計: {saveData.GetDebugInfo()}");
         
-        if (GUILayout.Button("すべてのセーブファイル削除"))
+        if (GUILayout.Button("セーブファイル削除"))
         {
-            var success = _saveDataManager.DeleteAllSaveFilesAndReload();
-            if (success) _gameStatsService.ReloadPlayerSaveData();
+            var success = _saveDataManager.DeleteSaveFile();
+            if (success) 
+            {
+                Debug.Log("[Debug] セーブファイル削除完了");
+            }
         }
         
         GUILayout.EndVertical();

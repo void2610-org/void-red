@@ -150,6 +150,18 @@ public class PersonalityLogService : IDisposable
     }
     
     /// <summary>
+    /// GameSaveDataから人格ログデータを同期
+    /// </summary>
+    /// <param name="saveData">同期元のGameSaveData</param>
+    public void SyncFromGameSaveData(GameSaveData saveData)
+    {
+        if (saveData != null)
+        {
+            _logData = saveData.PersonalityLog;
+        }
+    }
+    
+    /// <summary>
     /// 人格ログファイルを削除（デバッグ用）
     /// </summary>
     /// <returns>削除が成功したかどうか</returns>

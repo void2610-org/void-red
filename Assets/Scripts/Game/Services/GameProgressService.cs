@@ -17,9 +17,19 @@ public class GameProgressService
     
     private StoryNode _currentStoryNode;
     private int _currentStep;
+    private readonly SaveDataManager _saveDataManager;
+    private readonly GameStatsService _gameStatsService;
+    private readonly PersonalityLogService _personalityLogService;
     
-    public GameProgressService()
+    public GameProgressService(SaveDataManager saveDataManager, GameStatsService gameStatsService, PersonalityLogService personalityLogService)
     {
+        _saveDataManager = saveDataManager;
+        _gameStatsService = gameStatsService;
+        _personalityLogService = personalityLogService;
+        
+        // 起動時に自動でセーブデータをロード
+        var loadedData = _saveDataManager.LoadGameData();
+        LoadState(loadedData);
     }
     
     /// <summary>
@@ -37,28 +47,33 @@ public class GameProgressService
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
+        Debug.Log($"[GameProgressService] 次ノード決定: 現在Step {_currentStep}");
+        
         // 結果辞書を使用したストーリー分岐ロジック
-        return _currentStep switch
+        StoryNode nextNode = _currentStep switch
         {
             // 導入ノベル
-            0 => new NovelNode("intro_001"),
+            0 => new NovelNode("S001"),
             // 最初のバトル
-            1 => new BattleNode("enemy_001"),
+            1 => new BattleNode("E001"),
             // 最初のバトル結果に応じた分岐
             2 => GetResult("1") == "win" 
-                ? new NovelNode("first_victory") 
-                : new NovelNode("first_defeat"),
+                ? new NovelNode("S011") 
+                : new NovelNode("S012"),
             // 2番目のバトル
-            3 => new BattleNode("enemy_002"),
+            3 => new BattleNode("E002"),
             // 2番目のバトル結果に応じた分岐
             4 => GetResult("3") == "win"
-                ? new NovelNode("second_victory")
-                : new NovelNode("second_defeat"),
+                ? new NovelNode("S021")
+                : new NovelNode("S022"),
             // 最終バトル
-            5 => new BattleNode("enemy_003"),
+            5 => new BattleNode("E003"),
             // ゲーム終了
             _ => new EndingNode()
         };
+        
+        Debug.Log($"[GameProgressService] 決定されたノード: {nextNode.GetType().Name} ({nextNode.NodeId})");
+        return nextNode;
     }
     
     /// <summary>
@@ -66,8 +81,9 @@ public class GameProgressService
     /// </summary>
     public void AdvanceStory()
     {
+        var oldStep = _currentStep;
         _currentStep++;
-        Debug.Log($"[GameProgressService] ストーリー進行: Step {_currentStep}");
+        Debug.Log($"[GameProgressService] ストーリー進行: Step {oldStep} → {_currentStep}");
     }
     
     /// <summary>
@@ -77,7 +93,9 @@ public class GameProgressService
     /// <returns>結果の値（存在しない場合は空文字）</returns>
     private string GetResult(string id)
     {
-        return _results.TryGetValue(id, out var value) ? value : "";
+        var result = _results.TryGetValue(id, out var value) ? value : "";
+        Debug.Log($"[GameProgressService] 結果取得: ID '{id}' → '{result}' (総Results数: {_results.Count})");
+        return result;
     }
     
     /// <summary>
@@ -85,7 +103,42 @@ public class GameProgressService
     /// </summary>
     public void RecordCurrentBattleResult(bool isPlayerWin)
     {
-        _results[_currentStep.ToString()] = isPlayerWin ? "win" : "lose";
+        var result = isPlayerWin ? "win" : "lose";
+        _results[_currentStep.ToString()] = result;
+        Debug.Log($"[GameProgressService] バトル結果記録: Step {_currentStep} → {result}");
+    }
+    
+    /// <summary>
+    /// ゲーム進行状態を自動セーブ（全サービス統合）
+    /// </summary>
+    public void SaveAndPersist()
+    {
+        var saveData = _gameStatsService.CurrentSaveData;
+        
+        // 進行状態をsaveDataに同期
+        saveData.UpdateGameProgress(_currentStep, _results);
+        
+        // 実際にファイルに保存
+        _saveDataManager.SaveGameData(saveData);
+        
+        Debug.Log("[GameProgressService] 統合セーブ完了");
+    }
+    
+    /// <summary>
+    /// GameSaveDataからゲーム進行状態を復元
+    /// </summary>
+    public void LoadState(GameSaveData saveData)
+    {
+        _currentStep = saveData.CurrentStep;
+        _results.Clear();
+        
+        var loadedResults = saveData.GetResults();
+        foreach (var result in loadedResults)
+        {
+            _results[result.Key] = result.Value;
+        }
+        
+        Debug.Log($"[GameProgressService] ゲーム進行状態をロード: Step {_currentStep}, Results {_results.Count}件");
     }
     
     /// <summary>

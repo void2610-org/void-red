@@ -18,13 +18,20 @@ public class RootLifetimeScope : LifetimeScope
         // データの登録
         builder.RegisterInstance(allEnemyData);
         
-        // 設定管理とセーブデータ管理
-        builder.Register<PersonalityLogService>(Lifetime.Singleton);
+        // セーブデータ管理（最初に登録）
         builder.Register<SaveDataManager>(Lifetime.Singleton);
-        builder.Register<SettingsManager>(Lifetime.Singleton);
         
-        // ゲーム進行管理とシーン遷移
+        // PersonalityLogService（SaveDataManagerに依存）
+        builder.Register<PersonalityLogService>(Lifetime.Singleton);
+        
+        // GameStatsService（SaveDataManagerとPersonalityLogServiceに依存）
+        builder.Register<GameStatsService>(Lifetime.Singleton);
+        
+        // GameProgressService（すべてのサービスに依存、最後に登録）
         builder.Register<GameProgressService>(Lifetime.Singleton);
+        
+        // その他の設定管理
+        builder.Register<SettingsManager>(Lifetime.Singleton);
         
         // サウンドマネージャーの初期化
         InitializeSoundManagers();

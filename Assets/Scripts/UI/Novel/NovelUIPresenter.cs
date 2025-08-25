@@ -41,8 +41,11 @@ public class NovelUIPresenter : MonoBehaviour
     {
         await UniTask.Delay(3000);
         
-        // ストーリーを進行してホームシーンに戻る
+        // ストーリーを進行させてセーブ
         _gameProgressService.AdvanceStory();
+        _gameProgressService.SaveAndPersist();
+        
+        // ホームシーンに戻る
         await _gameProgressService.TransitionToScene(SceneType.Home);
     }
 }
