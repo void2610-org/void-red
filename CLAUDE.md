@@ -39,7 +39,11 @@ Game/
 │   ├── ThemeService.cs → テーマデータ管理
 │   ├── StatsTrackerService.cs → プレイヤー・敵の統計管理 + セーブ・ロード
 │   ├── SaveDataManager.cs → セーブデータファイル管理
-│   └── CardViewFactory.cs → カードビューファクトリ
+│   ├── CardViewFactory.cs → カードビューファクトリ
+│   └── SceneTransition/ → シーン遷移システム
+│       ├── SceneTransitionService.cs → 遷移管理とデータ受け渡し
+│       ├── SceneTransitionData.cs → 遷移データクラス群
+│       └── SceneType.cs → シーン種別定義と拡張メソッド
 ├── Logic/             → ゲームロジック
 │   ├── GameManager.cs → ゲーム進行制御 (IStartable)
 │   ├── ScoreCalculator.cs → スコア計算ロジック (static)
@@ -55,9 +59,14 @@ Game/
     └── EvolutionConditionGroup.cs → 進化条件グループ
 
 UI/
-├── Main/              → メインUI
+├── Main/              → メインUI (バトルシーン)
 │   └── UIPresenter.cs → UI Views統合管理 + イベント処理
 ├── Title/             → タイトル画面
+│   └── TitleUIPresenter.cs → タイトル画面UI制御
+├── Home/              → ホーム画面
+│   └── HomeUIPresenter.cs → ホーム画面UI制御・シーン遷移
+├── Novel/             → ノベル画面
+│   └── NovelUIPresenter.cs → ノベル画面UI制御
 └── Views/             → UI表示・アニメーション
     ├── HandView.cs    → 手札表示 + カードアニメーション
     ├── CardView.cs    → 個別カード表示 + アニメーション
@@ -68,6 +77,12 @@ Debug/
 ```
 
 ### 責任分離の詳細
+
+**SceneTransitionService (シーン遷移管理)**
+- 型安全なシーン遷移とデータ受け渡し
+- SceneTransitionDataによる構造化されたデータ管理
+- クロスシーンでのデータ永続化
+- VContainerでSingletonとして管理され全シーン共通利用
 
 **PlayerPresenter (統合プレゼンター)**
 - HandModel, DeckModel, PlayerModelの直接管理
@@ -132,15 +147,22 @@ Debug/
 
 ### VContainer Setup
 ```csharp
-// MainLifetimeScope.cs pattern
+// RootLifetimeScope.cs - Cross-scene services
+builder.Register<SaveDataManager>(Lifetime.Singleton);
+builder.Register<SceneTransitionService>(Lifetime.Singleton);
+builder.Register<PersonalityLogService>(Lifetime.Singleton);
+
+// BattleLifetimeScope.cs - Battle-specific dependencies
 builder.RegisterInstance(player);
 builder.RegisterInstance(enemy);
 builder.Register<CardPoolService>(Lifetime.Singleton);
 builder.Register<ThemeService>(Lifetime.Singleton);
-builder.Register<SaveDataManager>(Lifetime.Singleton);
-builder.Register<StatsTrackerService>(Lifetime.Singleton);
+builder.Register<GameStatsService>(Lifetime.Singleton);
 builder.RegisterEntryPoint<GameManager>();
 builder.RegisterComponentInHierarchy<UIPresenter>();
+
+// HomeLifetimeScope.cs - Home scene dependencies  
+builder.RegisterComponentInHierarchy<HomeUIPresenter>();
 ```
 
 ### 進化システムの重要実装
@@ -222,10 +244,45 @@ Don't null-check SerializeField components that should be set in Inspector. Let 
 ### Async Operations
 Use UniTask for all async operations. Prefer `.Forget()` for fire-and-forget operations.
 
-## Scene Structure
+## Scene Structure and Transition System
 
-- **TitleScene**: Entry point with TitleMenu
-- **MainScene**: Game scene with Player, Enemy, UIPresenter components
+### Scene Architecture
+- **TitleScene**: Entry point with TitleUIPresenter
+- **HomeScene**: Hub scene with HomeUIPresenter for navigation
+- **BattleScene**: Main game scene with Player, Enemy, UIPresenter components (renamed from MainScene)
+- **NovelScene**: Story scene with NovelUIPresenter for narrative content
+
+### Scene Transition System
+The project uses a centralized SceneTransitionService for type-safe scene management and data passing:
+
+```csharp
+// SceneType enum with extension methods for type safety
+public enum SceneType { Title, Home, Battle, Novel }
+
+// Base transition data class
+public abstract class SceneTransitionData
+{
+    public abstract SceneType TargetScene { get; }
+    public SceneType ReturnScene { get; set; } = SceneType.Home;
+    public virtual string GetDebugInfo() => $"Target: {TargetScene}, Return: {ReturnScene}";
+}
+
+// Specific transition data for battles
+public class BattleTransitionData : SceneTransitionData
+{
+    public override SceneType TargetScene => SceneType.Battle;
+    public EnemyData TargetEnemy { get; set; }  // Required for battle scenes
+}
+
+// Scene transition service usage
+await _sceneTransitionService.TransitionToScene(battleData);
+var receivedData = _sceneTransitionService.GetTransitionData<BattleTransitionData>();
+```
+
+### Scene Flow
+- Title → Home → Battle/Novel → Home (post-battle/story return)
+- All scenes use SceneTransitionService for navigation
+- Data persistence across scene changes via transition data objects
 
 ## Dependencies
 
@@ -253,10 +310,41 @@ Key packages from manifest.json:
 3. Implement display logic in View
 4. Control from UIPresenter
 
-### Modifying Game Flow
+### Scene Transition Implementation
+```csharp
+// 1. Create transition data if needed
+var battleData = new BattleTransitionData 
+{
+    TargetEnemy = enemyData,
+    ReturnScene = SceneType.Home
+};
+
+// 2. Transition to target scene
+await _sceneTransitionService.TransitionToScene(battleData);
+
+// 3. In target scene, retrieve data
+var receivedData = _sceneTransitionService.GetTransitionData<BattleTransitionData>();
+if (receivedData?.TargetEnemy != null) 
+{
+    // Use the received enemy data
+}
+
+// 4. Clean up and return
+_sceneTransitionService.ClearTransitionData();
+await _sceneTransitionService.TransitionToScene(SceneType.Home);
+```
+
+### Modifying Game Flow  
 1. Update GameState enum if needed
 2. Modify state transitions in GameManager.ChangeState()
 3. Handle new states appropriately
+
+### Adding New Scene Types
+1. Add new enum value to SceneType in SceneType.cs
+2. Update SceneTypeExtensions.SceneNames dictionary
+3. Create transition data class if data passing needed
+4. Create LifetimeScope for the new scene
+5. Implement UI presenter for scene management
 
 ### 進化条件の追加
 1. EvolutionConditionBase から継承した新しい条件クラスを作成
