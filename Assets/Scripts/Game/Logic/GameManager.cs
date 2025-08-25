@@ -19,6 +19,8 @@ public class GameManager: IStartable, IDisposable
     private readonly SceneTransitionService _sceneTransitionService;
     private readonly CardNarrationService _cardNarrationService;
     private readonly PersonalityLogService _personalityLogService;
+    private readonly GameProgressService _gameProgressService;
+    private readonly AllEnemyData _allEnemyData;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private readonly CompositeDisposable _disposables = new();
@@ -51,7 +53,9 @@ public class GameManager: IStartable, IDisposable
         SaveDataManager saveDataManager,
         SceneTransitionService sceneTransitionService,
         CardNarrationService cardNarrationService,
-        PersonalityLogService personalityLogService)
+        PersonalityLogService personalityLogService,
+        GameProgressService gameProgressService,
+        AllEnemyData allEnemyData)
     {
         _cardPoolService = cardPoolService;
         _themeService = themeService;
@@ -63,6 +67,8 @@ public class GameManager: IStartable, IDisposable
         _sceneTransitionService = sceneTransitionService;
         _cardNarrationService = cardNarrationService;
         _personalityLogService = personalityLogService;
+        _gameProgressService = gameProgressService;
+        _allEnemyData = allEnemyData;
 
         // 崩壊フラグを初期化
         _playerCollapse = false;
@@ -89,14 +95,15 @@ public class GameManager: IStartable, IDisposable
         // 敵の統計をリセット
         _gameStatsService.ResetEnemyStats();
         
-        // 遷移データから敵データを取得
-        var battleData = _sceneTransitionService.GetTransitionData<BattleTransitionData>();
-        if (battleData?.TargetEnemy == null)
+        // GameProgressServiceから敵データを取得
+        var currentNode = _gameProgressService.GetCurrentNode();
+        if (currentNode is not BattleNode battleNode)
         {
-            Debug.LogError("[GameManager] BattleTransitionDataまたはTargetEnemyが存在しません");
+            Debug.LogError("[GameManager] 現在のノードがBattleNodeではありません");
             return;
         }
-        _currentEnemyData = battleData.TargetEnemy;
+        
+        _currentEnemyData = _allEnemyData.GetEnemyById(battleNode.EnemyId);
         
         // 人格ログ: チャプター開始
         _personalityLogService.StartChapter(_currentEnemyData);
@@ -612,6 +619,11 @@ public class GameManager: IStartable, IDisposable
         
         // セーブデータを保存
         _saveDataManager.SaveAllData(_gameStatsService.PlayerSaveData);
+        
+        // バトル結果をGameProgressServiceに報告してストーリー進行
+        var playerWon = _playerWins >= WINS_TO_VICTORY;
+        _gameProgressService.AdvanceStory();
+        Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
         
         // バトル完了後はHomeSceneに戻る
         await UniTask.Delay(1000);
