@@ -16,11 +16,14 @@ public class HomeUIPresenter : MonoBehaviour
     [SerializeField] private Button storyButton;
     
     private SceneTransitionService _sceneTransitionService;
+    private GameProgressService _gameProgressService;
+    private StoryNode _currentNode;
     
     [Inject]
-    public void Construct(SceneTransitionService sceneTransitionService)
+    public void Construct(SceneTransitionService sceneTransitionService, GameProgressService gameProgressService)
     {
         _sceneTransitionService = sceneTransitionService;
+        _gameProgressService = gameProgressService;
     }
 
     private void Start()
@@ -50,39 +53,50 @@ public class HomeUIPresenter : MonoBehaviour
     }
 
     /// <summary>
+    /// 現在のノードを開始
     /// </summary>
+    private async UniTask StartCurrentNodeAsync()
     {
-    }
-    /// <summary>
-    /// バトル開始処理
-    /// </summary>
-    private async UniTask StartBattleAsync()
-    {
-        // 指定された敵データでバトル開始
-        var battleData = new BattleTransitionData
+        _currentNode = _gameProgressService.GetNextNode();
+        
+        switch (_currentNode)
         {
-            TargetEnemy = testEnemyData,
-            ReturnScene = SceneType.Home
-        };
-        // バトルシーンに遷移
-        await _sceneTransitionService.TransitionToScene(battleData);
+            case BattleNode battleNode:
+                await StartBattleNode(battleNode);
+                break;
+            case NovelNode novelNode:
+                await StartNovelNode(novelNode);
+                break;
+            case EndingNode:
+                Debug.Log("[ホームUI] ゲームが完了しています");
+                break;
+        }
     }
     
     /// <summary>
-    /// ノベル開始処理
+    /// バトルノード開始
     /// </summary>
-    private async UniTask StartNovelAsync()
+    private async UniTask StartBattleNode(BattleNode battleNode)
     {
-        // テスト用ノベルデータ
+        Debug.Log($"[ホームUI] バトル開始: 敵ID {battleNode.EnemyId}");
+        
+        // 単純にBattleSceneに遷移（敵情報はGameProgressServiceから取得）
+        await _sceneTransitionService.TransitionToScene(SceneType.Battle);
+    }
+    
+    /// <summary>
+    /// ノベルノード開始
+    /// </summary>
+    private async UniTask StartNovelNode(NovelNode novelNode)
+    {
         var novelData = new NovelTransitionData
         {
-            ScenarioId = "test_scenario_001",
+            ScenarioId = novelNode.ScenarioId,
             ReturnScene = SceneType.Home
         };
         
-        Debug.Log($"[HomeUI] ノベル開始: {novelData.ScenarioId}");
+        Debug.Log($"[ホームUI] ノベル開始: {novelNode.ScenarioId}");
         
-        // ノベルシーンに遷移
         await _sceneTransitionService.TransitionToScene(novelData);
     }
 }
