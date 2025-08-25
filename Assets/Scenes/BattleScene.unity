@@ -184,7 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1cef07666c8c4bf5ac49769a9da4e10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableFastMode: 0
+  enableFastMode: 1
   timeScale: 10
   showSaveInfo: 0
   startWithFreshData: 1

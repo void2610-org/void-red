@@ -23,10 +23,7 @@ public class RootLifetimeScope : LifetimeScope
         builder.Register<SaveDataManager>(Lifetime.Singleton);
         builder.Register<SettingsManager>(Lifetime.Singleton);
         
-        // シーン遷移管理
-        builder.Register<SceneTransitionService>(Lifetime.Singleton);
-        
-        // ゲーム進行管理
+        // ゲーム進行管理とシーン遷移
         builder.Register<GameProgressService>(Lifetime.Singleton);
         
         // サウンドマネージャーの初期化

@@ -3,6 +3,7 @@
 /// </summary>
 public abstract class StoryNode
 {
+    public string NodeId { get; protected set; }
 }
 
 /// <summary>
@@ -10,9 +11,6 @@ public abstract class StoryNode
 /// </summary>
 public class BattleNode : StoryNode
 {
-    /// <summary>
-    /// 敵キャラクターのID
-    /// </summary>
     public string EnemyId { get; }
     
     /// <summary>
@@ -21,6 +19,7 @@ public class BattleNode : StoryNode
     /// <param name="enemyId">敵ID</param>
     public BattleNode(string enemyId)
     {
+        NodeId = enemyId;
         EnemyId = enemyId;
     }
 }
@@ -41,6 +40,7 @@ public class NovelNode : StoryNode
     /// <param name="scenarioId">シナリオID</param>
     public NovelNode(string scenarioId)
     {
+        NodeId = scenarioId;
         ScenarioId = scenarioId;
     }
 }
@@ -55,5 +55,6 @@ public class EndingNode : StoryNode
     /// </summary>
     public EndingNode()
     {
+        NodeId = "ending";
     }
 }

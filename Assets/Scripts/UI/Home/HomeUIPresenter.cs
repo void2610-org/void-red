@@ -15,14 +15,12 @@ public class HomeUIPresenter : MonoBehaviour
     [SerializeField] private Button titleButton;
     [SerializeField] private Button storyButton;
     
-    private SceneTransitionService _sceneTransitionService;
     private GameProgressService _gameProgressService;
     private StoryNode _currentNode;
     
     [Inject]
-    public void Construct(SceneTransitionService sceneTransitionService, GameProgressService gameProgressService)
+    public void Construct(GameProgressService gameProgressService)
     {
-        _sceneTransitionService = sceneTransitionService;
         _gameProgressService = gameProgressService;
     }
 
@@ -41,7 +39,7 @@ public class HomeUIPresenter : MonoBehaviour
     /// </summary>
     private void OnTitleButtonClicked()
     {
-        _sceneTransitionService.TransitionToScene(SceneType.Title).Forget();
+        _gameProgressService.TransitionToScene(SceneType.Title).Forget();
     }
 
     /// <summary>
@@ -81,7 +79,7 @@ public class HomeUIPresenter : MonoBehaviour
         Debug.Log($"[ホームUI] バトル開始: 敵ID {battleNode.EnemyId}");
         
         // 単純にBattleSceneに遷移（敵情報はGameProgressServiceから取得）
-        await _sceneTransitionService.TransitionToScene(SceneType.Battle);
+        await _gameProgressService.TransitionToScene(SceneType.Battle);
     }
     
     /// <summary>
@@ -89,14 +87,9 @@ public class HomeUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTask StartNovelNode(NovelNode novelNode)
     {
-        var novelData = new NovelTransitionData
-        {
-            ScenarioId = novelNode.ScenarioId,
-            ReturnScene = SceneType.Home
-        };
-        
         Debug.Log($"[ホームUI] ノベル開始: {novelNode.ScenarioId}");
         
-        await _sceneTransitionService.TransitionToScene(novelData);
+        // ノベルシーンに遷移（シナリオ情報はGameProgressServiceから取得）
+        await _gameProgressService.TransitionToScene(SceneType.Novel);
     }
 }
