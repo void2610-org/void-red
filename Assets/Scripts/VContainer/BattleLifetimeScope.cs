@@ -44,16 +44,12 @@ public class BattleLifetimeScope : LifetimeScope
         builder.Register<CardPoolService>(Lifetime.Singleton);
         builder.Register<ThemeService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
+        builder.Register<GameStatsService>(Lifetime.Singleton);
         
         
         // === エントリーポイントとPresenterの登録 ===
         
         builder.RegisterEntryPoint<UIPresenter>().AsSelf();
         builder.RegisterEntryPoint<GameManager>();
-        
-        // === デバッグ機能の登録（エディター用） ===
-        #if UNITY_EDITOR
-        builder.RegisterComponentInHierarchy<DebugController>();
-        #endif
     }
 }
