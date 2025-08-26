@@ -11,16 +11,21 @@ public class RootLifetimeScope : LifetimeScope
 {
     [SerializeField] private BgmManager bgmManager;
     [SerializeField] private SeManager seManager;
+    [SerializeField] private AllEnemyData allEnemyData;
     
     protected override void Configure(IContainerBuilder builder)
     {
-        // 設定管理とセーブデータ管理
-        builder.Register<PersonalityLogService>(Lifetime.Singleton);
-        builder.Register<SaveDataManager>(Lifetime.Singleton);
-        builder.Register<SettingsManager>(Lifetime.Singleton);
+        // データの登録
+        builder.RegisterInstance(allEnemyData);
         
-        // シーン遷移管理
-        builder.Register<SceneTransitionService>(Lifetime.Singleton);
+        // セーブデータ管理
+        builder.Register<SaveDataManager>(Lifetime.Singleton);
+        
+        // ゲーム進行管理（全機能統合）
+        builder.Register<GameProgressService>(Lifetime.Singleton);
+        
+        // その他の設定管理
+        builder.Register<SettingsManager>(Lifetime.Singleton);
         
         // サウンドマネージャーの初期化
         InitializeSoundManagers();
