@@ -18,13 +18,13 @@ public class DebugController : MonoBehaviour
     private readonly ReactiveProperty<bool> _fastModeProperty = new();
     private readonly ReactiveProperty<float> _timeScaleProperty = new();
     
-    private GameStatsService _gameStatsService;
+    private GameProgressService _gameProgressService;
     private SaveDataManager _saveDataManager;
     
     [Inject]
-    public void Construct(GameStatsService gameStatsService, SaveDataManager saveDataManager)
+    public void Construct(GameProgressService gameProgressService, SaveDataManager saveDataManager)
     {
-        _gameStatsService = gameStatsService;
+        _gameProgressService = gameProgressService;
         _saveDataManager = saveDataManager;
     }
     
@@ -67,7 +67,7 @@ public class DebugController : MonoBehaviour
     
     private void OnGUI()
     {
-        if (!Application.isEditor || !showSaveInfo || _gameStatsService == null || _saveDataManager == null) return;
+        if (!Application.isEditor || !showSaveInfo || _gameProgressService == null || _saveDataManager == null) return;
         
         GUILayout.BeginArea(new Rect(10, 100, 300, 200));
         GUILayout.BeginVertical("box");
@@ -81,16 +81,15 @@ public class DebugController : MonoBehaviour
         // フラグ状態表示
         GUILayout.Label($"新データ開始: {(startWithFreshData ? "ON" : "OFF")}");
         
-        // プレイヤー統計情報表示
-        var saveData = _gameStatsService.CurrentSaveData;
-        GUILayout.Label($"統計: {saveData.GetDebugInfo()}");
+        // プレイヤー統計情報表示（現在のゲーム状態を表示）
+        GUILayout.Label($"精神力: {_gameProgressService.GetPlayerMentalPower()}");
         
         if (GUILayout.Button("セーブファイル削除"))
         {
             var success = _saveDataManager.DeleteSaveFile();
             if (success) 
             {
-                Debug.Log("[Debug] セーブファイル削除完了");
+                _gameProgressService.ResetToDefaultData();
             }
         }
         
