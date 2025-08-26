@@ -51,8 +51,10 @@ public class SaveDataManager
             
             if (string.IsNullOrEmpty(json))
             {
-                Debug.Log("[SaveDataManager] セーブファイルが存在しないため新規データを作成");
-                return new GameSaveData();
+                Debug.Log("[SaveDataManager] セーブファイルが存在しないため新規データを作成・保存");
+                var newSaveData = new GameSaveData();
+                SaveGameData(newSaveData); // 即座にファイルに保存
+                return newSaveData;
             }
             
             var saveData = JsonUtility.FromJson<GameSaveData>(json);
@@ -63,14 +65,18 @@ public class SaveDataManager
             }
             else
             {
-                Debug.LogWarning("[SaveDataManager] セーブデータの解析に失敗、新規データを作成");
-                return new GameSaveData();
+                Debug.LogWarning("[SaveDataManager] セーブデータの解析に失敗、新規データを作成・保存");
+                var newSaveData = new GameSaveData();
+                SaveGameData(newSaveData); // 解析失敗時も新規データを保存
+                return newSaveData;
             }
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[SaveDataManager] ロード中にエラーが発生: {ex.Message}");
-            return new GameSaveData();
+            Debug.LogError($"[SaveDataManager] ロード中にエラーが発生: {ex.Message}、新規データを作成・保存");
+            var newSaveData = new GameSaveData();
+            SaveGameData(newSaveData); // エラー時も新規データを保存
+            return newSaveData;
         }
     }
     
@@ -94,14 +100,24 @@ public class SaveDataManager
             // 存在確認
             if (!SaveFileExists())
             {
-                Debug.Log("[SaveDataManager] セーブファイルが存在しないため削除不要");
+                Debug.Log("[SaveDataManager] セーブファイルが存在しないため削除不要、新規データを保存");
+                var newSaveData = new GameSaveData();
+                SaveGameData(newSaveData); // 存在しない場合も新規データを保存
                 return true; // 削除済みとみなす
             }
             
             var success = DataPersistence.DeleteData(SAVE_DATA_KEY);
             
-            if (success) Debug.Log("[SaveDataManager] セーブファイル削除成功");
-            else Debug.LogWarning("[SaveDataManager] セーブファイル削除に失敗しました");
+            if (success) 
+            {
+                Debug.Log("[SaveDataManager] セーブファイル削除成功、新規データを保存");
+                var newSaveData = new GameSaveData();
+                SaveGameData(newSaveData); // 削除後に新規データを保存
+            }
+            else 
+            {
+                Debug.LogWarning("[SaveDataManager] セーブファイル削除に失敗しました");
+            }
             
             return success;
         }

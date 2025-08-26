@@ -15,6 +15,7 @@ public class SettingsManager : IDisposable
     private readonly Subject<string> _onSettingChanged = new();
     private readonly CompositeDisposable _disposables = new();
     private readonly SaveDataManager _saveDataManager;
+    private readonly GameProgressService _gameProgressService;
     
     private const string SETTINGS_KEY = "game_settings";
     
@@ -23,9 +24,10 @@ public class SettingsManager : IDisposable
     /// </summary>
     public IReadOnlyList<ISettingBase> Settings => _settings.AsReadOnly();
     
-    public SettingsManager(SaveDataManager saveDataManager)
+    public SettingsManager(SaveDataManager saveDataManager, GameProgressService gameProgressService)
     {
         _saveDataManager = saveDataManager;
+        _gameProgressService = gameProgressService;
         
         // 既存の設定がない場合は初期設定を作成
         if (_settings.Count == 0) InitializeDefaultSettings();
@@ -73,7 +75,13 @@ public class SettingsManager : IDisposable
             true, 
             "本当にセーブデータを削除しますか？この操作は元に戻せません。"
         );
-        deleteDataSetting.ButtonAction = () => _saveDataManager.DeleteSaveFile();
+        deleteDataSetting.ButtonAction = () => {
+            var success = _saveDataManager.DeleteSaveFile();
+            if (success) 
+            {
+                _gameProgressService.ResetToDefaultData();
+            }
+        };
         _settings.Add(deleteDataSetting);
     }
     

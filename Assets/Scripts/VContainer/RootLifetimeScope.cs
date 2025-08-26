@@ -18,16 +18,10 @@ public class RootLifetimeScope : LifetimeScope
         // データの登録
         builder.RegisterInstance(allEnemyData);
         
-        // セーブデータ管理（最初に登録）
+        // セーブデータ管理
         builder.Register<SaveDataManager>(Lifetime.Singleton);
         
-        // PersonalityLogService（SaveDataManagerに依存）
-        builder.Register<PersonalityLogService>(Lifetime.Singleton);
-        
-        // GameStatsService（SaveDataManagerとPersonalityLogServiceに依存）
-        builder.Register<GameStatsService>(Lifetime.Singleton);
-        
-        // GameProgressService（すべてのサービスに依存、最後に登録）
+        // ゲーム進行管理（全機能統合）
         builder.Register<GameProgressService>(Lifetime.Singleton);
         
         // その他の設定管理

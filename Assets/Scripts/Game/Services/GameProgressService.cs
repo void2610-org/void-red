@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
+using Game.PersonalityLog;
+using R3;
 
 /// <summary>
 /// ゲーム全体の進行度を管理し、次のイベントを決定するサービス
@@ -16,19 +19,88 @@ public class GameProgressService
     
     private StoryNode _currentStoryNode;
     private int _currentStep;
-    private readonly SaveDataManager _saveDataManager;
-    private readonly GameStatsService _gameStatsService;
-    private readonly PersonalityLogService _personalityLogService;
     
-    public GameProgressService(SaveDataManager saveDataManager, GameStatsService gameStatsService, PersonalityLogService personalityLogService)
+    // プレイヤー状態
+    private int _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
+    private List<string> _currentDeck = new();
+    private EvolutionStatsData _evolutionStats = new();
+    private EnemyStats _enemyStats = new();
+    
+    // 人格ログ
+    private PersonalityLogData _personalityLog = new();
+    private MoveLog _currentPlayerMove;
+    private MoveLog _currentEnemyMove;
+    private List<TurnEvent> _currentEvents = new();
+    private ChapterLog _currentChapter;
+    
+    private readonly SaveDataManager _saveDataManager;
+    
+    public GameProgressService(SaveDataManager saveDataManager)
     {
         _saveDataManager = saveDataManager;
-        _gameStatsService = gameStatsService;
-        _personalityLogService = personalityLogService;
         
         // 起動時に自動でセーブデータをロード
+        LoadAllGameData();
+    }
+    
+    /// <summary>
+    /// 起動時の全ゲームデータ自動ロード
+    /// </summary>
+    private void LoadAllGameData()
+    {
         var loadedData = _saveDataManager.LoadGameData();
-        LoadState(loadedData);
+        
+        // ストーリー進行データのロード
+        _currentStep = loadedData.CurrentStep;
+        _results.Clear();
+        var loadedResults = loadedData.GetResults();
+        foreach (var result in loadedResults)
+        {
+            _results[result.Key] = result.Value;
+        }
+        
+        // プレイヤー状態のロード
+        _currentMentalPower = loadedData.CurrentMentalPower;
+        _currentDeck.Clear();
+        _currentDeck.AddRange(loadedData.CurrentDeck);
+        _evolutionStats = loadedData.EvolutionStats ?? new EvolutionStatsData();
+        
+        // 人格ログのロード
+        _personalityLog = loadedData.PersonalityLog ?? new PersonalityLogData();
+        
+        // 新規データかどうかを判定（Step0かつ結果が0件の場合）
+        var isNewData = _currentStep == 0 && _results.Count == 0;
+        var dataType = isNewData ? "新規データ" : "既存データ";
+        
+        Debug.Log($"[GameProgressService] {dataType}自動ロード: Step {_currentStep}");
+    }
+    
+    /// <summary>
+    /// 全データを初期状態にリセット（デバッグ用）
+    /// </summary>
+    public void ResetToDefaultData()
+    {
+        // ストーリー進行データをリセット
+        _currentStep = 0;
+        _results.Clear();
+        
+        // プレイヤー状態をリセット
+        _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
+        _currentDeck.Clear();
+        _evolutionStats = new EvolutionStatsData();
+        _enemyStats = new EnemyStats();
+        
+        // 人格ログをリセット
+        _personalityLog = new PersonalityLogData();
+        _currentPlayerMove = null;
+        _currentEnemyMove = null;
+        _currentEvents.Clear();
+        _currentChapter = null;
+        
+        // リセット後に即座にセーブファイルに反映
+        SaveAndPersist();
+        
+        Debug.Log("[GameProgressService] 全データを初期状態にリセット完了");
     }
     
     /// <summary>
@@ -82,9 +154,7 @@ public class GameProgressService
     /// <returns>結果の値（存在しない場合は空文字）</returns>
     private string GetResult(string id)
     {
-        var result = _results.TryGetValue(id, out var value) ? value : "";
-        Debug.Log($"[GameProgressService] 結果取得: ID '{id}' → '{result}' (総Results数: {_results.Count})");
-        return result;
+        return _results.TryGetValue(id, out var value) ? value : "";
     }
     
     /// <summary>
@@ -115,15 +185,213 @@ public class GameProgressService
     /// </summary>
     private void SaveAndPersist()
     {
-        var saveData = _gameStatsService.CurrentSaveData;
-        
-        // 進行状態をsaveDataに同期
-        saveData.UpdateGameProgress(_currentStep, _results);
+        var saveData = CreateGameSaveData();
         
         // 実際にファイルに保存
         _saveDataManager.SaveGameData(saveData);
         
         Debug.Log("[GameProgressService] 統合セーブ完了");
+    }
+    
+    /// <summary>
+    /// 現在の状態からGameSaveDataを作成
+    /// </summary>
+    private GameSaveData CreateGameSaveData()
+    {
+        var saveData = new GameSaveData();
+        
+        // ストーリー進行データを設定
+        saveData.UpdateGameProgress(_currentStep, _results);
+        
+        // プレイヤー状態を設定
+        saveData.UpdateMentalPower(_currentMentalPower);
+        saveData.UpdateDeck(_currentDeck);
+        
+        // 進化統計データと人格ログデータを設定
+        saveData.UpdateEvolutionStats(_evolutionStats);
+        saveData.UpdatePersonalityLog(_personalityLog);
+        
+        return saveData;
+    }
+    
+    // === GameStatsServiceから移動したメソッド ===
+    
+    /// <summary>
+    /// プレイヤーの精神力を取得
+    /// </summary>
+    public int GetPlayerMentalPower()
+    {
+        return _currentMentalPower;
+    }
+    
+    /// <summary>
+    /// プレイヤーの精神力を更新
+    /// </summary>
+    public void UpdatePlayerMentalPower(int mentalPower)
+    {
+        _currentMentalPower = Mathf.Clamp(mentalPower, 0, GameConstants.MAX_MENTAL_POWER);
+        Debug.Log($"[GameProgressService] プレイヤー精神力更新: {_currentMentalPower}");
+    }
+    
+    /// <summary>
+    /// デッキ情報を更新
+    /// </summary>
+    public void UpdateDeck(List<string> deck)
+    {
+        _currentDeck.Clear();
+        _currentDeck.AddRange(deck);
+        Debug.Log($"[GameProgressService] デッキ更新: {_currentDeck.Count}枚");
+    }
+    
+    /// <summary>
+    /// 敵の統計をリセット
+    /// </summary>
+    public void ResetEnemyStats()
+    {
+        _enemyStats = new EnemyStats();
+        Debug.Log("[GameProgressService] 敵統計リセット");
+    }
+    
+    /// <summary>
+    /// ゲーム結果を記録（プレイヤー分）
+    /// </summary>
+    public void RecordPlayerGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
+    {
+        _evolutionStats.RecordGameResult(playerWon, playerMove, playerCollapsed);
+        Debug.Log($"[GameProgressService] プレイヤー結果記録: {(playerWon ? "勝利" : "敗北")}, Move: {playerMove}, Collapsed: {playerCollapsed}");
+    }
+    
+    /// <summary>
+    /// カード進化チェック（プレイヤー分）
+    /// </summary>
+    public CardData CheckPlayerCardEvolution(CardData card)
+    {
+        if (_evolutionStats.CheckAllEvolutionConditions(card))
+        {
+            Debug.Log($"[GameProgressService] カード進化: {card.CardName} → {card.EvolutionTarget.CardName}");
+            return card.EvolutionTarget;
+        }
+        
+        if (_evolutionStats.CheckAllDegradationConditions(card))
+        {
+            Debug.Log($"[GameProgressService] カード劣化: {card.CardName} → {card.DegradationTarget.CardName}");
+            return card.DegradationTarget;
+        }
+        
+        return card;
+    }
+    
+    /// <summary>
+    /// プレイヤー進化統計データを取得
+    /// </summary>
+    public EvolutionStatsData PlayerEvolutionStats => _evolutionStats;
+    
+    /// <summary>
+    /// 敵統計データを取得
+    /// </summary>
+    public EnemyStats EnemyStats => _enemyStats;
+    
+    // === PersonalityLogServiceから移動したメソッド ===
+    
+    /// <summary>
+    /// 新しいチャプターを開始
+    /// </summary>
+    public void StartChapter(EnemyData enemyData)
+    {
+        _currentChapter = _personalityLog.StartNewChapter(enemyData);
+        Debug.Log($"[GameProgressService] チャプター開始: {enemyData.EnemyName}");
+    }
+    
+    /// <summary>
+    /// チャプターを完了
+    /// </summary>
+    public void CompleteChapter()
+    {
+        if (_currentChapter != null)
+        {
+            _currentChapter.CompleteChapter();
+            Debug.Log("[GameProgressService] チャプター完了");
+        }
+    }
+    
+    /// <summary>
+    /// 新しいターンを開始
+    /// </summary>
+    public void StartTurn()
+    {
+        _currentPlayerMove = null;
+        _currentEnemyMove = null;
+        _currentEvents.Clear();
+        Debug.Log("[GameProgressService] ターン開始");
+    }
+    
+    /// <summary>
+    /// ターンを終了
+    /// </summary>
+    public void EndTurn()
+    {
+        if (_currentChapter != null)
+        {
+            var turnLog = new TurnLog(_currentPlayerMove, _currentEnemyMove, _currentEvents);
+            _currentChapter.AddTurn(turnLog);
+            Debug.Log("[GameProgressService] ターン終了");
+        }
+    }
+    
+    /// <summary>
+    /// プレイヤーのムーブを記録
+    /// </summary>
+    public void LogPlayerMove(PlayerMove move, int currentMentalPower)
+    {
+        _currentPlayerMove = new MoveLog(move, currentMentalPower);
+        Debug.Log($"[GameProgressService] プレイヤームーブ記録: {move}");
+    }
+    
+    /// <summary>
+    /// 敵のムーブを記録
+    /// </summary>
+    public void LogEnemyMove(PlayerMove move, int currentMentalPower)
+    {
+        _currentEnemyMove = new MoveLog(move, currentMentalPower);
+        Debug.Log($"[GameProgressService] 敵ムーブ記録: {move}");
+    }
+    
+    /// <summary>
+    /// 共鳴イベントを記録
+    /// </summary>
+    public void LogResonance(string actorId, CardData resonanceCard)
+    {
+        var resonanceEvent = new ResonanceEvent(actorId, resonanceCard);
+        _currentEvents.Add(resonanceEvent);
+        Debug.Log($"[GameProgressService] 共鳴イベント記録: {actorId} - {resonanceCard.CardName}");
+    }
+    
+    /// <summary>
+    /// カード進化イベントを記録
+    /// </summary>
+    public void LogCardEvolution(string actorId, CardData fromCard, CardData toCard)
+    {
+        var evolutionEvent = new CardEvolutionEvent(actorId, fromCard, toCard);
+        _currentEvents.Add(evolutionEvent);
+        Debug.Log($"[GameProgressService] カード進化イベント記録: {actorId} - {fromCard.CardName} → {toCard.CardName}");
+    }
+    
+    /// <summary>
+    /// カード崩壊イベントを記録
+    /// </summary>
+    public void LogCardCollapse(string actorId, CardData collapseCard)
+    {
+        var collapseEvent = new CardCollapseEvent(actorId, collapseCard);
+        _currentEvents.Add(collapseEvent);
+        Debug.Log($"[GameProgressService] カード崩壊イベント記録: {actorId} - {collapseCard.CardName}");
+    }
+    
+    /// <summary>
+    /// 人格ログデータを取得
+    /// </summary>
+    public PersonalityLogData GetPersonalityLogData()
+    {
+        return _personalityLog;
     }
     
     /// <summary>
