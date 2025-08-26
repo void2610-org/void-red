@@ -118,8 +118,6 @@ public class GameProgressService
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
-        Debug.Log($"[GameProgressService] 次ノード決定: 現在Step {_currentStep}");
-        
         // 結果辞書を使用したストーリー分岐ロジック
         StoryNode nextNode = _currentStep switch
         {
@@ -143,7 +141,6 @@ public class GameProgressService
             _ => new EndingNode()
         };
         
-        Debug.Log($"[GameProgressService] 決定されたノード: {nextNode.GetType().Name} ({nextNode.NodeId})");
         return nextNode;
     }
     
@@ -162,7 +159,6 @@ public class GameProgressService
     /// </summary>
     public void RecordBattleResultAndSave(bool isPlayerWin)
     {
-        // TODO: カードとか精神力もここで保存したい
         var result = isPlayerWin ? "win" : "lose";
         _results[_currentStep.ToString()] = result;
         _currentStep++;
@@ -189,8 +185,6 @@ public class GameProgressService
         
         // 実際にファイルに保存
         _saveDataManager.SaveGameData(saveData);
-        
-        Debug.Log("[GameProgressService] 統合セーブ完了");
     }
     
     /// <summary>
@@ -214,7 +208,7 @@ public class GameProgressService
         return saveData;
     }
     
-    // === GameStatsServiceから移動したメソッド ===
+    // === プレイヤー状態管理メソッド ===
     
     /// <summary>
     /// プレイヤーの精神力を取得
@@ -230,7 +224,6 @@ public class GameProgressService
     public void UpdatePlayerMentalPower(int mentalPower)
     {
         _currentMentalPower = Mathf.Clamp(mentalPower, 0, GameConstants.MAX_MENTAL_POWER);
-        Debug.Log($"[GameProgressService] プレイヤー精神力更新: {_currentMentalPower}");
     }
     
     /// <summary>
@@ -240,7 +233,6 @@ public class GameProgressService
     {
         _currentDeck.Clear();
         _currentDeck.AddRange(deck);
-        Debug.Log($"[GameProgressService] デッキ更新: {_currentDeck.Count}枚");
     }
     
     /// <summary>
@@ -249,7 +241,6 @@ public class GameProgressService
     public void ResetEnemyStats()
     {
         _enemyStats = new EnemyStats();
-        Debug.Log("[GameProgressService] 敵統計リセット");
     }
     
     /// <summary>
@@ -258,7 +249,6 @@ public class GameProgressService
     public void RecordPlayerGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
     {
         _evolutionStats.RecordGameResult(playerWon, playerMove, playerCollapsed);
-        Debug.Log($"[GameProgressService] プレイヤー結果記録: {(playerWon ? "勝利" : "敗北")}, Move: {playerMove}, Collapsed: {playerCollapsed}");
     }
     
     /// <summary>
@@ -268,13 +258,11 @@ public class GameProgressService
     {
         if (_evolutionStats.CheckAllEvolutionConditions(card))
         {
-            Debug.Log($"[GameProgressService] カード進化: {card.CardName} → {card.EvolutionTarget.CardName}");
             return card.EvolutionTarget;
         }
         
         if (_evolutionStats.CheckAllDegradationConditions(card))
         {
-            Debug.Log($"[GameProgressService] カード劣化: {card.CardName} → {card.DegradationTarget.CardName}");
             return card.DegradationTarget;
         }
         
@@ -291,7 +279,7 @@ public class GameProgressService
     /// </summary>
     public EnemyStats EnemyStats => _enemyStats;
     
-    // === PersonalityLogServiceから移動したメソッド ===
+    // === 人格ログ管理メソッド ===
     
     /// <summary>
     /// 新しいチャプターを開始
@@ -299,7 +287,6 @@ public class GameProgressService
     public void StartChapter(EnemyData enemyData)
     {
         _currentChapter = _personalityLog.StartNewChapter(enemyData);
-        Debug.Log($"[GameProgressService] チャプター開始: {enemyData.EnemyName}");
     }
     
     /// <summary>
@@ -310,7 +297,6 @@ public class GameProgressService
         if (_currentChapter != null)
         {
             _currentChapter.CompleteChapter();
-            Debug.Log("[GameProgressService] チャプター完了");
         }
     }
     
@@ -322,7 +308,6 @@ public class GameProgressService
         _currentPlayerMove = null;
         _currentEnemyMove = null;
         _currentEvents.Clear();
-        Debug.Log("[GameProgressService] ターン開始");
     }
     
     /// <summary>
@@ -334,7 +319,6 @@ public class GameProgressService
         {
             var turnLog = new TurnLog(_currentPlayerMove, _currentEnemyMove, _currentEvents);
             _currentChapter.AddTurn(turnLog);
-            Debug.Log("[GameProgressService] ターン終了");
         }
     }
     
@@ -344,7 +328,6 @@ public class GameProgressService
     public void LogPlayerMove(PlayerMove move, int currentMentalPower)
     {
         _currentPlayerMove = new MoveLog(move, currentMentalPower);
-        Debug.Log($"[GameProgressService] プレイヤームーブ記録: {move}");
     }
     
     /// <summary>
@@ -353,7 +336,6 @@ public class GameProgressService
     public void LogEnemyMove(PlayerMove move, int currentMentalPower)
     {
         _currentEnemyMove = new MoveLog(move, currentMentalPower);
-        Debug.Log($"[GameProgressService] 敵ムーブ記録: {move}");
     }
     
     /// <summary>
@@ -363,7 +345,6 @@ public class GameProgressService
     {
         var resonanceEvent = new ResonanceEvent(actorId, resonanceCard);
         _currentEvents.Add(resonanceEvent);
-        Debug.Log($"[GameProgressService] 共鳴イベント記録: {actorId} - {resonanceCard.CardName}");
     }
     
     /// <summary>
@@ -373,7 +354,6 @@ public class GameProgressService
     {
         var evolutionEvent = new CardEvolutionEvent(actorId, fromCard, toCard);
         _currentEvents.Add(evolutionEvent);
-        Debug.Log($"[GameProgressService] カード進化イベント記録: {actorId} - {fromCard.CardName} → {toCard.CardName}");
     }
     
     /// <summary>
@@ -383,7 +363,6 @@ public class GameProgressService
     {
         var collapseEvent = new CardCollapseEvent(actorId, collapseCard);
         _currentEvents.Add(collapseEvent);
-        Debug.Log($"[GameProgressService] カード崩壊イベント記録: {actorId} - {collapseCard.CardName}");
     }
     
     /// <summary>
@@ -407,8 +386,6 @@ public class GameProgressService
         {
             _results[result.Key] = result.Value;
         }
-        
-        Debug.Log($"[GameProgressService] ゲーム進行状態をロード: Step {_currentStep}, Results {_results.Count}件");
     }
     
     /// <summary>
