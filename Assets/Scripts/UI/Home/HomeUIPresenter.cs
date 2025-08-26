@@ -13,26 +13,22 @@ public class HomeUIPresenter : MonoBehaviour
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Button titleButton;
-    [SerializeField] private Button battleButton;
-    [SerializeField] private Button novelButton;
+    [SerializeField] private Button storyButton;
     
-    [Header("テスト用敵データ")]
-    [SerializeField] private EnemyData testEnemyData;
-    
-    private SceneTransitionService _sceneTransitionService;
+    private GameProgressService _gameProgressService;
+    private StoryNode _currentNode;
     
     [Inject]
-    public void Construct(SceneTransitionService sceneTransitionService)
+    public void Construct(GameProgressService gameProgressService)
     {
-        _sceneTransitionService = sceneTransitionService;
+        _gameProgressService = gameProgressService;
     }
 
     private void Start()
     {
         // ボタンイベントの設定
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
-        battleButton.OnClickAsObservable().Subscribe(_ => OnBattleButtonClicked()).AddTo(this);
-        novelButton.OnClickAsObservable().Subscribe(_ => OnNovelButtonClicked()).AddTo(this);
+        storyButton.OnClickAsObservable().Subscribe(_ => OnStoryButtonClicked()).AddTo(this);
         
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
@@ -43,55 +39,57 @@ public class HomeUIPresenter : MonoBehaviour
     /// </summary>
     private void OnTitleButtonClicked()
     {
-        _sceneTransitionService.TransitionToScene(SceneType.Title).Forget();
+        _gameProgressService.TransitionToScene(SceneType.Title).Forget();
     }
 
     /// <summary>
-    /// バトルボタンがクリックされた時の処理
+    /// ストーリーボタンがクリックされた時の処理
     /// </summary>
-    private void OnBattleButtonClicked()
+    private void OnStoryButtonClicked()
     {
-        StartBattleAsync().Forget();
+        StartCurrentNodeAsync().Forget();
     }
 
     /// <summary>
-    /// ノベルボタンがクリックされた時の処理
+    /// 現在のノードを開始
     /// </summary>
-    private void OnNovelButtonClicked()
+    private async UniTask StartCurrentNodeAsync()
     {
-        StartNovelAsync().Forget();
-    }
-
-    /// <summary>
-    /// バトル開始処理
-    /// </summary>
-    private async UniTask StartBattleAsync()
-    {
-        // 指定された敵データでバトル開始
-        var battleData = new BattleTransitionData
+        _currentNode = _gameProgressService.GetNextNode();
+        
+        switch (_currentNode)
         {
-            TargetEnemy = testEnemyData,
-            ReturnScene = SceneType.Home
-        };
-        // バトルシーンに遷移
-        await _sceneTransitionService.TransitionToScene(battleData);
+            case BattleNode battleNode:
+                await StartBattleNode(battleNode);
+                break;
+            case NovelNode novelNode:
+                await StartNovelNode(novelNode);
+                break;
+            case EndingNode:
+                Debug.Log("[ホームUI] ゲームが完了しています");
+                break;
+        }
     }
     
     /// <summary>
-    /// ノベル開始処理
+    /// バトルノード開始
     /// </summary>
-    private async UniTask StartNovelAsync()
+    private async UniTask StartBattleNode(BattleNode battleNode)
     {
-        // テスト用ノベルデータ
-        var novelData = new NovelTransitionData
-        {
-            ScenarioId = "test_scenario_001",
-            ReturnScene = SceneType.Home
-        };
+        Debug.Log($"[ホームUI] バトル開始: 敵ID {battleNode.EnemyId}");
         
-        Debug.Log($"[HomeUI] ノベル開始: {novelData.ScenarioId}");
+        // 単純にBattleSceneに遷移（敵情報はGameProgressServiceから取得）
+        await _gameProgressService.TransitionToScene(SceneType.Battle);
+    }
+    
+    /// <summary>
+    /// ノベルノード開始
+    /// </summary>
+    private async UniTask StartNovelNode(NovelNode novelNode)
+    {
+        Debug.Log($"[ホームUI] ノベル開始: {novelNode.ScenarioId}");
         
-        // ノベルシーンに遷移
-        await _sceneTransitionService.TransitionToScene(novelData);
+        // ノベルシーンに遷移（シナリオ情報はGameProgressServiceから取得）
+        await _gameProgressService.TransitionToScene(SceneType.Novel);
     }
 }

@@ -37,9 +37,13 @@ Game/
 ├── Services/          → サービス層
 │   ├── CardPoolService.cs → カードプール管理
 │   ├── ThemeService.cs → テーマデータ管理
-│   ├── StatsTrackerService.cs → プレイヤー・敵の統計管理 + セーブ・ロード
+│   ├── GameProgressService.cs → ゲーム進行・統計・ログ管理の統合サービス
 │   ├── SaveDataManager.cs → セーブデータファイル管理
-│   └── CardViewFactory.cs → カードビューファクトリ
+│   ├── CardViewFactory.cs → カードビューファクトリ
+│   └── SceneTransition/ → シーン遷移システム
+│       ├── SceneTransitionService.cs → 遷移管理とデータ受け渡し
+│       ├── SceneTransitionData.cs → 遷移データクラス群
+│       └── SceneType.cs → シーン種別定義と拡張メソッド
 ├── Logic/             → ゲームロジック
 │   ├── GameManager.cs → ゲーム進行制御 (IStartable)
 │   ├── ScoreCalculator.cs → スコア計算ロジック (static)
@@ -55,9 +59,14 @@ Game/
     └── EvolutionConditionGroup.cs → 進化条件グループ
 
 UI/
-├── Main/              → メインUI
+├── Main/              → メインUI (バトルシーン)
 │   └── UIPresenter.cs → UI Views統合管理 + イベント処理
 ├── Title/             → タイトル画面
+│   └── TitleUIPresenter.cs → タイトル画面UI制御
+├── Home/              → ホーム画面
+│   └── HomeUIPresenter.cs → ホーム画面UI制御・シーン遷移
+├── Novel/             → ノベル画面
+│   └── NovelUIPresenter.cs → ノベル画面UI制御
 └── Views/             → UI表示・アニメーション
     ├── HandView.cs    → 手札表示 + カードアニメーション
     ├── CardView.cs    → 個別カード表示 + アニメーション
@@ -69,6 +78,12 @@ Debug/
 
 ### 責任分離の詳細
 
+**SceneTransitionService (シーン遷移管理)**
+- 型安全なシーン遷移とデータ受け渡し
+- SceneTransitionDataによる構造化されたデータ管理
+- クロスシーンでのデータ永続化
+- VContainerでSingletonとして管理され全シーン共通利用
+
 **PlayerPresenter (統合プレゼンター)**
 - HandModel, DeckModel, PlayerModelの直接管理
 - HandViewとの連携によるUI制御
@@ -76,11 +91,11 @@ Debug/
 - 精神力管理との統合
 - 即時進化チェック機能の統合
 
-**StatsTrackerService (統計管理サービス)**
-- PlayerSaveData（プレイヤー固有）とEnemyStats（敵用簡略）の管理
-- PlayerTracker, EnemyTrackerの提供
-- 敵統計リセット機能（ResetEnemyStats）
-- SaveDataManagerと連携してセーブデータのロード
+**GameProgressService (統合ゲーム進行サービス)**
+- ストーリー進行、プレイヤー統計、人格ログの統一管理
+- バトル・ノベル結果の記録と分岐ロジック
+- セーブデータの自動ロード・保存機能
+- カード進化チェックと即時統計更新
 
 **SaveDataManager (セーブデータ管理)**
 - JSON形式でのPlayerSaveDataのシリアライズ・デシリアライズ
@@ -132,15 +147,21 @@ Debug/
 
 ### VContainer Setup
 ```csharp
-// MainLifetimeScope.cs pattern
+// RootLifetimeScope.cs - Cross-scene services
+builder.Register<SaveDataManager>(Lifetime.Singleton);
+builder.Register<SceneTransitionService>(Lifetime.Singleton);
+builder.Register<GameProgressService>(Lifetime.Singleton);
+
+// BattleLifetimeScope.cs - Battle-specific dependencies
 builder.RegisterInstance(player);
 builder.RegisterInstance(enemy);
 builder.Register<CardPoolService>(Lifetime.Singleton);
 builder.Register<ThemeService>(Lifetime.Singleton);
-builder.Register<SaveDataManager>(Lifetime.Singleton);
-builder.Register<StatsTrackerService>(Lifetime.Singleton);
 builder.RegisterEntryPoint<GameManager>();
 builder.RegisterComponentInHierarchy<UIPresenter>();
+
+// HomeLifetimeScope.cs - Home scene dependencies  
+builder.RegisterComponentInHierarchy<HomeUIPresenter>();
 ```
 
 ### 進化システムの重要実装
@@ -222,10 +243,45 @@ Don't null-check SerializeField components that should be set in Inspector. Let 
 ### Async Operations
 Use UniTask for all async operations. Prefer `.Forget()` for fire-and-forget operations.
 
-## Scene Structure
+## Scene Structure and Transition System
 
-- **TitleScene**: Entry point with TitleMenu
-- **MainScene**: Game scene with Player, Enemy, UIPresenter components
+### Scene Architecture
+- **TitleScene**: Entry point with TitleUIPresenter
+- **HomeScene**: Hub scene with HomeUIPresenter for navigation
+- **BattleScene**: Main game scene with Player, Enemy, UIPresenter components (renamed from MainScene)
+- **NovelScene**: Story scene with NovelUIPresenter for narrative content
+
+### Scene Transition System
+The project uses a centralized SceneTransitionService for type-safe scene management and data passing:
+
+```csharp
+// SceneType enum with extension methods for type safety
+public enum SceneType { Title, Home, Battle, Novel }
+
+// Base transition data class
+public abstract class SceneTransitionData
+{
+    public abstract SceneType TargetScene { get; }
+    public SceneType ReturnScene { get; set; } = SceneType.Home;
+    public virtual string GetDebugInfo() => $"Target: {TargetScene}, Return: {ReturnScene}";
+}
+
+// Specific transition data for battles
+public class BattleTransitionData : SceneTransitionData
+{
+    public override SceneType TargetScene => SceneType.Battle;
+    public EnemyData TargetEnemy { get; set; }  // Required for battle scenes
+}
+
+// Scene transition service usage
+await _sceneTransitionService.TransitionToScene(battleData);
+var receivedData = _sceneTransitionService.GetTransitionData<BattleTransitionData>();
+```
+
+### Scene Flow
+- Title → Home → Battle/Novel → Home (post-battle/story return)
+- All scenes use SceneTransitionService for navigation
+- Data persistence across scene changes via transition data objects
 
 ## Dependencies
 
@@ -253,10 +309,41 @@ Key packages from manifest.json:
 3. Implement display logic in View
 4. Control from UIPresenter
 
-### Modifying Game Flow
+### Scene Transition Implementation
+```csharp
+// 1. Create transition data if needed
+var battleData = new BattleTransitionData 
+{
+    TargetEnemy = enemyData,
+    ReturnScene = SceneType.Home
+};
+
+// 2. Transition to target scene
+await _sceneTransitionService.TransitionToScene(battleData);
+
+// 3. In target scene, retrieve data
+var receivedData = _sceneTransitionService.GetTransitionData<BattleTransitionData>();
+if (receivedData?.TargetEnemy != null) 
+{
+    // Use the received enemy data
+}
+
+// 4. Clean up and return
+_sceneTransitionService.ClearTransitionData();
+await _sceneTransitionService.TransitionToScene(SceneType.Home);
+```
+
+### Modifying Game Flow  
 1. Update GameState enum if needed
 2. Modify state transitions in GameManager.ChangeState()
 3. Handle new states appropriately
+
+### Adding New Scene Types
+1. Add new enum value to SceneType in SceneType.cs
+2. Update SceneTypeExtensions.SceneNames dictionary
+3. Create transition data class if data passing needed
+4. Create LifetimeScope for the new scene
+5. Implement UI presenter for scene management
 
 ### 進化条件の追加
 1. EvolutionConditionBase から継承した新しい条件クラスを作成
@@ -271,44 +358,40 @@ Key packages from manifest.json:
 
 ### 統計データのアクセス
 ```csharp
-// StatsTrackerServiceを注入
-public GameManager(StatsTrackerService statsTrackerService)
+// GameProgressServiceを注入
+public GameManager(GameProgressService gameProgressService)
 
 // プレイヤーの統計データ取得
-var playerStats = statsTrackerService.PlayerTracker.GetCardStats(cardData);
-var canEvolve = statsTrackerService.PlayerTracker.CanCardEvolve(cardData);
+var playerStats = gameProgressService.PlayerEvolutionStats;
+var evolvedCard = gameProgressService.CheckPlayerCardEvolution(cardData);
 
 // 敵の統計データ取得  
-var enemyStats = statsTrackerService.EnemyTracker.GetCardStats(cardData);
+var enemyStats = gameProgressService.EnemyStats;
 ```
 
 ### セーブ・ロード機能の使用
 ```csharp
-// SaveDataManagerをDIで注入
-public GameManager(SaveDataManager saveDataManager, StatsTrackerService statsTrackerService)
+// GameProgressServiceを注入（SaveDataManagerは内部で使用）
+public GameManager(GameProgressService gameProgressService)
 
-// バトル終了時の自動セーブ（どちらかが3勝した時）
-_saveDataManager.SavePlayerData(_statsTrackerService.PlayerSaveData);
+// バトル結果の記録と自動セーブ
+gameProgressService.RecordBattleResultAndSave(playerWon);
+gameProgressService.RecordNovelResultAndSave(choices);
 
-// セーブファイル存在確認
-bool saveExists = _saveDataManager.SaveFileExists();
+// プレイヤー結果記録
+gameProgressService.RecordPlayerGameResult(playerWon, playerMove, playerCollapsed);
 
-// プレイヤーセーブデータへのアクセス
-PlayerSaveData saveData = _statsTrackerService.PlayerSaveData;
+// データリセット（デバッグ用）
+gameProgressService.ResetToDefaultData();
 
-// セーブデータの手動ロード
-PlayerSaveData loadedData = _saveDataManager.LoadPlayerData();
-
-// デバッグ用：セーブファイル削除
-_saveDataManager.DeleteSaveFile();
-
-// セーブファイルパスの取得（デバッグ用）
-string savePath = _saveDataManager.SaveFilePath;
+// 現在のゲーム進行状況取得
+var currentNode = gameProgressService.GetCurrentNode();
+var mentalPower = gameProgressService.GetPlayerMentalPower();
 ```
 
 ### セーブデータの自動ロード
-- StatsTrackerServiceのコンストラクタで自動的にセーブデータをロード
-- セーブファイルが存在しない場合は新規データを作成
+- GameProgressServiceのコンストラクタで自動的にセーブデータをロード
+- セーブファイルが存在しない場合は新規データを作成・保存
 - 読み込みエラー時も新規データで安全にフォールバック
 - セーブデータはJSON形式でApplication.persistentDataPathに保存
 
