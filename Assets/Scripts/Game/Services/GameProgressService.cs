@@ -9,7 +9,6 @@ using Cysharp.Threading.Tasks;
 /// </summary>
 public class GameProgressService
 {
-    
     /// <summary>
     /// バトル結果やノベル選択結果を管理する辞書
     /// </summary>
@@ -77,16 +76,6 @@ public class GameProgressService
     }
     
     /// <summary>
-    /// ストーリーを次のステップに進行
-    /// </summary>
-    public void AdvanceStory()
-    {
-        var oldStep = _currentStep;
-        _currentStep++;
-        Debug.Log($"[GameProgressService] ストーリー進行: Step {oldStep} → {_currentStep}");
-    }
-    
-    /// <summary>
     /// 結果を取得
     /// </summary>
     /// <param name="id">結果のID</param>
@@ -101,17 +90,30 @@ public class GameProgressService
     /// <summary>
     /// 現在のバトル結果を記録
     /// </summary>
-    public void RecordCurrentBattleResult(bool isPlayerWin)
+    public void RecordBattleResultAndSave(bool isPlayerWin)
     {
+        // TODO: カードとか精神力もここで保存したい
         var result = isPlayerWin ? "win" : "lose";
         _results[_currentStep.ToString()] = result;
-        Debug.Log($"[GameProgressService] バトル結果記録: Step {_currentStep} → {result}");
+        _currentStep++;
+        SaveAndPersist();
     }
     
     /// <summary>
-    /// ゲーム進行状態を自動セーブ（全サービス統合）
+    /// ノベル完了（複数選択記録 + 進行 + セーブを統合）
     /// </summary>
-    public void SaveAndPersist()
+    public void RecordNovelResultAndSave(Dictionary<string, string> choices)
+    {
+        foreach (var choice in choices)
+            _results[choice.Key] = choice.Value;
+        _currentStep++;
+        SaveAndPersist();
+    }
+    
+    /// <summary>
+    /// ゲーム進行状態をセーブ（全サービス統合）
+    /// </summary>
+    private void SaveAndPersist()
     {
         var saveData = _gameStatsService.CurrentSaveData;
         

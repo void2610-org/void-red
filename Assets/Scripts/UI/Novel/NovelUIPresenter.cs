@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -41,9 +42,14 @@ public class NovelUIPresenter : MonoBehaviour
     {
         await UniTask.Delay(3000);
         
-        // ストーリーを進行させてセーブ
-        _gameProgressService.AdvanceStory();
-        _gameProgressService.SaveAndPersist();
+        // ハードコード: 複数選択結果
+        var choices = new Dictionary<string, string>
+        {
+            { "fork0", "option1" },
+            { "fork1", "option2" }
+        };
+        
+        _gameProgressService.RecordNovelResultAndSave(choices);
         
         // ホームシーンに戻る
         await _gameProgressService.TransitionToScene(SceneType.Home);
