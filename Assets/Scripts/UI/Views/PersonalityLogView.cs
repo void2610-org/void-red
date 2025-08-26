@@ -16,16 +16,16 @@ public class PersonalityLogView : MonoBehaviour
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Button closeButton;
     
-    private PersonalityLogService _personalityLogService;
+    private GameProgressService _gameProgressService;
     private RectTransform _scrollContent;
     
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Initialize(PersonalityLogService personalityLogService)
+    public void Initialize(GameProgressService gameProgressService)
     {
         _scrollContent = scrollRect.content;
-        _personalityLogService = personalityLogService;
+        _gameProgressService = gameProgressService;
         closeButton.onClick.AddListener(HideLog);
         
         HideLog();
@@ -53,7 +53,7 @@ public class PersonalityLogView : MonoBehaviour
     /// </summary>
     public void UpdateLogDisplay()
     {
-        var logData = _personalityLogService.GetLogData();
+        var logData = _gameProgressService.GetPersonalityLogData();
         var displayText = FormatLogData(logData);
         
         // テキストを設定
