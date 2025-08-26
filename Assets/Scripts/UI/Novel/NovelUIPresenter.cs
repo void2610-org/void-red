@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -13,31 +14,44 @@ public class NovelUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private TextMeshProUGUI scenarioIdText;
     
-    private SceneTransitionService _sceneTransitionService;
+    private GameProgressService _gameProgressService;
     
     [Inject]
-    public void Construct(SceneTransitionService sceneTransitionService)
+    public void Construct(GameProgressService gameProgressService)
     {
-        _sceneTransitionService = sceneTransitionService;
+        _gameProgressService = gameProgressService;
     }
     
     private void Start()
     {
-        // 遷移データを取得
-        var novelData = _sceneTransitionService.GetTransitionData<NovelTransitionData>();
+        // 現在のノベルノードから情報を取得
+        var currentNode = _gameProgressService.GetCurrentNode();
+        if (currentNode is NovelNode novelNode)
+        {
+            scenarioIdText.text = $"シナリオID: {novelNode.ScenarioId}";
+        }
+        else
+        {
+            scenarioIdText.text = "シナリオIDが取得できませんでした";
+        }
         
-        // 遷移データの情報を表示
-        scenarioIdText.text = $"シナリオID: {novelData.ScenarioId}";
-        
-        ReturnAsync(novelData.ReturnScene).Forget();
+        ReturnAsync().Forget();
     }
     
-    private async UniTask ReturnAsync(SceneType returnScene)
+    private async UniTask ReturnAsync()
     {
         await UniTask.Delay(3000);
         
-        // 遷移データをクリアしてシーンに戻る
-        _sceneTransitionService.ClearTransitionData();
-        await _sceneTransitionService.TransitionToScene(returnScene);
+        // ハードコード: 複数選択結果
+        var choices = new Dictionary<string, string>
+        {
+            { "fork0", "option1" },
+            { "fork1", "option2" }
+        };
+        
+        _gameProgressService.RecordNovelResultAndSave(choices);
+        
+        // ホームシーンに戻る
+        await _gameProgressService.TransitionToScene(SceneType.Home);
     }
 }
