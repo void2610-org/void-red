@@ -105,10 +105,15 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: チャプター開始
         _personalityLogService.StartChapter(_currentEnemyData);
         
-        // プレイヤーの精神力を復元（最初の起動時のみ）
+        // セーブデータを読み込み・初期化
         if (isInitialStart)
         {
-            _player.SetMentalPower(_gameStatsService.PlayerSaveData.CurrentMentalPower);
+            var saveData = _saveDataManager.LoadGameData();
+            _gameStatsService.SetSaveData(saveData);
+            _gameProgressService.LoadState(saveData);
+            
+            // プレイヤーの精神力を復元
+            _player.SetMentalPower(_gameStatsService.GetPlayerMentalPower());
         }
         
         // 次の敵への進行の場合は手札を戻す演出
@@ -450,7 +455,7 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
         
         // ゲーム結果を統計に記録（進化チェック前に実行）
-        _gameStatsService.PlayerSaveData.RecordGameResult(playerWon, _playerMove, _playerCollapse);
+        _gameStatsService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
         _gameStatsService.EnemyStats.RecordGameResult(!playerWon, _npcMove, _npcCollapse);
         
         await _uiPresenter.HideBlackOverlay();
@@ -479,7 +484,7 @@ public class GameManager: IStartable, IDisposable
             if (playerCard)
             {
                 // 進化
-                var playerCardAfterEvolution = _gameStatsService.PlayerSaveData.CheckCardEvolution(playerCard);
+                var playerCardAfterEvolution = _gameStatsService.CheckPlayerCardEvolution(playerCard);
                 if (playerCardAfterEvolution != playerCard)
                 {
                     // 人格ログ: プレイヤーカード進化イベント記録
@@ -611,19 +616,12 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: チャプター完了
         _personalityLogService.CompleteChapter();
         
-        // 現在の精神力をセーブデータに反映
-        _gameStatsService.PlayerSaveData.UpdateMentalPower(_player.MentalPower.CurrentValue);
-        
-        // セーブデータを保存
-        _saveDataManager.SaveAllData(_gameStatsService.PlayerSaveData);
-        
-        // バトル結果をGameProgressServiceに報告してストーリー進行
+        // バトル結果をGameProgressServiceに報告してストーリー進行（セーブ前に実行）
         var playerWon = _playerWins >= WINS_TO_VICTORY;
         
         // 現在のバトル結果を記録
-        _gameProgressService.RecordCurrentBattleResult(playerWon);
-        
-        _gameProgressService.AdvanceStory();
+        _gameStatsService.UpdatePlayerMentalPower(_player.MentalPower.CurrentValue);
+        _gameProgressService.RecordBattleResultAndSave(playerWon);
         Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
         
         // バトル完了後はHomeSceneに戻る
