@@ -111,40 +111,11 @@ jobs:
           buildsPath:     CIBuilds
           buildName:      build
 
-      - name: Prepare artifact for deployment 🎯
+      - name: Prepare artifact 🎯
         run: |
-          # ブランチ名取得
-          BRANCH=${GITHUB_REF_NAME#refs/heads/}
-          # 出力先フォルダを決定
-          if [ "$BRANCH" = "main" ]; then
-            DEST_DIR="public"
-            PUBLISH_DEST=""
-          else
-            DEST_DIR="public/$BRANCH"
-            PUBLISH_DEST="$BRANCH"
-          fi
-          echo "Branch=$BRANCH -> DEST_DIR=$DEST_DIR PUBLISH_DEST=$PUBLISH_DEST"
-          # 環境変数として後続ステップに渡す
-          echo "PUBLISH_DEST=$PUBLISH_DEST" >> $GITHUB_ENV
-          # root 権限でディレクトリ作成・移動
-          sudo mkdir -p "$DEST_DIR"
-          sudo mv CIBuilds/WebGL/build/* "$DEST_DIR/"
-          # public 以下を現在のユーザー所有に変更
-          sudo chown -R $USER:$USER public
-
-      - name: Deploy to gh-pages branch 📤
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token:    ${{ secrets.GITHUB_TOKEN }}
-          publish_dir:     public
-          publish_branch:  gh-pages
-          destination_dir: ${{ env.PUBLISH_DEST }}
-          keep_files: true
-
-      # ↑ここまでで gh-pages ブランチへのデプロイは完了↑
-
-      # ───────────────────────────────────────────────
-      # ▼ ここから「プレビュー用アーティファクト」のアップロード ▼
+          # ビルド結果をpublicディレクトリに移動
+          mkdir -p public
+          mv CIBuilds/WebGL/build/* public/
 
       - name: Upload Pages artifact 🏷️
         id: upload_pages
@@ -155,15 +126,16 @@ jobs:
           # retention-days: 1   # 必要に応じて保持期間を設定
 
   preview:
-    name: Deploy Preview 🌐
-    if: github.event_name == 'pull_request'
+    name: Deploy to GitHub Pages 🌐
+    # PRまたはmainブランチへのpushで実行
+    if: github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
     needs: build
     runs-on: ubuntu-latest
 
     environment:
-      name: preview
-      # PR 番号＋mergeフォルダ構造に合わせたプレビュー URL を返す
-      url: https://void2610.github.io/void-red/${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge/
+      name: ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
+      # PRならプレビューURL、mainならルートURL
+      url: ${{ github.event_name == 'pull_request' && format('https://void2610.github.io/void-red/{0}/merge/{0}/merge/', github.event.pull_request.number) || 'https://void2610.github.io/void-red/' }}
     
     steps:
       - name: Download Pages artifact 📥
@@ -172,30 +144,15 @@ jobs:
           name: github-pages    # upload-pages-artifact のデフォルト名
           path: public
 
-      - name: Deploy Preview to gh-pages 📤
+      - name: Deploy to gh-pages branch 📤
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token:    ${{ secrets.GITHUB_TOKEN }}
-          publish_dir:     public/${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge
+          # PRならサブディレクトリ、mainならルート
+          publish_dir:     ${{ github.event_name == 'pull_request' && format('public/{0}/merge/{0}/merge', github.event.pull_request.number) || 'public' }}
           publish_branch:  gh-pages
-          destination_dir: ${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge
+          destination_dir: ${{ github.event_name == 'pull_request' && format('{0}/merge/{0}/merge', github.event.pull_request.number) || '' }}
           keep_files:      true
-
-  deploy:
-    name: Deploy Production 🚀
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: build
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Download Pages artifact 📥
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages    # upload-pages-artifact のデフォルト名
-          
-      - name: Deploy to GitHub Pages 🌐
-        id: deployment
-        uses: actions/deploy-pages@v4
 
   discord:
     name: Notify Discord 🤖
