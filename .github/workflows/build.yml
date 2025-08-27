@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write    # リポジトリの内容をプッシュする権限
   pages: write       # GitHub Pages ブランチへの書き込み権限
+  id-token: write    # GitHub Pages環境への認証用
 
 jobs:
   build:
@@ -179,6 +180,21 @@ jobs:
           publish_branch:  gh-pages
           destination_dir: ${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge
           keep_files:      true
+
+  deploy:
+    name: Deploy Production 🚀
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Deploy to GitHub Pages 🌐
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   discord:
     name: Notify Discord 🤖
