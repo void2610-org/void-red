@@ -181,6 +181,8 @@ jobs:
           destination_dir: ${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge
           keep_files:      true
 
+  deploy:
+    name: Deploy Production 🚀
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: build
     runs-on: ubuntu-latest
