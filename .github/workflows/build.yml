@@ -113,9 +113,11 @@ jobs:
 
       - name: Prepare artifact 🎯
         run: |
-          # ビルド結果をpublicディレクトリに移動
-          mkdir -p public
-          mv CIBuilds/WebGL/build/* public/
+          # ビルド結果をpublicディレクトリに移動（権限問題対応）
+          sudo mkdir -p public
+          sudo mv CIBuilds/WebGL/build/* public/
+          # publicディレクトリを現在のユーザー所有に変更
+          sudo chown -R $USER:$USER public
 
       - name: Upload Pages artifact 🏷️
         id: upload_pages
