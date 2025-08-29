@@ -180,12 +180,12 @@ public abstract class PlayerPresenter : IDisposable
         if (shouldCollapse)
         {
             // 崩壊する場合はActiveCardsから削除してCollapsedCardsに移動
-            _deckModel?.CollapseCard(selectedCard);
+            _deckModel.CollapseCard(selectedCard);
         }
         else
         {
             // 崩壊しない場合はデッキに戻す
-            _deckModel?.ReturnCard(selectedCard);
+            _deckModel.ReturnCard(selectedCard);
         }
         
         // デッキの変更をセーブ
@@ -323,6 +323,19 @@ public abstract class PlayerPresenter : IDisposable
             // 全カード（AllCards）をセーブデータに反映
             _gameProgressService.UpdateDeckFromCardModels(_deckModel.AllCards);
         }
+    }
+    
+    /// <summary>
+    /// デッキ表示用のカード情報を取得
+    /// </summary>
+    public (List<CardModel> allCards, List<CardModel> activeCards, List<CardModel> collapsedCards) GetDeckDisplayData()
+    {
+        if (_deckModel == null)
+        {
+            return (new List<CardModel>(), new List<CardModel>(), new List<CardModel>());
+        }
+        
+        return (_deckModel.AllCards, _deckModel.ActiveCards, _deckModel.CollapsedCards);
     }
     
     // === 手札・デッキリセット ===

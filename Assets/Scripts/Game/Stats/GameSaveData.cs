@@ -101,6 +101,6 @@ public class GameSaveData
     /// </summary>
     public string GetDebugInfo()
     {
-        return $"Step: {currentStep}, MentalPower: {currentMentalPower}, Deck: {currentDeck.Count}cards, Results: {resultKeys.Count}entries";
+        return $"Step: {currentStep}, MentalPower: {currentMentalPower}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries";
     }
 }
