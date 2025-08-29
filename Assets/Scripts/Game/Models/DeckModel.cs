@@ -14,12 +14,12 @@ public class DeckModel
     /// <summary>
     /// 山札（ドロー可能なカード）
     /// </summary>
-    public List<CardModel> DrawPile => new (_deck);
+    public IReadOnlyList<CardModel> DrawPile => _deck.AsReadOnly();
     
     /// <summary>
     /// 獲得した全カード（崩壊しても記録として残る）
     /// </summary>
-    public List<CardModel> AllCards => new (_allCards);
+    public IReadOnlyList<CardModel> AllCards => _allCards.AsReadOnly();
     
     /// <summary>
     /// 現在プレイに使用可能なカード（崩壊したカードは除く）
@@ -221,8 +221,21 @@ public class DeckModel
     {
         if (cardModel == null) return;
         
+        // AllCardsに含まれているか確認
+        var indexInAllCards = _allCards.FindIndex(c => c.InstanceId == cardModel.InstanceId);
+        
         // カードの崩壊フラグを設定
-        cardModel.IsCollapsed = true;
+        if (indexInAllCards >= 0)
+        {
+            // _allCards内の正しい参照に対してフラグを設定
+            _allCards[indexInAllCards].IsCollapsed = true;
+            // 引数のcardModelにも設定（一貫性のため）
+            cardModel.IsCollapsed = true;
+        }
+        else 
+        {
+            return;
+        }
         
         // 山札から削除
         _deck.Remove(cardModel);

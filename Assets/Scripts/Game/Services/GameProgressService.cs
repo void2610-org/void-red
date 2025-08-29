@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
@@ -22,7 +23,7 @@ public class GameProgressService
     
     // プレイヤー状態
     private int _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
-    private readonly List<string> _currentDeck = new();
+    private readonly List<SavedCard> _currentDeck = new();
     private EvolutionStatsData _evolutionStats = new();
     private EnemyStats _enemyStats = new();
     
@@ -64,7 +65,7 @@ public class GameProgressService
         // プレイヤー状態のロード
         _currentMentalPower = loadedData.CurrentMentalPower;
         _currentDeck.Clear();
-        _currentDeck.AddRange(loadedData.CurrentDeck);
+        _currentDeck.AddRange(loadedData.SavedDeck);
         _evolutionStats = loadedData.EvolutionStats ?? new EvolutionStatsData();
         
         // 人格ログのロード
@@ -229,50 +230,57 @@ public class GameProgressService
     }
     
     /// <summary>
-    /// デッキ情報を更新
+    /// デッキ情報を更新（CardModelから変換）
     /// </summary>
-    public void UpdateDeck(List<string> deck)
+    public void UpdateDeckFromCardModels(IReadOnlyList<CardModel> cardModels)
     {
         _currentDeck.Clear();
-        _currentDeck.AddRange(deck);
-    }
-    
-    /// <summary>
-    /// 現在のデッキ情報を取得
-    /// </summary>
-    public List<string> GetCurrentDeck()
-    {
-        return new List<string>(_currentDeck);
-    }
-    
-    /// <summary>
-    /// CardDataのリストからCardIdのリストに変換
-    /// </summary>
-    public void UpdateDeckFromCardData(List<CardData> cardDataList)
-    {
-        _currentDeck.Clear();
-        foreach (var card in cardDataList)
+        foreach (var cardModel in cardModels)
         {
-            if (card)
+            if (cardModel?.Data)
             {
-                _currentDeck.Add(card.CardId);
+                _currentDeck.Add(new SavedCard(
+                    cardModel.Data.CardId,
+                    cardModel.InstanceId,
+                    cardModel.IsCollapsed
+                ));
             }
         }
     }
     
     /// <summary>
-    /// CardIdのリストからCardDataのリストに変換
+    /// CardIdのリストからCardModelのリストに変換
     /// </summary>
-    public List<CardData> ConvertDeckToCardData()
+    public List<CardModel> ConvertDeckToCardModels()
     {
-        var cardDataList = new List<CardData>();
-        foreach (var cardId in _currentDeck)
+        var cardModels = new List<CardModel>();
+        foreach (var savedCard in _currentDeck)
         {
-            var cardData = _cardPoolService.GetCardById(cardId);
-            if (cardData) cardDataList.Add(cardData);
-            else Debug.LogWarning($"[GameProgressService] カードID '{cardId}' が見つかりませんでした");
+            var cardData = _cardPoolService.GetCardById(savedCard.cardId);
+            if (cardData)
+            {
+                var cardModel = new CardModel(cardData, savedCard.instanceId, savedCard.isCollapsed);
+                cardModels.Add(cardModel);
+            }
+            else
+            {
+                Debug.LogWarning($"[GameProgressService] カードID '{savedCard.cardId}' が見つかりませんでした");
+            }
         }
-        return cardDataList;
+        return cardModels;
+    }
+    
+    /// <summary>
+    /// デッキ表示用の詳細情報を取得
+    /// </summary>
+    public (List<CardData> allCards, List<CardData> activeCards, List<CardData> collapsedCards) GetDeckDisplayData()
+    {
+        var cardModels = ConvertDeckToCardModels();
+        var allCards = cardModels.Select(cm => cm.Data).ToList();
+        var activeCards = cardModels.Where(cm => !cm.IsCollapsed).Select(cm => cm.Data).ToList();
+        var collapsedCards = cardModels.Where(cm => cm.IsCollapsed).Select(cm => cm.Data).ToList();
+        
+        return (allCards, activeCards, collapsedCards);
     }
     
     /// <summary>

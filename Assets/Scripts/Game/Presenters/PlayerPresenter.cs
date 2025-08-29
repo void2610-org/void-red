@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using R3;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// プレイヤーとNPCの基底プレゼンタークラス（Presenter Layer）
@@ -55,7 +57,6 @@ public abstract class PlayerPresenter : IDisposable
     public void InitializeDeck(List<CardData> cardDataList)
     {
         _deckModel = new DeckModel(cardDataList);
-        SaveDeckChanges();
     }
     
     /// <summary>
@@ -179,7 +180,7 @@ public abstract class PlayerPresenter : IDisposable
         
         if (shouldCollapse)
         {
-            // 崩壊する場合はActiveCardsから削除してCollapsedCardsに移動
+            // 崩壊する場合はカードを崩壊状態に変更
             _deckModel.CollapseCard(selectedCard);
         }
         else
@@ -187,9 +188,6 @@ public abstract class PlayerPresenter : IDisposable
             // 崩壊しない場合はデッキに戻す
             _deckModel.ReturnCard(selectedCard);
         }
-        
-        // デッキの変更をセーブ
-        SaveDeckChanges();
         
         return true;
     }
@@ -221,7 +219,6 @@ public abstract class PlayerPresenter : IDisposable
             // 新しいCardModelを作成してデッキに戻す
             var cardModel = new CardModel(card);
             _deckModel?.ReturnCard(cardModel);
-            SaveDeckChanges();
         }
     }
     
@@ -306,17 +303,13 @@ public abstract class PlayerPresenter : IDisposable
         if (_deckModel == null) return false;
         
         var success = _deckModel.ReplaceCard(oldCard, newCard);
-        if (success)
-        {
-            SaveDeckChanges();
-        }
         return success;
     }
     
     /// <summary>
     /// デッキの変更をGameProgressServiceに通知してセーブ
     /// </summary>
-    protected void SaveDeckChanges()
+    public virtual void SaveDeckChanges()
     {
         if (_gameProgressService != null && _deckModel != null)
         {
@@ -328,11 +321,11 @@ public abstract class PlayerPresenter : IDisposable
     /// <summary>
     /// デッキ表示用のカード情報を取得
     /// </summary>
-    public (List<CardModel> allCards, List<CardModel> activeCards, List<CardModel> collapsedCards) GetDeckDisplayData()
+    public (IReadOnlyList<CardModel> allCards, List<CardModel> activeCards, List<CardModel> collapsedCards) GetDeckDisplayData()
     {
         if (_deckModel == null)
         {
-            return (new List<CardModel>(), new List<CardModel>(), new List<CardModel>());
+            return (new List<CardModel>().AsReadOnly(), new List<CardModel>(), new List<CardModel>());
         }
         
         return (_deckModel.AllCards, _deckModel.ActiveCards, _deckModel.CollapsedCards);

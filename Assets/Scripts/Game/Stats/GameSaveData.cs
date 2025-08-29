@@ -4,6 +4,24 @@ using UnityEngine;
 using Game.PersonalityLog;
 
 /// <summary>
+/// セーブ用カードデータ
+/// </summary>
+[Serializable]
+public class SavedCard
+{
+    public string cardId;      // CardDataのID
+    public string instanceId;   // インスタンスID
+    public bool isCollapsed;    // 崩壊状態
+    
+    public SavedCard(string cardId, string instanceId, bool isCollapsed)
+    {
+        this.cardId = cardId;
+        this.instanceId = instanceId;
+        this.isCollapsed = isCollapsed;
+    }
+}
+
+/// <summary>
 /// 全ゲーム情報を統合したセーブデータクラス
 /// </summary>
 [Serializable]
@@ -11,7 +29,7 @@ public class GameSaveData
 {
     [Header("基礎ゲームデータ")]
     [SerializeField] private int currentMentalPower = GameConstants.MAX_MENTAL_POWER;
-    [SerializeField] private List<string> currentDeck = new();
+    [SerializeField] private List<SavedCard> savedDeck = new();
     
     [Header("ゲーム進行データ")]
     [SerializeField] private int currentStep = 0;
@@ -26,7 +44,7 @@ public class GameSaveData
     
     // プロパティ
     public int CurrentMentalPower => currentMentalPower;
-    public List<string> CurrentDeck => currentDeck;
+    public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
     public EvolutionStatsData EvolutionStats => evolutionStats;
     public PersonalityLogData PersonalityLog => personalityLog;
@@ -42,10 +60,10 @@ public class GameSaveData
     /// <summary>
     /// デッキ情報を更新
     /// </summary>
-    public void UpdateDeck(List<string> deck)
+    public void UpdateDeck(List<SavedCard> deck)
     {
-        currentDeck.Clear();
-        currentDeck.AddRange(deck);
+        savedDeck.Clear();
+        savedDeck.AddRange(deck);
     }
     
     /// <summary>
