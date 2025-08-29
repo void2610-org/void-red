@@ -95,12 +95,8 @@ public class HomeUIPresenter : MonoBehaviour
     /// </summary>
     private void RefreshDeckData()
     {
-        // セーブデータからデッキ情報を取得
-        var savedDeck = _gameProgressService.GetSavedDeckForDisplay();
+        var (allCards, activeCards, collapsedCards) = _gameProgressService.GetDeckDisplayData();
         
-        // 現在はセーブデータの基本情報のみ表示
-        // 崩壊状況などの詳細情報はバトルシーンでのみ利用可能
-        var emptyList = new List<CardData>();
-        deckView.ShowDeck(savedDeck, savedDeck, emptyList, RefreshDeckData);
+        deckView.ShowDeck(allCards, activeCards, collapsedCards, RefreshDeckData);
     }
 }

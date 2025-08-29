@@ -285,7 +285,7 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(1000);
         
         // AIでカードを選択
-        var npcCard = _enemy.GetRandomCardDataFromHand();
+        var npcCard = _enemy.GetRandomCardFromHand();
         _enemy.SelectCard(npcCard);
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
         var npcPlayStyle = (PlayStyle)UnityEngine.Random.Range(0, 3);
@@ -464,10 +464,14 @@ public class GameManager: IStartable, IDisposable
         // 使用したカードをプレイ
         if (_playerCollapse)
         {
+            // 崩壊処理前にカード情報を取得
             var playerCollapseCard = _player.SelectedCard.CurrentValue;
-            // 人格ログ: プレイヤーカード崩壊イベント記録
-            if (playerCollapseCard)
-                _gameProgressService.LogCardCollapse("player", playerCollapseCard);
+            
+            // 実際の崩壊処理を実行
+            await _player.CollapseSelectedCard();
+            
+            if (playerCollapseCard != null)
+                _gameProgressService.LogCardCollapse("player", playerCollapseCard.Data);
         }
         else
         {
@@ -500,9 +504,9 @@ public class GameManager: IStartable, IDisposable
         if (_npcCollapse)
         {
             var npcCollapseCard = _enemy.SelectedCard.CurrentValue;
-            // 人格ログ: NPCカード崩壊イベント記録
-            if (npcCollapseCard)
-                _gameProgressService.LogCardCollapse("enemy", npcCollapseCard);
+            // 実際の崩壊処理を実行
+            _enemy.PlaySelectedCard(true);
+            _gameProgressService.LogCardCollapse("enemy", npcCollapseCard.Data);
         }
         else
         {
