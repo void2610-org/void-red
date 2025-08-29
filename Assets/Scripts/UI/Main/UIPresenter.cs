@@ -11,7 +11,7 @@ public class UIPresenter : IStartable, System.IDisposable
 {
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly ThemeService _themeService;
-    [Inject] private readonly PersonalityLogService _personalityLogService;
+    [Inject] private readonly GameProgressService _gameProgressService;
     
     public Observable<Unit> PlayButtonClicked => _playButtonView.PlayButtonClicked;
     public Observable<Unit> RetryButtonClicked => _gameOverView.OnRetryClicked;
@@ -152,8 +152,7 @@ public class UIPresenter : IStartable, System.IDisposable
     public void Start()
     {
         // PersonalityLogViewを初期化
-        _personalityLogView?.Initialize(_personalityLogService);
-        _personalityLogService.OnLogUpdated.Subscribe(_ => _personalityLogView?.UpdateLogDisplay()).AddTo(_disposables);
+        _personalityLogView?.Initialize(_gameProgressService);
         
         // プレイヤーの精神力変化を監視
         _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
