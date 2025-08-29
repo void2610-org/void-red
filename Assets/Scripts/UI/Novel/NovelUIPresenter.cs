@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -17,9 +18,9 @@ public class NovelUIPresenter : MonoBehaviour
     private DialogView _dialogView;
     
     [Inject]
-    public void Construct(SceneTransitionService sceneTransitionService)
+    public void Construct(GameProgressService gameProgressService)
     {
-        _sceneTransitionService = sceneTransitionService;
+        _gameProgressService = gameProgressService;
     }
     
     private void Start()
