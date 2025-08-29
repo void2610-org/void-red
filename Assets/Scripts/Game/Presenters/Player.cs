@@ -4,6 +4,6 @@
 /// </summary>
 public class Player : PlayerPresenter
 {
-    public Player(HandView handView, int maxHandSize = 3) 
-        : base(handView, maxHandSize) { }
+    public Player(HandView handView, GameProgressService gameProgressService = null, int maxHandSize = 3) 
+        : base(handView, gameProgressService, maxHandSize) { }
 }

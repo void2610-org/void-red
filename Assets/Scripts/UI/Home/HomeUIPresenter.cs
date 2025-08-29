@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
@@ -14,6 +15,8 @@ public class HomeUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Button titleButton;
     [SerializeField] private Button storyButton;
+    [SerializeField] private Button deckButton;
+    [SerializeField] private DeckView deckView;
     
     private GameProgressService _gameProgressService;
     private StoryNode _currentNode;
@@ -28,7 +31,8 @@ public class HomeUIPresenter : MonoBehaviour
     {
         // ボタンイベントの設定
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
-        storyButton.OnClickAsObservable().Subscribe(_ => OnStoryButtonClicked()).AddTo(this);
+        storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
+        deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
         
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
@@ -40,14 +44,6 @@ public class HomeUIPresenter : MonoBehaviour
     private void OnTitleButtonClicked()
     {
         _gameProgressService.TransitionToScene(SceneType.Title).Forget();
-    }
-
-    /// <summary>
-    /// ストーリーボタンがクリックされた時の処理
-    /// </summary>
-    private void OnStoryButtonClicked()
-    {
-        StartCurrentNodeAsync().Forget();
     }
 
     /// <summary>
@@ -91,5 +87,14 @@ public class HomeUIPresenter : MonoBehaviour
         
         // ノベルシーンに遷移（シナリオ情報はGameProgressServiceから取得）
         await _gameProgressService.TransitionToScene(SceneType.Novel);
+    }
+    
+    
+    /// <summary>
+    /// デッキデータを更新
+    /// </summary>
+    private void RefreshDeckData()
+    {
+        deckView.ShowDeck(_gameProgressService.GetDeckCardModels());
     }
 }
