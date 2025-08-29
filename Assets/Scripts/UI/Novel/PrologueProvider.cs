@@ -13,7 +13,8 @@ public static class PrologueProvider
         return new List<DialogData>
         {
             // 演出：暗転
-            // new DialogData("", "(暗転。静寂。)"),
+            new DialogData("", "（エレベーターが停止する音）"),
+            new DialogData("", "（扉が開く音）"),
             
             // 主人公の最初の独白
             new DialogData("---", "………。ん……。"),
@@ -22,6 +23,7 @@ public static class PrologueProvider
             new DialogData("---", "なにも……思い出せない……。"),
             
             // 足音の後
+            new DialogData("", "（足音が近づく）"),
             new DialogData("---", "……何の音……？"),
             
             // アルヴ登場
@@ -37,7 +39,7 @@ public static class PrologueProvider
             new DialogData("???", "これはこれは。"),
             new DialogData("???", "申し遅れました。"),
             new DialogData("アルヴ", "この場所の支配人を務めている、アルヴと申します。"),
-            new DialogData("アルヴ", "以後、お見知り置きを。(ﾆｺｯ)"),
+            new DialogData("アルヴ", "以後、お見知り置きを。"),
             
             new DialogData("---", "アルヴ……？"),
             new DialogData("---", "ここって……何なの？"),
@@ -117,9 +119,8 @@ public static class PrologueProvider
             new DialogData("アルヴ", "ただ、無理はなさらぬように。"),
             new DialogData("アルヴ", "……まあ、今はまだ意味が分からないでしょうから——"),
             new DialogData("アルヴ", "模擬オークションで、慣れていただきましょう。"),
+            new DialogData("", "（足音が遠ざかる）"),
             
-            // 暗転
-            // new DialogData("", "暗転。足音が遠ざかる……")
         };
     }
 }
