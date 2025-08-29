@@ -150,8 +150,8 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token:    ${{ secrets.GITHUB_TOKEN }}
-          # PRならサブディレクトリ、mainならルート
-          publish_dir:     ${{ github.event_name == 'pull_request' && format('public/{0}/merge/{0}/merge', github.event.pull_request.number) || 'public' }}
+          # Artifactからデプロイ（publicディレクトリから直接）
+          publish_dir:     public
           publish_branch:  gh-pages
           destination_dir: ${{ github.event_name == 'pull_request' && format('{0}/merge/{0}/merge', github.event.pull_request.number) || '' }}
           keep_files:      true
