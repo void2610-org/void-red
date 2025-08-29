@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using R3;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// プレイヤーとNPCの基底プレゼンタークラス（Presenter Layer）
@@ -10,7 +12,7 @@ using System;
 public abstract class PlayerPresenter : IDisposable
 {
     // 公開プロパティ
-    public ReadOnlyReactiveProperty<CardData> SelectedCard => _handModel.SelectedCard;
+    public ReadOnlyReactiveProperty<CardModel> SelectedCard => _handModel.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _playerModel.MentalPower;
     public ReadOnlyReactiveProperty<int> SelectedIndex => _handModel.SelectedIndex;
     public int HandCount => _handModel.Count;
@@ -23,17 +25,20 @@ public abstract class PlayerPresenter : IDisposable
     private DeckModel _deckModel;
     private readonly HandView _handView;
     private readonly CompositeDisposable _disposables = new();
+    private readonly GameProgressService _gameProgressService;
     
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="handView">手札ビュー</param>
+    /// <param name="gameProgressService">ゲーム進行サービス（オプショナル）</param>
     /// <param name="maxHandSize">最大手札数</param>
-    protected PlayerPresenter(HandView handView, int maxHandSize = 3)
+    protected PlayerPresenter(HandView handView, GameProgressService gameProgressService = null, int maxHandSize = 3)
     {
         _playerModel = new PlayerModel();
         _handModel = new HandModel(maxHandSize);
         _handView = handView;
+        _gameProgressService = gameProgressService;
         
         // UI制御の設定
         _handView.BindModel(_handModel);
@@ -52,6 +57,22 @@ public abstract class PlayerPresenter : IDisposable
     public void InitializeDeck(List<CardData> cardDataList)
     {
         _deckModel = new DeckModel(cardDataList);
+    }
+    
+    /// <summary>
+    /// セーブデータからデッキを復元
+    /// </summary>
+    /// <returns>復元に成功したかどうか</returns>
+    public bool LoadDeckFromSaveData()
+    {
+        var savedCardModels = _gameProgressService.ConvertDeckToCardModels();
+        if (savedCardModels.Count > 0)
+        {
+            _deckModel = new DeckModel(savedCardModels);
+            return true;
+        }
+        
+        return false;
     }
     
     /// <summary>
@@ -87,11 +108,11 @@ public abstract class PlayerPresenter : IDisposable
             if (IsDeckEmpty || HandCount >= MaxHandSize)
                 break;
                 
-            var cardData = _deckModel?.DrawCard();
-            if (!cardData || !_handModel.TryAddCard(cardData))
+            var cardModel = _deckModel?.DrawCard();
+            if (cardModel == null || !_handModel.TryAddCard(cardModel))
             {
                 // 手札に追加できなかった場合はデッキに戻す
-                if (cardData) _deckModel?.ReturnCard(cardData);
+                if (cardModel != null) _deckModel?.ReturnCard(cardModel);
                 break;
             }
         }
@@ -112,12 +133,12 @@ public abstract class PlayerPresenter : IDisposable
     /// <summary>
     /// ランダムなカードを手札から取得 (敵の行動用)
     /// </summary>
-    public CardData GetRandomCardDataFromHand() => _handModel.GetRandomCard();
+    public CardModel GetRandomCardFromHand() => _handModel.GetRandomCard();
     
     /// <summary>
     /// カードを選択
     /// </summary>
-    public void SelectCard(CardData cardData) => _handModel.SelectCard(cardData);
+    public void SelectCard(CardModel cardModel) => _handModel.SelectCard(cardModel);
     
     /// <summary>
     /// インデックスでカードを選択
@@ -136,7 +157,7 @@ public abstract class PlayerPresenter : IDisposable
     public bool SelectRandomCard()
     {
         var randomCard = _handModel.GetRandomCard();
-        if (!randomCard) return false;
+        if (randomCard == null) return false;
         
         _handModel.SelectCard(randomCard);
         return true;
@@ -152,20 +173,20 @@ public abstract class PlayerPresenter : IDisposable
     public bool PlaySelectedCard(bool shouldCollapse)
     {
         var selectedCard = SelectedCard.CurrentValue;
-        if (!selectedCard) return false;
+        if (selectedCard == null) return false;
         
         // 手札から削除
         if (!_handModel.TryRemoveCard(selectedCard)) return false;
         
         if (shouldCollapse)
         {
-            // 崩壊する場合はActiveCardsから削除してCollapsedCardsに移動
-            _deckModel?.CollapseCard(selectedCard);
+            // 崩壊する場合はカードを崩壊状態に変更
+            _deckModel.CollapseCard(selectedCard);
         }
         else
         {
             // 崩壊しない場合はデッキに戻す
-            _deckModel?.ReturnCard(selectedCard);
+            _deckModel.ReturnCard(selectedCard);
         }
         
         return true;
@@ -178,11 +199,11 @@ public abstract class PlayerPresenter : IDisposable
     public CardData RemoveSelectedCard()
     {
         var selectedCard = SelectedCard.CurrentValue;
-        if (!selectedCard) return null;
+        if (selectedCard == null) return null;
         
         // 手札から削除
         if (_handModel.TryRemoveCard(selectedCard))
-            return selectedCard;
+            return selectedCard.Data;
         
         return null;
     }
@@ -194,7 +215,11 @@ public abstract class PlayerPresenter : IDisposable
     public void ReturnCardToDeck(CardData card)
     {
         if (card)
-            _deckModel?.ReturnCard(card);
+        {
+            // 新しいCardModelを作成してデッキに戻す
+            var cardModel = new CardModel(card);
+            _deckModel?.ReturnCard(cardModel);
+        }
     }
     
     /// <summary>
@@ -203,7 +228,7 @@ public abstract class PlayerPresenter : IDisposable
     /// <param name="card">プレイするカード</param>
     /// <param name="shouldCollapse">崩壊させるかどうか</param>
     /// <returns>プレイに成功したかどうか</returns>
-    public bool PlayCard(CardData card, bool shouldCollapse)
+    public bool PlayCard(CardModel card, bool shouldCollapse)
     {
         if (!_handModel.HasCard(card)) return false;
         
@@ -217,7 +242,7 @@ public abstract class PlayerPresenter : IDisposable
     /// </summary>
     /// <param name="card">チェックするカード</param>
     /// <returns>プレイ可能かどうか</returns>
-    public bool CanPlayCard(CardData card) => _handModel.HasCard(card);
+    public bool CanPlayCard(CardModel card) => _handModel.HasCard(card);
     
     /// <summary>
     /// 選択したカードを崩壊させる（UI制御付き）
@@ -265,6 +290,47 @@ public abstract class PlayerPresenter : IDisposable
     /// <param name="value">設定する精神力</param>
     public void SetMentalPower(int value) => _playerModel.SetMentalPower(value);
     
+    // === セーブデータ管理 ===
+    
+    /// <summary>
+    /// カードを進化・劣化で置き換え
+    /// </summary>
+    /// <param name="oldCard">置き換える元のカード</param>
+    /// <param name="newCard">新しいカード</param>
+    /// <returns>置き換えに成功したかどうか</returns>
+    public bool ReplaceCard(CardModel oldCard, CardData newCard)
+    {
+        if (_deckModel == null) return false;
+        
+        var success = _deckModel.ReplaceCard(oldCard, newCard);
+        return success;
+    }
+    
+    /// <summary>
+    /// デッキの変更をGameProgressServiceに通知してセーブ
+    /// </summary>
+    public virtual void SaveDeckChanges()
+    {
+        if (_gameProgressService != null && _deckModel != null)
+        {
+            // 全カード（AllCards）をセーブデータに反映
+            _gameProgressService.UpdateDeckFromCardModels(_deckModel.AllCards);
+        }
+    }
+    
+    /// <summary>
+    /// デッキ表示用のカード情報を取得
+    /// </summary>
+    public (IReadOnlyList<CardModel> allCards, List<CardModel> activeCards, List<CardModel> collapsedCards) GetDeckDisplayData()
+    {
+        if (_deckModel == null)
+        {
+            return (new List<CardModel>().AsReadOnly(), new List<CardModel>(), new List<CardModel>());
+        }
+        
+        return (_deckModel.AllCards, _deckModel.ActiveCards, _deckModel.CollapsedCards);
+    }
+    
     // === 手札・デッキリセット ===
     
     /// <summary>
@@ -283,12 +349,11 @@ public abstract class PlayerPresenter : IDisposable
     /// 手札を全てデッキに戻す
     /// </summary>
     /// <returns>戻したカードのリスト</returns>
-    private List<CardData> ReturnAllHandToDeck()
+    private void ReturnAllHandToDeck()
     {
         var handCards = _handModel.GetAllCards();
         _handModel.Clear();
         _deckModel?.ReturnCards(handCards);
-        return handCards;
     }
     
     /// <summary>

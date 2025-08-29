@@ -12,11 +12,17 @@ public class RootLifetimeScope : LifetimeScope
     [SerializeField] private BgmManager bgmManager;
     [SerializeField] private SeManager seManager;
     [SerializeField] private AllEnemyData allEnemyData;
+    [SerializeField] private AllCardData allCardData;
     
     protected override void Configure(IContainerBuilder builder)
     {
-        // データの登録
+        // データの登録と初期化
         builder.RegisterInstance(allEnemyData);
+        builder.RegisterInstance(allCardData);
+        RegisterAllData();
+        
+        // カードプールサービス（GameProgressServiceが依存）
+        builder.Register<CardPoolService>(Lifetime.Singleton);
         
         // セーブデータ管理
         builder.Register<SaveDataManager>(Lifetime.Singleton);
@@ -29,6 +35,14 @@ public class RootLifetimeScope : LifetimeScope
         
         // サウンドマネージャーの初期化
         InitializeSoundManagers();
+    }
+    
+    private void RegisterAllData()
+    {
+        #if UNITY_EDITOR
+        allCardData.RegisterAllCards();
+        allEnemyData.RegisterAllEnemies();
+        #endif
     }
     
     private void InitializeSoundManagers()

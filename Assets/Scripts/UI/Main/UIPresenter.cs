@@ -164,11 +164,11 @@ public class UIPresenter : IStartable, System.IDisposable
         }).AddTo(_disposables);
         
         // プレイヤーのカード選択を監視して敵のSpriteを更新
-        _player.SelectedCard.Subscribe(cardData => 
+        _player.SelectedCard.Subscribe(cardModel => 
         {
             // 手動制御モード中は自動更新をスキップ
             if (_isEnemySpriteManualMode) return;
-            if (cardData) _enemyView.UpdateSpriteForAttribute(cardData.Attribute).Forget();
+            if (cardModel != null && cardModel.Data) _enemyView.UpdateSpriteForAttribute(cardModel.Data.Attribute).Forget();
             else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
         

@@ -129,10 +129,15 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
         
         // カードデッキを初期化
-        var playerDeck = _cardPoolService.GetRandomCards(5);
-        var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);
+        // プレイヤーデッキ: セーブデータから復元を試行、失敗時はランダム生成
+        if (!_player.LoadDeckFromSaveData())
+        {
+            var playerDeck = _cardPoolService.GetRandomCards(5);
+            _player.InitializeDeck(playerDeck);
+        }
         
-        _player.InitializeDeck(playerDeck);
+        // 敵デッキ: 固定デッキを使用
+        var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);
         _enemy.InitializeDeck(enemyDeck);
         
         _player.DrawCardsWithDelay(3, 300).Forget();
@@ -224,7 +229,7 @@ public class GameManager: IStartable, IDisposable
                 return;
             
             var selectedCard = _player.SelectedCard.CurrentValue;
-            if (!selectedCard) continue;
+            if (selectedCard == null) continue;
             // カードが選択されたらプレイボタンを表示
             _uiPresenter.ShowPlayButton();
             break;
@@ -244,9 +249,9 @@ public class GameManager: IStartable, IDisposable
         _uiPresenter.HidePlayButton();
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
-        if (!finalSelectedCard) return;
+        if (finalSelectedCard == null) return;
         
-        _uiPresenter.UpdateEnemySprite(finalSelectedCard.Attribute).Forget();
+        _uiPresenter.UpdateEnemySprite(finalSelectedCard.Data.Attribute).Forget();
         
         // プレイヤーの手を作成
         var playStyle = _uiPresenter.GetSelectedPlayStyle();
@@ -254,7 +259,7 @@ public class GameManager: IStartable, IDisposable
         // 精神力を消費
         var mentalBet = _uiPresenter.GetMentalBetValue();
         _player.ConsumeMentalPower(mentalBet);
-        _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
+        _playerMove = new PlayerMove(finalSelectedCard.Data, playStyle, mentalBet);
         
         // 人格ログ: プレイヤームーブ記録
         _gameProgressService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
@@ -280,7 +285,7 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(1000);
         
         // AIでカードを選択
-        var npcCard = _enemy.GetRandomCardDataFromHand();
+        var npcCard = _enemy.GetRandomCardFromHand();
         _enemy.SelectCard(npcCard);
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
         var npcPlayStyle = (PlayStyle)UnityEngine.Random.Range(0, 3);
@@ -288,7 +293,7 @@ public class GameManager: IStartable, IDisposable
         
         // NPCの精神力を消費
         _enemy.ConsumeMentalPower(npcMentalBet);
-        _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
+        _npcMove = new PlayerMove(npcCard.Data, npcPlayStyle, npcMentalBet);
         
         // 人格ログ: 敵ムーブ記録
         _gameProgressService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
@@ -459,63 +464,76 @@ public class GameManager: IStartable, IDisposable
         // 使用したカードをプレイ
         if (_playerCollapse)
         {
+            // 崩壊処理前にカード情報を取得
             var playerCollapseCard = _player.SelectedCard.CurrentValue;
-            // 人格ログ: プレイヤーカード崩壊イベント記録
-            if (playerCollapseCard)
-                _gameProgressService.LogCardCollapse("player", playerCollapseCard);
+            
+            // 実際の崩壊処理を実行
+            await _player.CollapseSelectedCard();
+            
+            if (playerCollapseCard != null)
+                _gameProgressService.LogCardCollapse("player", playerCollapseCard.Data);
         }
         else
         {
-            // プレイヤーカードを手札から削除（デッキに戻さない）
-            var playerCard = _player.RemoveSelectedCard();
-            if (playerCard)
+            // プレイヤーカードの進化処理（InstanceIdを保持）
+            var selectedCard = _player.SelectedCard.CurrentValue;
+            if (selectedCard != null)
             {
-                // 進化
-                var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(playerCard);
-                if (playerCardAfterEvolution != playerCard)
+                // 進化チェック
+                var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(selectedCard.Data);
+                if (playerCardAfterEvolution != selectedCard.Data)
                 {
+                    // カードを進化後のデータで置換（InstanceIdは保持）
+                    _player.ReplaceCard(selectedCard, playerCardAfterEvolution);
+                    
                     // 人格ログ: プレイヤーカード進化イベント記録
-                    _gameProgressService.LogCardEvolution("player", playerCard, playerCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化");
+                    _gameProgressService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
+                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
                 }
                 
                 // 共鳴チェック
-                if (_currentEnemyData && _currentEnemyData.ResonanceCard && playerCard == _currentEnemyData.ResonanceCard)
+                if (_currentEnemyData && _currentEnemyData.ResonanceCard && selectedCard.Data == _currentEnemyData.ResonanceCard)
                 {
                     // 人格ログ: 共鳴イベント記録
-                    _gameProgressService.LogResonance("Player", playerCard);
-                    await _uiPresenter.ShowAnnouncement($"共鳴発生: {playerCard.CardName}");
+                    _gameProgressService.LogResonance("Player", selectedCard.Data);
+                    await _uiPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
                 }
                 
-                // 進化後のカードをデッキに戻す
-                _player.ReturnCardToDeck(playerCardAfterEvolution);
+                // カードをプレイ（崩壊しない）
+                _player.PlaySelectedCard(false);
             }
         }
 
         if (_npcCollapse)
         {
             var npcCollapseCard = _enemy.SelectedCard.CurrentValue;
-            // 人格ログ: NPCカード崩壊イベント記録
-            if (npcCollapseCard)
-                _gameProgressService.LogCardCollapse("enemy", npcCollapseCard);
+            // 実際の崩壊処理を実行
+            _enemy.PlaySelectedCard(true);
+            
+            if (npcCollapseCard != null)
+                _gameProgressService.LogCardCollapse("enemy", npcCollapseCard.Data);
         }
         else
         {
-            // NPCカードを手札から削除（デッキに戻さない）
-            var npcCard = _enemy.RemoveSelectedCard();
-            if (npcCard)
+            // NPCカードの進化処理（InstanceIdを保持）
+            var selectedEnemyCard = _enemy.SelectedCard.CurrentValue;
+            if (selectedEnemyCard != null)
             {
                 // 即時進化チェック
-                var npcCardAfterEvolution = _gameProgressService.EnemyStats.CheckCardEvolution(npcCard);
+                var npcCardAfterEvolution = _gameProgressService.EnemyStats.CheckCardEvolution(selectedEnemyCard.Data);
                 // 進化結果をアナウンス
-                if (npcCardAfterEvolution != npcCard)
+                if (npcCardAfterEvolution != selectedEnemyCard.Data)
                 {
+                    // カードを進化後のデータで置換（InstanceIdは保持）
+                    _enemy.ReplaceCard(selectedEnemyCard, npcCardAfterEvolution);
+                    
                     // 人格ログ: NPCカード進化イベント記録
-                    _gameProgressService.LogCardEvolution("enemy", npcCard, npcCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"対戦相手の {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化");
+                    _gameProgressService.LogCardEvolution("enemy", selectedEnemyCard.Data, npcCardAfterEvolution);
+                    await _uiPresenter.ShowAnnouncement($"対戦相手の {selectedEnemyCard.Data.CardName} が {npcCardAfterEvolution.CardName} に変化");
                 }
-                // 進化後のカードをデッキに戻す
-                _enemy.ReturnCardToDeck(npcCardAfterEvolution);
+                
+                // カードをプレイ（崩壊しない）
+                _enemy.PlaySelectedCard(false);
             }
         }
         
@@ -605,6 +623,9 @@ public class GameManager: IStartable, IDisposable
         
         // バトル結果をGameProgressServiceに報告してストーリー進行（セーブ前に実行）
         var playerWon = _playerWins >= WINS_TO_VICTORY;
+        
+        // プレイヤーのデッキ変更をセーブ（バトル終了時のみ）
+        _player.SaveDeckChanges();
         
         // 現在のバトル結果を記録
         _gameProgressService.UpdatePlayerMentalPower(_player.MentalPower.CurrentValue);

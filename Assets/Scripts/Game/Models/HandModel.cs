@@ -9,14 +9,14 @@ using R3;
 public class HandModel
 {
     // 公開プロパティ
-    public ReadOnlyReactiveProperty<List<CardData>> Cards => _cards;
+    public ReadOnlyReactiveProperty<List<CardModel>> Cards => _cards;
     public ReadOnlyReactiveProperty<int> SelectedIndex => _selectedIndex;
-    public ReadOnlyReactiveProperty<CardData> SelectedCard { get; }
+    public ReadOnlyReactiveProperty<CardModel> SelectedCard { get; }
     public int Count => _cards.Value.Count;
     public int MaxHandSize { get; }
     
     // 手札のカードデータ
-    private readonly ReactiveProperty<List<CardData>> _cards = new(new List<CardData>());
+    private readonly ReactiveProperty<List<CardModel>> _cards = new(new List<CardModel>());
     private readonly ReactiveProperty<int> _selectedIndex = new(-1);
     
     /// <summary>
@@ -38,12 +38,12 @@ public class HandModel
     /// </summary>
     /// <param name="card">追加するカード</param>
     /// <returns>追加に成功したか</returns>
-    public bool TryAddCard(CardData card)
+    public bool TryAddCard(CardModel card)
     {
         if (_cards.Value.Count >= MaxHandSize) return false;
         
         // リスト自体を変更しないと通知が行われないため、新しいリストを作成
-        var newList = new List<CardData>(_cards.Value) { card };
+        var newList = new List<CardModel>(_cards.Value) { card };
         _cards.Value = newList;
         return true;
     }
@@ -53,7 +53,7 @@ public class HandModel
     /// </summary>
     /// <param name="cards">追加するカードリスト</param>
     /// <returns>追加されたカードの数</returns>
-    public int TryAddCards(IEnumerable<CardData> cards)
+    public int TryAddCards(IEnumerable<CardModel> cards)
     {
         var addedCount = 0;
         foreach (var card in cards)
@@ -71,7 +71,7 @@ public class HandModel
     /// </summary>
     /// <param name="card">チェックするカード</param>
     /// <returns>手札にあるかどうか</returns>
-    public bool HasCard(CardData card)
+    public bool HasCard(CardModel card)
     {
         return _cards.Value.Contains(card);
     }
@@ -81,12 +81,12 @@ public class HandModel
     /// </summary>
     /// <param name="card">削除するカード</param>
     /// <returns>削除に成功したか</returns>
-    public bool TryRemoveCard(CardData card)
+    public bool TryRemoveCard(CardModel card)
     {
         var index = _cards.Value.IndexOf(card);
         if (index < 0) return false;
         
-        var newList = new List<CardData>(_cards.Value);
+        var newList = new List<CardModel>(_cards.Value);
         newList.RemoveAt(index);
         _cards.Value = newList;
         
@@ -131,7 +131,7 @@ public class HandModel
     /// カードデータで選択
     /// </summary>
     /// <param name="card">選択するカード</param>
-    public void SelectCard(CardData card)
+    public void SelectCard(CardModel card)
     {
         var index = _cards.Value.IndexOf(card);
         SelectCardAt(index);
@@ -150,7 +150,7 @@ public class HandModel
     /// </summary>
     public void Clear()
     {
-        _cards.Value = new List<CardData>();
+        _cards.Value = new List<CardModel>();
         _selectedIndex.Value = -1;
     }
     
@@ -158,18 +158,18 @@ public class HandModel
     /// 全てのカードを取得（クリアしない）
     /// </summary>
     /// <returns>カードリストのコピー</returns>
-    public List<CardData> GetAllCards()
+    public List<CardModel> GetAllCards()
     {
-        return new List<CardData>(_cards.Value);
+        return new List<CardModel>(_cards.Value);
     }
     
     /// <summary>
     /// 全てのカードを取得してクリア
     /// </summary>
     /// <returns>取得したカードリスト</returns>
-    public List<CardData> TakeAllCards()
+    public List<CardModel> TakeAllCards()
     {
-        var cards = new List<CardData>(_cards.Value);
+        var cards = new List<CardModel>(_cards.Value);
         Clear();
         return cards;
     }
@@ -179,7 +179,7 @@ public class HandModel
     /// </summary>
     /// <param name="index">インデックス</param>
     /// <returns>カードデータ（存在しない場合はnull）</returns>
-    public CardData GetCardAt(int index)
+    public CardModel GetCardAt(int index)
     {
         if (index < 0 || index >= _cards.Value.Count) return null;
         return _cards.Value[index];
@@ -189,7 +189,7 @@ public class HandModel
     /// ランダムなカードを取得
     /// </summary>
     /// <returns>ランダムに選ばれたカード（手札が空の場合はnull）</returns>
-    public CardData GetRandomCard()
+    public CardModel GetRandomCard()
     {
         if (_cards.Value.Count == 0) return null;
         var randomIndex = UnityEngine.Random.Range(0, _cards.Value.Count);
