@@ -284,6 +284,14 @@ public class GameProgressService
     }
     
     /// <summary>
+    /// デッキ表示用のCardModelリストを取得
+    /// </summary>
+    public List<CardModel> GetDeckCardModels()
+    {
+        return ConvertDeckToCardModels();
+    }
+    
+    /// <summary>
     /// 敵の統計をリセット
     /// </summary>
     public void ResetEnemyStats()
