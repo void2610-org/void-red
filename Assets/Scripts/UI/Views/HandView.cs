@@ -64,7 +64,7 @@ public class HandView : MonoBehaviour
     /// <summary>
     /// カード表示を更新（差分更新）
     /// </summary>
-    private async UniTask UpdateCardViews(List<CardData> cards)
+    private async UniTask UpdateCardViews(List<CardModel> cards)
     {
         // 削除処理：余分なCardViewを削除
         while (_cardViews.Count > cards.Count)
@@ -84,16 +84,16 @@ public class HandView : MonoBehaviour
         // 追加処理：新しいカードを作成（アニメーションなし）
         for (var i = _cardViews.Count; i < cards.Count; i++)
         {
-            var cardView = CreateCardView(cards[i]);
+            var cardView = CreateCardView(cards[i].Data);
             _cardViews.Add(cardView);
         }
         
         // 既存のCardViewのデータを更新
         for (var i = 0; i < newCardStartIndex && i < cards.Count; i++)
         {
-            if (_cardViews[i] && _cardViews[i].CardData != cards[i])
+            if (_cardViews[i] && _cardViews[i].CardData != cards[i].Data)
             {
-                _cardViews[i].Initialize(cards[i]);
+                _cardViews[i].Initialize(cards[i].Data);
             }
         }
         
