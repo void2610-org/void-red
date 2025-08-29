@@ -229,7 +229,7 @@ public class GameManager: IStartable, IDisposable
                 return;
             
             var selectedCard = _player.SelectedCard.CurrentValue;
-            if (!selectedCard) continue;
+            if (selectedCard == null) continue;
             // カードが選択されたらプレイボタンを表示
             _uiPresenter.ShowPlayButton();
             break;
@@ -249,9 +249,9 @@ public class GameManager: IStartable, IDisposable
         _uiPresenter.HidePlayButton();
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
-        if (!finalSelectedCard) return;
+        if (finalSelectedCard == null) return;
         
-        _uiPresenter.UpdateEnemySprite(finalSelectedCard.Attribute).Forget();
+        _uiPresenter.UpdateEnemySprite(finalSelectedCard.Data.Attribute).Forget();
         
         // プレイヤーの手を作成
         var playStyle = _uiPresenter.GetSelectedPlayStyle();
@@ -259,7 +259,7 @@ public class GameManager: IStartable, IDisposable
         // 精神力を消費
         var mentalBet = _uiPresenter.GetMentalBetValue();
         _player.ConsumeMentalPower(mentalBet);
-        _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
+        _playerMove = new PlayerMove(finalSelectedCard.Data, playStyle, mentalBet);
         
         // 人格ログ: プレイヤームーブ記録
         _gameProgressService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
@@ -293,7 +293,7 @@ public class GameManager: IStartable, IDisposable
         
         // NPCの精神力を消費
         _enemy.ConsumeMentalPower(npcMentalBet);
-        _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
+        _npcMove = new PlayerMove(npcCard.Data, npcPlayStyle, npcMentalBet);
         
         // 人格ログ: 敵ムーブ記録
         _gameProgressService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
