@@ -475,29 +475,32 @@ public class GameManager: IStartable, IDisposable
         }
         else
         {
-            // プレイヤーカードを手札から削除（デッキに戻さない）
-            var playerCard = _player.RemoveSelectedCard();
-            if (playerCard)
+            // プレイヤーカードの進化処理（InstanceIdを保持）
+            var selectedCard = _player.SelectedCard.CurrentValue;
+            if (selectedCard != null)
             {
-                // 進化
-                var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(playerCard);
-                if (playerCardAfterEvolution != playerCard)
+                // 進化チェック
+                var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(selectedCard.Data);
+                if (playerCardAfterEvolution != selectedCard.Data)
                 {
+                    // カードを進化後のデータで置換（InstanceIdは保持）
+                    _player.ReplaceCard(selectedCard, playerCardAfterEvolution);
+                    
                     // 人格ログ: プレイヤーカード進化イベント記録
-                    _gameProgressService.LogCardEvolution("player", playerCard, playerCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {playerCard.CardName} が {playerCardAfterEvolution.CardName} に変化");
+                    _gameProgressService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
+                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
                 }
                 
                 // 共鳴チェック
-                if (_currentEnemyData && _currentEnemyData.ResonanceCard && playerCard == _currentEnemyData.ResonanceCard)
+                if (_currentEnemyData && _currentEnemyData.ResonanceCard && selectedCard.Data == _currentEnemyData.ResonanceCard)
                 {
                     // 人格ログ: 共鳴イベント記録
-                    _gameProgressService.LogResonance("Player", playerCard);
-                    await _uiPresenter.ShowAnnouncement($"共鳴発生: {playerCard.CardName}");
+                    _gameProgressService.LogResonance("Player", selectedCard.Data);
+                    await _uiPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
                 }
                 
-                // 進化後のカードをデッキに戻す
-                _player.ReturnCardToDeck(playerCardAfterEvolution);
+                // カードをプレイ（崩壊しない）
+                _player.PlaySelectedCard(false);
             }
         }
 
@@ -506,25 +509,31 @@ public class GameManager: IStartable, IDisposable
             var npcCollapseCard = _enemy.SelectedCard.CurrentValue;
             // 実際の崩壊処理を実行
             _enemy.PlaySelectedCard(true);
-            _gameProgressService.LogCardCollapse("enemy", npcCollapseCard.Data);
+            
+            if (npcCollapseCard != null)
+                _gameProgressService.LogCardCollapse("enemy", npcCollapseCard.Data);
         }
         else
         {
-            // NPCカードを手札から削除（デッキに戻さない）
-            var npcCard = _enemy.RemoveSelectedCard();
-            if (npcCard)
+            // NPCカードの進化処理（InstanceIdを保持）
+            var selectedEnemyCard = _enemy.SelectedCard.CurrentValue;
+            if (selectedEnemyCard != null)
             {
                 // 即時進化チェック
-                var npcCardAfterEvolution = _gameProgressService.EnemyStats.CheckCardEvolution(npcCard);
+                var npcCardAfterEvolution = _gameProgressService.EnemyStats.CheckCardEvolution(selectedEnemyCard.Data);
                 // 進化結果をアナウンス
-                if (npcCardAfterEvolution != npcCard)
+                if (npcCardAfterEvolution != selectedEnemyCard.Data)
                 {
+                    // カードを進化後のデータで置換（InstanceIdは保持）
+                    _enemy.ReplaceCard(selectedEnemyCard, npcCardAfterEvolution);
+                    
                     // 人格ログ: NPCカード進化イベント記録
-                    _gameProgressService.LogCardEvolution("enemy", npcCard, npcCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"対戦相手の {npcCard.CardName} が {npcCardAfterEvolution.CardName} に変化");
+                    _gameProgressService.LogCardEvolution("enemy", selectedEnemyCard.Data, npcCardAfterEvolution);
+                    await _uiPresenter.ShowAnnouncement($"対戦相手の {selectedEnemyCard.Data.CardName} が {npcCardAfterEvolution.CardName} に変化");
                 }
-                // 進化後のカードをデッキに戻す
-                _enemy.ReturnCardToDeck(npcCardAfterEvolution);
+                
+                // カードをプレイ（崩壊しない）
+                _enemy.PlaySelectedCard(false);
             }
         }
         
@@ -614,6 +623,9 @@ public class GameManager: IStartable, IDisposable
         
         // バトル結果をGameProgressServiceに報告してストーリー進行（セーブ前に実行）
         var playerWon = _playerWins >= WINS_TO_VICTORY;
+        
+        // プレイヤーのデッキ変更をセーブ（バトル終了時のみ）
+        _player.SaveDeckChanges();
         
         // 現在のバトル結果を記録
         _gameProgressService.UpdatePlayerMentalPower(_player.MentalPower.CurrentValue);
