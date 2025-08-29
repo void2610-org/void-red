@@ -12,6 +12,8 @@ public class DeckCardView : MonoBehaviour
     [SerializeField] private Image cardImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Image backgroundImage;
+    [SerializeField] private Image cardTextBanner;
+    [SerializeField] private Image cardFrame;
     
     [Header("色設定")]
     [SerializeField] private Color activeColor = Color.white;
@@ -34,12 +36,17 @@ public class DeckCardView : MonoBehaviour
     /// </summary>
     private void UpdateDisplay()
     {
-        if (CardModel?.Data == null) return;
+        if (!CardModel?.Data) return;
         
         // カード画像と名前を設定
         cardImage.sprite = CardModel.Data.CardImage;
         cardImage.color = CardModel.Data.CardImage ? Color.white : Color.clear;
         cardNameText.text = CardModel.Data.CardName;
+        cardNameText.color = CardModel.Data.IsTextColorBlack ? Color.black : Color.white;
+        
+        // バナーとフレームの色をカードの色に設定
+        cardTextBanner.color = CardModel.Data.Color;
+        cardFrame.color = CardModel.Data.Color;
         
         // 状態に応じて色を変更
         if (CardModel.IsCollapsed)
