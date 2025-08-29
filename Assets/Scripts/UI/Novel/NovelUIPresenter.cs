@@ -14,7 +14,7 @@ public class NovelUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private TextMeshProUGUI scenarioIdText;
     
-    private SceneTransitionService _sceneTransitionService;
+    private GameProgressService _gameProgressService;
     private DialogView _dialogView;
     
     [Inject]
@@ -28,36 +28,41 @@ public class NovelUIPresenter : MonoBehaviour
         // DialogViewを取得
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
         
-        // 遷移データを取得
-        var novelData = _sceneTransitionService.GetTransitionData<NovelTransitionData>();
+        // 現在のノベルノードから情報を取得
+        var currentNode = _gameProgressService.GetCurrentNode();
+        string scenarioId = "test_scenario_001"; // デフォルト値
         
-        // 遷移データの情報を表示
-        if (scenarioIdText != null)
+        if (currentNode is NovelNode novelNode)
         {
-            scenarioIdText.text = $"シナリオID: {novelData.ScenarioId}";
+            scenarioId = novelNode.ScenarioId;
+            scenarioIdText.text = $"シナリオID: {novelNode.ScenarioId}";
+        }
+        else
+        {
+            scenarioIdText.text = $"シナリオID: {scenarioId}";
         }
         
         // DialogViewが見つかった場合はダイアログテストを開始
         if (_dialogView != null)
         {
             Debug.Log("[NovelUIPresenter] DialogViewを発見しました。テストダイアログを開始します。");
-            StartDialogTest(novelData.ReturnScene).Forget();
+            StartDialogTest().Forget();
         }
         else
         {
             // DialogViewがない場合は従来の処理
             Debug.LogWarning("[NovelUIPresenter] DialogViewが見つかりません。3秒後に戻ります。");
-            ReturnAsync(novelData.ReturnScene).Forget();
+            ReturnAsync().Forget();
         }
     }
     
     /// <summary>
     /// ダイアログテストを開始
     /// </summary>
-    private async UniTaskVoid StartDialogTest(SceneType returnScene)
+    private async UniTaskVoid StartDialogTest()
     {
         // DialogViewの完了イベントを購読
-        _dialogView.OnDialogCompleted += () => OnDialogCompleted(returnScene).Forget();
+        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         
         Debug.Log("[NovelUIPresenter] テストダイアログを開始します");
         
@@ -70,27 +75,43 @@ public class NovelUIPresenter : MonoBehaviour
     /// <summary>
     /// ダイアログ完了時の処理
     /// </summary>
-    private async UniTaskVoid OnDialogCompleted(SceneType returnScene)
+    private async UniTaskVoid OnDialogCompleted()
     {
         Debug.Log("[NovelUIPresenter] 全てのダイアログが完了しました。シーンを戻ります。");
         
         // 少し待ってからシーンを戻る
         await UniTask.Delay(1000);
         
-        // 遷移データをクリアしてシーンに戻る
-        _sceneTransitionService.ClearTransitionData();
-        await _sceneTransitionService.TransitionToScene(returnScene);
+        // ダイアログ結果を記録（将来的にはDialogViewから取得）
+        var choices = new Dictionary<string, string>
+        {
+            { "dialog_completed", "true" },
+            { "scenario_id", "test_scenario_001" }
+        };
+        
+        _gameProgressService.RecordNovelResultAndSave(choices);
+        
+        // ホームシーンに戻る
+        await _gameProgressService.TransitionToScene(SceneType.Home);
     }
     
     /// <summary>
     /// フォールバック用の戻り処理（DialogViewがない場合）
     /// </summary>
-    private async UniTask ReturnAsync(SceneType returnScene)
+    private async UniTask ReturnAsync()
     {
         await UniTask.Delay(3000);
         
-        // 遷移データをクリアしてシーンに戻る
-        _sceneTransitionService.ClearTransitionData();
-        await _sceneTransitionService.TransitionToScene(returnScene);
+        // ハードコード: 複数選択結果
+        var choices = new Dictionary<string, string>
+        {
+            { "fork0", "option1" },
+            { "fork1", "option2" }
+        };
+        
+        _gameProgressService.RecordNovelResultAndSave(choices);
+        
+        // ホームシーンに戻る
+        await _gameProgressService.TransitionToScene(SceneType.Home);
     }
 }
