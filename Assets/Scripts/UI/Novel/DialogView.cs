@@ -246,12 +246,9 @@ public class DialogView : MonoBehaviour
     /// </summary>
     private async UniTask WaitForNextWithTimeout()
     {
-        var elapsedTime = 0f;
-        
-        while (_isWaitingForNext && elapsedTime < autoNextDelay)
+        if (_isWaitingForNext)
         {
-            elapsedTime += Time.deltaTime;
-            await UniTask.Yield();
+            await UniTask.Delay(TimeSpan.FromSeconds(autoNextDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
         }
     }
     
