@@ -129,10 +129,15 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
         
         // カードデッキを初期化
-        var playerDeck = _cardPoolService.GetRandomCards(5);
-        var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);
+        // プレイヤーデッキ: セーブデータから復元を試行、失敗時はランダム生成
+        if (!_player.LoadDeckFromSaveData())
+        {
+            var playerDeck = _cardPoolService.GetRandomCards(5);
+            _player.InitializeDeck(playerDeck);
+        }
         
-        _player.InitializeDeck(playerDeck);
+        // 敵デッキ: 固定デッキを使用
+        var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);
         _enemy.InitializeDeck(enemyDeck);
         
         _player.DrawCardsWithDelay(3, 300).Forget();

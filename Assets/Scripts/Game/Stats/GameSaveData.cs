@@ -11,18 +11,18 @@ public class GameSaveData
 {
     [Header("基礎ゲームデータ")]
     [SerializeField] private int currentMentalPower = GameConstants.MAX_MENTAL_POWER;
-    [SerializeField] private List<string> currentDeck = new List<string>();
+    [SerializeField] private List<string> currentDeck = new();
     
     [Header("ゲーム進行データ")]
     [SerializeField] private int currentStep = 0;
-    [SerializeField] private List<string> resultKeys = new List<string>();
-    [SerializeField] private List<string> resultValues = new List<string>();
+    [SerializeField] private List<string> resultKeys = new();
+    [SerializeField] private List<string> resultValues = new();
     
     [Header("統計・進化データ")]
-    [SerializeField] private EvolutionStatsData evolutionStats = new EvolutionStatsData();
+    [SerializeField] private EvolutionStatsData evolutionStats = new();
     
     [Header("人格ログデータ")]
-    [SerializeField] private PersonalityLogData personalityLog = new PersonalityLogData();
+    [SerializeField] private PersonalityLogData personalityLog = new();
     
     // プロパティ
     public int CurrentMentalPower => currentMentalPower;

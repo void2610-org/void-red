@@ -22,7 +22,7 @@ public class GameProgressService
     
     // プレイヤー状態
     private int _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
-    private List<string> _currentDeck = new();
+    private readonly List<string> _currentDeck = new();
     private EvolutionStatsData _evolutionStats = new();
     private EnemyStats _enemyStats = new();
     
@@ -30,14 +30,16 @@ public class GameProgressService
     private PersonalityLogData _personalityLog = new();
     private MoveLog _currentPlayerMove;
     private MoveLog _currentEnemyMove;
-    private List<TurnEvent> _currentEvents = new();
+    private readonly List<TurnEvent> _currentEvents = new();
     private ChapterLog _currentChapter;
     
     private readonly SaveDataManager _saveDataManager;
+    private readonly CardPoolService _cardPoolService;
     
-    public GameProgressService(SaveDataManager saveDataManager)
+    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService)
     {
         _saveDataManager = saveDataManager;
+        _cardPoolService = cardPoolService;
         
         // 起動時に自動でセーブデータをロード
         LoadAllGameData();
@@ -233,6 +235,44 @@ public class GameProgressService
     {
         _currentDeck.Clear();
         _currentDeck.AddRange(deck);
+    }
+    
+    /// <summary>
+    /// 現在のデッキ情報を取得
+    /// </summary>
+    public List<string> GetCurrentDeck()
+    {
+        return new List<string>(_currentDeck);
+    }
+    
+    /// <summary>
+    /// CardDataのリストからCardIdのリストに変換
+    /// </summary>
+    public void UpdateDeckFromCardData(List<CardData> cardDataList)
+    {
+        _currentDeck.Clear();
+        foreach (var card in cardDataList)
+        {
+            if (card)
+            {
+                _currentDeck.Add(card.CardId);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// CardIdのリストからCardDataのリストに変換
+    /// </summary>
+    public List<CardData> ConvertDeckToCardData()
+    {
+        var cardDataList = new List<CardData>();
+        foreach (var cardId in _currentDeck)
+        {
+            var cardData = _cardPoolService.GetCardById(cardId);
+            if (cardData) cardDataList.Add(cardData);
+            else Debug.LogWarning($"[GameProgressService] カードID '{cardId}' が見つかりませんでした");
+        }
+        return cardDataList;
     }
     
     /// <summary>

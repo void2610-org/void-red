@@ -23,17 +23,20 @@ public abstract class PlayerPresenter : IDisposable
     private DeckModel _deckModel;
     private readonly HandView _handView;
     private readonly CompositeDisposable _disposables = new();
+    private readonly GameProgressService _gameProgressService;
     
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="handView">手札ビュー</param>
+    /// <param name="gameProgressService">ゲーム進行サービス（オプショナル）</param>
     /// <param name="maxHandSize">最大手札数</param>
-    protected PlayerPresenter(HandView handView, int maxHandSize = 3)
+    protected PlayerPresenter(HandView handView, GameProgressService gameProgressService = null, int maxHandSize = 3)
     {
         _playerModel = new PlayerModel();
         _handModel = new HandModel(maxHandSize);
         _handView = handView;
+        _gameProgressService = gameProgressService;
         
         // UI制御の設定
         _handView.BindModel(_handModel);
@@ -52,6 +55,23 @@ public abstract class PlayerPresenter : IDisposable
     public void InitializeDeck(List<CardData> cardDataList)
     {
         _deckModel = new DeckModel(cardDataList);
+        SaveDeckChanges();
+    }
+    
+    /// <summary>
+    /// セーブデータからデッキを復元
+    /// </summary>
+    /// <returns>復元に成功したかどうか</returns>
+    public bool LoadDeckFromSaveData()
+    {
+        var savedCardData = _gameProgressService.ConvertDeckToCardData();
+        if (savedCardData.Count > 0)
+        {
+            _deckModel = new DeckModel(savedCardData);
+            return true;
+        }
+        
+        return false;
     }
     
     /// <summary>
@@ -168,6 +188,9 @@ public abstract class PlayerPresenter : IDisposable
             _deckModel?.ReturnCard(selectedCard);
         }
         
+        // デッキの変更をセーブ
+        SaveDeckChanges();
+        
         return true;
     }
     
@@ -194,7 +217,10 @@ public abstract class PlayerPresenter : IDisposable
     public void ReturnCardToDeck(CardData card)
     {
         if (card)
+        {
             _deckModel?.ReturnCard(card);
+            SaveDeckChanges();
+        }
     }
     
     /// <summary>
@@ -265,6 +291,38 @@ public abstract class PlayerPresenter : IDisposable
     /// <param name="value">設定する精神力</param>
     public void SetMentalPower(int value) => _playerModel.SetMentalPower(value);
     
+    // === セーブデータ管理 ===
+    
+    /// <summary>
+    /// カードを進化・劣化で置き換え
+    /// </summary>
+    /// <param name="oldCard">置き換える元のカード</param>
+    /// <param name="newCard">新しいカード</param>
+    /// <returns>置き換えに成功したかどうか</returns>
+    public bool ReplaceCard(CardData oldCard, CardData newCard)
+    {
+        if (_deckModel == null) return false;
+        
+        var success = _deckModel.ReplaceCard(oldCard, newCard);
+        if (success)
+        {
+            SaveDeckChanges();
+        }
+        return success;
+    }
+    
+    /// <summary>
+    /// デッキの変更をGameProgressServiceに通知してセーブ
+    /// </summary>
+    protected void SaveDeckChanges()
+    {
+        if (_gameProgressService != null && _deckModel != null)
+        {
+            // 全カード（AllCards）をセーブデータに反映
+            _gameProgressService.UpdateDeckFromCardData(_deckModel.AllCards);
+        }
+    }
+    
     // === 手札・デッキリセット ===
     
     /// <summary>
@@ -283,12 +341,11 @@ public abstract class PlayerPresenter : IDisposable
     /// 手札を全てデッキに戻す
     /// </summary>
     /// <returns>戻したカードのリスト</returns>
-    private List<CardData> ReturnAllHandToDeck()
+    private void ReturnAllHandToDeck()
     {
         var handCards = _handModel.GetAllCards();
         _handModel.Clear();
         _deckModel?.ReturnCards(handCards);
-        return handCards;
     }
     
     /// <summary>
