@@ -168,7 +168,7 @@ public class UIPresenter : IStartable, System.IDisposable
         {
             // 手動制御モード中は自動更新をスキップ
             if (_isEnemySpriteManualMode) return;
-            if (cardModel.Data) _enemyView.UpdateSpriteForAttribute(cardModel.Data.Attribute).Forget();
+            if (cardModel != null && cardModel.Data) _enemyView.UpdateSpriteForAttribute(cardModel.Data.Attribute).Forget();
             else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
         
