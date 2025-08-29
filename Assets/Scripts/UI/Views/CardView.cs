@@ -15,6 +15,8 @@ public class CardView : MonoBehaviour
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
+    [SerializeField] private Image cardNameBanner;
+    [SerializeField] private Image cardFrame;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
     
@@ -176,12 +178,17 @@ public class CardView : MonoBehaviour
         
         // カード名を設定
         cardNameText.text = CardData.CardName;
+        cardNameText.color = CardData.IsTextColorBlack ? Color.black : Color.white;
         
         // カード画像を設定
         if (CardData.CardImage)
             cardImage.sprite = CardData.CardImage;
         else
             cardImage.color = Color.clear;
+        
+        // バナーとフレームの色をCardDataの色に設定
+        cardNameBanner.color = CardData.Color;
+        cardFrame.color = CardData.Color;
     }
     
     /// <summary>

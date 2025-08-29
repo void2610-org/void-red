@@ -18,6 +18,7 @@ MonoBehaviour:
   image: {fileID: 21300000, guid: eb5bcb40c4aa84e68a08979361b3b0f4, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
+  color: {r: 0, g: 0.07855177, b: 1, a: 1}
   evolutionConditionGroups:
   - conditions:
     - rid: 8005200165294309478

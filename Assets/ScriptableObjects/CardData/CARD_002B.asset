@@ -18,6 +18,8 @@ MonoBehaviour:
   image: {fileID: 0}
   scoreMultiplier: 1
   collapseThreshold: 3
+  color: {r: 1, g: 0.8624264, b: 0, a: 1}
+  isTextColorBlack: 1
   evolutionConditionGroups: []
   evolutionTarget: {fileID: 0}
   isTransformationTarget: 1
