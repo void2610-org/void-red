@@ -89,14 +89,14 @@ public class DialogView : MonoBehaviour
     {
         var testDialogs = new List<DialogData>
         {
-            new DialogData("主人公", "こんにちは、世界！今日はいい天気ですね。", "Dialog"),
-            new DialogData("相手", "そうですね！とても気持ちの良い日です。", "Dialog"),
-            new DialogData("", "二人は公園のベンチに座った。"),
-            new DialogData("主人公", "ここからの景色は本当に美しいですね。", "Dialog"),
-            new DialogData("相手", "ええ、特に夕日が沈む時間帯は格別です。", "Dialog"),
-            new DialogData("", "夕日が空を赤く染めていく。"),
-            new DialogData("主人公", "また明日も来ましょうか。", "Dialog"),
-            new DialogData("相手", "はい、ぜひそうしましょう！", "Dialog")
+            new DialogData("ノア", "こんにちは。", "Dialog"),
+            new DialogData("相手", "やあ。", "Dialog"),
+            new DialogData("", "二人はベンチに座った。"),
+            new DialogData("ノア", "あなたは誰？。", "Dialog"),
+            new DialogData("相手", "君は知っているはずだけど？\n忘れた？。", "Dialog"),
+            new DialogData("", "～～～～～～～～～～～"),
+            new DialogData("ノア", "なにも思い出せないんだ。", "Dialog"),
+            new DialogData("相手", "君が1から決めればいいよ", "Dialog")
         };
         
         await StartDialog(testDialogs);
@@ -360,7 +360,7 @@ public class DialogView : MonoBehaviour
             var localPos = indicatorRectTransform.parent.GetComponent<RectTransform>().InverseTransformPoint(worldPos);
             
             // インジケーターの位置を設定（少し右にオフセット）
-            indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 20f, localPos.y + 5f);
+            indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
         }
     }
     
