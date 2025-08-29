@@ -51,6 +51,7 @@ public class DialogView : MonoBehaviour
         canvasGroup.alpha = 0f;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
+        dialogText.text = "";
         
         if (nextIndicator)
         {
@@ -80,26 +81,6 @@ public class DialogView : MonoBehaviour
         
         // 最初のダイアログを表示
         await ShowNextDialog();
-    }
-    
-    /// <summary>
-    /// テスト用のハードコードされたダイアログを開始
-    /// </summary>
-    public async UniTask StartTestDialog()
-    {
-        var testDialogs = new List<DialogData>
-        {
-            new DialogData("ノア", "こんにちは。", "Dialog"),
-            new DialogData("相手", "やあ。", "Dialog"),
-            new DialogData("", "二人はベンチに座った。"),
-            new DialogData("ノア", "あなたは誰？。", "Dialog"),
-            new DialogData("相手", "君は知っているはずだけど？\n忘れた？。", "Dialog"),
-            new DialogData("", "～～～～～～～～～～～"),
-            new DialogData("ノア", "なにも思い出せないんだ。", "Dialog"),
-            new DialogData("相手", "君が1から決めればいいよ", "Dialog")
-        };
-        
-        await StartDialog(testDialogs);
     }
     
     /// <summary>

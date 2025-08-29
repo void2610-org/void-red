@@ -27,33 +27,7 @@ public class NovelUIPresenter : MonoBehaviour
     {
         // DialogViewを取得
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
-        
-        // 現在のノベルノードから情報を取得
-        var currentNode = _gameProgressService.GetCurrentNode();
-        string scenarioId = "test_scenario_001"; // デフォルト値
-        
-        if (currentNode is NovelNode novelNode)
-        {
-            scenarioId = novelNode.ScenarioId;
-            scenarioIdText.text = $"シナリオID: {novelNode.ScenarioId}";
-        }
-        else
-        {
-            scenarioIdText.text = $"シナリオID: {scenarioId}";
-        }
-        
-        // DialogViewが見つかった場合はダイアログテストを開始
-        if (_dialogView != null)
-        {
-            Debug.Log("[NovelUIPresenter] DialogViewを発見しました。テストダイアログを開始します。");
-            StartDialogTest().Forget();
-        }
-        else
-        {
-            // DialogViewがない場合は従来の処理
-            Debug.LogWarning("[NovelUIPresenter] DialogViewが見つかりません。3秒後に戻ります。");
-            ReturnAsync().Forget();
-        }
+        StartDialogTest().Forget();
     }
     
     /// <summary>
@@ -64,10 +38,11 @@ public class NovelUIPresenter : MonoBehaviour
         // DialogViewの完了イベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         
-        Debug.Log("[NovelUIPresenter] テストダイアログを開始します");
+        Debug.Log("[NovelUIPresenter] プロローグシナリオを開始します");
         
-        // テストダイアログを開始
-        await _dialogView.StartTestDialog();
+        // プロローグシナリオを取得して開始
+        var prologueDialogs = PrologueProvider.GetPrologueScenario();
+        await _dialogView.StartDialog(prologueDialogs);
         
         Debug.Log("[NovelUIPresenter] ダイアログが完了しました");
     }
