@@ -109,6 +109,16 @@ public class CardPoolService
     }
     
     /// <summary>
+    /// CardIdでカードを取得（全カード対象、進化・劣化先も含む）
+    /// </summary>
+    /// <param name="cardId">カードID</param>
+    /// <returns>見つかったカード（存在しない場合はnull）</returns>
+    public CardData GetCardById(string cardId)
+    {
+        return _allCardData.CardList.FirstOrDefault(card => card.CardId == cardId);
+    }
+    
+    /// <summary>
     /// 初期デッキに使用可能なカードの数を取得
     /// </summary>
     /// <returns>進化・劣化先を除いたカード数</returns>
