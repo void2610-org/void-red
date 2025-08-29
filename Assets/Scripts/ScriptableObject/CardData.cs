@@ -16,6 +16,8 @@ public class CardData : ScriptableObject
     [SerializeField] private Sprite image;
     [SerializeField] private float scoreMultiplier = 1.0f;
     [SerializeField] private int collapseThreshold = 3;
+    [SerializeField] private Color color = Color.white;
+    [SerializeField] private bool isTextColorBlack = false;
     
     [Header("進化システム")]
     [SerializeField] private List<EvolutionConditionGroup> evolutionConditionGroups = new List<EvolutionConditionGroup>();
@@ -34,6 +36,8 @@ public class CardData : ScriptableObject
     public Sprite CardImage => image;
     public float ScoreMultiplier => scoreMultiplier;
     public int CollapseThreshold => collapseThreshold;
+    public Color Color => color;
+    public bool IsTextColorBlack => isTextColorBlack;
     
     public List<EvolutionConditionGroup> EvolutionConditionGroups => evolutionConditionGroups;
     public CardData EvolutionTarget => evolutionTarget;

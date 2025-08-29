@@ -61,3 +61,6 @@ MonoBehaviour:
   - name: Wheel
     audioClip: {fileID: 8300000, guid: 3127a9de5a79a4f349fc861185b31ae3, type: 3}
     volume: 1
+  - name: Dialog
+    audioClip: {fileID: 8300000, guid: b35d02ce93242465399575ea7a805e4d, type: 3}
+    volume: 1
