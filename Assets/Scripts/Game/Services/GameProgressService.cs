@@ -121,27 +121,13 @@ public class GameProgressService
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
-        // 結果辞書を使用したストーリー分岐ロジック
         StoryNode nextNode = _currentStep switch
         {
-            // 導入ノベル
-            0 => new NovelNode("S001"),
-            // 最初のバトル
+            // プロローグ
+            0 => new NovelNode("prologue"),
+            // アルヴ
             1 => new BattleNode("E001"),
-            // 最初のバトル結果に応じた分岐
-            2 => GetResult("1") == "win" 
-                ? new NovelNode("S011") 
-                : new NovelNode("S012"),
-            // 2番目のバトル
-            3 => new BattleNode("E002"),
-            // 2番目のバトル結果に応じた分岐
-            4 => GetResult("3") == "win"
-                ? new NovelNode("S021")
-                : new NovelNode("S022"),
-            // 最終バトル
-            5 => new BattleNode("E003"),
-            // ゲーム終了
-            _ => new EndingNode()
+            _ => new NovelNode("ending"),
         };
         
         return nextNode;

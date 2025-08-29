@@ -27,24 +27,47 @@ public class NovelUIPresenter : MonoBehaviour
     {
         // DialogViewを取得
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
-        StartDialogTest().Forget();
+
+        var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
+        
+        if (scenarioId == "prologue")
+            StartPrologueTest().Forget();
+        else if (scenarioId == "ending")
+            StartEndingTest().Forget();
+        else
+        {
+            Debug.LogWarning($"[NovelUIPresenter] 未知のシナリオID: {scenarioId}。フォールバックで3秒後にシーンを戻ります。");
+            ReturnAsync().Forget();
+        }
     }
     
     /// <summary>
-    /// ダイアログテストを開始
+    /// デモビルド用のプロローグシナリオ開始
     /// </summary>
-    private async UniTaskVoid StartDialogTest()
+    private async UniTaskVoid StartPrologueTest()
     {
         // DialogViewの完了イベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         
-        Debug.Log("[NovelUIPresenter] プロローグシナリオを開始します");
-        
         // プロローグシナリオを取得して開始
         var prologueDialogs = PrologueProvider.GetPrologueScenario();
         await _dialogView.StartDialog(prologueDialogs);
-        
-        Debug.Log("[NovelUIPresenter] ダイアログが完了しました");
+    }
+    
+    /// <summary>
+    /// デモビルド用のエンディングシナリオ開始
+    /// </summary>
+    private async UniTaskVoid StartEndingTest()
+    {
+        // DialogViewの完了イベントを購読
+        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
+        var endingDialogs = new List<DialogData>
+        {
+            new DialogData("", "アルファ版はここまでです。"),
+            new DialogData("", "プレイしていただきありがとうございます。"),
+            new DialogData("", "製品版リリースをお待ちください。")
+        };
+        await _dialogView.StartDialog(endingDialogs);
     }
     
     /// <summary>
