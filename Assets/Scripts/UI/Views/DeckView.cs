@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -30,7 +31,9 @@ public class DeckView : MonoBehaviour
     private readonly List<DeckCardView> _cardViews = new();
     private readonly CompositeDisposable _disposables = new();
     private DeckDisplayMode _currentMode = DeckDisplayMode.All;
-    private System.Action _refreshDataCallback;
+    
+    // CardModelリストを保持
+    private List<CardModel> _cardModels;
     
     private enum DeckDisplayMode
     {
@@ -42,16 +45,15 @@ public class DeckView : MonoBehaviour
     /// <summary>
     /// デッキを表示
     /// </summary>
-    /// <param name="allCards">全カード</param>
-    /// <param name="activeCards">使用可能カード</param>
-    /// <param name="collapsedCards">崩壊カード</param>
-    /// <param name="refreshCallback">データ再取得用のコールバック</param>
-    public void ShowDeck(List<CardData> allCards, List<CardData> activeCards, List<CardData> collapsedCards, System.Action refreshCallback = null)
+    /// <param name="cardModels">カードモデルのリスト</param>
+    public void ShowDeck(List<CardModel> cardModels)
     {
-        _refreshDataCallback = refreshCallback;
+        // データを保持
+        _cardModels = cardModels;
+        
         deckPanel.SetActive(true);
-        UpdateDeckDisplay(allCards, activeCards, collapsedCards);
-        UpdateStatistics(allCards, activeCards, collapsedCards);
+        UpdateDeckDisplay();
+        UpdateStatistics();
         UpdateButtonStates();
     }
     
@@ -70,32 +72,33 @@ public class DeckView : MonoBehaviour
     {
         _currentMode = mode;
         UpdateButtonStates();
-        
-        // データ再取得コールバックがある場合は実行
-        _refreshDataCallback?.Invoke();
+        UpdateDeckDisplay();  // 保持されたデータで表示を更新
     }
     
     /// <summary>
     /// デッキ表示を更新
     /// </summary>
-    private void UpdateDeckDisplay(List<CardData> allCards, List<CardData> activeCards, List<CardData> collapsedCards)
+    private void UpdateDeckDisplay()
     {
         // 既存のカードViewをクリア
         ClearCardViews();
         
+        // データがない場合は何もしない
+        if (_cardModels == null || _cardModels.Count == 0) return;
+        
         // 表示するカードリストを決定
         var displayCards = _currentMode switch
         {
-            DeckDisplayMode.All => allCards,
-            DeckDisplayMode.Active => activeCards,
-            DeckDisplayMode.Collapsed => collapsedCards,
-            _ => allCards
+            DeckDisplayMode.All => _cardModels,
+            DeckDisplayMode.Active => _cardModels.Where(cm => !cm.IsCollapsed).ToList(),
+            DeckDisplayMode.Collapsed => _cardModels.Where(cm => cm.IsCollapsed).ToList(),
+            _ => _cardModels
         };
         
         // カードViewを生成
-        foreach (var card in displayCards)
+        foreach (var cardModel in displayCards)
         {
-            CreateCardView(card, activeCards, collapsedCards);
+            CreateCardView(cardModel);
         }
         
         // スクロール位置をリセット
@@ -105,13 +108,10 @@ public class DeckView : MonoBehaviour
     /// <summary>
     /// カードViewを生成
     /// </summary>
-    private void CreateCardView(CardData card, List<CardData> activeCards, List<CardData> collapsedCards)
+    private void CreateCardView(CardModel cardModel)
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
-        var isActive = activeCards.Contains(card);
-        var isCollapsed = collapsedCards.Contains(card);
-        
-        cardView.Initialize(card, isActive, isCollapsed);
+        cardView.Initialize(cardModel);
         _cardViews.Add(cardView);
     }
     
@@ -130,11 +130,23 @@ public class DeckView : MonoBehaviour
     /// <summary>
     /// 統計情報を更新
     /// </summary>
-    private void UpdateStatistics(List<CardData> allCards, List<CardData> activeCards, List<CardData> collapsedCards)
+    private void UpdateStatistics()
     {
-        totalCardsText.text = $"全カード: {allCards.Count}枚";
-        activeCardsText.text = $"使用可能: {activeCards.Count}枚";
-        collapsedCardsText.text = $"崩壊: {collapsedCards.Count}枚";
+        if (_cardModels == null)
+        {
+            totalCardsText.text = "全カード: 0枚";
+            activeCardsText.text = "使用可能: 0枚";
+            collapsedCardsText.text = "崩壊: 0枚";
+            return;
+        }
+        
+        var totalCount = _cardModels.Count;
+        var activeCount = _cardModels.Count(cm => !cm.IsCollapsed);
+        var collapsedCount = _cardModels.Count(cm => cm.IsCollapsed);
+        
+        totalCardsText.text = $"全カード: {totalCount}枚";
+        activeCardsText.text = $"使用可能: {activeCount}枚";
+        collapsedCardsText.text = $"崩壊: {collapsedCount}枚";
     }
     
     /// <summary>
@@ -147,9 +159,9 @@ public class DeckView : MonoBehaviour
         var activeButtonColor = _currentMode == DeckDisplayMode.Active ? Color.yellow : Color.white;
         var collapsedButtonColor = _currentMode == DeckDisplayMode.Collapsed ? Color.yellow : Color.white;
         
-        if (showAllButton) showAllButton.GetComponent<Image>().color = allButtonColor;
-        if (showActiveButton) showActiveButton.GetComponent<Image>().color = activeButtonColor;
-        if (showCollapsedButton) showCollapsedButton.GetComponent<Image>().color = collapsedButtonColor;
+        showAllButton.GetComponent<Image>().color = allButtonColor;
+        showActiveButton.GetComponent<Image>().color = activeButtonColor;
+        showCollapsedButton.GetComponent<Image>().color = collapsedButtonColor;
     }
     
     private void Awake()

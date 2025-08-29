@@ -95,8 +95,6 @@ public class HomeUIPresenter : MonoBehaviour
     /// </summary>
     private void RefreshDeckData()
     {
-        var (allCards, activeCards, collapsedCards) = _gameProgressService.GetDeckDisplayData();
-        
-        deckView.ShowDeck(allCards, activeCards, collapsedCards, RefreshDeckData);
+        deckView.ShowDeck(_gameProgressService.GetDeckCardModels());
     }
 }
