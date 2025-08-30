@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using Game.PersonalityLog;
 using R3;
@@ -36,11 +35,13 @@ public class GameProgressService
     
     private readonly SaveDataManager _saveDataManager;
     private readonly CardPoolService _cardPoolService;
+    private readonly SceneTransitionManager _sceneTransitionManager;
     
-    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService)
+    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, SceneTransitionManager sceneTransitionManager)
     {
         _saveDataManager = saveDataManager;
         _cardPoolService = cardPoolService;
+        _sceneTransitionManager = sceneTransitionManager;
         
         // 起動時に自動でセーブデータをロード
         LoadAllGameData();
@@ -431,14 +432,12 @@ public class GameProgressService
     }
     
     /// <summary>
-    /// 指定したシーンに遷移
+    /// 指定したシーンに遷移（クロスフェード付き）
     /// </summary>
     /// <param name="targetScene">遷移先のシーンタイプ</param>
     /// <returns>遷移完了のUniTask</returns>
     public async UniTask TransitionToScene(SceneType targetScene)
     {
-        var sceneName = targetScene.ToSceneName();
-        var asyncOperation = SceneManager.LoadSceneAsync(sceneName);
-        await UniTask.WaitUntil(() => asyncOperation.isDone);
+        await _sceneTransitionManager.TransitionToSceneWithFade(targetScene);
     }
 }

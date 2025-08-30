@@ -19,12 +19,14 @@ public class HomeUIPresenter : MonoBehaviour
     [SerializeField] private DeckView deckView;
     
     private GameProgressService _gameProgressService;
+    private SceneTransitionManager _sceneTransitionManager;
     private StoryNode _currentNode;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService)
+    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager)
     {
         _gameProgressService = gameProgressService;
+        _sceneTransitionManager = sceneTransitionManager;
     }
 
     private void Start()
@@ -43,7 +45,7 @@ public class HomeUIPresenter : MonoBehaviour
     /// </summary>
     private void OnTitleButtonClicked()
     {
-        _gameProgressService.TransitionToScene(SceneType.Title).Forget();
+        _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Title).Forget();
     }
 
     /// <summary>
@@ -75,7 +77,7 @@ public class HomeUIPresenter : MonoBehaviour
         Debug.Log($"[ホームUI] バトル開始: 敵ID {battleNode.EnemyId}");
         
         // 単純にBattleSceneに遷移（敵情報はGameProgressServiceから取得）
-        await _gameProgressService.TransitionToScene(SceneType.Battle);
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle);
     }
     
     /// <summary>
@@ -86,7 +88,7 @@ public class HomeUIPresenter : MonoBehaviour
         Debug.Log($"[ホームUI] ノベル開始: {novelNode.ScenarioId}");
         
         // ノベルシーンに遷移（シナリオ情報はGameProgressServiceから取得）
-        await _gameProgressService.TransitionToScene(SceneType.Novel);
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Novel);
     }
     
     

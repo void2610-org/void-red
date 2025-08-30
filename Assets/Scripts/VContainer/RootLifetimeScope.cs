@@ -27,6 +27,9 @@ public class RootLifetimeScope : LifetimeScope
         // セーブデータ管理
         builder.Register<SaveDataManager>(Lifetime.Singleton);
         
+        // シーン遷移管理（クロスフェード機能付き）
+        builder.Register<SceneTransitionManager>(Lifetime.Singleton);
+        
         // ゲーム進行管理（全機能統合）
         builder.Register<GameProgressService>(Lifetime.Singleton);
         

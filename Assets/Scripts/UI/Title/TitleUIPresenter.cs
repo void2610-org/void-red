@@ -15,13 +15,13 @@ public class TitleUIPresenter : MonoBehaviour
     [SerializeField] private Button settingsButton;
     
     private SettingsPresenter _settingsPresenter;
-    private GameProgressService _gameProgressService;
+    private SceneTransitionManager _sceneTransitionManager;
     
     [Inject]
-    public void Construct(SettingsPresenter settingsPresenter, GameProgressService gameProgressService)
+    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionManager sceneTransitionManager)
     {
         _settingsPresenter = settingsPresenter;
-        _gameProgressService = gameProgressService;
+        _sceneTransitionManager = sceneTransitionManager;
     }
 
     private void Start()
@@ -37,7 +37,7 @@ public class TitleUIPresenter : MonoBehaviour
     /// </summary>
     private void OnStartButtonClicked()
     {
-        _gameProgressService.TransitionToScene(SceneType.Home).Forget();
+        _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
     }
 
     /// <summary>
