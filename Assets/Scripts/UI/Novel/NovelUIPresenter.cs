@@ -15,12 +15,14 @@ public class NovelUIPresenter : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scenarioIdText;
     
     private GameProgressService _gameProgressService;
+    private SceneTransitionManager _sceneTransitionManager;
     private DialogView _dialogView;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService)
+    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager)
     {
         _gameProgressService = gameProgressService;
+        _sceneTransitionManager = sceneTransitionManager;
     }
     
     private void Start()
@@ -90,7 +92,7 @@ public class NovelUIPresenter : MonoBehaviour
         _gameProgressService.RecordNovelResultAndSave(choices);
         
         // ホームシーンに戻る
-        await _gameProgressService.TransitionToScene(SceneType.Home);
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
     }
     
     /// <summary>
@@ -110,6 +112,6 @@ public class NovelUIPresenter : MonoBehaviour
         _gameProgressService.RecordNovelResultAndSave(choices);
         
         // ホームシーンに戻る
-        await _gameProgressService.TransitionToScene(SceneType.Home);
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
     }
 }
