@@ -14,10 +14,10 @@ public class DialogData
     
     [Header("音響効果")]
     [SerializeField] private string seClipName;
-    [SerializeField] private bool playSEOnStart = true;
+    [SerializeField] private bool playSeOnStart;
     
     [Header("表示設定")]
-    [SerializeField] private float customCharSpeed = -1f; // -1の場合はデフォルト速度を使用
+    [SerializeField] private float customCharSpeed; // -1の場合はデフォルト速度を使用
     [SerializeField] private bool autoAdvance = false; // 自動で次に進むかどうか
     
     /// <summary>
@@ -38,7 +38,7 @@ public class DialogData
     /// <summary>
     /// セリフ開始時にSEを再生するかどうか
     /// </summary>
-    public bool PlaySEOnStart => playSEOnStart;
+    public bool PlaySEOnStart => playSeOnStart;
     
     /// <summary>
     /// カスタム文字速度（-1の場合はデフォルト速度）
@@ -58,7 +58,7 @@ public class DialogData
         this.speakerName = speakerName;
         this.dialogText = dialogText;
         this.seClipName = seClipName;
-        this.playSEOnStart = playSEOnStart;
+        this.playSeOnStart = playSEOnStart;
         this.customCharSpeed = -1f;
         this.autoAdvance = false;
     }
