@@ -16,6 +16,7 @@ public class GameManager: IStartable, IDisposable
     private readonly Enemy _enemy;
     private readonly CardNarrationService _cardNarrationService;
     private readonly GameProgressService _gameProgressService;
+    private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
@@ -47,6 +48,7 @@ public class GameManager: IStartable, IDisposable
         Enemy enemy,
         CardNarrationService cardNarrationService,
         GameProgressService gameProgressService,
+        SceneTransitionManager sceneTransitionManager,
         AllEnemyData allEnemyData)
     {
         _cardPoolService = cardPoolService;
@@ -56,6 +58,7 @@ public class GameManager: IStartable, IDisposable
         _enemy = enemy;
         _cardNarrationService = cardNarrationService;
         _gameProgressService = gameProgressService;
+        _sceneTransitionManager = sceneTransitionManager;
         _allEnemyData = allEnemyData;
 
         // 崩壊フラグを初期化
@@ -636,7 +639,7 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(1000);
         
         // HomeSceneに戻る
-        await _gameProgressService.TransitionToScene(SceneType.Home);
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
         
         _isProcessing = false;
     }

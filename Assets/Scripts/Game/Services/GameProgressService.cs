@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using Game.PersonalityLog;
 using R3;
@@ -36,11 +35,13 @@ public class GameProgressService
     
     private readonly SaveDataManager _saveDataManager;
     private readonly CardPoolService _cardPoolService;
+    private readonly SceneTransitionManager _sceneTransitionManager;
     
-    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService)
+    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, SceneTransitionManager sceneTransitionManager)
     {
         _saveDataManager = saveDataManager;
         _cardPoolService = cardPoolService;
+        _sceneTransitionManager = sceneTransitionManager;
         
         // 起動時に自動でセーブデータをロード
         LoadAllGameData();
@@ -121,27 +122,13 @@ public class GameProgressService
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
-        // 結果辞書を使用したストーリー分岐ロジック
         StoryNode nextNode = _currentStep switch
         {
-            // 導入ノベル
-            0 => new NovelNode("S001"),
-            // 最初のバトル
+            // プロローグ
+            0 => new NovelNode("prologue"),
+            // アルヴ
             1 => new BattleNode("E001"),
-            // 最初のバトル結果に応じた分岐
-            2 => GetResult("1") == "win" 
-                ? new NovelNode("S011") 
-                : new NovelNode("S012"),
-            // 2番目のバトル
-            3 => new BattleNode("E002"),
-            // 2番目のバトル結果に応じた分岐
-            4 => GetResult("3") == "win"
-                ? new NovelNode("S021")
-                : new NovelNode("S022"),
-            // 最終バトル
-            5 => new BattleNode("E003"),
-            // ゲーム終了
-            _ => new EndingNode()
+            _ => new NovelNode("ending"),
         };
         
         return nextNode;
@@ -445,14 +432,12 @@ public class GameProgressService
     }
     
     /// <summary>
-    /// 指定したシーンに遷移
+    /// 指定したシーンに遷移（クロスフェード付き）
     /// </summary>
     /// <param name="targetScene">遷移先のシーンタイプ</param>
     /// <returns>遷移完了のUniTask</returns>
     public async UniTask TransitionToScene(SceneType targetScene)
     {
-        var sceneName = targetScene.ToSceneName();
-        var asyncOperation = SceneManager.LoadSceneAsync(sceneName);
-        await UniTask.WaitUntil(() => asyncOperation.isDone);
+        await _sceneTransitionManager.TransitionToSceneWithFade(targetScene);
     }
 }
