@@ -5,6 +5,9 @@ using UnityEngine.UI;
 using System.Linq;
 using LitMotion;
 using LitMotion.Extensions;
+using TMPro;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -300,6 +303,52 @@ namespace Void2610.UnityTemplate
                 .WithEase(ease)
                 .BindToRotation(transform)
                 .AddTo(transform.gameObject);
+        }
+        
+        /// <summary>
+        /// TextMeshProUGUIにタイプライター効果を適用（1文字ずつ表示）
+        /// </summary>
+        public static async UniTask TypewriterAnimation(
+            this TextMeshProUGUI text, 
+            string message, 
+            float charSpeed = 0.05f,
+            CancellationToken cancellationToken = default)
+        {
+            if (text == null || string.IsNullOrEmpty(message)) return;
+            
+            // 初期状態でテキストをクリア
+            text.text = "";
+            
+            // LitMotionで文字数を増やすアニメーション
+            var totalDuration = charSpeed * message.Length;
+            var currentLength = 0;
+            
+            var motion = LMotion.Create(0f, message.Length, totalDuration)
+                .WithEase(Ease.Linear)
+                .Bind(value =>
+                {
+                    var newLength = Mathf.FloorToInt(value);
+                    if (newLength != currentLength && text)
+                    {
+                        currentLength = newLength;
+                        text.text = message.Substring(0, currentLength);
+                    }
+                })
+                .AddTo(text.gameObject);
+            
+            try
+            {
+                await motion.ToUniTask(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                // キャンセル時は完全なテキストを表示
+                if (text) text.text = message;
+                throw;
+            }
+            
+            // 最終的に完全なテキストを表示（念のため）
+            if (text) text.text = message;
         }
         
 #if UNITY_EDITOR
