@@ -41,6 +41,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly Player _player;
     private readonly Enemy _enemy;
     private bool _isEnemySpriteManualMode;
+    private readonly TutorialPresenter _tutorialPresenter;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
@@ -73,8 +74,9 @@ public class UIPresenter : IStartable, System.IDisposable
     
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
+    public async UniTask StartTutorial() => await _tutorialPresenter.StartTutorial();
     
-    public UIPresenter(Player player, Enemy enemy)
+    public UIPresenter(Player player, Enemy enemy, TutorialData tutorialData)
     {
         _player = player;
         _enemy = enemy;
@@ -106,6 +108,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _scoreView = UnityEngine.Object.FindFirstObjectByType<ScoreView>();
         _resultView = UnityEngine.Object.FindFirstObjectByType<ResultView>();
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
+        _tutorialPresenter = new TutorialPresenter(tutorialData);
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)

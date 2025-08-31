@@ -6,6 +6,7 @@ using TMPro;
 using LitMotion;
 using Cysharp.Threading.Tasks;
 using Void2610.UnityTemplate;
+using System.Threading;
 
 /// <summary>
 /// DialogDataのリストを受け取って順番に表示するViewクラス
@@ -35,7 +36,6 @@ public class DialogView : MonoBehaviour
     private int _currentIndex;
     private bool _isTyping;
     private bool _isWaitingForNext;
-    private bool _skipTyping;
     private bool _isCompleted;
     
     private MotionHandle _typewriterMotion;
@@ -118,16 +118,15 @@ public class DialogView : MonoBehaviour
         // 文字送りアニメーションを開始
         _isTyping = true;
         _isWaitingForNext = false;
-        _skipTyping = false;
         
         // 文字速度を決定（カスタム速度またはデフォルト速度）
         float charSpeed = currentDialog.UseDefaultCharSpeed ? defaultCharSpeed : currentDialog.CustomCharSpeed;
         
-        await TypewriterEffect(currentDialog.DialogText, charSpeed);
+        await dialogText.TypewriterAnimation(currentDialog.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
+        await UniTask.Yield(); // スキップと進行の競合を防ぐために1フレーム待つ
         
         // アニメーション完了後の状態をリセット
         _isTyping = false;
-        _skipTyping = false;
         _isWaitingForNext = true;
         
         // インジケーターを表示してアニメーション
@@ -165,51 +164,6 @@ public class DialogView : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 文字送りエフェクト
-    /// </summary>
-    private async UniTask TypewriterEffect(string text, float charSpeed)
-    {
-        if (_typewriterMotion.IsActive())
-            _typewriterMotion.Cancel();
-        
-        // スキップフラグがすでに true の場合は即座に完了
-        if (_skipTyping)
-        {
-            dialogText.text = text;
-            return;
-        }
-        
-        // 文字送りアニメーション
-        float totalDuration = charSpeed * text.Length;
-        _typewriterMotion = LMotion.Create(0f, text.Length, totalDuration)
-            .WithEase(Ease.Linear)
-            .Bind(charCount =>
-            {
-                if (_skipTyping)
-                {
-                    dialogText.text = text;
-                    _typewriterMotion.Cancel();
-                    return;
-                }
-                
-                var displayCount = Mathf.FloorToInt(charCount);
-                if (displayCount <= text.Length)
-                {
-                    dialogText.text = text.Substring(0, displayCount);
-                }
-            })
-            .AddTo(this);
-        
-        try
-        {
-            await _typewriterMotion.ToUniTask();
-        }
-        catch (OperationCanceledException) { }
-        
-        // 最終的に完全なテキストを表示（念のため）
-        dialogText.text = text;
-    }
     
     /// <summary>
     /// 次へ進むのを待つ
@@ -254,12 +208,7 @@ public class DialogView : MonoBehaviour
         if (canvasGroup.alpha == 0f || !canvasGroup.interactable)
             return;
             
-        if (_isTyping && !_skipTyping)
-        {
-            // 文字送り中の場合はスキップ
-            _skipTyping = true;
-        }
-        else if (_isWaitingForNext)
+        if (!_isTyping && _isWaitingForNext)
         {
             // 次へ進む
             _isWaitingForNext = false;
