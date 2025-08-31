@@ -69,7 +69,14 @@ public class GameManager: IStartable, IDisposable
     public void Start()
     {
         InitializeGame(true).Forget();
-        SetupGameOverEvents();
+        // リトライボタンのイベント
+        _uiPresenter.RetryButtonClicked.Subscribe(
+            _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle).Forget())
+            .AddTo(_disposables);
+        // タイトルボタンのイベント
+        _uiPresenter.TitleButtonClicked.Subscribe(
+            _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Title).Forget())
+            .AddTo(_disposables);
     }
     
     /// <summary>
@@ -682,33 +689,6 @@ public class GameManager: IStartable, IDisposable
         
         // ゲームオーバー画面を表示
         await _uiPresenter.ShowGameOverScreen(gameOverReason);
-    }
-    
-    /// <summary>
-    /// ゲームオーバー時のイベントを設定（非同期）
-    /// </summary>
-    private void SetupGameOverEvents()
-    {
-        // リトライボタンのイベント
-        _uiPresenter.RetryButtonClicked.Subscribe(_ => OnRetryButtonClicked()).AddTo(_disposables);
-        // タイトルボタンのイベント
-        _uiPresenter.TitleButtonClicked.Subscribe(_ => OnTitleButtonClicked()).AddTo(_disposables);
-    }
-    
-    /// <summary>
-    /// リトライボタンクリック時の処理
-    /// </summary>
-    private void OnRetryButtonClicked()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("MainScene");
-    }
-    
-    /// <summary>
-    /// タイトルボタンクリック時の処理
-    /// </summary>
-    private void OnTitleButtonClicked()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("TitleScene");
     }
     
     /// <summary>

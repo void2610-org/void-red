@@ -24,6 +24,7 @@ public class TutorialView : MonoBehaviour
     private MotionHandle _currentMaskPositionHandle;
     private MotionHandle _currentMaskSizeHandle;
     private bool _isFirstStep = true;
+    private Vector2 _currentMaskSize = Vector2.zero;
     
     /// <summary>
     /// チュートリアルステップを表示してクリック待機
@@ -45,8 +46,30 @@ public class TutorialView : MonoBehaviour
         if (_currentMaskSizeHandle.IsActive())
             _currentMaskSizeHandle.Cancel();
 
-        _currentMaskPositionHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION, Ease.OutQuart);
-        _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
+        // 現在のマスクサイズと新しいマスクサイズをチェック
+        bool isCurrentSizeZero = _currentMaskSize == Vector2.zero;
+        bool isNewSizeZero = step.MaskSize == Vector2.zero;
+        
+        if (isCurrentSizeZero && !isNewSizeZero)
+        {
+            // ケース1: (0,0) → 非(0,0) - 位置を瞬間移動してサイズアニメーションのみ
+            maskArea.anchoredPosition = step.MaskPosition;
+            _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
+        }
+        else if (!isCurrentSizeZero && isNewSizeZero)
+        {
+            // ケース2: 非(0,0) → (0,0) - サイズアニメーションのみ（縮小）
+            _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
+        }
+        else
+        {
+            // ケース3: その他（非(0,0) → 非(0,0)、同じ値など）- 通常のアニメーション
+            _currentMaskPositionHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION, Ease.OutQuart);
+            _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
+        }
+        
+        // 現在のサイズを更新
+        _currentMaskSize = step.MaskSize;
         
         // メッセージテキストの更新
         await messageText.TypewriterAnimation(step.Message, 0.05f, this.GetCancellationTokenOnDestroy());
@@ -89,6 +112,7 @@ public class TutorialView : MonoBehaviour
         
         // 次回のために初期化
         _isFirstStep = true;
+        _currentMaskSize = Vector2.zero;
     }
     
     private void Awake()
