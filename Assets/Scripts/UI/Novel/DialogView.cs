@@ -42,6 +42,7 @@ public class DialogView : MonoBehaviour
     private MotionHandle _typewriterMotion;
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
+    private CancellationTokenSource _typewriterCts;
     
     // ダイアログ完了時のイベント
     public event Action OnDialogCompleted;
@@ -124,9 +125,27 @@ public class DialogView : MonoBehaviour
         // 文字速度を決定（カスタム速度またはデフォルト速度）
         float charSpeed = currentDialog.UseDefaultCharSpeed ? defaultCharSpeed : currentDialog.CustomCharSpeed;
         
-        // スキップフラグがある場合は即座に表示
-        if (_skipTyping) dialogText.text = currentDialog.DialogText;
-        else await dialogText.TypewriterAnimation(currentDialog.DialogText, charSpeed, this.GetCancellationTokenOnDestroy());
+        // タイプライターアニメーション用のCancellationTokenを作成
+        _typewriterCts?.Cancel();
+        _typewriterCts?.Dispose();
+        _typewriterCts = new CancellationTokenSource();
+        
+        var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+            _typewriterCts.Token, 
+            this.GetCancellationTokenOnDestroy());
+        
+        try
+        {
+            // スキップフラグがある場合は即座に表示
+            if (_skipTyping) dialogText.text = currentDialog.DialogText;
+            else await dialogText.TypewriterAnimation(currentDialog.DialogText, charSpeed, linkedCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // スキップ時の処理：完全なテキストを表示
+            dialogText.text = currentDialog.DialogText;
+        }
+        finally { linkedCts?.Dispose(); }
         
         // アニメーション完了後の状態をリセット
         _isTyping = false;
@@ -214,8 +233,9 @@ public class DialogView : MonoBehaviour
             
         if (_isTyping && !_skipTyping)
         {
-            // 文字送り中の場合はスキップ
+            // 文字送り中の場合はスキップ（CancellationTokenをキャンセル）
             _skipTyping = true;
+            _typewriterCts?.Cancel();
         }
         else if (_isWaitingForNext)
         {
@@ -362,5 +382,9 @@ public class DialogView : MonoBehaviour
             _fadeMotion.Cancel();
         if (_indicatorMotion.IsActive())
             _indicatorMotion.Cancel();
+        
+        // CancellationTokenSourceをクリーンアップ
+        _typewriterCts?.Cancel();
+        _typewriterCts?.Dispose();
     }
 }

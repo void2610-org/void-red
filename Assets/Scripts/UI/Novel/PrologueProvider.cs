@@ -95,13 +95,13 @@ public static class PrologueProvider
             new DialogData("アルヴ", "あなたには、ボクの話した通り——"),
             new DialogData("アルヴ", "このオークションに参加する以外、記憶を取り戻す術はありません。"),
             new DialogData("アルヴ", "……理解が遅いですね。"),
-            new DialogData("アルヴ", "少々、くどい(微笑)。"),
+            new DialogData("アルヴ", "少々、くどい。"),
             
             // 主人公の諦め
             new DialogData("---", "……もう……訳が分からない……。"),
             new DialogData("---", "言い返す気力もなくなってきた……"),
             
-            new DialogData("アルヴ", "では、大人しくボクの案内を聞いていただけると嬉しいです。^^"),
+            new DialogData("アルヴ", "では、大人しくボクの案内を聞いていただけると嬉しいです。"),
             
             // 精神札の説明
             new DialogData("アルヴ", "さて、あなたには記憶を競り落とすために、他のお客様と戦っていただきます。"),
