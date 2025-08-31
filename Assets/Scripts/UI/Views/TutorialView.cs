@@ -21,7 +21,8 @@ public class TutorialView : MonoBehaviour
     
     private CanvasGroup _canvasGroup;
     private MotionHandle _currentFadeHandle;
-    private MotionHandle _currentMaskHandle;
+    private MotionHandle _currentMaskPositionHandle;
+    private MotionHandle _currentMaskSizeHandle;
     private bool _isFirstStep = true;
     
     /// <summary>
@@ -39,11 +40,13 @@ public class TutorialView : MonoBehaviour
         }
         
         // マスク領域の更新（アニメーション付き）
-        if (_currentMaskHandle.IsActive())
-            _currentMaskHandle.Cancel();
+        if (_currentMaskPositionHandle.IsActive())
+            _currentMaskPositionHandle.Cancel();
+        if (_currentMaskSizeHandle.IsActive())
+            _currentMaskSizeHandle.Cancel();
 
-        _currentMaskHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION);
-        _currentMaskHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION);
+        _currentMaskPositionHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION);
+        _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION);
         
         // メッセージテキストの更新
         await messageText.TypewriterAnimation(step.Message, 0.05f, this.GetCancellationTokenOnDestroy());
@@ -106,7 +109,9 @@ public class TutorialView : MonoBehaviour
         // アニメーションのクリーンアップ
         if (_currentFadeHandle.IsActive())
             _currentFadeHandle.Cancel();
-        if (_currentMaskHandle.IsActive())
-            _currentMaskHandle.Cancel();
+        if (_currentMaskPositionHandle.IsActive())
+            _currentMaskPositionHandle.Cancel();
+        if (_currentMaskSizeHandle.IsActive())
+            _currentMaskSizeHandle.Cancel();
     }
 }
