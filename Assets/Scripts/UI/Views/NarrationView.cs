@@ -16,7 +16,6 @@ public class NarrationView : MonoBehaviour
     
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_OUT_DURATION = 0.3f;
-    private const float CHARACTER_DISPLAY_INTERVAL = 0.05f; // 1文字あたりの表示間隔
     
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentNarrationCts;
@@ -60,7 +59,7 @@ public class NarrationView : MonoBehaviour
                 .ToUniTask(cancellationToken);
             
             // 1文字ずつ表示するアニメーション
-            await narrationText.TypewriterAnimation(message, CHARACTER_DISPLAY_INTERVAL, cancellationToken);
+            await narrationText.TypewriterAnimation(message, cancellationToken: cancellationToken);
             
             // 表示時間を待つ
             await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
