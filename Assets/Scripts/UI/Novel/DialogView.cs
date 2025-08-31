@@ -20,6 +20,7 @@ public class DialogView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private Image backgroundPanel;
     [SerializeField] private GameObject nextIndicator; // 次へ進むインジケーター（▼など）
+    [SerializeField] private Image characterImage;
     
     [Header("文字送り設定")]
     [SerializeField] private float defaultCharSpeed = 0.05f; // デフォルトの1文字表示間隔（秒）
@@ -31,6 +32,8 @@ public class DialogView : MonoBehaviour
     
     [Header("話者名表示設定")]
     [SerializeField] private GameObject speakerNamePanel; // 話者名パネル（話者がいない場合は非表示）
+    
+    [SerializeField] private List<Sprite> characterSprites; // キャラクター画像のリスト (簡易版)
     
     private List<DialogData> _dialogList;
     private int _currentIndex;
@@ -53,15 +56,10 @@ public class DialogView : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
         dialogText.text = "";
         
-        if (nextIndicator)
-        {
-            nextIndicator.SetActive(false);
-        }
-        
-        if (speakerNamePanel)
-        {
-            speakerNamePanel.SetActive(false);
-        }
+        nextIndicator.SetActive(false);
+        speakerNamePanel.SetActive(false);
+        characterImage.color = new Color(1f, 1f, 1f, 0f);
+        characterImage.sprite = null;
         
         _isCompleted = false;
     }
@@ -106,6 +104,12 @@ public class DialogView : MonoBehaviour
         
         // 話者名を設定
         SetSpeakerName(currentDialog.SpeakerName);
+        
+        // キャラクター画像を設定
+        var sprite = characterSprites.Find(s => s.name == currentDialog.CharacterImageName);
+        if (sprite && !characterImage.sprite) characterImage.FadeIn(0.5f);
+        else if (!sprite && characterImage.sprite) characterImage.FadeOut(0.5f);
+        if (sprite) characterImage.sprite = sprite;
         
         // ダイアログテキストをクリア
         dialogText.text = "";
