@@ -72,7 +72,7 @@ public class TutorialView : MonoBehaviour
         _currentMaskSize = step.MaskSize;
         
         // メッセージテキストの更新
-        await messageText.TypewriterAnimation(step.Message, 0.05f, this.GetCancellationTokenOnDestroy());
+        await messageText.TypewriterAnimation(step.Message, cancellationToken: this.GetCancellationTokenOnDestroy());
         
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));

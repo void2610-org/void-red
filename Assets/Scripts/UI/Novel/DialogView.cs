@@ -36,13 +36,11 @@ public class DialogView : MonoBehaviour
     private int _currentIndex;
     private bool _isTyping;
     private bool _isWaitingForNext;
-    private bool _skipTyping;
     private bool _isCompleted;
     
     private MotionHandle _typewriterMotion;
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
-    private CancellationTokenSource _typewriterCts;
     
     // ダイアログ完了時のイベント
     public event Action OnDialogCompleted;
@@ -120,36 +118,15 @@ public class DialogView : MonoBehaviour
         // 文字送りアニメーションを開始
         _isTyping = true;
         _isWaitingForNext = false;
-        _skipTyping = false;
         
         // 文字速度を決定（カスタム速度またはデフォルト速度）
         float charSpeed = currentDialog.UseDefaultCharSpeed ? defaultCharSpeed : currentDialog.CustomCharSpeed;
         
-        // タイプライターアニメーション用のCancellationTokenを作成
-        _typewriterCts?.Cancel();
-        _typewriterCts?.Dispose();
-        _typewriterCts = new CancellationTokenSource();
-        
-        var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
-            _typewriterCts.Token, 
-            this.GetCancellationTokenOnDestroy());
-        
-        try
-        {
-            // スキップフラグがある場合は即座に表示
-            if (_skipTyping) dialogText.text = currentDialog.DialogText;
-            else await dialogText.TypewriterAnimation(currentDialog.DialogText, charSpeed, linkedCts.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            // スキップ時の処理：完全なテキストを表示
-            dialogText.text = currentDialog.DialogText;
-        }
-        finally { linkedCts?.Dispose(); }
+        await dialogText.TypewriterAnimation(currentDialog.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
+        await UniTask.Yield(); // スキップと進行の競合を防ぐために1フレーム待つ
         
         // アニメーション完了後の状態をリセット
         _isTyping = false;
-        _skipTyping = false;
         _isWaitingForNext = true;
         
         // インジケーターを表示してアニメーション
@@ -231,13 +208,7 @@ public class DialogView : MonoBehaviour
         if (canvasGroup.alpha == 0f || !canvasGroup.interactable)
             return;
             
-        if (_isTyping && !_skipTyping)
-        {
-            // 文字送り中の場合はスキップ（CancellationTokenをキャンセル）
-            _skipTyping = true;
-            _typewriterCts?.Cancel();
-        }
-        else if (_isWaitingForNext)
+        if (!_isTyping && _isWaitingForNext)
         {
             // 次へ進む
             _isWaitingForNext = false;
@@ -382,9 +353,5 @@ public class DialogView : MonoBehaviour
             _fadeMotion.Cancel();
         if (_indicatorMotion.IsActive())
             _indicatorMotion.Cancel();
-        
-        // CancellationTokenSourceをクリーンアップ
-        _typewriterCts?.Cancel();
-        _typewriterCts?.Dispose();
     }
 }
