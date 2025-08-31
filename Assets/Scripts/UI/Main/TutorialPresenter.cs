@@ -30,5 +30,6 @@ public class TutorialPresenter
         }
         
         await _tutorialView.Hide();
+        await UniTask.Delay(500);
     }
 }
