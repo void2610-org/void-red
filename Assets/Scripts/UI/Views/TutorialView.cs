@@ -45,8 +45,8 @@ public class TutorialView : MonoBehaviour
         if (_currentMaskSizeHandle.IsActive())
             _currentMaskSizeHandle.Cancel();
 
-        _currentMaskPositionHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION);
-        _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION);
+        _currentMaskPositionHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION, Ease.OutQuart);
+        _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
         
         // メッセージテキストの更新
         await messageText.TypewriterAnimation(step.Message, 0.05f, this.GetCancellationTokenOnDestroy());
