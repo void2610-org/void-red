@@ -41,17 +41,9 @@ public class TutorialView : MonoBehaviour
         // マスク領域の更新（アニメーション付き）
         if (_currentMaskHandle.IsActive())
             _currentMaskHandle.Cancel();
-        
-        _currentMaskHandle = LMotion.Create(maskArea.anchoredPosition, step.MaskPosition, MASK_TRANSITION_DURATION)
-            .WithEase(Ease.OutQuart)
-            .BindToAnchoredPosition(maskArea)
-            .AddTo(gameObject);
-        
-        // サイズもアニメーション
-        LMotion.Create(maskArea.sizeDelta, step.MaskSize, MASK_TRANSITION_DURATION)
-            .WithEase(Ease.OutQuart)
-            .BindToSizeDelta(maskArea)
-            .AddTo(gameObject);
+
+        _currentMaskHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION);
+        _currentMaskHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION);
         
         // メッセージテキストの更新
         await messageText.TypewriterAnimation(step.Message, 0.05f, this.GetCancellationTokenOnDestroy());
