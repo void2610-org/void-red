@@ -75,7 +75,7 @@ public static class PrologueProvider
             new DialogData("---", "一体どういうこと…？", "1-2"),
             
             new DialogData("アルヴ", "驚かれるのも当然です。", "2-1"),
-            new DialogData("アルヴ", "さらに申し上げますと——"),
+            new DialogData("アルヴ", "さらに申し上げますと——", "2-1"),
             new DialogData("アルヴ", "ここには、あなたの記憶も出品されています。", "2-4"),
             
             // 主人公の反発
