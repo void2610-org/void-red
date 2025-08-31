@@ -325,7 +325,7 @@ namespace Void2610.UnityTemplate
             float charSpeed = 0.05f,
             CancellationToken cancellationToken = default)
         {
-            if (text == null || string.IsNullOrEmpty(message)) return;
+            if (!text || string.IsNullOrEmpty(message)) return;
             
             // 初期状態でテキストをクリア
             text.text = "";
