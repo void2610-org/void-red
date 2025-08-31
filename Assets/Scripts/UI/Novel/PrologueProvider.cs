@@ -28,12 +28,12 @@ public static class PrologueProvider
             
             // アルヴ登場
             new DialogData("???", "おかえりなさいませ、---様。", "1-1"),
-            new DialogData("---", "……？"),
-            new DialogData("---", "誰……？"),
+            new DialogData("---", "……？", "1-1"),
+            new DialogData("---", "誰……？", "1-1"),
             new DialogData("???", "おや。", "2-3"),
             new DialogData("???", "---様、ずいぶん驚かれているようですね。", "1-1"),
-            new DialogData("---", "あなたは……誰？"),
-            new DialogData("---", "ここは……どこなの？"),
+            new DialogData("---", "あなたは……誰？", "1-1"),
+            new DialogData("---", "ここは……どこなの？", "1-1"),
             
             // アルヴの自己紹介
             new DialogData("???", "これはこれは。", "2-1"),
@@ -41,9 +41,9 @@ public static class PrologueProvider
             new DialogData("アルヴ", "この場所の支配人を務めている、アルヴと申します。", "1-2"),
             new DialogData("アルヴ", "以後、お見知り置きを。", "1-4"),
             
-            new DialogData("---", "アルヴ……？"),
-            new DialogData("---", "ここって……何なの？"),
-            new DialogData("---", "どうして私、ここに……"),
+            new DialogData("---", "アルヴ……？", "1-4"),
+            new DialogData("---", "ここって……何なの？", "1-4"),
+            new DialogData("---", "どうして私、ここに……", "1-4"),
             
             // VOID REDの説明
             new DialogData("アルヴ", "本当に、何も覚えていらっしゃらないのですね。", "2-5"),
@@ -51,46 +51,46 @@ public static class PrologueProvider
             new DialogData("アルヴ", "ここはVOID RED。", "2-3"),
             new DialogData("アルヴ", "あなたが自ら望んで来られた、オークション会場です。", "2-2"),
             
-            new DialogData("---", "……オークション？"),
-            new DialogData("---", "私が……望んで？"),
+            new DialogData("---", "……オークション？", "2-2"),
+            new DialogData("---", "私が……望んで？", "2-2"),
             
             // 精神オークションの説明
             new DialogData("アルヴ", "ええ。あなたにはとても愉快なオークションにご参加いただきます。", "1-2"),
             new DialogData("アルヴ", "その名も——「精神オークション」。", "1-4"),
             
-            new DialogData("---", "精神……オークション？"),
+            new DialogData("---", "精神……オークション？", "1-4"),
             
             // クイズ
             new DialogData("アルヴ", "この会場には、様々な品物が出品されています。", "2-1"),
             new DialogData("アルヴ", "さて、ここでクイズです。", "1-1"),
             new DialogData("アルヴ", "何が並んでいると思いますか？", "1-2"),
             
-            new DialogData("---", "……壺？ 絵画？ 高そうなものとか……？"),
+            new DialogData("---", "……壺？ 絵画？ 高そうなものとか……？", "1-2"),
             
             // 記憶の説明
             new DialogData("アルヴ", "面白いですね。", "2-4"),
             new DialogData("アルヴ", "正解は——「記憶」。", "1-2"),
             
-            new DialogData("---", "……記憶！？"),
-            new DialogData("---", "一体どういうこと…？"),
+            new DialogData("---", "……記憶！？", "1-2"),
+            new DialogData("---", "一体どういうこと…？", "1-2"),
             
             new DialogData("アルヴ", "驚かれるのも当然です。", "2-1"),
             new DialogData("アルヴ", "さらに申し上げますと——"),
             new DialogData("アルヴ", "ここには、あなたの記憶も出品されています。", "2-4"),
             
             // 主人公の反発
-            new DialogData("---", "……っ！？"),
-            new DialogData("---", "じゃあ……私が何も思い出せないのって……"),
-            new DialogData("---", "あなたのせい……？"),
-            new DialogData("---", "返してよ……私の記憶！"),
+            new DialogData("---", "……っ！？", "2-4"),
+            new DialogData("---", "じゃあ……私が何も思い出せないのって……", "2-4"),
+            new DialogData("---", "あなたのせい……？", "2-4"),
+            new DialogData("---", "返してよ……私の記憶！", "2-4"),
             
             // ルールの説明
             new DialogData("アルヴ", "それはできません。", "1-5"),
             new DialogData("アルヴ", "ここでは、自分の力で記憶を取り戻していただきます。", "1-3"),
             new DialogData("アルヴ", "それが、この会場のルールです。", "2-1"),
             
-            new DialogData("---", "勝手に奪っておいて、ルール？"),
-            new DialogData("---", "ふざけないで。そんなの、従うわけ——"),
+            new DialogData("---", "勝手に奪っておいて、ルール？", "2-1"),
+            new DialogData("---", "ふざけないで。そんなの、従うわけ——", "2-1"),
             
             new DialogData("アルヴ", "あなたには、ボクの話した通り——", "1-4"),
             new DialogData("アルヴ", "このオークションに参加する以外、記憶を取り戻す術はありません。", "1-4"),
@@ -98,8 +98,8 @@ public static class PrologueProvider
             new DialogData("アルヴ", "少々、くどい。", "2-1"),
             
             // 主人公の諦め
-            new DialogData("---", "……もう……訳が分からない……。"),
-            new DialogData("---", "言い返す気力もなくなってきた……"),
+            new DialogData("---", "……もう……訳が分からない……。", "2-1"),
+            new DialogData("---", "言い返す気力もなくなってきた……", "2-1"),
             
             new DialogData("アルヴ", "では、大人しくボクの案内を聞いていただけると嬉しいです。", "1-4"),
             
@@ -112,7 +112,7 @@ public static class PrologueProvider
             new DialogData("アルヴ", "これがなければ、オークションには参加できません。", "2-5"),
             new DialogData("アルヴ", "……くれぐれも、破損などなさらぬよう。", "2-3"),
             
-            new DialogData("---", "破損って……そんなガサツに見えてる？"),
+            new DialogData("---", "破損って……そんなガサツに見えてる？", "2-3"),
             
             // 模擬オークションへ
             new DialogData("アルヴ", "とんでもない。", "1-4"),

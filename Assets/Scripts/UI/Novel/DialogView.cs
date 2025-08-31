@@ -58,7 +58,8 @@ public class DialogView : MonoBehaviour
         
         nextIndicator.SetActive(false);
         speakerNamePanel.SetActive(false);
-        characterImage.color = Color.clear;
+        characterImage.color = new Color(1f, 1f, 1f, 0f);
+        characterImage.sprite = null;
         
         _isCompleted = false;
     }
@@ -106,8 +107,8 @@ public class DialogView : MonoBehaviour
         
         // キャラクター画像を設定
         var sprite = characterSprites.Find(s => s.name == currentDialog.CharacterImageName);
+        if (sprite && !characterImage.sprite) characterImage.FadeIn(0.5f);
         characterImage.sprite = sprite;
-        characterImage.color = sprite ? Color.white : Color.clear;
         
         // ダイアログテキストをクリア
         dialogText.text = "";

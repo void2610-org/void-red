@@ -163,14 +163,14 @@ RectTransform:
   m_GameObject: {fileID: 1729111333539379011}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalScale: {x: 0.265, y: 0.265, z: 0.265}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8503395000404048060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 40}
   m_SizeDelta: {x: 1655, y: 2048}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2782719288850797196
@@ -345,13 +345,23 @@ MonoBehaviour:
   dialogText: {fileID: 1666317025185700510}
   backgroundPanel: {fileID: 0}
   nextIndicator: {fileID: 5656026911901862804}
-  characterImage: {fileID: 0}
+  characterImage: {fileID: 4576503207100050310}
   defaultCharSpeed: 0.05
   autoNextDelay: 3
   fadeInDuration: 0.5
   fadeOutDuration: 0.5
   speakerNamePanel: {fileID: 2114269188409416653}
-  characterSprites: []
+  characterSprites:
+  - {fileID: 21300000, guid: 021a93a055b804f418cd07b3416b25a0, type: 3}
+  - {fileID: 21300000, guid: b605c2f9307684c0fad67f28322427f6, type: 3}
+  - {fileID: 21300000, guid: e68ebd9d44f2540e5b10007e15146cc6, type: 3}
+  - {fileID: 21300000, guid: 412de83ff24f348f68b1ca97bf0e3e7d, type: 3}
+  - {fileID: 21300000, guid: 0f04f2ed6f09d4213a05a7b814860a64, type: 3}
+  - {fileID: 21300000, guid: 5ab3d58af953648619198c0ebb508f72, type: 3}
+  - {fileID: 21300000, guid: dbd9d78e045314a78af872aff7db913d, type: 3}
+  - {fileID: 21300000, guid: 9f53c6cf7e0ba48c5a1684a9818b0157, type: 3}
+  - {fileID: 21300000, guid: 662dbee2ec75a47adbf1ffd469ff3af9, type: 3}
+  - {fileID: 21300000, guid: 23cde201719fc48f2aa1bde7fa2d0560, type: 3}
 --- !u!225 &4422162762152353045
 CanvasGroup:
   m_ObjectHideFlags: 0
