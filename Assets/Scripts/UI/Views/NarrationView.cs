@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using LitMotion;
 using LitMotion.Extensions;
 using System.Threading;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// ナレーション表示を担当するViewクラス
@@ -59,7 +60,7 @@ public class NarrationView : MonoBehaviour
                 .ToUniTask(cancellationToken);
             
             // 1文字ずつ表示するアニメーション
-            await TypewriterAnimation(message, cancellationToken);
+            await narrationText.TypewriterAnimation(message, CHARACTER_DISPLAY_INTERVAL, cancellationToken);
             
             // 表示時間を待つ
             await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
@@ -99,32 +100,6 @@ public class NarrationView : MonoBehaviour
         narrationText.gameObject.SetActive(false);
     }
     
-    /// <summary>
-    /// タイプライターアニメーション（1文字ずつ表示）
-    /// </summary>
-    private async UniTask TypewriterAnimation(string message, CancellationToken cancellationToken)
-    {
-        var currentLength = 0;
-        var targetLength = message.Length;
-        
-        // LitMotionで文字数を増やすアニメーション
-        await LMotion.Create(0f, targetLength, targetLength * CHARACTER_DISPLAY_INTERVAL)
-            .WithEase(Ease.Linear)
-            .Bind(value =>
-            {
-                var newLength = Mathf.FloorToInt(value);
-                if (newLength != currentLength && narrationText)
-                {
-                    currentLength = newLength;
-                    narrationText.text = message.Substring(0, currentLength);
-                }
-            })
-            .AddTo(gameObject)
-            .ToUniTask(cancellationToken);
-        
-        // 最終的に全文を表示（念のため）
-        narrationText.text = message;
-    }
     
     private void OnDestroy()
     {

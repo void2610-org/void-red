@@ -430,14 +430,4 @@ public class GameProgressService
             _results[result.Key] = result.Value;
         }
     }
-    
-    /// <summary>
-    /// 指定したシーンに遷移（クロスフェード付き）
-    /// </summary>
-    /// <param name="targetScene">遷移先のシーンタイプ</param>
-    /// <returns>遷移完了のUniTask</returns>
-    public async UniTask TransitionToScene(SceneType targetScene)
-    {
-        await _sceneTransitionManager.TransitionToSceneWithFade(targetScene);
-    }
 }

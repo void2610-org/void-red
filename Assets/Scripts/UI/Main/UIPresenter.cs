@@ -190,7 +190,5 @@ public class UIPresenter : IStartable, System.IDisposable
     {
         // すべてのViewのイベントを解除
         _disposables.Dispose();
-        // TutorialPresenterのクリーンアップ
-        _tutorialPresenter?.Dispose();
     }
 }

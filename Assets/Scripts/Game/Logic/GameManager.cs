@@ -150,6 +150,10 @@ public class GameManager: IStartable, IDisposable
         // エネミーのカードを非インタラクティブに設定
         _enemy.SetHandInteractable(false);
         
+        // 敵がアルヴならチュートリアルを表示
+        if (_currentEnemyData.EnemyId == "E001") 
+            await _uiPresenter.StartTutorial();
+        
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement);
     }

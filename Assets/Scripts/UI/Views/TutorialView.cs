@@ -1,8 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
-using R3;
 using System;
 using LitMotion;
 using LitMotion.Extensions;
@@ -56,7 +54,7 @@ public class TutorialView : MonoBehaviour
             .AddTo(gameObject);
         
         // メッセージテキストの更新
-        messageText.text = step.Message;
+        await messageText.TypewriterAnimation(step.Message, 0.05f, this.GetCancellationTokenOnDestroy());
         
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));
@@ -68,7 +66,7 @@ public class TutorialView : MonoBehaviour
     /// <summary>
     /// チュートリアルビューを表示
     /// </summary>
-    public async UniTask Show()
+    private async UniTask Show()
     {
         // 現在のアニメーションをキャンセル
         if (_currentFadeHandle.IsActive())
