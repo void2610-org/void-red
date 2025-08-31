@@ -295,6 +295,17 @@ namespace Void2610.UnityTemplate
         }
         
         /// <summary>
+        /// RectTransformをLitMotionで指定サイズに変更（sizeDelta）
+        /// </summary>
+        public static MotionHandle SizeTo(this RectTransform rectTransform, Vector2 targetSize, float duration, Ease ease = Ease.Linear)
+        {
+            return LMotion.Create(rectTransform.sizeDelta, targetSize, duration)
+                .WithEase(ease)
+                .BindToSizeDelta(rectTransform)
+                .AddTo(rectTransform.gameObject);
+        }
+        
+        /// <summary>
         /// TransformをLitMotionで指定回転に変更
         /// </summary>
         public static MotionHandle RotateTo(this Transform transform, Quaternion targetRotation, float duration, Ease ease = Ease.Linear)
