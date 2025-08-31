@@ -12,6 +12,9 @@ public class DialogData
     [SerializeField] private string speakerName;
     [SerializeField, TextArea(3, 5)] private string dialogText;
     
+    [Header("画像情報")]
+    [SerializeField] private string characterImageName; // キャラクター画像の名前
+    
     [Header("音響効果")]
     [SerializeField] private string seClipName;
     [SerializeField] private bool playSeOnStart;
@@ -29,6 +32,11 @@ public class DialogData
     /// セリフの内容
     /// </summary>
     public string DialogText => dialogText;
+    
+    /// <summary>
+    /// キャラクター画像の名前
+    /// </summary>
+    public string CharacterImageName => characterImageName;
     
     /// <summary>
     /// 再生するSEのクリップ名
@@ -50,18 +58,6 @@ public class DialogData
     /// </summary>
     public bool AutoAdvance => autoAdvance;
     
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public DialogData(string speakerName, string dialogText, string seClipName = "", bool playSEOnStart = true)
-    {
-        this.speakerName = speakerName;
-        this.dialogText = dialogText;
-        this.seClipName = seClipName;
-        this.playSeOnStart = playSEOnStart;
-        this.customCharSpeed = -1f;
-        this.autoAdvance = false;
-    }
     
     /// <summary>
     /// セリフに有効なテキストが含まれているかどうか
@@ -77,4 +73,18 @@ public class DialogData
     /// デフォルト文字速度を使用するかどうか
     /// </summary>
     public bool UseDefaultCharSpeed => customCharSpeed < 0f;
+    
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public DialogData(string speakerName, string dialogText, string characterImageName = "", string seClipName = "", bool playSeOnStart = true)
+    {
+        this.speakerName = speakerName;
+        this.dialogText = dialogText;
+        this.characterImageName = characterImageName;
+        this.seClipName = seClipName;
+        this.playSeOnStart = playSeOnStart;
+        this.customCharSpeed = -1f;
+        this.autoAdvance = false;
+    }
 }

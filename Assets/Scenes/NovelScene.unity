@@ -798,6 +798,54 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: characterImage
+      value: 
+      objectReference: {fileID: 1899330456664192953}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: characterSprites.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[0]'
+      value: 
+      objectReference: {fileID: 21300000, guid: 021a93a055b804f418cd07b3416b25a0, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[1]'
+      value: 
+      objectReference: {fileID: 21300000, guid: b605c2f9307684c0fad67f28322427f6, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[2]'
+      value: 
+      objectReference: {fileID: 21300000, guid: e68ebd9d44f2540e5b10007e15146cc6, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[3]'
+      value: 
+      objectReference: {fileID: 21300000, guid: 412de83ff24f348f68b1ca97bf0e3e7d, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[4]'
+      value: 
+      objectReference: {fileID: 21300000, guid: 0f04f2ed6f09d4213a05a7b814860a64, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[5]'
+      value: 
+      objectReference: {fileID: 21300000, guid: 5ab3d58af953648619198c0ebb508f72, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[6]'
+      value: 
+      objectReference: {fileID: 21300000, guid: dbd9d78e045314a78af872aff7db913d, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[7]'
+      value: 
+      objectReference: {fileID: 21300000, guid: 9f53c6cf7e0ba48c5a1684a9818b0157, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[8]'
+      value: 
+      objectReference: {fileID: 21300000, guid: 662dbee2ec75a47adbf1ffd469ff3af9, type: 3}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: 'characterSprites.Array.data[9]'
+      value: 
+      objectReference: {fileID: 21300000, guid: 23cde201719fc48f2aa1bde7fa2d0560, type: 3}
     - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Name
       value: DialogView
@@ -887,6 +935,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+--- !u!114 &1899330456664192953 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4576503207100050310, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+  m_PrefabInstance: {fileID: 1899330456664192952}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
