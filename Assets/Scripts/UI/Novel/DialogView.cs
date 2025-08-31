@@ -108,7 +108,8 @@ public class DialogView : MonoBehaviour
         // キャラクター画像を設定
         var sprite = characterSprites.Find(s => s.name == currentDialog.CharacterImageName);
         if (sprite && !characterImage.sprite) characterImage.FadeIn(0.5f);
-        characterImage.sprite = sprite;
+        else if (!sprite && characterImage.sprite) characterImage.FadeOut(0.5f);
+        if (sprite) characterImage.sprite = sprite;
         
         // ダイアログテキストをクリア
         dialogText.text = "";
