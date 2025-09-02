@@ -13,6 +13,7 @@ public class TitleUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Button startButton;
     [SerializeField] private Button settingsButton;
+    [SerializeField] private Button reviewFormButton;
     
     private SettingsPresenter _settingsPresenter;
     private SceneTransitionManager _sceneTransitionManager;
@@ -28,6 +29,7 @@ public class TitleUIPresenter : MonoBehaviour
     {
         startButton.OnClickAsObservable().Subscribe(_ => OnStartButtonClicked()).AddTo(this);
         settingsButton.OnClickAsObservable().Subscribe(_ => OnSettingsButtonClicked()).AddTo(this);
+        reviewFormButton.OnClickAsObservable().Subscribe(_ => OnReviewFormButtonClicked()).AddTo(this);
         
         BgmManager.Instance.PlayRandomBGM(BgmType.Title);
     }
@@ -46,5 +48,13 @@ public class TitleUIPresenter : MonoBehaviour
     private void OnSettingsButtonClicked()
     {
         _settingsPresenter.ShowSettings();
+    }
+    
+    /// <summary>
+    /// 感想フォームボタンがクリックされた時の処理
+    /// </summary>
+    private void OnReviewFormButtonClicked()
+    {
+        Application.OpenURL("https://docs.google.com/forms/d/e/1FAIpQLSfNMqCyXFzWijWAv__wTpDVRN6AtEfFXpdPxyFcIkMbiq2UKw/viewform");
     }
 }
