@@ -75,7 +75,7 @@ public class DialogData
     public bool UseDefaultCharSpeed => customCharSpeed < 0f;
     
     /// <summary>
-    /// コンストラクタ
+    /// コンストラクタ（基本版）
     /// </summary>
     public DialogData(string speakerName, string dialogText, string characterImageName = "", string seClipName = "", bool playSeOnStart = true)
     {
@@ -86,5 +86,27 @@ public class DialogData
         this.playSeOnStart = playSeOnStart;
         this.customCharSpeed = -1f;
         this.autoAdvance = false;
+    }
+    
+    /// <summary>
+    /// コンストラクタ（詳細設定版）
+    /// </summary>
+    public DialogData(string speakerName, string dialogText, string characterImageName, string seClipName, bool playSeOnStart, float customCharSpeed, bool autoAdvance)
+    {
+        this.speakerName = speakerName;
+        this.dialogText = dialogText;
+        this.characterImageName = characterImageName;
+        this.seClipName = seClipName;
+        this.playSeOnStart = playSeOnStart;
+        this.customCharSpeed = customCharSpeed;
+        this.autoAdvance = autoAdvance;
+    }
+    
+    /// <summary>
+    /// スプレッドシートデータ用のファクトリメソッド
+    /// </summary>
+    public static DialogData CreateFromSpreadsheetData(string speakerName, string dialogText, string characterImageName = "", string seClipName = "", bool playSeOnStart = true, float customCharSpeed = -1f, bool autoAdvance = false)
+    {
+        return new DialogData(speakerName, dialogText, characterImageName, seClipName, playSeOnStart, customCharSpeed, autoAdvance);
     }
 }

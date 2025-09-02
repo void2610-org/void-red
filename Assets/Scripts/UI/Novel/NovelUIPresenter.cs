@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VContainer;
 using Cysharp.Threading.Tasks;
+using VoidRed.Game.Services;
 
 /// <summary>
 /// ノベルシーンのUI管理を担当するプレゼンター
@@ -16,60 +18,81 @@ public class NovelUIPresenter : MonoBehaviour
     
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
+    private CardDialogService _cardDialogService;
     private DialogView _dialogView;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager)
+    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager, CardDialogService cardDialogService)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
+        _cardDialogService = cardDialogService;
     }
     
-    private void Start()
+    private async void Start()
     {
         // DialogViewを取得
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
         
-        if (scenarioId == "prologue")
-            StartPrologueTest().Forget();
-        else if (scenarioId == "ending")
-            StartEndingTest().Forget();
-        else
+        // CardDialogServiceを初期化
+        await _cardDialogService.InitializeAsync();
+        
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        // デバッグ用：利用可能なシナリオIDを表示（開発時のみ）
+        _cardDialogService.LogAvailableScenarios();
+#endif
+        
+        // シナリオIDを画面に表示
+        if (scenarioIdText != null)
         {
-            Debug.LogWarning($"[NovelUIPresenter] 未知のシナリオID: {scenarioId}。フォールバックで3秒後にシーンを戻ります。");
+            scenarioIdText.text = $"シナリオID: {scenarioId}";
+        }
+        
+        // シナリオを開始
+        StartScenario(scenarioId).Forget();
+    }
+    
+    /// <summary>
+    /// 指定されたシナリオIDのシナリオを開始
+    /// </summary>
+    private async UniTaskVoid StartScenario(string scenarioId)
+    {
+        if (_dialogView == null)
+        {
+            Debug.LogError("[NovelUIPresenter] DialogViewが見つかりません。");
+            ReturnAsync().Forget();
+            return;
+        }
+
+        try
+        {
+            // DialogViewの完了イベントを購読
+            _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
+            
+            Debug.Log($"[NovelUIPresenter] シナリオ '{scenarioId}' をスプレッドシートから取得中...");
+            
+            // スプレッドシートからシナリオデータを取得
+            var scenarioDialogs = _cardDialogService.GetDialogsByScenarioId(scenarioId);
+            
+            if (scenarioDialogs == null || scenarioDialogs.Count == 0)
+            {
+                Debug.LogWarning($"[NovelUIPresenter] シナリオ '{scenarioId}' のデータが空です。");
+                ReturnAsync().Forget();
+                return;
+            }
+            
+            Debug.Log($"[NovelUIPresenter] シナリオ '{scenarioId}' を開始 ({scenarioDialogs.Count}行)");
+            
+            // ダイアログを開始
+            await _dialogView.StartDialog(scenarioDialogs);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[NovelUIPresenter] シナリオ開始エラー: {ex.Message}");
             ReturnAsync().Forget();
         }
-    }
-    
-    /// <summary>
-    /// デモビルド用のプロローグシナリオ開始
-    /// </summary>
-    private async UniTaskVoid StartPrologueTest()
-    {
-        // DialogViewの完了イベントを購読
-        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
-        
-        // プロローグシナリオを取得して開始
-        var prologueDialogs = PrologueProvider.GetPrologueScenario();
-        await _dialogView.StartDialog(prologueDialogs);
-    }
-    
-    /// <summary>
-    /// デモビルド用のエンディングシナリオ開始
-    /// </summary>
-    private async UniTaskVoid StartEndingTest()
-    {
-        // DialogViewの完了イベントを購読
-        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
-        var endingDialogs = new List<DialogData>
-        {
-            new DialogData("", "アルファ版はここまでです。"),
-            new DialogData("", "プレイしていただきありがとうございます。"),
-            new DialogData("", "製品版リリースをお待ちください。")
-        };
-        await _dialogView.StartDialog(endingDialogs);
     }
     
     /// <summary>
@@ -82,11 +105,11 @@ public class NovelUIPresenter : MonoBehaviour
         // 少し待ってからシーンを戻る
         await UniTask.Delay(1000);
         
-        // ダイアログ結果を記録（将来的にはDialogViewから取得）
+        // ダイアログ結果を記録
         var choices = new Dictionary<string, string>
         {
             { "dialog_completed", "true" },
-            { "scenario_id", "test_scenario_001" }
+            { "scenario_id", _gameProgressService.GetCurrentNode().NodeId }
         };
         
         _gameProgressService.RecordNovelResultAndSave(choices);

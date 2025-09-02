@@ -106,10 +106,7 @@ public class DialogView : MonoBehaviour
         SetSpeakerName(currentDialog.SpeakerName);
         
         // キャラクター画像を設定
-        var sprite = characterSprites.Find(s => s.name == currentDialog.CharacterImageName);
-        if (sprite && !characterImage.sprite) characterImage.FadeIn(0.5f);
-        else if (!sprite && characterImage.sprite) characterImage.FadeOut(0.5f);
-        if (sprite) characterImage.sprite = sprite;
+        SetCharacterImage(currentDialog.CharacterImageName);
         
         // ダイアログテキストをクリア
         dialogText.text = "";
@@ -165,6 +162,78 @@ public class DialogView : MonoBehaviour
         if (speakerNameText)
         {
             speakerNameText.text = hasSpeaker ? speakerName : "";
+        }
+    }
+    
+    /// <summary>
+    /// キャラクター画像を設定する（Resources フォルダから動的読み込み + characterSprites リスト対応）
+    /// </summary>
+    private void SetCharacterImage(string characterImageName)
+    {
+        Sprite targetSprite = null;
+        
+        // 1. 空の場合は画像を非表示
+        if (string.IsNullOrEmpty(characterImageName))
+        {
+            if (characterImage.sprite)
+            {
+                characterImage.FadeOut(0.5f);
+            }
+            return;
+        }
+        
+        // 2. characterSpritesリストから検索（既存機能との互換性）
+        targetSprite = characterSprites.Find(s => s && s.name == characterImageName);
+        
+        // 3. Resourcesフォルダから動的読み込み（リストにない場合）
+        if (!targetSprite)
+        {
+            // パスにスラッシュが含まれている場合はフルパスとして扱う
+            if (characterImageName.Contains("/"))
+            {
+                targetSprite = Resources.Load<Sprite>($"Characters/{characterImageName}");
+            }
+            else
+            {
+                // まず直接のパスで試す
+                targetSprite = Resources.Load<Sprite>($"Characters/{characterImageName}");
+                
+                // 見つからない場合、サブフォルダも検索
+                if (!targetSprite)
+                {
+                    // 既知のサブフォルダパターンを試す
+                    var possiblePaths = new string[]
+                    {
+                        $"Characters/alv/{characterImageName}",
+                        $"Characters/noah/{characterImageName}",
+                    };
+                    
+                    foreach (var path in possiblePaths)
+                    {
+                        targetSprite = Resources.Load<Sprite>(path);
+                        if (targetSprite) break;
+                    }
+                }
+            }
+            
+            if (!targetSprite)
+            {
+                Debug.LogWarning($"[DialogView] キャラクター画像 '{characterImageName}' が見つかりません。Resources/Characters/ またはそのサブフォルダ、characterSprites リストに追加してください。");
+            }
+        }
+        
+        // 4. 画像の表示・非表示とフェード処理
+        if (targetSprite)
+        {
+            if (!characterImage.sprite)
+            {
+                characterImage.FadeIn(0.5f);
+            }
+            characterImage.sprite = targetSprite;
+        }
+        else if (characterImage.sprite)
+        {
+            characterImage.FadeOut(0.5f);
         }
     }
     

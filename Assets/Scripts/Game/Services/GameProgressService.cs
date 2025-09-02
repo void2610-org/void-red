@@ -117,7 +117,7 @@ public class GameProgressService
     }
     
     /// <summary>
-    /// 次に発生するストーリーノードを決定（結果辞書による分岐対応）
+    /// 次に発生するストーリーノードを決定
     /// </summary>
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
