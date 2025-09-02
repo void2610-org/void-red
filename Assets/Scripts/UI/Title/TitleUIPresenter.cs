@@ -15,6 +15,7 @@ public class TitleUIPresenter : MonoBehaviour
     [SerializeField] private Button continueButton;
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button reviewFormButton;
+    [SerializeField] private ConfirmationDialogView confirmationDialog;
     
     private SettingsPresenter _settingsPresenter;
     private SceneTransitionManager _sceneTransitionManager;
@@ -30,10 +31,13 @@ public class TitleUIPresenter : MonoBehaviour
 
     private void Start()
     {
-        startButton.OnClickAsObservable().Subscribe(_ => OnStartButtonClicked()).AddTo(this);
+        startButton.OnClickAsObservable().Subscribe(_ => OnStartButtonClicked().Forget()).AddTo(this);
         continueButton.OnClickAsObservable().Subscribe(_ => OnContinueButtonClicked()).AddTo(this);
         settingsButton.OnClickAsObservable().Subscribe(_ => OnSettingsButtonClicked()).AddTo(this);
         reviewFormButton.OnClickAsObservable().Subscribe(_ => OnReviewFormButtonClicked()).AddTo(this);
+        
+        // セーブデータの有無によるボタン状態管理
+        continueButton.interactable = _gameProgressService.HasSaveData();
         
         BgmManager.Instance.PlayRandomBGM(BgmType.Title);
     }
@@ -41,8 +45,20 @@ public class TitleUIPresenter : MonoBehaviour
     /// <summary>
     /// スタートボタンがクリックされた時の処理（セーブデータリセット）
     /// </summary>
-    private void OnStartButtonClicked()
+    private async UniTask OnStartButtonClicked()
     {
+        // セーブデータが存在する場合は確認ダイアログを表示
+        if (_gameProgressService.HasSaveData())
+        {
+            var confirmed = await confirmationDialog.ShowDialog(
+                "既存のセーブデータが削除されます。よろしいですか？",
+                "はい", 
+                "いいえ"
+            );
+            
+            if (!confirmed) return;
+        }
+        
         _gameProgressService.ResetToDefaultData();
         _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
     }
