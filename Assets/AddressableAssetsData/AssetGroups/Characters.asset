@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Characters
+  m_EditorClassIdentifier: 
+  m_GroupName: Characters
+  m_GUID: 44776811b9a50854fa294e05c27a9844
+  m_SerializeEntries:
+  - m_GUID: 021a93a055b804f418cd07b3416b25a0
+    m_Address: Assets/Sprites/Character/Alv/1-1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f04f2ed6f09d4213a05a7b814860a64
+    m_Address: Assets/Sprites/Character/Alv/1-5.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 23cde201719fc48f2aa1bde7fa2d0560
+    m_Address: Assets/Sprites/Character/Alv/2-5.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 412de83ff24f348f68b1ca97bf0e3e7d
+    m_Address: Assets/Sprites/Character/Alv/1-4.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ab3d58af953648619198c0ebb508f72
+    m_Address: Assets/Sprites/Character/Alv/2-1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 662dbee2ec75a47adbf1ffd469ff3af9
+    m_Address: Assets/Sprites/Character/Alv/2-4.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f53c6cf7e0ba48c5a1684a9818b0157
+    m_Address: Assets/Sprites/Character/Alv/2-3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b605c2f9307684c0fad67f28322427f6
+    m_Address: Assets/Sprites/Character/Alv/1-2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dbd9d78e045314a78af872aff7db913d
+    m_Address: Assets/Sprites/Character/Alv/2-2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e68ebd9d44f2540e5b10007e15146cc6
+    m_Address: Assets/Sprites/Character/Alv/1-3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 69c76ce4113598c4aa06fd02eddeefc7, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: b76865ac7b588fc42a739f4fdadac7c9, type: 2}
+    - {fileID: 11400000, guid: 1e99ca977f84bca4ca4e998b082073f4, type: 2}

@@ -122,6 +122,8 @@ public class GameProgressService
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
+        Debug.Log($"[GameProgressService] 現在のStep: {_currentStep}");
+        
         StoryNode nextNode = _currentStep switch
         {
             // プロローグ
@@ -131,6 +133,7 @@ public class GameProgressService
             _ => new NovelNode("ending"),
         };
         
+        Debug.Log($"[GameProgressService] Step {_currentStep} → ノード: {nextNode.NodeId}");
         return nextNode;
     }
     

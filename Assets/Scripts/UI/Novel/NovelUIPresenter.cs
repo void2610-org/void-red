@@ -18,15 +18,15 @@ public class NovelUIPresenter : MonoBehaviour
     
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
-    private CardDialogService _cardDialogService;
+    private NovelDialogService _novelDialogService;
     private DialogView _dialogView;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager, CardDialogService cardDialogService)
+    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager, NovelDialogService novelDialogService)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _cardDialogService = cardDialogService;
+        _novelDialogService = novelDialogService;
     }
     
     private async void Start()
@@ -34,14 +34,23 @@ public class NovelUIPresenter : MonoBehaviour
         // DialogViewを取得
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        // デバッグ用：プロローグから開始するためにリセット
+        Debug.Log("[NovelUIPresenter] デバッグモード: ゲーム進行をリセットしてプロローグから開始");
+        _gameProgressService.ResetToDefaultData();
+#endif
+
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
         
-        // CardDialogServiceを初期化
-        await _cardDialogService.InitializeAsync();
+        // NovelDialogServiceを初期化
+        await _novelDialogService.InitializeAsync();
         
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+        // デバッグ用：スプレッドシート接続テスト
+        await _novelDialogService.TestSpreadsheetConnection();
+        
         // デバッグ用：利用可能なシナリオIDを表示（開発時のみ）
-        _cardDialogService.LogAvailableScenarios();
+        _novelDialogService.LogAvailableScenarios();
 #endif
         
         // シナリオIDを画面に表示
@@ -73,8 +82,8 @@ public class NovelUIPresenter : MonoBehaviour
             
             Debug.Log($"[NovelUIPresenter] シナリオ '{scenarioId}' をスプレッドシートから取得中...");
             
-            // スプレッドシートからシナリオデータを取得
-            var scenarioDialogs = _cardDialogService.GetDialogsByScenarioId(scenarioId);
+            // スプレッドシートからシナリオデータを取得（遅延ロード対応）
+            var scenarioDialogs = await _novelDialogService.GetDialogsByScenarioIdAsync(scenarioId);
             
             if (scenarioDialogs == null || scenarioDialogs.Count == 0)
             {

@@ -12,7 +12,10 @@ public class NovelLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         // ノベルシーン用サービスを登録
-        builder.Register<CardDialogService>(Lifetime.Singleton);
+        builder.Register<NovelDialogService>(Lifetime.Singleton);
+        
+        // Addressables画像読み込みサービスを登録
+        builder.Register<AddressableCharacterImageLoader>(Lifetime.Singleton);
         
         // UIプレゼンターを登録
         builder.RegisterComponentInHierarchy<NovelUIPresenter>();

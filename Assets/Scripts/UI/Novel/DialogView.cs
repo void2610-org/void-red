@@ -7,6 +7,8 @@ using LitMotion;
 using Cysharp.Threading.Tasks;
 using Void2610.UnityTemplate;
 using System.Threading;
+using VContainer;
+using VoidRed.Game.Services;
 
 /// <summary>
 /// DialogDataのリストを受け取って順番に表示するViewクラス
@@ -35,6 +37,9 @@ public class DialogView : MonoBehaviour
     
     [SerializeField] private List<Sprite> characterSprites; // キャラクター画像のリスト (簡易版)
     
+    // 依存性注入
+    private AddressableCharacterImageLoader _imageLoader;
+    
     private List<DialogData> _dialogList;
     private int _currentIndex;
     private bool _isTyping;
@@ -47,6 +52,15 @@ public class DialogView : MonoBehaviour
     
     // ダイアログ完了時のイベント
     public event Action OnDialogCompleted;
+    
+    /// <summary>
+    /// 依存性注入（VContainer）
+    /// </summary>
+    [Inject]
+    public void Construct(AddressableCharacterImageLoader imageLoader)
+    {
+        _imageLoader = imageLoader;
+    }
     
     private void Awake()
     {
@@ -105,8 +119,8 @@ public class DialogView : MonoBehaviour
         // 話者名を設定
         SetSpeakerName(currentDialog.SpeakerName);
         
-        // キャラクター画像を設定
-        SetCharacterImage(currentDialog.CharacterImageName);
+        // キャラクター画像を設定（非同期）
+        SetCharacterImageAsync(currentDialog.CharacterImageName).Forget();
         
         // ダイアログテキストをクリア
         dialogText.text = "";
@@ -166,9 +180,9 @@ public class DialogView : MonoBehaviour
     }
     
     /// <summary>
-    /// キャラクター画像を設定する（Resources フォルダから動的読み込み + characterSprites リスト対応）
+    /// キャラクター画像を設定する
     /// </summary>
-    private void SetCharacterImage(string characterImageName)
+    private async UniTaskVoid SetCharacterImageAsync(string characterImageName)
     {
         Sprite targetSprite = null;
         
@@ -182,44 +196,13 @@ public class DialogView : MonoBehaviour
             return;
         }
         
-        // 2. characterSpritesリストから検索（既存機能との互換性）
+        // 2. characterSpritesリストから検索
         targetSprite = characterSprites.Find(s => s && s.name == characterImageName);
         
-        // 3. Resourcesフォルダから動的読み込み（リストにない場合）
+        // 3. Addressablesから動的読み込み（リストにない場合）
         if (!targetSprite)
         {
-            // パスにスラッシュが含まれている場合はフルパスとして扱う
-            if (characterImageName.Contains("/"))
-            {
-                targetSprite = Resources.Load<Sprite>($"Characters/{characterImageName}");
-            }
-            else
-            {
-                // まず直接のパスで試す
-                targetSprite = Resources.Load<Sprite>($"Characters/{characterImageName}");
-                
-                // 見つからない場合、サブフォルダも検索
-                if (!targetSprite)
-                {
-                    // 既知のサブフォルダパターンを試す
-                    var possiblePaths = new string[]
-                    {
-                        $"Characters/alv/{characterImageName}",
-                        $"Characters/noah/{characterImageName}",
-                    };
-                    
-                    foreach (var path in possiblePaths)
-                    {
-                        targetSprite = Resources.Load<Sprite>(path);
-                        if (targetSprite) break;
-                    }
-                }
-            }
-            
-            if (!targetSprite)
-            {
-                Debug.LogWarning($"[DialogView] キャラクター画像 '{characterImageName}' が見つかりません。Resources/Characters/ またはそのサブフォルダ、characterSprites リストに追加してください。");
-            }
+            targetSprite = await _imageLoader.LoadCharacterImageAsync(characterImageName);
         }
         
         // 4. 画像の表示・非表示とフェード処理
