@@ -199,7 +199,12 @@ jobs:
           name: github-pages    # upload-pages-artifact のデフォルト名
           path: public
 
-      - name: Deploy Preview to gh-pages 📤
+      - name: Extract artifact 📦
+        run: |
+          # アーティファクトを解凍
+          tar -xf artifact.tar
+
+      - name: Deploy Production to gh-pages 📤
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token:    ${{ secrets.GITHUB_TOKEN }}
