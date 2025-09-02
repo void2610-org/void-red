@@ -37,6 +37,8 @@ public class GameProgressService
     private readonly CardPoolService _cardPoolService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     
+    private readonly Subject<Unit> _onDataSaved = new();
+    
     public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, SceneTransitionManager sceneTransitionManager)
     {
         _saveDataManager = saveDataManager;
@@ -184,6 +186,9 @@ public class GameProgressService
         
         // 実際にファイルに保存
         _saveDataManager.SaveGameData(saveData);
+        
+        // データセーブイベントを発火
+        _onDataSaved.OnNext(Unit.Default);
     }
     
     /// <summary>
@@ -330,6 +335,11 @@ public class GameProgressService
     /// 敵統計データを取得
     /// </summary>
     public EnemyStats EnemyStats => _enemyStats;
+    
+    /// <summary>
+    /// データセーブ時のイベント
+    /// </summary>
+    public Observable<Unit> OnDataSaved => _onDataSaved;
     
     // === 人格ログ管理メソッド ===
     
