@@ -12,22 +12,26 @@ public class TitleUIPresenter : MonoBehaviour
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Button startButton;
+    [SerializeField] private Button continueButton;
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button reviewFormButton;
     
     private SettingsPresenter _settingsPresenter;
     private SceneTransitionManager _sceneTransitionManager;
+    private GameProgressService _gameProgressService;
     
     [Inject]
-    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionManager sceneTransitionManager)
+    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionManager sceneTransitionManager, GameProgressService gameProgressService)
     {
         _settingsPresenter = settingsPresenter;
         _sceneTransitionManager = sceneTransitionManager;
+        _gameProgressService = gameProgressService;
     }
 
     private void Start()
     {
         startButton.OnClickAsObservable().Subscribe(_ => OnStartButtonClicked()).AddTo(this);
+        continueButton.OnClickAsObservable().Subscribe(_ => OnContinueButtonClicked()).AddTo(this);
         settingsButton.OnClickAsObservable().Subscribe(_ => OnSettingsButtonClicked()).AddTo(this);
         reviewFormButton.OnClickAsObservable().Subscribe(_ => OnReviewFormButtonClicked()).AddTo(this);
         
@@ -35,9 +39,18 @@ public class TitleUIPresenter : MonoBehaviour
     }
 
     /// <summary>
-    /// スタートボタンがクリックされた時の処理
+    /// スタートボタンがクリックされた時の処理（セーブデータリセット）
     /// </summary>
     private void OnStartButtonClicked()
+    {
+        _gameProgressService.ResetToDefaultData();
+        _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
+    }
+    
+    /// <summary>
+    /// 続きからボタンがクリックされた時の処理（既存データで続行）
+    /// </summary>
+    private void OnContinueButtonClicked()
     {
         _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
     }
