@@ -201,8 +201,24 @@ jobs:
 
       - name: Extract artifact 📦
         run: |
-          # アーティファクトを解凍
-          tar -xf artifact.tar
+          echo "📁 Checking downloaded files:"
+          ls -la public/
+          
+          # artifact.tarが存在する場合のみ解凍
+          if [ -f "public/artifact.tar" ]; then
+            echo "📦 Found artifact.tar, extracting..."
+            cd public
+            tar -xf artifact.tar
+            rm artifact.tar
+            echo "✅ Extraction completed"
+            ls -la
+            cd ..
+          else
+            echo "ℹ️ No artifact.tar found - files may already be extracted"
+          fi
+          
+          echo "📁 Final public directory contents:"
+          ls -la public/
 
       - name: Deploy Production to gh-pages 📤
         uses: peaceiris/actions-gh-pages@v4
