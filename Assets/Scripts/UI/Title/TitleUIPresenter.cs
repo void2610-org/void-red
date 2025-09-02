@@ -38,6 +38,10 @@ public class TitleUIPresenter : MonoBehaviour
         
         // セーブデータの有無によるボタン状態管理
         continueButton.interactable = _gameProgressService.HasSaveData();
+        _gameProgressService.OnDataSaved
+            .Select(_ => _gameProgressService.HasSaveData())
+            .Subscribe(b => continueButton.interactable = b)
+            .AddTo(this);
         
         BgmManager.Instance.PlayRandomBGM(BgmType.Title);
     }
