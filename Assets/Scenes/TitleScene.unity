@@ -152,6 +152,7 @@ MonoBehaviour:
   continueButton: {fileID: 1132243628}
   settingsButton: {fileID: 1557927029}
   reviewFormButton: {fileID: 1780273427886845126}
+  confirmationDialog: {fileID: 372742872}
 --- !u!4 &21796593
 Transform:
   m_ObjectHideFlags: 0

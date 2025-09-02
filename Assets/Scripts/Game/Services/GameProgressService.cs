@@ -80,6 +80,15 @@ public class GameProgressService
     }
     
     /// <summary>
+    /// 有効なセーブデータが存在するかチェック（ストーリー進行ベース）
+    /// </summary>
+    /// <returns>ストーリーが進行しているセーブデータの存在有無</returns>
+    public bool HasSaveData()
+    {
+        return _saveDataManager.SaveFileExists() && (_currentStep > 0 || _results.Count > 0);
+    }
+    
+    /// <summary>
     /// 全データを初期状態にリセット（デバッグ用）
     /// </summary>
     public void ResetToDefaultData()
