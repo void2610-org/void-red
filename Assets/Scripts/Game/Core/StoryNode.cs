@@ -4,6 +4,12 @@
 public abstract class StoryNode
 {
     public string NodeId { get; protected set; }
+    
+    /// <summary>
+    /// このノード終了後にホームに戻るかどうか
+    /// true: ホームに戻る、false: 次のノードへ直接遷移
+    /// </summary>
+    public bool ReturnToHome { get; set; } = true;
 }
 
 /// <summary>
@@ -17,10 +23,12 @@ public class BattleNode : StoryNode
     /// コンストラクタ
     /// </summary>
     /// <param name="enemyId">敵ID</param>
-    public BattleNode(string enemyId)
+    /// <param name="returnToHome">このノード終了後にホームに戻るか（デフォルト: true）</param>
+    public BattleNode(string enemyId, bool returnToHome = true)
     {
         NodeId = enemyId;
         EnemyId = enemyId;
+        ReturnToHome = returnToHome;
     }
 }
 
@@ -38,10 +46,12 @@ public class NovelNode : StoryNode
     /// コンストラクタ
     /// </summary>
     /// <param name="scenarioId">シナリオID</param>
-    public NovelNode(string scenarioId)
+    /// <param name="returnToHome">このノード終了後にホームに戻るか（デフォルト: true）</param>
+    public NovelNode(string scenarioId, bool returnToHome = true)
     {
         NodeId = scenarioId;
         ScenarioId = scenarioId;
+        ReturnToHome = returnToHome;
     }
 }
 
