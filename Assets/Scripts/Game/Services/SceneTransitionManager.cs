@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
 using Void2610.UnityTemplate;
+using DelayType = Cysharp.Threading.Tasks.DelayType;
 
 /// <summary>
 /// シーン遷移とクロスフェード演出を管理するマネージャー
@@ -98,7 +99,7 @@ public class SceneTransitionManager : IDisposable
             asyncOperation.allowSceneActivation = true;
             // シーンの有効化完了を待つ
             await UniTask.WaitUntil(() => asyncOperation.isDone);
-            await UniTask.Delay(100);
+            await UniTask.Delay(100, DelayType.UnscaledDeltaTime);
             
             await FadeOut(fadeDuration);
         }
@@ -120,8 +121,8 @@ public class SceneTransitionManager : IDisposable
         
         _fadeCanvas.SetActive(true);
         _fadeImage.color = new Color(0, 0, 0, 0); // 完全に透明な黒から開始
-        
-        _currentFadeHandle = _fadeImage.FadeIn(duration, Ease.OutQuart);
+
+        _currentFadeHandle = _fadeImage.FadeIn(duration, Ease.OutQuart, ignoreTimeScale: true);
         
         await _currentFadeHandle.ToUniTask();
     }
@@ -136,7 +137,7 @@ public class SceneTransitionManager : IDisposable
         if (_currentFadeHandle.IsActive())
             _currentFadeHandle.Cancel();
         
-        _currentFadeHandle = _fadeImage.FadeOut(duration, Ease.InQuart);
+        _currentFadeHandle = _fadeImage.FadeOut(duration, Ease.InQuart, ignoreTimeScale: true);
         
         await _currentFadeHandle.ToUniTask();
         
