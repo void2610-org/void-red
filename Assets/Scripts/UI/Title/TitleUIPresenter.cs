@@ -64,7 +64,10 @@ public class TitleUIPresenter : MonoBehaviour
         }
         
         _gameProgressService.ResetToDefaultData();
-        _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
+        
+        // 新規開始時は次のノードに直接遷移
+        var nextScene = _gameProgressService.GetNextSceneType();
+        _sceneTransitionManager.TransitionToSceneWithFade(nextScene).Forget();
     }
     
     /// <summary>
@@ -72,7 +75,9 @@ public class TitleUIPresenter : MonoBehaviour
     /// </summary>
     private void OnContinueButtonClicked()
     {
-        _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
+        // 続行時は現在のノードに基づいて遷移
+        var targetScene = _gameProgressService.GetCurrentSceneType();
+        _sceneTransitionManager.TransitionToSceneWithFade(targetScene).Forget();
     }
 
     /// <summary>

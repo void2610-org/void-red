@@ -3,10 +3,10 @@ using UnityEngine.UI;
 using R3;
 
 /// <summary>
-/// 人格ログを開くボタンのViewコンポーネント
+/// ポーズボタンのViewコンポーネント
 /// </summary>
 [RequireComponent(typeof(Button))]
-public class PersonalityLogButtonView : MonoBehaviour
+public class PauseButtonView : MonoBehaviour
 {
     private Button _logButton;
     
