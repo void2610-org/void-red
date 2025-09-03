@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 using Game.PersonalityLog;
 using R3;
 
@@ -17,7 +15,7 @@ public class GameProgressService
     /// </summary>
     private readonly Dictionary<string, string> _results = new();
     
-    private StoryNode _currentStoryNode;
+    private StoryNode _currentNode; // 現在のノードを保持
     private int _currentStep;
     
     // プレイヤー状態
@@ -79,6 +77,9 @@ public class GameProgressService
         var dataType = isNewData ? "新規データ" : "既存データ";
         
         Debug.Log($"[GameProgressService] {dataType}自動ロード: Step {_currentStep}");
+        
+        // 現在のノードを初期化
+        _currentNode = GetNextNode();
     }
     
     /// <summary>
@@ -98,6 +99,7 @@ public class GameProgressService
         // ストーリー進行データをリセット
         _currentStep = 0;
         _results.Clear();
+        _currentNode = GetNextNode(); // 現在のノードを初期化
         
         // プレイヤー状態をリセット
         _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
@@ -122,10 +124,7 @@ public class GameProgressService
     /// 現在のストーリーノードを取得
     /// </summary>
     /// <returns>現在のストーリーノード</returns>
-    public StoryNode GetCurrentNode()
-    {
-        return GetNextNode();
-    }
+    public StoryNode GetCurrentNode() => _currentNode;
     
     /// <summary>
     /// 次に発生するストーリーノードを決定（結果辞書による分岐対応）
@@ -133,27 +132,53 @@ public class GameProgressService
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
-        StoryNode nextNode = _currentStep switch
+        StoryNode nextNode;
+        switch (_currentStep)
         {
-            // プロローグ
-            0 => new NovelNode("prologue"),
-            // アルヴ
-            1 => new BattleNode("E001"),
-            _ => new NovelNode("ending"),
-        };
-        
+            // プロローグ1 - 次のバトルへ直接遷移
+            case 0:
+                nextNode = new NovelNode("prologue1", false);
+                break;
+            // アルヴ - バトル後は次のノベルへ直接遷移
+            case 1:
+                nextNode = new BattleNode("E001", false);
+                break;
+            // プロローグ2 - ノベル後はホームに戻る（デフォルトtrue）
+            case 2:
+                nextNode = new NovelNode("prologue2");
+                break;
+            // 敵2は分岐 - バトル後はホームに戻る
+            case 3:
+                nextNode = new BattleNode(Random.Range(0f,1f) > 0.5f ? "E002" : "E003");
+                break;
+            default:
+                // この先は未定
+                nextNode = new NovelNode("ending");
+                break;
+        }
+
         return nextNode;
     }
     
     /// <summary>
-    /// 結果を取得
+    /// StoryNodeから対応するSceneTypeを取得
     /// </summary>
-    /// <param name="id">結果のID</param>
-    /// <returns>結果の値（存在しない場合は空文字）</returns>
-    private string GetResult(string id)
+    /// <param name="node">ストーリーノード</param>
+    /// <returns>対応するシーンタイプ</returns>
+    private SceneType GetSceneTypeForNode(StoryNode node)
     {
-        return _results.TryGetValue(id, out var value) ? value : "";
+        return node switch
+        {
+            BattleNode => SceneType.Battle,
+            NovelNode => SceneType.Novel,
+            EndingNode => SceneType.Home, // エンディング後はホームへ
+            _ => SceneType.Home
+        };
     }
+    
+    public SceneType GetCurrentSceneType() => GetSceneTypeForNode(_currentNode);
+    public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
+    private string GetResult(string id) => _results.GetValueOrDefault(id, "");
     
     /// <summary>
     /// 現在のバトル結果を記録
@@ -163,6 +188,7 @@ public class GameProgressService
         var result = isPlayerWin ? "win" : "lose";
         _results[_currentStep.ToString()] = result;
         _currentStep++;
+        _currentNode = GetNextNode(); // 次のノードに更新
         SaveAndPersist();
     }
     
@@ -174,6 +200,7 @@ public class GameProgressService
         foreach (var choice in choices)
             _results[choice.Key] = choice.Value;
         _currentStep++;
+        _currentNode = GetNextNode(); // 次のノードに更新
         SaveAndPersist();
     }
     

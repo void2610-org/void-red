@@ -641,16 +641,26 @@ public class GameManager: IStartable, IDisposable
         // プレイヤーのデッキ変更をセーブ（バトル終了時のみ）
         _player.SaveDeckChanges();
         
+        var currentNode = _gameProgressService.GetCurrentNode();
+        
         // 現在のバトル結果を記録
         _gameProgressService.UpdatePlayerMentalPower(_player.MentalPower.CurrentValue);
         _gameProgressService.RecordBattleResultAndSave(playerWon);
         Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
         
-        // バトル完了後はHomeSceneに戻る
+        // ノード設定に基づいてシーン遷移
         await UniTask.Delay(1000);
-        
-        // HomeSceneに戻る
-        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+        if (currentNode.ReturnToHome)
+        {
+            // ホームに戻る
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+        }
+        else
+        {
+            // 次のノードへ直接遷移
+            var nextScene = _gameProgressService.GetNextSceneType();
+            await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
+        }
         
         _isProcessing = false;
     }

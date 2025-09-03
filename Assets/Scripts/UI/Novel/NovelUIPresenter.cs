@@ -29,17 +29,22 @@ public class NovelUIPresenter : MonoBehaviour
     {
         // DialogViewを取得
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
+        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
         
-        if (scenarioId == "prologue")
+        if (scenarioId == "prologue1")
             StartPrologueTest().Forget();
+        else if (scenarioId == "prologue2")
+        {
+            StartPrologueTest2().Forget();
+        }
         else if (scenarioId == "ending")
             StartEndingTest().Forget();
         else
         {
             Debug.LogWarning($"[NovelUIPresenter] 未知のシナリオID: {scenarioId}。フォールバックで3秒後にシーンを戻ります。");
-            ReturnAsync().Forget();
+            _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
         }
     }
     
@@ -48,11 +53,17 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartPrologueTest()
     {
-        // DialogViewの完了イベントを購読
-        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
-        
         // プロローグシナリオを取得して開始
         var prologueDialogs = PrologueProvider.GetPrologueScenario();
+        await _dialogView.StartDialog(prologueDialogs);
+    }
+    
+    /// <summary>
+    /// デモビルド用のプロローグシナリオ開始2
+    /// </summary>
+    private async UniTaskVoid StartPrologueTest2()
+    {
+        var prologueDialogs = new List<DialogData> { new("システム", "これはプロローグシナリオ2です。") };
         await _dialogView.StartDialog(prologueDialogs);
     }
     
@@ -61,8 +72,6 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartEndingTest()
     {
-        // DialogViewの完了イベントを購読
-        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         var endingDialogs = new List<DialogData>
         {
             new DialogData("", "アルファ版はここまでです。"),
@@ -82,6 +91,9 @@ public class NovelUIPresenter : MonoBehaviour
         // 少し待ってからシーンを戻る
         await UniTask.Delay(1000);
         
+        // 現在のノードを結果記録前に取得
+        var currentNode = _gameProgressService.GetCurrentNode();
+        
         // ダイアログ結果を記録（将来的にはDialogViewから取得）
         var choices = new Dictionary<string, string>
         {
@@ -91,27 +103,17 @@ public class NovelUIPresenter : MonoBehaviour
         
         _gameProgressService.RecordNovelResultAndSave(choices);
         
-        // ホームシーンに戻る
-        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
-    }
-    
-    /// <summary>
-    /// フォールバック用の戻り処理（DialogViewがない場合）
-    /// </summary>
-    private async UniTask ReturnAsync()
-    {
-        await UniTask.Delay(3000);
-        
-        // ハードコード: 複数選択結果
-        var choices = new Dictionary<string, string>
+        // 記録前に取得したノードの設定を確認
+        if (currentNode.ReturnToHome)
         {
-            { "fork0", "option1" },
-            { "fork1", "option2" }
-        };
-        
-        _gameProgressService.RecordNovelResultAndSave(choices);
-        
-        // ホームシーンに戻る
-        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+            // ホームに戻る
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+        }
+        else
+        {
+            // 次のノードへ直接遷移
+            var nextScene = _gameProgressService.GetNextSceneType();
+            await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
+        }
     }
 }
