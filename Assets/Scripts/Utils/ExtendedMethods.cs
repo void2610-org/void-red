@@ -220,10 +220,11 @@ namespace Void2610.UnityTemplate
         /// <summary>
         /// Imageの透明度をLitMotionでフェードインさせる
         /// </summary>
-        public static MotionHandle FadeIn(this Image image, float duration, Ease ease = Ease.Linear)
+        public static MotionHandle FadeIn(this Image image, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
         {
             return LMotion.Create(0f, 1f, duration)
                 .WithEase(ease)
+                .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
                 .BindToColorA(image)
                 .AddTo(image.gameObject);
         }
@@ -231,10 +232,11 @@ namespace Void2610.UnityTemplate
         /// <summary>
         /// Imageの透明度をLitMotionでフェードアウトさせる
         /// </summary>
-        public static MotionHandle FadeOut(this Image image, float duration, Ease ease = Ease.Linear)
+        public static MotionHandle FadeOut(this Image image, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
         {
             return LMotion.Create(1f, 0f, duration)
                 .WithEase(ease)
+                .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
                 .BindToColorA(image)
                 .AddTo(image.gameObject);
         }
