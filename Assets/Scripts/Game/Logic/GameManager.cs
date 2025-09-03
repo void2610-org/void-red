@@ -69,14 +69,6 @@ public class GameManager: IStartable, IDisposable
     public void Start()
     {
         InitializeGame(true).Forget();
-        // リトライボタンのイベント
-        _uiPresenter.RetryButtonClicked.Subscribe(
-            _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle).Forget())
-            .AddTo(_disposables);
-        // タイトルボタンのイベント
-        _uiPresenter.TitleButtonClicked.Subscribe(
-            _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Title).Forget())
-            .AddTo(_disposables);
     }
     
     /// <summary>
