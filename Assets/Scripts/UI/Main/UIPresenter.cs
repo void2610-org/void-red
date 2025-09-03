@@ -14,9 +14,6 @@ public class UIPresenter : IStartable, System.IDisposable
     [Inject] private readonly GameProgressService _gameProgressService;
     
     public Observable<Unit> PlayButtonClicked => _playButtonView.PlayButtonClicked;
-    public Observable<Unit> RetryButtonClicked => _gameOverView.OnRetryClicked;
-    public Observable<Unit> TitleButtonClicked => _gameOverView.OnTitleClicked;
-    
     
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
@@ -31,7 +28,9 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly ConfirmationDialogView _confirmationDialogView;
     private readonly EnemyView _enemyView;
     private readonly PersonalityLogView _personalityLogView;
+    private readonly PauseView _pauseView;
     private readonly PersonalityLogButtonView _personalityLogButtonView;
+    private readonly PauseButtonView _pauseButtonView;
     private readonly ScoreView _scoreView;
     private readonly ResultView _resultView;
     private readonly BlackOverlayView _blackOverlayView;
@@ -42,6 +41,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly Enemy _enemy;
     private bool _isEnemySpriteManualMode;
     private readonly TutorialPresenter _tutorialPresenter;
+    private readonly SceneTransitionManager _sceneTransitionManager;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
@@ -76,7 +76,7 @@ public class UIPresenter : IStartable, System.IDisposable
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
     public async UniTask StartTutorial() => await _tutorialPresenter.StartTutorial();
     
-    public UIPresenter(Player player, Enemy enemy, TutorialData tutorialData)
+    public UIPresenter(Player player, Enemy enemy, TutorialData tutorialData, SceneTransitionManager sceneTransitionManager)
     {
         _player = player;
         _enemy = enemy;
@@ -104,11 +104,14 @@ public class UIPresenter : IStartable, System.IDisposable
         _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
         _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
         _personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
+        _pauseView = UnityEngine.Object.FindFirstObjectByType<PauseView>();
         _personalityLogButtonView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogButtonView>();
+        _pauseButtonView = UnityEngine.Object.FindFirstObjectByType<PauseButtonView>();
         _scoreView = UnityEngine.Object.FindFirstObjectByType<ScoreView>();
         _resultView = UnityEngine.Object.FindFirstObjectByType<ResultView>();
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
         _tutorialPresenter = new TutorialPresenter(tutorialData);
+        _sceneTransitionManager = sceneTransitionManager;
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
@@ -119,10 +122,8 @@ public class UIPresenter : IStartable, System.IDisposable
     private void OnMentalBetChanged(int delta)
     {
         var newValue = _mentalBetValue + delta;
-        
         // 範囲チェック
         if (newValue < GameConstants.MIN_MENTAL_BET || newValue > GameConstants.MAX_MENTAL_BET) return;
-        
         _mentalBetValue = newValue;
         UpdateMentalBetDisplay();
     }
@@ -150,22 +151,12 @@ public class UIPresenter : IStartable, System.IDisposable
         _playStyleView.PlayStyleSelected.Subscribe(OnPlayStyleSelected).AddTo(_disposables);
         // 精神ベット変更イベント
         _mentalBetView.MentalBetChanged.Subscribe(OnMentalBetChanged).AddTo(_disposables);
-    }
-    
-    public void Start()
-    {
-        // PersonalityLogViewを初期化
-        _personalityLogView?.Initialize(_gameProgressService);
-        
         // プレイヤーの精神力変化を監視
         _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
-        
         // 敵の精神力変化を監視
         _enemy.MentalPower.Subscribe(mentalPower => 
-        {
-            _enemyMentalPowerView.UpdateDisplay(mentalPower, GameConstants.MAX_MENTAL_POWER);
-        }).AddTo(_disposables);
-        
+            _enemyMentalPowerView.UpdateDisplay(mentalPower, GameConstants.MAX_MENTAL_POWER)
+        ).AddTo(_disposables);
         // プレイヤーのカード選択を監視して敵のSpriteを更新
         _player.SelectedCard.Subscribe(cardModel => 
         {
@@ -174,12 +165,36 @@ public class UIPresenter : IStartable, System.IDisposable
             if (cardModel != null && cardModel.Data) _enemyView.UpdateSpriteForAttribute(cardModel.Data.Attribute).Forget();
             else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
+    }
+    
+    private void SetUpButtonEvents()
+    {
+        _personalityLogButtonView?.OnButtonClicked.Subscribe(
+            _ => _personalityLogView.ShowLog())
+            .AddTo(_disposables);
+        _pauseButtonView?.OnButtonClicked.Subscribe(
+                _ => _pauseView.Show())
+            .AddTo(_disposables);
+        _pauseView.OnTitleButtonClicked.Subscribe(
+            _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget()
+            ).AddTo(_disposables);
+        _gameOverView.OnRetryClicked.Subscribe(
+                _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle).Forget())
+            .AddTo(_disposables);
+        _gameOverView.OnTitleClicked.Subscribe(
+                _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget())
+            .AddTo(_disposables);
+    }
+    
+    public void Start()
+    {
+        // PersonalityLogViewを初期化
+        _personalityLogView.Initialize(_gameProgressService);
         
         // Viewイベントの設定
         SetupViewEvents();
-        
-        // PersonalityLogButtonのイベント設定
-        _personalityLogButtonView?.OnButtonClicked.Subscribe(_ => _personalityLogView.ShowLog()).AddTo(_disposables);
+        // ボタンのイベント設定
+        SetUpButtonEvents();
         
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
