@@ -102,7 +102,7 @@ public class DeckView : MonoBehaviour
         }
         
         // スクロール位置をリセット
-        scrollRect.verticalNormalizedPosition = 1f;
+        scrollRect.horizontalNormalizedPosition = 1f;
     }
     
     /// <summary>

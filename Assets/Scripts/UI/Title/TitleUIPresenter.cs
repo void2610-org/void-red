@@ -71,13 +71,12 @@ public class TitleUIPresenter : MonoBehaviour
     }
     
     /// <summary>
-    /// 続きからボタンがクリックされた時の処理（既存データで続行）
+    /// 続きからボタンがクリックされた時の処理
     /// </summary>
     private void OnContinueButtonClicked()
     {
-        // 続行時は現在のノードに基づいて遷移
-        var targetScene = _gameProgressService.GetCurrentSceneType();
-        _sceneTransitionManager.TransitionToSceneWithFade(targetScene).Forget();
+        // 続きから開始時は一旦ホームに遷移
+        _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
     }
 
     /// <summary>

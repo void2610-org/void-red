@@ -315,6 +315,8 @@ public abstract class PlayerPresenter : IDisposable
         {
             // 全カード（AllCards）をセーブデータに反映
             _gameProgressService.UpdateDeckFromCardModels(_deckModel.AllCards);
+            // プレイヤーのデッキを閲覧済みとして記録
+            _gameProgressService.RecordCardViews(_deckModel.AllCards.Select(c => c.Data).ToList());
         }
     }
     
