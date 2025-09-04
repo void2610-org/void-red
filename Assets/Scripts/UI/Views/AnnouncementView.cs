@@ -22,6 +22,7 @@ public class AnnouncementView : MonoBehaviour
     
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentAnnouncementCts;
+    private CancellationToken _destroyToken;
 
     /// <summary>
     /// アナウンスメントを表示
@@ -38,7 +39,7 @@ public class AnnouncementView : MonoBehaviour
         // アプリケーション終了時にもキャンセルされるようにする  
         var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
             _currentAnnouncementCts.Token,
-            this.GetCancellationTokenOnDestroy(), 
+            _destroyToken, 
             Application.exitCancellationToken
         ).Token;
         
@@ -140,7 +141,7 @@ public class AnnouncementView : MonoBehaviour
         }
         finally
         {
-            _canvasGroup.alpha = 0f;
+            if (_canvasGroup) _canvasGroup.alpha = 0f;
         }
     }
     
@@ -149,6 +150,9 @@ public class AnnouncementView : MonoBehaviour
         // 初期状態の設定
         _canvasGroup = GetComponent<CanvasGroup>();
         _canvasGroup.alpha = 0f;
+        
+        // DestroyCancellationTokenを事前に取得してUnityで初期化
+        _destroyToken = this.GetCancellationTokenOnDestroy();
     }
     
     private void OnDestroy()
