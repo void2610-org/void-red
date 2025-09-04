@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -26,7 +27,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly MentalPowerView _enemyMentalPowerView;
     private readonly GameOverView _gameOverView;
     private readonly ConfirmationDialogView _confirmationDialogView;
-    private readonly EnemyView _enemyView;
+    private EnemyView _enemyView;
     private readonly PersonalityLogView _personalityLogView;
     private readonly PauseView _pauseView;
     private readonly PersonalityLogButtonView _personalityLogButtonView;
@@ -54,7 +55,13 @@ public class UIPresenter : IStartable, System.IDisposable
         => await _confirmationDialogView.ShowDialog(message, confirmText, cancelText);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
-    public void InitializeEnemy(EnemyData enemyData) => _enemyView.Initialize(enemyData);
+
+    public void InitializeEnemy(EnemyData enemyData)
+    {
+        _enemyView　= UnityEngine.Object.FindFirstObjectByType<EnemyView>();
+        _enemyView.Initialize(enemyData);
+    }
+
     public async UniTask ShowEnemy() => await _enemyView.Show();
     public async UniTask HideEnemy() => await _enemyView.Hide();
     public async UniTask ResetEnemyToDefault() 
