@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
@@ -39,7 +40,7 @@ public class HomeUIPresenter : MonoBehaviour
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
         deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
-        libraryButton.OnClickAsObservable().Subscribe(_ => cardLibraryView.Show(_allCardData)).AddTo(this);
+        libraryButton.OnClickAsObservable().Subscribe(_ => ShowCardLibrary()).AddTo(this);
         
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
@@ -102,6 +103,19 @@ public class HomeUIPresenter : MonoBehaviour
     /// </summary>
     private void RefreshDeckData()
     {
-        deckView.ShowDeck(_gameProgressService.GetDeckCardModels());
+        var cardModels = _gameProgressService.GetDeckCardModels();
+        var cardDataList = cardModels.Select(cm => cm.Data).ToList();
+        
+        _gameProgressService.RecordCardViews(cardDataList);
+        deckView.ShowDeck(cardModels);
+    }
+    
+    /// <summary>
+    /// カード図鑑を表示
+    /// </summary>
+    private void ShowCardLibrary()
+    {
+        var viewedCardIds = _gameProgressService.GetViewedCardIds();
+        cardLibraryView.Show(_allCardData, viewedCardIds);
     }
 }

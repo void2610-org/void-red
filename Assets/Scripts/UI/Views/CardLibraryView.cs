@@ -29,13 +29,14 @@ public class CardLibraryView : MonoBehaviour
     /// カード図鑑を表示
     /// </summary>
     /// <param name="allCardData">全カードデータ</param>
-    public void Show(AllCardData allCardData)
+    /// <param name="viewedCardIds">閲覧済みカードIDのセット</param>
+    public void Show(AllCardData allCardData, HashSet<string> viewedCardIds)
     {
         // データを保持
         _allCardData = allCardData;
         
         libraryPanel.SetActive(true);
-        UpdateLibraryDisplay();
+        UpdateLibraryDisplay(viewedCardIds);
     }
     
     /// <summary>
@@ -49,19 +50,49 @@ public class CardLibraryView : MonoBehaviour
     /// <summary>
     /// カード図鑑表示を更新
     /// </summary>
-    private void UpdateLibraryDisplay()
+    /// <param name="viewedCardIds">閲覧済みカードIDのセット</param>
+    private void UpdateLibraryDisplay(HashSet<string> viewedCardIds)
     {
         // 既存のカードViewをクリア
         ClearCardViews();
         
-        // カードViewを生成
-        foreach (var cardData in _allCardData.CardList.OrderBy(cd => cd.CardId))
+        // カードを閲覧済み優先でソートしてから生成
+        var sortedCards = new List<CardData>();
+        
+        // 先に閲覧済みカードを追加
+        foreach (var cardData in _allCardData.CardList)
         {
-            CreateCardView(cardData);
+            if (viewedCardIds.Contains(cardData.CardId))
+            {
+                sortedCards.Add(cardData);
+            }
+        }
+        
+        // 次に未閲覧カードを追加
+        foreach (var cardData in _allCardData.CardList)
+        {
+            if (!viewedCardIds.Contains(cardData.CardId))
+            {
+                sortedCards.Add(cardData);
+            }
+        }
+        
+        // カードViewを生成
+        foreach (var cardData in sortedCards)
+        {
+            CreateCardView(cardData, !viewedCardIds.Contains(cardData.CardId));
         }
         
         // 統計情報を更新
-        statisticsText.text = $"全カード: {_allCardData.CardList.Count}枚";
+        var viewedCount = 0;
+        foreach (var cardData in _allCardData.CardList)
+        {
+            if (viewedCardIds.Contains(cardData.CardId))
+            {
+                viewedCount++;
+            }
+        }
+        statisticsText.text = $"全カード: {_allCardData.CardList.Count}枚 (閲覧済み: {viewedCount}枚)";
         // スクロール位置をリセット
         scrollRect.verticalNormalizedPosition = 1f;
     }
@@ -69,12 +100,14 @@ public class CardLibraryView : MonoBehaviour
     /// <summary>
     /// カードViewを生成
     /// </summary>
-    private void CreateCardView(CardData cardData)
+    /// <param name="cardData">カードデータ</param>
+    /// <param name="isUnviewed">未閲覧かどうか</param>
+    private void CreateCardView(CardData cardData, bool isUnviewed = false)
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
-        // CardDataをCardModelに変換して表示（図鑑なので崩壊状態は常にfalse）
         var cardModel = new CardModel(cardData);
-        cardView.Initialize(cardModel);
+        cardView.Initialize(cardModel, isUnviewed);
+        
         _cardViews.Add(cardView);
     }
     

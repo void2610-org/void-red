@@ -267,6 +267,9 @@ public class GameManager: IStartable, IDisposable
         _player.ConsumeMentalPower(mentalBet);
         _playerMove = new PlayerMove(finalSelectedCard.Data, playStyle, mentalBet);
         
+        // 選択されたカードを閲覧済みとして記録
+        _gameProgressService.RecordCardView(finalSelectedCard.Data);
+        
         // 人格ログ: プレイヤームーブ記録
         _gameProgressService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
         
@@ -300,6 +303,9 @@ public class GameManager: IStartable, IDisposable
         // NPCの精神力を消費
         _enemy.ConsumeMentalPower(npcMentalBet);
         _npcMove = new PlayerMove(npcCard.Data, npcPlayStyle, npcMentalBet);
+        
+        // 敵のカードも閲覧済みとして記録
+        _gameProgressService.RecordCardView(npcCard.Data);
         
         // 人格ログ: 敵ムーブ記録
         _gameProgressService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);

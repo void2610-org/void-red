@@ -42,6 +42,9 @@ public class GameSaveData
     [Header("人格ログデータ")]
     [SerializeField] private PersonalityLogData personalityLog = new();
     
+    [Header("カード閲覧履歴")]
+    [SerializeField] private List<string> viewedCardIds = new();
+    
     // プロパティ
     public int CurrentMentalPower => currentMentalPower;
     public List<SavedCard> SavedDeck => savedDeck;
@@ -115,10 +118,41 @@ public class GameSaveData
     }
     
     /// <summary>
+    /// カード閲覧を記録
+    /// </summary>
+    /// <param name="cardId">閲覧したカードのID</param>
+    public void RecordCardView(string cardId)
+    {
+        if (!string.IsNullOrEmpty(cardId) && !viewedCardIds.Contains(cardId))
+        {
+            viewedCardIds.Add(cardId);
+        }
+    }
+    
+    /// <summary>
+    /// カードが閲覧済みかチェック
+    /// </summary>
+    /// <param name="cardId">チェックするカードのID</param>
+    /// <returns>閲覧済みの場合true</returns>
+    public bool IsCardViewed(string cardId)
+    {
+        return viewedCardIds.Contains(cardId);
+    }
+    
+    /// <summary>
+    /// 閲覧済みカードIDリストを取得
+    /// </summary>
+    /// <returns>閲覧済みカードIDのHashSet</returns>
+    public HashSet<string> GetViewedCardIds()
+    {
+        return new HashSet<string>(viewedCardIds);
+    }
+    
+    /// <summary>
     /// デバッグ用情報文字列
     /// </summary>
     public string GetDebugInfo()
     {
-        return $"Step: {currentStep}, MentalPower: {currentMentalPower}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries";
+        return $"Step: {currentStep}, MentalPower: {currentMentalPower}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}";
     }
 }

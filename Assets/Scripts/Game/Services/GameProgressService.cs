@@ -326,6 +326,40 @@ public class GameProgressService
     {
         _enemyStats = new EnemyStats();
     }
+
+    /// <summary>
+    /// カード閲覧をリストで記録
+    /// </summary>
+    /// <param name="cardDataList">閲覧したカードデータのリスト</param>
+    public void RecordCardViews(List<CardData> cardDataList)
+    {
+        foreach (var cardData in cardDataList)
+        {
+            RecordCardView(cardData);
+        }
+    }
+
+    /// カード閲覧を記録
+    /// </summary>
+    /// <param name="cardData">閲覧したカードデータ</param>
+    public void RecordCardView(CardData cardData)
+    {
+        if (!cardData || string.IsNullOrEmpty(cardData.CardId)) return;
+        
+        var saveData = _saveDataManager.LoadGameData();
+        saveData.RecordCardView(cardData.CardId);
+        _saveDataManager.SaveGameData(saveData);
+    }
+    
+    /// <summary>
+    /// 閲覧済みカードIDリストを取得
+    /// </summary>
+    /// <returns>閲覧済みカードIDのHashSet</returns>
+    public HashSet<string> GetViewedCardIds()
+    {
+        var loadedData = _saveDataManager.LoadGameData();
+        return loadedData.GetViewedCardIds();
+    }
     
     /// <summary>
     /// ゲーム結果を記録（プレイヤー分）
