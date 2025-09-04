@@ -18,23 +18,25 @@ public class DeckCardView : MonoBehaviour
     [Header("色設定")]
     [SerializeField] private Color activeColor = Color.white;
     [SerializeField] private Color collapsedColor = new(0.5f, 0.5f, 0.5f, 0.7f);
+    [SerializeField] private Color unviewedColor = new(0.2f, 0.2f, 0.2f, 0.9f);
     
     public CardModel CardModel { get; private set; }
-    
+
     /// <summary>
     /// カードモデルを設定して表示を更新
     /// </summary>
     /// <param name="cardModel">表示するカードモデル</param>
-    public void Initialize(CardModel cardModel)
+    /// <param name="isVealed">カードが隠されているか</param>
+    public void Initialize(CardModel cardModel, bool isVealed = false)
     {
         CardModel = cardModel;
-        UpdateDisplay();
+        UpdateDisplay(isVealed || CardModel.IsCollapsed);
     }
     
     /// <summary>
     /// 表示を更新
     /// </summary>
-    private void UpdateDisplay()
+    private void UpdateDisplay(bool isVealed)
     {
         if (!CardModel?.Data) return;
         
@@ -47,17 +49,15 @@ public class DeckCardView : MonoBehaviour
         // バナーとフレームの色をカードの色に設定
         cardTextBanner.color = CardModel.Data.Color;
         cardFrame.color = CardModel.Data.Color;
-        
-        // 状態に応じて色を変更
-        if (CardModel.IsCollapsed)
+
+        // 未閲覧カード：黒く暗い表示
+        if (isVealed)
         {
-            // 崩壊したカード：暗い色で半透明
-            backgroundImage.color = collapsedColor;
-        }
-        else
-        {
-            // 使用可能なカード：通常の白色
-            backgroundImage.color = activeColor;
+            backgroundImage.color = unviewedColor;
+            cardImage.color = CardModel.Data.CardImage ? new Color(0.2f, 0.2f, 0.2f, 1f) : Color.clear;
+            cardTextBanner.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+            cardNameText.color = Color.black;
+            cardFrame.color = new Color(0.2f, 0.2f, 0.2f, 1f);
         }
     }
 }
