@@ -22,12 +22,16 @@ public class AnnouncementView : MonoBehaviour
     
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentAnnouncementCts;
+    private CancellationToken _destroyToken;
 
     /// <summary>
     /// アナウンスメントを表示
     /// </summary>
     public async UniTask DisplayAnnouncement(string message, float duration = 2f)
     {
+        // オブジェクトが破棄されているかチェック
+        if (!this || !_canvasGroup) return;
+        
         // 現在実行中のアナウンスメントをキャンセル
         _currentAnnouncementCts?.Cancel();
         _currentAnnouncementCts?.Dispose();
@@ -38,7 +42,7 @@ public class AnnouncementView : MonoBehaviour
         // アプリケーション終了時にもキャンセルされるようにする  
         var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
             _currentAnnouncementCts.Token,
-            this.GetCancellationTokenOnDestroy(), 
+            _destroyToken, 
             Application.exitCancellationToken
         ).Token;
         
@@ -46,6 +50,9 @@ public class AnnouncementView : MonoBehaviour
         
         try
         {
+            // コンポーネントの存在確認
+            if (!announcementText || !announcementBackground) return;
+            
             // テキストの位置をリセット（前回のアニメーションの影響を除去）
             var textRect = announcementText.rectTransform;
             var originalPosition = Vector2.zero;
@@ -140,7 +147,7 @@ public class AnnouncementView : MonoBehaviour
         }
         finally
         {
-            _canvasGroup.alpha = 0f;
+            if (_canvasGroup) _canvasGroup.alpha = 0f;
         }
     }
     
@@ -149,6 +156,9 @@ public class AnnouncementView : MonoBehaviour
         // 初期状態の設定
         _canvasGroup = GetComponent<CanvasGroup>();
         _canvasGroup.alpha = 0f;
+        
+        // DestroyCancellationTokenを事前に取得してUnityで初期化
+        _destroyToken = this.GetCancellationTokenOnDestroy();
     }
     
     private void OnDestroy()
