@@ -31,17 +31,18 @@ public class GameProgressService
     private readonly List<TurnEvent> _currentEvents = new();
     private ChapterLog _currentChapter;
     
+    // 閲覧済みカード
+    private readonly HashSet<string> _viewedCardIds = new();
+    
     private readonly SaveDataManager _saveDataManager;
     private readonly CardPoolService _cardPoolService;
-    private readonly SceneTransitionManager _sceneTransitionManager;
     
     private readonly Subject<Unit> _onDataSaved = new();
     
-    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, SceneTransitionManager sceneTransitionManager)
+    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService)
     {
         _saveDataManager = saveDataManager;
         _cardPoolService = cardPoolService;
-        _sceneTransitionManager = sceneTransitionManager;
         
         // 起動時に自動でセーブデータをロード
         LoadAllGameData();
@@ -71,6 +72,14 @@ public class GameProgressService
         
         // 人格ログのロード
         _personalityLog = loadedData.PersonalityLog ?? new PersonalityLogData();
+        
+        // 閲覧済みカードをメモリにロード
+        _viewedCardIds.Clear();
+        var viewedIds = loadedData.GetViewedCardIds();
+        foreach (var id in viewedIds)
+        {
+            _viewedCardIds.Add(id);
+        }
         
         // 新規データかどうかを判定（Step0かつ結果が0件の場合）
         var isNewData = _currentStep == 0 && _results.Count == 0;
@@ -236,6 +245,12 @@ public class GameProgressService
         saveData.UpdateEvolutionStats(_evolutionStats);
         saveData.UpdatePersonalityLog(_personalityLog);
         
+        // 閲覧済みカードをセーブデータに追加
+        foreach (var cardId in _viewedCardIds)
+        {
+            saveData.RecordCardView(cardId);
+        }
+        
         return saveData;
     }
     
@@ -339,6 +354,7 @@ public class GameProgressService
         }
     }
 
+    /// <summary>
     /// カード閲覧を記録
     /// </summary>
     /// <param name="cardData">閲覧したカードデータ</param>
@@ -346,9 +362,7 @@ public class GameProgressService
     {
         if (!cardData || string.IsNullOrEmpty(cardData.CardId)) return;
         
-        var saveData = _saveDataManager.LoadGameData();
-        saveData.RecordCardView(cardData.CardId);
-        _saveDataManager.SaveGameData(saveData);
+        _viewedCardIds.Add(cardData.CardId);
     }
     
     /// <summary>
@@ -357,8 +371,7 @@ public class GameProgressService
     /// <returns>閲覧済みカードIDのHashSet</returns>
     public HashSet<string> GetViewedCardIds()
     {
-        var loadedData = _saveDataManager.LoadGameData();
-        return loadedData.GetViewedCardIds();
+        return new HashSet<string>(_viewedCardIds);
     }
     
     /// <summary>
