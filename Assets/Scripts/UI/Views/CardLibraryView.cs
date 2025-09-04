@@ -56,27 +56,11 @@ public class CardLibraryView : MonoBehaviour
         // 既存のカードViewをクリア
         ClearCardViews();
         
-        // カードを閲覧済み優先でソートしてから生成
-        var sortedCards = new List<CardData>();
-        
-        // 先に閲覧済みカードを追加
-        foreach (var cardData in _allCardData.CardList)
-        {
-            if (viewedCardIds.Contains(cardData.CardId))
-            {
-                sortedCards.Add(cardData);
-            }
-        }
-        
-        // 次に未閲覧カードを追加
-        foreach (var cardData in _allCardData.CardList)
-        {
-            if (!viewedCardIds.Contains(cardData.CardId))
-            {
-                sortedCards.Add(cardData);
-            }
-        }
-        
+        // 閲覧済みカードを優先してソート
+        var sortedCards = _allCardData.CardList
+            .OrderBy(cardData => !viewedCardIds.Contains(cardData.CardId))
+            .ToList();
+
         // カードViewを生成
         foreach (var cardData in sortedCards)
         {
@@ -84,17 +68,11 @@ public class CardLibraryView : MonoBehaviour
         }
         
         // 統計情報を更新
-        var viewedCount = 0;
-        foreach (var cardData in _allCardData.CardList)
-        {
-            if (viewedCardIds.Contains(cardData.CardId))
-            {
-                viewedCount++;
-            }
-        }
-        statisticsText.text = $"全カード: {_allCardData.CardList.Count}枚 (閲覧済み: {viewedCount}枚)";
+        var allCardCount = _allCardData.CardList.Count;
+        var viewedCount = _allCardData.CardList.Count(cardData => viewedCardIds.Contains(cardData.CardId));
+        statisticsText.text = $"全カード: {allCardCount}枚 (閲覧済み: {viewedCount}枚)";
         // スクロール位置をリセット
-        scrollRect.verticalNormalizedPosition = 1f;
+        scrollRect.horizontalNormalizedPosition = 1f;
     }
     
     /// <summary>
