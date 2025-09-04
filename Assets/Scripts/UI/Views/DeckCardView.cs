@@ -26,17 +26,17 @@ public class DeckCardView : MonoBehaviour
     /// カードモデルを設定して表示を更新
     /// </summary>
     /// <param name="cardModel">表示するカードモデル</param>
-    /// <param name="isVealed">カードが隠されているか</param>
-    public void Initialize(CardModel cardModel, bool isVealed = false)
+    /// <param name="isVeiled">カードが隠されているか</param>
+    public void Initialize(CardModel cardModel, bool isVeiled = false)
     {
         CardModel = cardModel;
-        UpdateDisplay(isVealed || CardModel.IsCollapsed);
+        UpdateDisplay(isVeiled || CardModel.IsCollapsed);
     }
     
     /// <summary>
     /// 表示を更新
     /// </summary>
-    private void UpdateDisplay(bool isVealed)
+    private void UpdateDisplay(bool isVeiled)
     {
         if (!CardModel?.Data) return;
         
@@ -51,7 +51,7 @@ public class DeckCardView : MonoBehaviour
         cardFrame.color = CardModel.Data.Color;
 
         // 未閲覧カード：黒く暗い表示
-        if (isVealed)
+        if (isVeiled)
         {
             backgroundImage.color = unviewedColor;
             cardImage.color = CardModel.Data.CardImage ? new Color(0.2f, 0.2f, 0.2f, 1f) : Color.clear;
