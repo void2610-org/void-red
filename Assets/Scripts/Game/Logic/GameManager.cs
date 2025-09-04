@@ -24,6 +24,7 @@ public class GameManager: IStartable, IDisposable
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
     private bool _isProcessing;
+    private bool _isDisposed;
     
     // バトル勝利数管理
     private int _playerWins;
@@ -162,7 +163,9 @@ public class GameManager: IStartable, IDisposable
     /// </summary>
     private void ChangeState(GameState newState)
     {
-        _currentState.Value = newState;
+        if (_isDisposed) return;
+        
+        if (!TrySetReactiveProperty(_currentState, newState)) return;
         switch (newState)
         {
             case GameState.ThemeAnnouncement:
@@ -201,11 +204,15 @@ public class GameManager: IStartable, IDisposable
     /// </summary>
     private void HandleThemeAnnouncement()
     {
+        if (_isDisposed) return;
+        
         // 人格ログ: ターン開始
         _gameProgressService.StartTurn();
         
         // ランダムなお題を選択
-        _currentTheme.Value = _themeService.GetRandomTheme();
+        var newTheme = _themeService.GetRandomTheme();
+        if (!TrySetReactiveProperty(_currentTheme, newTheme)) return;
+        
         _uiPresenter.SetTheme(_currentTheme.Value);
         
         DelayedStateChangeAsync(GameState.PlayerCardSelection, 0.3f).Forget();
@@ -709,10 +716,29 @@ public class GameManager: IStartable, IDisposable
     }
     
     /// <summary>
+    /// ReactivePropertyに安全に値を設定
+    /// </summary>
+    private bool TrySetReactiveProperty<T>(ReactiveProperty<T> reactiveProperty, T value)
+    {
+        if (_isDisposed || reactiveProperty == null) return false;
+        
+        try
+        {
+            reactiveProperty.Value = value;
+            return true;
+        }
+        catch (ObjectDisposedException)
+        {
+            return false;
+        }
+    }
+    
+    /// <summary>
     /// リソースの解放
     /// </summary>
     public void Dispose()
     {
+        _isDisposed = true;
         _disposables?.Dispose();
         _currentState?.Dispose();
         _currentTheme?.Dispose();

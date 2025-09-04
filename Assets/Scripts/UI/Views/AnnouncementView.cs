@@ -29,6 +29,9 @@ public class AnnouncementView : MonoBehaviour
     /// </summary>
     public async UniTask DisplayAnnouncement(string message, float duration = 2f)
     {
+        // オブジェクトが破棄されているかチェック
+        if (!this || !_canvasGroup) return;
+        
         // 現在実行中のアナウンスメントをキャンセル
         _currentAnnouncementCts?.Cancel();
         _currentAnnouncementCts?.Dispose();
@@ -47,6 +50,9 @@ public class AnnouncementView : MonoBehaviour
         
         try
         {
+            // コンポーネントの存在確認
+            if (!announcementText || !announcementBackground) return;
+            
             // テキストの位置をリセット（前回のアニメーションの影響を除去）
             var textRect = announcementText.rectTransform;
             var originalPosition = Vector2.zero;
