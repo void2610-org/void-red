@@ -46,7 +46,7 @@ public class NovelNode : StoryNode
     /// コンストラクタ
     /// </summary>
     /// <param name="scenarioId">シナリオID</param>
-    /// <param name="returnToHome">ホームに戻るかどうか</param>
+    /// <param name="returnToHome">このノード終了後にホームに戻るか（デフォルト: true）</param>
     public NovelNode(string scenarioId, bool returnToHome = true)
     {
         NodeId = scenarioId;

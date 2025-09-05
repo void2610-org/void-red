@@ -17,10 +17,7 @@ public class GameProgressService
     /// </summary>
     private readonly Dictionary<string, string> _results = new();
     
-    /// <summary>
-    /// 現在のストーリーノード
-    /// </summary>
-    private StoryNode _currentNode;
+    private StoryNode _currentNode; // 現在のノードを保持
     private int _currentStep;
     
     // プレイヤー状態
@@ -139,7 +136,7 @@ public class GameProgressService
                 break;
             // 敵2は分岐 - バトル後はホームに戻る
             case 3:
-                nextNode = new BattleNode(UnityEngine.Random.Range(0f,1f) > 0.5f ? "E002" : "E003");
+                nextNode = new BattleNode(Random.Range(0f,1f) > 0.5f ? "E002" : "E003");
                 break;
             default:
                 // この先は未定
@@ -147,26 +144,11 @@ public class GameProgressService
                 break;
         }
 
-        _currentNode = nextNode;
         return nextNode;
     }
     
     /// <summary>
-    /// 次のシーンタイプを取得
-    /// </summary>
-    public SceneType GetNextSceneType()
-    {
-        var nextNode = GetNextNode();
-        return nextNode switch
-        {
-            BattleNode => SceneType.Battle,
-            NovelNode => SceneType.Novel,
-            _ => SceneType.Home
-        };
-    }
-    
-    /// <summary>
-    /// 結果を取得
+    /// StoryNodeから対応するSceneTypeを取得
     /// </summary>
     /// <param name="id">結果のID</param>
     /// <returns>結果の値（存在しない場合は空文字）</returns>
