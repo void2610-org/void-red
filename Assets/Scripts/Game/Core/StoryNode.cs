@@ -4,6 +4,7 @@
 public abstract class StoryNode
 {
     public string NodeId { get; protected set; }
+    public bool ReturnToHome { get; protected set; } = true;
 }
 
 /// <summary>
@@ -17,10 +18,12 @@ public class BattleNode : StoryNode
     /// コンストラクタ
     /// </summary>
     /// <param name="enemyId">敵ID</param>
-    public BattleNode(string enemyId)
+    /// <param name="returnToHome">ホームに戻るかどうか</param>
+    public BattleNode(string enemyId, bool returnToHome = true)
     {
         NodeId = enemyId;
         EnemyId = enemyId;
+        ReturnToHome = returnToHome;
     }
 }
 
@@ -38,10 +41,12 @@ public class NovelNode : StoryNode
     /// コンストラクタ
     /// </summary>
     /// <param name="scenarioId">シナリオID</param>
-    public NovelNode(string scenarioId)
+    /// <param name="returnToHome">ホームに戻るかどうか</param>
+    public NovelNode(string scenarioId, bool returnToHome = true)
     {
         NodeId = scenarioId;
         ScenarioId = scenarioId;
+        ReturnToHome = returnToHome;
     }
 }
 

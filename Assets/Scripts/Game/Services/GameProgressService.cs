@@ -18,6 +18,7 @@ public class GameProgressService
     private readonly Dictionary<string, string> _results = new();
     
     private StoryNode _currentStoryNode;
+    private StoryNode _currentNode;
     private int _currentStep;
     
     // プレイヤー状態
@@ -111,10 +112,7 @@ public class GameProgressService
     /// 現在のストーリーノードを取得
     /// </summary>
     /// <returns>現在のストーリーノード</returns>
-    public StoryNode GetCurrentNode()
-    {
-        return GetNextNode();
-    }
+    public StoryNode GetCurrentNode() => _currentNode;
     
     /// <summary>
     /// 次に発生するストーリーノードを決定
@@ -122,19 +120,47 @@ public class GameProgressService
     /// <returns>次のストーリーノード</returns>
     public StoryNode GetNextNode()
     {
-        Debug.Log($"[GameProgressService] 現在のStep: {_currentStep}");
-        
-        StoryNode nextNode = _currentStep switch
+        StoryNode nextNode;
+        switch (_currentStep)
         {
-            // プロローグ
-            0 => new NovelNode("prologue"),
-            // アルヴ
-            1 => new BattleNode("E001"),
-            _ => new NovelNode("ending"),
-        };
-        
-        Debug.Log($"[GameProgressService] Step {_currentStep} → ノード: {nextNode.NodeId}");
+            // プロローグ1 - 次のバトルへ直接遷移
+            case 0:
+                nextNode = new NovelNode("prologue1", false);
+                break;
+            // アルヴ - バトル後は次のノベルへ直接遷移
+            case 1:
+                nextNode = new BattleNode("E001", false);
+                break;
+            // プロローグ2 - ノベル後はホームに戻る（デフォルトtrue）
+            case 2:
+                nextNode = new NovelNode("prologue2");
+                break;
+            // 敵2は分岐 - バトル後はホームに戻る
+            case 3:
+                nextNode = new BattleNode(UnityEngine.Random.Range(0f,1f) > 0.5f ? "E002" : "E003");
+                break;
+            default:
+                // この先は未定
+                nextNode = new NovelNode("ending");
+                break;
+        }
+
+        _currentNode = nextNode;
         return nextNode;
+    }
+    
+    /// <summary>
+    /// 次のシーンタイプを取得
+    /// </summary>
+    public SceneType GetNextSceneType()
+    {
+        var nextNode = GetNextNode();
+        return nextNode switch
+        {
+            BattleNode => SceneType.Battle,
+            NovelNode => SceneType.Novel,
+            _ => SceneType.Home
+        };
     }
     
     /// <summary>

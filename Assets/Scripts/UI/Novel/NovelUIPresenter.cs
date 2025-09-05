@@ -34,16 +34,130 @@ public class NovelUIPresenter : MonoBehaviour
     private async void Start()
     {
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
-        var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
-        
-        await _novelDialogService.InitializeAsync();
-        
-        if (scenarioIdText != null)
+
+        if (_dialogView == null)
         {
-            scenarioIdText.text = $"シナリオID: {scenarioId}";
+            await OnDialogCompleted();
+            return;
         }
+
+        // 必要なサービスのnullチェック
+        if (_gameProgressService == null)
+        {
+            await OnDialogCompleted();
+            return;
+        }
+
+        var currentNode = _gameProgressService.GetNextNode();
+        if (currentNode == null)
+        {
+            await OnDialogCompleted();
+            return;
+        }
+
+        var scenarioId = currentNode.NodeId;
         
-        StartScenario(scenarioId).Forget();
+        if (scenarioId == "prologue1")
+            StartPrologueTest().Forget();
+        else if (scenarioId == "prologue2")
+        {
+            StartPrologueTest2().Forget();
+        }
+        else if (scenarioId == "ending")
+            StartEndingTest().Forget();
+        else
+        {
+            _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
+        }
+    }
+    
+    /// <summary>
+    /// デモビルド用のプロローグシナリオ開始
+    /// </summary>
+    private async UniTaskVoid StartPrologueTest()
+    {
+        // プロローグシナリオを取得して開始
+        var prologueDialogs = PrologueProvider.GetPrologueScenario();
+        await ExecuteDialogs(prologueDialogs);
+    }
+    
+    /// <summary>
+    /// デモビルド用のプロローグシナリオ開始2
+    /// </summary>
+    private async UniTaskVoid StartPrologueTest2()
+    {
+        var prologueDialogs = new List<DialogData> { new("システム", "これはプロローグシナリオ2です。") };
+        await ExecuteDialogs(prologueDialogs);
+    }
+    
+    /// <summary>
+    /// デモビルド用のエンディングシナリオ開始
+    /// </summary>
+    private async UniTaskVoid StartEndingTest()
+    {
+        var endingDialogs = new List<DialogData>
+        {
+            new("システム", "これはエンディングです。"),
+            new("ナレーター", "お疲れ様でした！")
+        };
+        await ExecuteDialogs(endingDialogs);
+    }
+    
+    /// <summary>
+    /// ダイアログリストを実行する共通処理
+    /// </summary>
+    private async UniTask ExecuteDialogs(List<DialogData> dialogList)
+    {
+        if (_dialogView == null || dialogList == null || dialogList.Count == 0)
+        {
+            await OnDialogCompleted();
+            return;
+        }
+
+        try
+        {
+            await _dialogView.FadeIn();
+            
+            for (int i = 0; i < dialogList.Count; i++)
+            {
+                var dialog = dialogList[i];
+                
+                _dialogView.SetSpeakerName(dialog.SpeakerName);
+                
+                if (!string.IsNullOrEmpty(dialog.CharacterImageName))
+                {
+                    var sprite = await _imageLoader.LoadCharacterImageAsync(dialog.CharacterImageName);
+                    _dialogView.SetCharacterImage(sprite);
+                }
+                else
+                {
+                    _dialogView.SetCharacterImage(null);
+                }
+                
+                if (dialog.HasSE && dialog.PlaySEOnStart)
+                {
+                    SeManager.Instance.PlaySe(dialog.SEClipName);
+                }
+                
+                await _dialogView.DisplayText(dialog.DialogText);
+                
+                if (i < dialogList.Count - 1)
+                {
+                    await _dialogView.WaitForNextInput();
+                }
+            }
+            
+            await OnDialogCompleted();
+        }
+        catch (OperationCanceledException)
+        {
+            // キャンセル時は正常終了として扱う
+            await OnDialogCompleted();
+        }
+        catch (Exception ex)
+        {
+            await OnDialogCompleted();
+        }
     }
     
     /// <summary>
@@ -53,7 +167,7 @@ public class NovelUIPresenter : MonoBehaviour
     {
         if (_dialogView == null)
         {
-            ReturnAsync().Forget();
+            await OnDialogCompleted();
             return;
         }
 
@@ -63,7 +177,7 @@ public class NovelUIPresenter : MonoBehaviour
             
             if (scenarioDialogs == null || scenarioDialogs.Count == 0)
             {
-                ReturnAsync().Forget();
+                await OnDialogCompleted();
                 return;
             }
             
@@ -102,7 +216,7 @@ public class NovelUIPresenter : MonoBehaviour
         }
         catch (Exception ex)
         {
-            ReturnAsync().Forget();
+            await OnDialogCompleted();
         }
     }
     
@@ -110,6 +224,10 @@ public class NovelUIPresenter : MonoBehaviour
     {
         await UniTask.Delay(1000);
         
+        // 現在のノードを結果記録前に取得
+        var currentNode = _gameProgressService.GetCurrentNode();
+        
+        // ダイアログ結果を記録（将来的にはDialogViewから取得）
         var choices = new Dictionary<string, string>
         {
             { "dialog_completed", "true" },
@@ -117,19 +235,18 @@ public class NovelUIPresenter : MonoBehaviour
         };
         
         _gameProgressService.RecordNovelResultAndSave(choices);
-        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
-    }
-    
-    private async UniTask ReturnAsync()
-    {
-        await UniTask.Delay(1000);
         
-        var choices = new Dictionary<string, string>
+        // 記録前に取得したノードの設定を確認
+        if (currentNode.ReturnToHome)
         {
-            { "dialog_completed", "false" }
-        };
-        
-        _gameProgressService.RecordNovelResultAndSave(choices);
-        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+            // ホームに戻る
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+        }
+        else
+        {
+            // 次のノードへ直接遷移
+            var nextScene = _gameProgressService.GetNextSceneType();
+            await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
+        }
     }
 }
