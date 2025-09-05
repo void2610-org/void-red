@@ -67,6 +67,7 @@ public class NovelUIPresenter : MonoBehaviour
             StartEndingTest().Forget();
         else
         {
+            Debug.LogWarning($"[NovelUIPresenter] 未知のシナリオID: {scenarioId}。フォールバックで3秒後にシーンを戻ります。");
             _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
         }
     }
@@ -222,6 +223,9 @@ public class NovelUIPresenter : MonoBehaviour
     
     private async UniTask OnDialogCompleted()
     {
+        Debug.Log("[NovelUIPresenter] 全てのダイアログが完了しました。シーンを戻ります。");
+        
+        // 少し待ってからシーンを戻る
         await UniTask.Delay(1000);
         
         // 現在のノードを結果記録前に取得

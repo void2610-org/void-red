@@ -17,7 +17,9 @@ public class GameProgressService
     /// </summary>
     private readonly Dictionary<string, string> _results = new();
     
-    private StoryNode _currentStoryNode;
+    /// <summary>
+    /// 現在のストーリーノード
+    /// </summary>
     private StoryNode _currentNode;
     private int _currentStep;
     
