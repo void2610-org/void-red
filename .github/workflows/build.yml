@@ -186,18 +186,48 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: build
     runs-on: ubuntu-latest
+
     environment:
-      name: github-pages
+      name: main
+      # ルートURLを返す
+      url: https://void2610.github.io/void-red/
     
     steps:
       - name: Download Pages artifact 📥
         uses: actions/download-artifact@v4
         with:
           name: github-pages    # upload-pages-artifact のデフォルト名
+          path: public
+
+      - name: Extract artifact 📦
+        run: |
+          echo "📁 Checking downloaded files:"
+          ls -la public/
           
-      - name: Deploy to GitHub Pages 🌐
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # artifact.tarが存在する場合のみ解凍
+          if [ -f "public/artifact.tar" ]; then
+            echo "📦 Found artifact.tar, extracting..."
+            cd public
+            tar -xf artifact.tar
+            rm artifact.tar
+            echo "✅ Extraction completed"
+            ls -la
+            cd ..
+          else
+            echo "ℹ️ No artifact.tar found - files may already be extracted"
+          fi
+          
+          echo "📁 Final public directory contents:"
+          ls -la public/
+
+      - name: Deploy Production to gh-pages 📤
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token:    ${{ secrets.GITHUB_TOKEN }}
+          publish_dir:     public/
+          publish_branch:  gh-pages
+          destination_dir: "" # ルートにデプロイ
+          keep_files:      true
 
   discord:
     name: Notify Discord 🤖

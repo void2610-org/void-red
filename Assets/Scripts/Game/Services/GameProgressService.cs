@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 using Game.PersonalityLog;
 using R3;
 
@@ -33,15 +31,18 @@ public class GameProgressService
     private readonly List<TurnEvent> _currentEvents = new();
     private ChapterLog _currentChapter;
     
+    // 閲覧済みカード
+    private readonly HashSet<string> _viewedCardIds = new();
+    
     private readonly SaveDataManager _saveDataManager;
     private readonly CardPoolService _cardPoolService;
-    private readonly SceneTransitionManager _sceneTransitionManager;
     
-    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, SceneTransitionManager sceneTransitionManager)
+    private readonly Subject<Unit> _onDataSaved = new();
+    
+    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService)
     {
         _saveDataManager = saveDataManager;
         _cardPoolService = cardPoolService;
-        _sceneTransitionManager = sceneTransitionManager;
         
         // 起動時に自動でセーブデータをロード
         LoadAllGameData();
@@ -72,11 +73,31 @@ public class GameProgressService
         // 人格ログのロード
         _personalityLog = loadedData.PersonalityLog ?? new PersonalityLogData();
         
+        // 閲覧済みカードをメモリにロード
+        _viewedCardIds.Clear();
+        var viewedIds = loadedData.GetViewedCardIds();
+        foreach (var id in viewedIds)
+        {
+            _viewedCardIds.Add(id);
+        }
+        
         // 新規データかどうかを判定（Step0かつ結果が0件の場合）
         var isNewData = _currentStep == 0 && _results.Count == 0;
         var dataType = isNewData ? "新規データ" : "既存データ";
         
         Debug.Log($"[GameProgressService] {dataType}自動ロード: Step {_currentStep}");
+        
+        // 現在のノードを初期化
+        _currentNode = GetNextNode();
+    }
+    
+    /// <summary>
+    /// 有効なセーブデータが存在するかチェック（ストーリー進行ベース）
+    /// </summary>
+    /// <returns>ストーリーが進行しているセーブデータの存在有無</returns>
+    public bool HasSaveData()
+    {
+        return _saveDataManager.SaveFileExists() && (_currentStep > 0 || _results.Count > 0);
     }
     
     /// <summary>
@@ -87,6 +108,7 @@ public class GameProgressService
         // ストーリー進行データをリセット
         _currentStep = 0;
         _results.Clear();
+        _currentNode = GetNextNode(); // 現在のノードを初期化
         
         // プレイヤー状態をリセット
         _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
@@ -150,12 +172,22 @@ public class GameProgressService
     /// <summary>
     /// StoryNodeから対応するSceneTypeを取得
     /// </summary>
-    /// <param name="id">結果のID</param>
-    /// <returns>結果の値（存在しない場合は空文字）</returns>
-    private string GetResult(string id)
+    /// <param name="node">ストーリーノード</param>
+    /// <returns>対応するシーンタイプ</returns>
+    private SceneType GetSceneTypeForNode(StoryNode node)
     {
-        return _results.TryGetValue(id, out var value) ? value : "";
+        return node switch
+        {
+            BattleNode => SceneType.Battle,
+            NovelNode => SceneType.Novel,
+            EndingNode => SceneType.Home, // エンディング後はホームへ
+            _ => SceneType.Home
+        };
     }
+    
+    public SceneType GetCurrentSceneType() => GetSceneTypeForNode(_currentNode);
+    public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
+    private string GetResult(string id) => _results.GetValueOrDefault(id, "");
     
     /// <summary>
     /// 現在のバトル結果を記録
@@ -165,6 +197,7 @@ public class GameProgressService
         var result = isPlayerWin ? "win" : "lose";
         _results[_currentStep.ToString()] = result;
         _currentStep++;
+        _currentNode = GetNextNode(); // 次のノードに更新
         SaveAndPersist();
     }
     
@@ -176,6 +209,7 @@ public class GameProgressService
         foreach (var choice in choices)
             _results[choice.Key] = choice.Value;
         _currentStep++;
+        _currentNode = GetNextNode(); // 次のノードに更新
         SaveAndPersist();
     }
     
@@ -188,6 +222,9 @@ public class GameProgressService
         
         // 実際にファイルに保存
         _saveDataManager.SaveGameData(saveData);
+        
+        // データセーブイベントを発火
+        _onDataSaved.OnNext(Unit.Default);
     }
     
     /// <summary>
@@ -207,6 +244,12 @@ public class GameProgressService
         // 進化統計データと人格ログデータを設定
         saveData.UpdateEvolutionStats(_evolutionStats);
         saveData.UpdatePersonalityLog(_personalityLog);
+        
+        // 閲覧済みカードをセーブデータに追加
+        foreach (var cardId in _viewedCardIds)
+        {
+            saveData.RecordCardView(cardId);
+        }
         
         return saveData;
     }
@@ -298,6 +341,38 @@ public class GameProgressService
     {
         _enemyStats = new EnemyStats();
     }
+
+    /// <summary>
+    /// カード閲覧をリストで記録
+    /// </summary>
+    /// <param name="cardDataList">閲覧したカードデータのリスト</param>
+    public void RecordCardViews(List<CardData> cardDataList)
+    {
+        foreach (var cardData in cardDataList)
+        {
+            RecordCardView(cardData);
+        }
+    }
+
+    /// <summary>
+    /// カード閲覧を記録
+    /// </summary>
+    /// <param name="cardData">閲覧したカードデータ</param>
+    public void RecordCardView(CardData cardData)
+    {
+        if (!cardData || string.IsNullOrEmpty(cardData.CardId)) return;
+        
+        _viewedCardIds.Add(cardData.CardId);
+    }
+    
+    /// <summary>
+    /// 閲覧済みカードIDリストを取得
+    /// </summary>
+    /// <returns>閲覧済みカードIDのHashSet</returns>
+    public HashSet<string> GetViewedCardIds()
+    {
+        return new HashSet<string>(_viewedCardIds);
+    }
     
     /// <summary>
     /// ゲーム結果を記録（プレイヤー分）
@@ -334,6 +409,11 @@ public class GameProgressService
     /// 敵統計データを取得
     /// </summary>
     public EnemyStats EnemyStats => _enemyStats;
+    
+    /// <summary>
+    /// データセーブ時のイベント
+    /// </summary>
+    public Observable<Unit> OnDataSaved => _onDataSaved;
     
     // === 人格ログ管理メソッド ===
     

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1167758629638592614}
   - component: {fileID: 8686837477837500151}
   - component: {fileID: 9024825807648402152}
+  - component: {fileID: 1160536877475633329}
   m_Layer: 5
   m_Name: TitleButton
   m_TagString: Untagged
@@ -133,6 +134,27 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1160536877475633329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277754951790194367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 46588a43ac385441e83030760a98df9a, type: 3}
+  clickVolume: 1
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
+  isImportantButton: 0
 --- !u!1 &4537349981176782011
 GameObject:
   m_ObjectHideFlags: 0

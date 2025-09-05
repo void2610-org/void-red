@@ -34,6 +34,7 @@ public class NovelUIPresenter : MonoBehaviour
     private async void Start()
     {
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
+        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
 
         if (_dialogView == null)
         {
@@ -89,6 +90,15 @@ public class NovelUIPresenter : MonoBehaviour
     {
         var prologueDialogs = new List<DialogData> { new("システム", "これはプロローグシナリオ2です。") };
         await ExecuteDialogs(prologueDialogs);
+    }
+    
+    /// <summary>
+    /// デモビルド用のプロローグシナリオ開始2
+    /// </summary>
+    private async UniTaskVoid StartPrologueTest2()
+    {
+        var prologueDialogs = new List<DialogData> { new("システム", "これはプロローグシナリオ2です。") };
+        await _dialogView.StartDialog(prologueDialogs);
     }
     
     /// <summary>

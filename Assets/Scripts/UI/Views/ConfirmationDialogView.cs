@@ -64,6 +64,7 @@ public class ConfirmationDialogView : MonoBehaviour
             // ユーザーの選択を待つ
             var result = await _dialogResult.Task;
             
+            await UniTask.Yield(cancellationToken);
             // ダイアログを非表示
             HideDialog();
             
