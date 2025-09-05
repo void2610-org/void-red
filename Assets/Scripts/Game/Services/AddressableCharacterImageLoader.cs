@@ -34,8 +34,6 @@ namespace VoidRed.Game.Services
 
             try
             {
-                Debug.Log($"[AddressableCharacterImageLoader] 画像を読み込み中: {characterImageName}");
-                
                 // Addressables で非同期読み込み（キー名は画像名そのまま）
                 var handle = Addressables.LoadAssetAsync<Sprite>(characterImageName);
                 var sprite = await handle.ToUniTask();
@@ -43,18 +41,12 @@ namespace VoidRed.Game.Services
                 if (sprite != null)
                 {
                     _spriteCache[characterImageName] = sprite;
-                    Debug.Log($"[AddressableCharacterImageLoader] 画像読み込み成功: {characterImageName}");
-                }
-                else
-                {
-                    Debug.LogWarning($"[AddressableCharacterImageLoader] 画像が見つかりません: {characterImageName}");
                 }
                 
                 return sprite;
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[AddressableCharacterImageLoader] 画像読み込みエラー ({characterImageName}): {e.Message}");
                 return null;
             }
         }

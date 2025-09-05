@@ -810,12 +810,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
     - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: speakerText
+      value: 
+      objectReference: {fileID: 1590943567}
+    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: backgroundPanel
       value: 
       objectReference: {fileID: 188086367}
+    - target: {fileID: 4422162762152353045, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: m_Alpha
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Name
       value: DialogView
+      objectReference: {fileID: 0}
+    - target: {fileID: 5656026911901862804, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8503395000404048060, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Pivot.x

@@ -1,67 +1,35 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using LitMotion;
 using Cysharp.Threading.Tasks;
-using Void2610.UnityTemplate;
 using System.Threading;
-using VContainer;
-using VoidRed.Game.Services;
 
 /// <summary>
-/// DialogDataのリストを受け取って順番に表示するViewクラス
-/// 話者名、セリフ、SE再生機能を提供
+/// 小説システム用のViewクラス - 純粋なUI表示のみを担当
+/// MVPパターンに準拠し、表示とユーザー入力のハンドリングのみ行う
 /// </summary>
 public class DialogView : MonoBehaviour
 {
     [Header("UI要素")]
     [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private TextMeshProUGUI speakerNameText;
+    [SerializeField] private TextMeshProUGUI speakerText;
     [SerializeField] private TextMeshProUGUI dialogText;
-    [SerializeField] private Image backgroundPanel;
-    [SerializeField] private GameObject nextIndicator; // 次へ進むインジケーター（▼など）
     [SerializeField] private Image characterImage;
-    
-    [Header("文字送り設定")]
-    [SerializeField] private float defaultCharSpeed = 0.05f; // デフォルトの1文字表示間隔（秒）
-    [SerializeField] private float autoNextDelay = 3f; // 自動で次へ進むまでの待機時間（秒）
+    [SerializeField] private GameObject nextIndicator;
     
     [Header("フェード設定")]
     [SerializeField] private float fadeInDuration = 0.5f;
     [SerializeField] private float fadeOutDuration = 0.5f;
     
-    [Header("話者名表示設定")]
-    [SerializeField] private GameObject speakerNamePanel; // 話者名パネル（話者がいない場合は非表示）
-    
-    [SerializeField] private List<Sprite> characterSprites; // キャラクター画像のリスト (簡易版)
-    
-    // 依存性注入
-    private AddressableCharacterImageLoader _imageLoader;
-    
-    private List<DialogData> _dialogList;
-    private int _currentIndex;
-    private bool _isTyping;
-    private bool _isWaitingForNext;
-    private bool _isCompleted;
-    
     private MotionHandle _typewriterMotion;
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
     
-    // ダイアログ完了時のイベント
-    public event Action OnDialogCompleted;
-    
-    /// <summary>
-    /// 依存性注入（VContainer）
-    /// </summary>
-    [Inject]
-    public void Construct(AddressableCharacterImageLoader imageLoader)
-    {
-        _imageLoader = imageLoader;
-    }
-    
+    private bool _isTyping;
+    private bool _isWaitingForNext;
+    private CancellationTokenSource _inputCancellationTokenSource;
+
     private void Awake()
     {
         // 初期状態を設定
@@ -69,183 +37,23 @@ public class DialogView : MonoBehaviour
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
         dialogText.text = "";
+        speakerText.text = "";
         
-        nextIndicator.SetActive(false);
-        speakerNamePanel.SetActive(false);
-        characterImage.color = new Color(1f, 1f, 1f, 0f);
-        characterImage.sprite = null;
-        
-        _isCompleted = false;
-    }
-    
-    /// <summary>
-    /// ダイアログの表示を開始する
-    /// </summary>
-    /// <param name="dialogList">表示するDialogDataのリスト</param>
-    public async UniTask StartDialog(List<DialogData> dialogList)
-    {
-        _dialogList = new List<DialogData>(dialogList);
-        _currentIndex = 0;
-        _isCompleted = false;
-        
-        // フェードイン
-        await FadeIn();
-        
-        // 最初のダイアログを表示
-        await ShowNextDialog();
-    }
-    
-    /// <summary>
-    /// 次のダイアログを表示する
-    /// </summary>
-    private async UniTask ShowNextDialog()
-    {
-        if (_currentIndex >= _dialogList.Count)
+        if (characterImage != null)
         {
-            // すべてのダイアログを表示完了
-            await CompleteDialog();
-            return;
+            characterImage.sprite = null;
+            characterImage.gameObject.SetActive(false);
         }
         
-        var currentDialog = _dialogList[_currentIndex];
-        _currentIndex++;
-        
-        // SE再生
-        if (currentDialog.HasSE && currentDialog.PlaySEOnStart)
+        if (nextIndicator != null)
         {
-            SeManager.Instance.PlaySe(currentDialog.SEClipName);
+            nextIndicator.SetActive(false);
         }
         
-        // 話者名を設定
-        SetSpeakerName(currentDialog.SpeakerName);
-        
-        // キャラクター画像を設定（非同期）
-        SetCharacterImageAsync(currentDialog.CharacterImageName).Forget();
-        
-        // ダイアログテキストをクリア
-        dialogText.text = "";
-        
-        // インジケーターを非表示
-        nextIndicator.SetActive(false);
-        if (_indicatorMotion.IsActive())
-            _indicatorMotion.Cancel();
-        
-        // 文字送りアニメーションを開始
-        _isTyping = true;
-        _isWaitingForNext = false;
-        
-        // 文字速度を決定（カスタム速度またはデフォルト速度）
-        float charSpeed = currentDialog.UseDefaultCharSpeed ? defaultCharSpeed : currentDialog.CustomCharSpeed;
-        
-        await dialogText.TypewriterAnimation(currentDialog.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
-        await UniTask.Yield(); // スキップと進行の競合を防ぐために1フレーム待つ
-        
-        // アニメーション完了後の状態をリセット
         _isTyping = false;
-        _isWaitingForNext = true;
-        
-        // インジケーターを表示してアニメーション
-        ShowNextIndicator();
-        
-        // 自動進行またはユーザー入力待ち
-        if (currentDialog.AutoAdvance)
-        {
-            await WaitForNextWithTimeout();
-        }
-        else
-        {
-            await WaitForNext();
-        }
-        
-        // 次のダイアログへ
-        await ShowNextDialog();
+        _isWaitingForNext = false;
     }
-    
-    /// <summary>
-    /// 話者名を設定する
-    /// </summary>
-    private void SetSpeakerName(string speakerName)
-    {
-        bool hasSpeaker = !string.IsNullOrEmpty(speakerName);
-        
-        if (speakerNamePanel)
-        {
-            speakerNamePanel.SetActive(hasSpeaker);
-        }
-        
-        if (speakerNameText)
-        {
-            speakerNameText.text = hasSpeaker ? speakerName : "";
-        }
-    }
-    
-    /// <summary>
-    /// キャラクター画像を設定する
-    /// </summary>
-    private async UniTaskVoid SetCharacterImageAsync(string characterImageName)
-    {
-        Sprite targetSprite = null;
-        
-        // 1. 空の場合は画像を非表示
-        if (string.IsNullOrEmpty(characterImageName))
-        {
-            if (characterImage.sprite)
-            {
-                characterImage.FadeOut(0.5f);
-            }
-            return;
-        }
-        
-        // 2. characterSpritesリストから検索
-        targetSprite = characterSprites.Find(s => s && s.name == characterImageName);
-        
-        // 3. Addressablesから動的読み込み（リストにない場合）
-        if (!targetSprite)
-        {
-            targetSprite = await _imageLoader.LoadCharacterImageAsync(characterImageName);
-        }
-        
-        // 4. 画像の表示・非表示とフェード処理
-        if (targetSprite)
-        {
-            if (!characterImage.sprite)
-            {
-                characterImage.FadeIn(0.5f);
-            }
-            characterImage.sprite = targetSprite;
-        }
-        else if (characterImage.sprite)
-        {
-            characterImage.FadeOut(0.5f);
-        }
-    }
-    
-    
-    /// <summary>
-    /// 次へ進むのを待つ
-    /// </summary>
-    private async UniTask WaitForNext()
-    {
-        while (_isWaitingForNext)
-        {
-            await UniTask.Yield();
-        }
-    }
-    
-    /// <summary>
-    /// タイムアウト付きで次へ進むのを待つ
-    /// </summary>
-    private async UniTask WaitForNextWithTimeout()
-    {
-        if (_isWaitingForNext)
-        {
-            await UniTask.Delay(TimeSpan.FromSeconds(autoNextDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
-        }
-    }
-    
-    /// <summary>
-    /// マウスクリック検知による進行処理
-    /// </summary>
+
     private void Update()
     {
         // マウスクリックまたはタッチ入力を検知
@@ -254,7 +62,7 @@ public class DialogView : MonoBehaviour
             OnClick();
         }
     }
-    
+
     /// <summary>
     /// クリック時の処理
     /// </summary>
@@ -264,24 +72,145 @@ public class DialogView : MonoBehaviour
         if (canvasGroup.alpha == 0f || !canvasGroup.interactable)
             return;
             
-        if (!_isTyping && _isWaitingForNext)
+        if (_isTyping)
+        {
+            // タイピング中の場合はスキップ
+            if (_typewriterMotion.IsActive())
+                _typewriterMotion.Cancel();
+            _isTyping = false;
+        }
+        else if (_isWaitingForNext)
         {
             // 次へ進む
             _isWaitingForNext = false;
+            _inputCancellationTokenSource?.Cancel();
         }
     }
-    
+
     /// <summary>
-    /// 次へ進むインジケーターを表示
+    /// フェードイン
+    /// </summary>
+    public async UniTask FadeIn()
+    {
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
+        
+        if (_fadeMotion.IsActive())
+            _fadeMotion.Cancel();
+        
+        _fadeMotion = LMotion.Create(0f, 1f, fadeInDuration)
+            .WithEase(Ease.OutCubic)
+            .Bind(alpha => canvasGroup.alpha = alpha)
+            .AddTo(this);
+        
+        await _fadeMotion.ToUniTask();
+    }
+
+    /// <summary>
+    /// フェードアウト
+    /// </summary>
+    public async UniTask FadeOut()
+    {
+        if (_fadeMotion.IsActive())
+            _fadeMotion.Cancel();
+        
+        _fadeMotion = LMotion.Create(canvasGroup.alpha, 0f, fadeOutDuration)
+            .WithEase(Ease.OutCubic)
+            .Bind(alpha => canvasGroup.alpha = alpha)
+            .AddTo(this);
+        
+        await _fadeMotion.ToUniTask();
+        
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+    }
+
+    /// <summary>
+    /// キャラクター画像の表示
+    /// </summary>
+    public void SetCharacterImage(Sprite sprite)
+    {
+        if (sprite != null)
+        {
+            characterImage.sprite = sprite;
+            characterImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            characterImage.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// 話者名の設定 (View is responsible for display only)
+    /// </summary>
+    public void SetSpeakerName(string speakerName)
+    {
+        speakerText.text = speakerName ?? string.Empty;
+    }
+
+    /// <summary>
+    /// ダイアログテキストの表示 (View is responsible for display only)
+    /// </summary>
+    public async UniTask DisplayText(string text)
+    {
+        dialogText.text = "";
+        _isTyping = true;
+        
+        if (nextIndicator != null)
+            nextIndicator.SetActive(false);
+        
+        if (_typewriterMotion.IsActive())
+            _typewriterMotion.Cancel();
+
+        const float duration = 0.05f;
+        
+        _typewriterMotion = LMotion.Create(0, text.Length, duration * text.Length)
+            .WithEase(Ease.Linear)
+            .Bind(length => 
+            {
+                int charCount = Mathf.RoundToInt(length);
+                dialogText.text = text.Substring(0, Mathf.Min(charCount, text.Length));
+            })
+            .AddTo(this);
+        
+        await _typewriterMotion.ToUniTask();
+        
+        _isTyping = false;
+        ShowNextIndicator();
+    }
+
+    /// <summary>
+    /// 次の入力を待機 (View is responsible for input handling only)
+    /// </summary>
+    public async UniTask WaitForNextInput()
+    {
+        _isWaitingForNext = true;
+        _inputCancellationTokenSource?.Cancel();
+        _inputCancellationTokenSource = new CancellationTokenSource();
+        
+        try
+        {
+            await UniTask.WaitWhile(() => _isWaitingForNext, cancellationToken: _inputCancellationTokenSource.Token);
+        }
+        catch (System.OperationCanceledException)
+        {
+            // キャンセルされた場合は正常終了
+        }
+        
+        if (nextIndicator != null)
+            nextIndicator.SetActive(false);
+    }
+
+    /// <summary>
+    /// 次へ進むインジケーターを表示してアニメーション
     /// </summary>
     private void ShowNextIndicator()
     {
+        if (nextIndicator == null) return;
+        
         nextIndicator.SetActive(true);
         
-        // 最後の文字の横にインジケーターを配置
-        PositionIndicatorAtLastCharacter();
-        
-        // 上下にゆらゆら動くアニメーション
         if (_indicatorMotion.IsActive())
             _indicatorMotion.Cancel();
         
@@ -301,113 +230,17 @@ public class DialogView : MonoBehaviour
                 .AddTo(this);
         }
     }
-    
-    /// <summary>
-    /// インジケーターを最後の文字の横に配置する
-    /// </summary>
-    private void PositionIndicatorAtLastCharacter()
-    {
-        var indicatorRectTransform = nextIndicator.GetComponent<RectTransform>();
-        // TextMeshProUGUIのtextInfoを使用して最後の文字の位置を取得
-        dialogText.ForceMeshUpdate();
-        
-        var textInfo = dialogText.textInfo;
-        if (textInfo.characterCount == 0) return;
-        
-        // 最後の可視文字のインデックスを取得
-        var lastVisibleCharIndex = textInfo.characterCount - 1;
-        
-        // 改行や空白文字を除いた実際の最後の文字を探す
-        while (lastVisibleCharIndex >= 0)
-        {
-            var charInfo = textInfo.characterInfo[lastVisibleCharIndex];
-            if (charInfo.isVisible && !char.IsWhiteSpace(charInfo.character))
-            {
-                break;
-            }
-            lastVisibleCharIndex--;
-        }
-        
-        if (lastVisibleCharIndex >= 0)
-        {
-            var lastCharInfo = textInfo.characterInfo[lastVisibleCharIndex];
-            
-            // 最後の文字の右端の位置を計算
-            var lastCharPosition = new Vector3(lastCharInfo.topRight.x, lastCharInfo.bottomRight.y, 0);
-            
-            // テキストのRectTransformからワールド座標に変換
-            var textRectTransform = dialogText.GetComponent<RectTransform>();
-            var worldPos = textRectTransform.TransformPoint(lastCharPosition);
-            
-            // インジケーターの親のRectTransformでローカル座標に変換
-            var localPos = indicatorRectTransform.parent.GetComponent<RectTransform>().InverseTransformPoint(worldPos);
-            
-            // インジケーターの位置を設定（少し右にオフセット）
-            indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
-        }
-    }
-    
-    /// <summary>
-    /// ダイアログ完了処理
-    /// </summary>
-    private async UniTask CompleteDialog()
-    {
-        _isCompleted = true;
-        await FadeOut();
-        OnDialogCompleted?.Invoke();
-    }
-    
-    /// <summary>
-    /// フェードイン
-    /// </summary>
-    private async UniTask FadeIn()
-    {
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
-        
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
-        
-        _fadeMotion = LMotion.Create(0f, 1f, fadeInDuration)
-            .WithEase(Ease.OutCubic)
-            .Bind(alpha => canvasGroup.alpha = alpha)
-            .AddTo(this);
-        
-        await _fadeMotion.ToUniTask();
-    }
-    
-    /// <summary>
-    /// フェードアウト
-    /// </summary>
-    private async UniTask FadeOut()
-    {
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-        
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
-        
-        _fadeMotion = LMotion.Create(1f, 0f, fadeOutDuration)
-            .WithEase(Ease.InCubic)
-            .Bind(alpha => canvasGroup.alpha = alpha)
-            .AddTo(this);
-        
-        await _fadeMotion.ToUniTask();
-    }
-    
-    /// <summary>
-    /// ダイアログが完了しているかどうか
-    /// </summary>
-    public bool IsCompleted => _isCompleted;
-    
+
     private void OnDestroy()
     {
-        // モーションを停止
         if (_typewriterMotion.IsActive())
             _typewriterMotion.Cancel();
         if (_fadeMotion.IsActive())
             _fadeMotion.Cancel();
         if (_indicatorMotion.IsActive())
             _indicatorMotion.Cancel();
+        
+        _inputCancellationTokenSource?.Cancel();
+        _inputCancellationTokenSource?.Dispose();
     }
 }
