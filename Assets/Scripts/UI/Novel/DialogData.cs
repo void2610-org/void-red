@@ -87,4 +87,20 @@ public class DialogData
         this.customCharSpeed = -1f;
         this.autoAdvance = false;
     }
+    
+    /// <summary>
+    /// カスタム文字速度を設定
+    /// </summary>
+    public void SetCustomCharSpeed(float speed)
+    {
+        this.customCharSpeed = speed;
+    }
+    
+    /// <summary>
+    /// 自動進行を設定
+    /// </summary>
+    public void SetAutoAdvance(bool autoAdvance)
+    {
+        this.autoAdvance = autoAdvance;
+    }
 }

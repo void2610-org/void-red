@@ -33,8 +33,6 @@ public class DialogView : MonoBehaviour
     [Header("話者名表示設定")]
     [SerializeField] private GameObject speakerNamePanel; // 話者名パネル（話者がいない場合は非表示）
     
-    [SerializeField] private List<Sprite> characterSprites; // キャラクター画像のリスト (簡易版)
-    
     private List<DialogData> _dialogList;
     private int _currentIndex;
     private bool _isTyping;
@@ -44,6 +42,10 @@ public class DialogView : MonoBehaviour
     private MotionHandle _typewriterMotion;
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
+    
+    // キャラクター画像のコールバック（Presenterから設定）
+    private System.Func<string, UniTask<Sprite>> _loadCharacterImageCallback;
+    private string _currentImageName;
     
     // ダイアログ完了時のイベント
     public event Action OnDialogCompleted;
@@ -62,6 +64,14 @@ public class DialogView : MonoBehaviour
         characterImage.sprite = null;
         
         _isCompleted = false;
+    }
+    
+    /// <summary>
+    /// キャラクター画像読み込みコールバックを設定
+    /// </summary>
+    public void SetCharacterImageLoader(System.Func<string, UniTask<Sprite>> loadCallback)
+    {
+        _loadCharacterImageCallback = loadCallback;
     }
     
     /// <summary>
@@ -106,10 +116,7 @@ public class DialogView : MonoBehaviour
         SetSpeakerName(currentDialog.SpeakerName);
         
         // キャラクター画像を設定
-        var sprite = characterSprites.Find(s => s.name == currentDialog.CharacterImageName);
-        if (sprite && !characterImage.sprite) characterImage.FadeIn(0.5f);
-        else if (!sprite && characterImage.sprite) characterImage.FadeOut(0.5f);
-        if (sprite) characterImage.sprite = sprite;
+        await SetCharacterImage(currentDialog.CharacterImageName);
         
         // ダイアログテキストをクリア
         dialogText.text = "";
@@ -165,6 +172,39 @@ public class DialogView : MonoBehaviour
         if (speakerNameText)
         {
             speakerNameText.text = hasSpeaker ? speakerName : "";
+        }
+    }
+    
+    /// <summary>
+    /// キャラクター画像を設定（Presenterから提供されたコールバックを使用）
+    /// </summary>
+    private async UniTask SetCharacterImage(string imageName)
+    {
+        // 同じ画像の場合は処理をスキップ
+        if (_currentImageName == imageName)
+            return;
+        
+        // 前の画像をフェードアウト
+        if (!string.IsNullOrEmpty(_currentImageName))
+        {
+            await characterImage.FadeOut(0.3f);
+        }
+        
+        _currentImageName = imageName;
+        
+        // 新しい画像を設定
+        if (!string.IsNullOrEmpty(imageName) && _loadCharacterImageCallback != null)
+        {
+            var sprite = await _loadCharacterImageCallback(imageName);
+            if (sprite)
+            {
+                characterImage.sprite = sprite;
+                await characterImage.FadeIn(0.3f);
+            }
+        }
+        else
+        {
+            characterImage.sprite = null;
         }
     }
     
