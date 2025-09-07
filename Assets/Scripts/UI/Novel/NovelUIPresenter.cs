@@ -16,69 +16,122 @@ public class NovelUIPresenter : MonoBehaviour
     
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
+    private NovelDialogService _novelDialogService;
+    private AddressableCharacterImageLoader _characterImageLoader;
     private DialogView _dialogView;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager)
+    public void Construct(
+        GameProgressService gameProgressService, 
+        SceneTransitionManager sceneTransitionManager, 
+        NovelDialogService novelDialogService,
+        AddressableCharacterImageLoader characterImageLoader)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
+        _novelDialogService = novelDialogService;
+        _characterImageLoader = characterImageLoader;
     }
     
     private void Start()
     {
         // DialogViewを取得
         _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
+        if (!_dialogView)
+        {
+            return;
+        }
+        
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
         
-        if (scenarioId == "prologue1")
-            StartPrologueTest().Forget();
-        else if (scenarioId == "prologue2")
+        // シナリオIDに応じて処理を分岐
+        StartScenario(scenarioId).Forget();
+    }
+    
+    /// <summary>
+    /// シナリオIDに応じてシナリオを開始
+    /// </summary>
+    private async UniTaskVoid StartScenario(string scenarioId)
+    {
+        try
         {
-            StartPrologueTest2().Forget();
+            List<DialogData> dialogList = null;
+            
+            // ハードコードシナリオの処理
+            switch (scenarioId)
+            {
+                case "prologue1":
+                    dialogList = PrologueProvider.GetPrologueScenario();
+                    break;
+                case "prologue2":
+                    dialogList = PrologueProvider.GetPrologue2Scenario();
+                    break;
+                case "ending":
+                    dialogList = new List<DialogData>
+                    {
+                        new DialogData("", "アルファ版はここまでです。"),
+                        new DialogData("", "プレイしていただきありがとうございます。"),
+                        new DialogData("", "製品版リリースをお待ちください。")
+                    };
+                    break;
+                default:
+                    // スプレッドシートからシナリオを読み込み
+                    dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
+                    break;
+            }
+            
+            // ダイアログリストが有効かチェック
+            if (dialogList == null || dialogList.Count == 0)
+            {
+                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+                return;
+            }
+            
+            // キャラクター画像を事前に読み込み
+            await PreloadCharacterImages(dialogList);
+            
+            // DialogViewにキャラクター画像読み込みコールバックを設定
+            _dialogView.SetCharacterImageLoader(imageName => _characterImageLoader.LoadCharacterImageAsync(imageName));
+            
+            // ダイアログを開始
+            await _dialogView.StartDialog(dialogList);
         }
-        else if (scenarioId == "ending")
-            StartEndingTest().Forget();
-        else
+        catch (System.Exception ex)
         {
-            Debug.LogWarning($"[NovelUIPresenter] 未知のシナリオID: {scenarioId}。フォールバックで3秒後にシーンを戻ります。");
-            _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
         }
     }
     
     /// <summary>
-    /// デモビルド用のプロローグシナリオ開始
+    /// ダイアログリストに含まれるキャラクター画像を事前に読み込み
     /// </summary>
-    private async UniTaskVoid StartPrologueTest()
+    private async UniTask PreloadCharacterImages(List<DialogData> dialogList)
     {
-        // プロローグシナリオを取得して開始
-        var prologueDialogs = PrologueProvider.GetPrologueScenario();
-        await _dialogView.StartDialog(prologueDialogs);
-    }
-    
-    /// <summary>
-    /// デモビルド用のプロローグシナリオ開始2
-    /// </summary>
-    private async UniTaskVoid StartPrologueTest2()
-    {
-        var prologueDialogs = new List<DialogData> { new("システム", "これはプロローグシナリオ2です。") };
-        await _dialogView.StartDialog(prologueDialogs);
-    }
-    
-    /// <summary>
-    /// デモビルド用のエンディングシナリオ開始
-    /// </summary>
-    private async UniTaskVoid StartEndingTest()
-    {
-        var endingDialogs = new List<DialogData>
+        var imageNames = new HashSet<string>();
+        
+        // ダイアログリストから使用される画像名を抽出
+        for (int i = 0; i < dialogList.Count; i++)
         {
-            new DialogData("", "アルファ版はここまでです。"),
-            new DialogData("", "プレイしていただきありがとうございます。"),
-            new DialogData("", "製品版リリースをお待ちください。")
-        };
-        await _dialogView.StartDialog(endingDialogs);
+            var dialog = dialogList[i];
+            if (!string.IsNullOrEmpty(dialog.CharacterImageName))
+            {
+                imageNames.Add(dialog.CharacterImageName);
+            }
+        }
+        
+        // 画像を並列で読み込み
+        var loadTasks = new List<UniTask>();
+        foreach (var imageName in imageNames)
+        {
+            loadTasks.Add(_characterImageLoader.LoadCharacterImageAsync(imageName).AsUniTask());
+        }
+        
+        if (loadTasks.Count > 0)
+        {
+            await UniTask.WhenAll(loadTasks);
+        }
     }
     
     /// <summary>
@@ -86,19 +139,17 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid OnDialogCompleted()
     {
-        Debug.Log("[NovelUIPresenter] 全てのダイアログが完了しました。シーンを戻ります。");
-        
         // 少し待ってからシーンを戻る
         await UniTask.Delay(1000);
         
         // 現在のノードを結果記録前に取得
         var currentNode = _gameProgressService.GetCurrentNode();
         
-        // ダイアログ結果を記録（将来的にはDialogViewから取得）
+        // ダイアログ結果を記録
         var choices = new Dictionary<string, string>
         {
             { "dialog_completed", "true" },
-            { "scenario_id", "test_scenario_001" }
+            { "scenario_id", currentNode.NodeId }
         };
         
         _gameProgressService.RecordNovelResultAndSave(choices);
@@ -115,5 +166,11 @@ public class NovelUIPresenter : MonoBehaviour
             var nextScene = _gameProgressService.GetNextSceneType();
             await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
         }
+    }
+    
+    private void OnDestroy()
+    {
+        // キャラクター画像のメモリを解放
+        _characterImageLoader?.UnloadAllCharacterImages();
     }
 }

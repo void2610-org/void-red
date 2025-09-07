@@ -123,4 +123,15 @@ public static class PrologueProvider
             
         };
     }
+    
+    /// <summary>
+    /// プロローグ2シナリオを取得
+    /// </summary>
+    public static List<DialogData> GetPrologue2Scenario()
+    {
+        return new List<DialogData>
+        {
+            new DialogData("システム", "これはプロローグシナリオ2です。")
+        };
+    }
 }

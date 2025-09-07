@@ -33,6 +33,10 @@ public class RootLifetimeScope : LifetimeScope
         // ゲーム進行管理（全機能統合）
         builder.Register<GameProgressService>(Lifetime.Singleton);
         
+        // ノベルシステム関連サービス
+        builder.Register<NovelDialogService>(Lifetime.Singleton);
+        builder.Register<AddressableCharacterImageLoader>(Lifetime.Singleton);
+        
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
         
