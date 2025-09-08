@@ -22,16 +22,11 @@ public class AddressableCharacterImageLoader
     /// <returns>読み込まれたSprite（失敗時はnull）</returns>
     public async UniTask<Sprite> LoadCharacterImageAsync(string imageName)
     {
-        if (string.IsNullOrEmpty(imageName))
-        {
-            return null;
-        }
+        if (string.IsNullOrEmpty(imageName)) return null;
         
         // キャッシュに存在する場合は返却
         if (_loadedSprites.TryGetValue(imageName, out var cachedSprite))
-        {
             return cachedSprite;
-        }
         
         // Addressablesから読み込み
         var handle = Addressables.LoadAssetAsync<Sprite>(imageName);
@@ -47,10 +42,7 @@ public class AddressableCharacterImageLoader
         }
         
         // 読み込み失敗時
-        if (handle.IsValid())
-        {
-            Addressables.Release(handle);
-        }
+        if (handle.IsValid()) Addressables.Release(handle);
         _handles.Remove(imageName);
         
         Debug.LogWarning($"[AddressableCharacterImageLoader] キャラクター画像 '{imageName}' の読み込みに失敗しました");
@@ -63,8 +55,7 @@ public class AddressableCharacterImageLoader
     /// <param name="imageName">解放する画像名</param>
     public void UnloadCharacterImage(string imageName)
     {
-        if (string.IsNullOrEmpty(imageName))
-            return;
+        if (string.IsNullOrEmpty(imageName)) return;
         
         // キャッシュから削除
         _loadedSprites.Remove(imageName);
@@ -72,10 +63,7 @@ public class AddressableCharacterImageLoader
         // Addressableハンドルを解放
         if (_handles.TryGetValue(imageName, out var handle))
         {
-            if (handle.IsValid())
-            {
-                Addressables.Release(handle);
-            }
+            if (handle.IsValid()) Addressables.Release(handle);
             _handles.Remove(imageName);
         }
     }
@@ -89,9 +77,7 @@ public class AddressableCharacterImageLoader
         foreach (var kvp in _handles)
         {
             if (kvp.Value.IsValid())
-            {
                 Addressables.Release(kvp.Value);
-            }
         }
         
         _handles.Clear();

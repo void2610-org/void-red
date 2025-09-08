@@ -33,7 +33,6 @@ public class DialogView : MonoBehaviour
     
     private bool _isTyping;
     private bool _isWaitingForNext;
-    private bool _isCompleted;
     
     private MotionHandle _typewriterMotion;
     private MotionHandle _fadeMotion;
@@ -57,8 +56,6 @@ public class DialogView : MonoBehaviour
         speakerNamePanel.SetActive(false);
         characterImage.color = Color.clear;
         characterImage.sprite = null;
-        
-        _isCompleted = false;
     }
     
     /// <summary>
@@ -129,7 +126,7 @@ public class DialogView : MonoBehaviour
         _isWaitingForNext = false;
         
         // 文字速度を決定
-        float charSpeed = dialogData.UseDefaultCharSpeed ? defaultCharSpeed : dialogData.CustomCharSpeed;
+        var charSpeed = dialogData.UseDefaultCharSpeed ? defaultCharSpeed : dialogData.CustomCharSpeed;
         
         await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
         await UniTask.Yield();
@@ -157,7 +154,6 @@ public class DialogView : MonoBehaviour
     /// </summary>
     public async UniTask ShowDialogComplete()
     {
-        _isCompleted = true;
         await FadeOut();
         OnDialogCompleted?.Invoke();
     }
@@ -167,7 +163,7 @@ public class DialogView : MonoBehaviour
     /// </summary>
     private void SetSpeakerName(string speakerName)
     {
-        bool hasSpeaker = !string.IsNullOrEmpty(speakerName);
+        var hasSpeaker = !string.IsNullOrEmpty(speakerName);
         
         if (speakerNamePanel)
         {
@@ -185,16 +181,8 @@ public class DialogView : MonoBehaviour
     /// </summary>
     private void SetCharacterImage(Sprite sprite)
     {
-        if (sprite != null)
-        {
             characterImage.sprite = sprite;
-            characterImage.color = Color.white;
-        }
-        else
-        {
-            characterImage.sprite = null;
-            characterImage.color = Color.clear;
-        }
+            characterImage.color = sprite ? Color.white : Color.clear;
     }
     
     /// <summary>
@@ -308,8 +296,6 @@ public class DialogView : MonoBehaviour
             indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
         }
     }
-    
-    public bool IsCompleted => _isCompleted;
     
     private void OnDestroy()
     {
