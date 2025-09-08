@@ -55,7 +55,7 @@ public class DialogView : MonoBehaviour
         
         nextIndicator.SetActive(false);
         speakerNamePanel.SetActive(false);
-        characterImage.color = new Color(1f, 1f, 1f, 0f);
+        characterImage.color = Color.clear;
         characterImage.sprite = null;
         
         _isCompleted = false;
@@ -193,7 +193,7 @@ public class DialogView : MonoBehaviour
         else
         {
             characterImage.sprite = null;
-            characterImage.color = new Color(1f, 1f, 1f, 0f);
+            characterImage.color = Color.clear;
         }
     }
     
