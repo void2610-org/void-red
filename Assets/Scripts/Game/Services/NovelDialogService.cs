@@ -45,7 +45,7 @@ public class NovelDialogService
         var dialogList = new List<DialogData>();
         
         // ヘッダー行をスキップ（1行目）
-        for (int i = 1; i < sheetData.Count; i++)
+        for (var i = 1; i < sheetData.Count; i++)
         {
             var row = sheetData[i];
             
@@ -54,10 +54,7 @@ public class NovelDialogService
                 continue;
             
             var dialogData = CreateDialogDataFromRow(row);
-            if (dialogData != null)
-            {
-                dialogList.Add(dialogData);
-            }
+            if (dialogData != null) dialogList.Add(dialogData);
         }
         
         return dialogList;
@@ -68,25 +65,21 @@ public class NovelDialogService
     /// </summary>
     private DialogData CreateDialogDataFromRow(IList<object> row)
     {
-        if (row.Count < 2)
-        {
-            return null;
-        }
+        if (row.Count < 2) return null;
         
         // 基本情報（必須）
         var speakerName = GetStringValue(row, 0);
         var dialogText = GetStringValue(row, 1);
         
         // セリフが空の場合はスキップ
-        if (string.IsNullOrEmpty(dialogText))
-            return null;
+        if (string.IsNullOrEmpty(dialogText)) return null;
         
         // オプション情報
         var characterImageName = GetStringValue(row, 2);
         var seClipName = GetStringValue(row, 3);
         var customCharSpeed = GetFloatValue(row, 4, -1f);
         
-        // DialogDataを作成（カスタム文字速度を含む）
+        // DialogDataを作成
         return new DialogData(speakerName, dialogText, characterImageName, seClipName, true, customCharSpeed);
     }
     

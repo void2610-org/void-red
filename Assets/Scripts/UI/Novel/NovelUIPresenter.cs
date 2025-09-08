@@ -39,11 +39,7 @@ public class NovelUIPresenter : MonoBehaviour
     private void Start()
     {
         // DialogViewを取得
-        _dialogView = UnityEngine.Object.FindFirstObjectByType<DialogView>();
-        if (!_dialogView)
-        {
-            return;
-        }
+        _dialogView = FindFirstObjectByType<DialogView>();
         
         // Viewイベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
@@ -60,7 +56,7 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartScenario(string scenarioId)
     {
-        List<DialogData> dialogList = null;
+        List<DialogData> dialogList;
         
         // ハードコードシナリオの処理
         switch (scenarioId)
@@ -164,9 +160,8 @@ public class NovelUIPresenter : MonoBehaviour
         var imageNames = new HashSet<string>();
         
         // ダイアログリストから使用される画像名を抽出
-        for (int i = 0; i < dialogList.Count; i++)
+        foreach (var dialog in dialogList)
         {
-            var dialog = dialogList[i];
             if (!string.IsNullOrEmpty(dialog.CharacterImageName))
             {
                 imageNames.Add(dialog.CharacterImageName);
