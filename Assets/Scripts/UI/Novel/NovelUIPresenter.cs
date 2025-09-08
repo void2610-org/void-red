@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using VContainer;
 using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// ノベルシーンのUI管理を担当するプレゼンター
-/// DialogViewを使用してダイアログ表示を管理し、完了後にシーンを戻る
+/// ダイアログの進行制御とViewの管理を行う
 /// </summary>
 public class NovelUIPresenter : MonoBehaviour
 {
@@ -19,6 +18,10 @@ public class NovelUIPresenter : MonoBehaviour
     private NovelDialogService _novelDialogService;
     private AddressableCharacterImageLoader _characterImageLoader;
     private DialogView _dialogView;
+    
+    // ダイアログ制御用
+    private List<DialogData> _currentDialogList;
+    private int _currentDialogIndex;
     
     [Inject]
     public void Construct(
@@ -42,7 +45,9 @@ public class NovelUIPresenter : MonoBehaviour
             return;
         }
         
+        // Viewイベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
+        _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
         
@@ -95,13 +100,55 @@ public class NovelUIPresenter : MonoBehaviour
             // DialogViewにキャラクター画像読み込みコールバックを設定
             _dialogView.SetCharacterImageLoader(imageName => _characterImageLoader.LoadCharacterImageAsync(imageName));
             
-            // ダイアログを開始
-            await _dialogView.StartDialog(dialogList);
+            // ダイアログシーケンスを開始
+            await StartDialogSequence(dialogList);
         }
         catch (System.Exception ex)
         {
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
         }
+    }
+    
+    /// <summary>
+    /// ダイアログシーケンスを開始（Presenterが制御）
+    /// </summary>
+    private async UniTask StartDialogSequence(List<DialogData> dialogList)
+    {
+        _currentDialogList = dialogList;
+        _currentDialogIndex = 0;
+        
+        // フェードイン
+        await _dialogView.FadeIn();
+        
+        // 最初のダイアログを表示
+        await ShowNextDialog();
+    }
+    
+    /// <summary>
+    /// 次のダイアログを表示
+    /// </summary>
+    private async UniTask ShowNextDialog()
+    {
+        if (_currentDialogIndex >= _currentDialogList.Count)
+        {
+            // すべてのダイアログを表示完了
+            await _dialogView.ShowDialogComplete();
+            return;
+        }
+        
+        var currentDialog = _currentDialogList[_currentDialogIndex];
+        _currentDialogIndex++;
+        
+        await _dialogView.ShowSingleDialog(currentDialog);
+    }
+    
+    /// <summary>
+    /// ユーザークリック処理
+    /// </summary>
+    private async UniTaskVoid HandleUserClick()
+    {
+        // 次のダイアログへ進む
+        await ShowNextDialog();
     }
     
     /// <summary>
