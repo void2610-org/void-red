@@ -77,14 +77,14 @@ public class DialogData
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public DialogData(string speakerName, string dialogText, string characterImageName = "", string seClipName = "", bool playSeOnStart = true)
+    public DialogData(string speakerName, string dialogText, string characterImageName = "", string seClipName = "", bool playSeOnStart = true, float customCharSpeed = -1f)
     {
         this.speakerName = speakerName;
         this.dialogText = dialogText;
         this.characterImageName = characterImageName;
         this.seClipName = seClipName;
         this.playSeOnStart = playSeOnStart;
-        this.customCharSpeed = -1f;
+        this.customCharSpeed = customCharSpeed;
         this.autoAdvance = false;
     }
 }
