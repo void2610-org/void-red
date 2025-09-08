@@ -39,10 +39,21 @@ public class AddressableCharacterImageLoader
         
         var sprite = await handle.ToUniTask();
         
-        // キャッシュに保存
+        // 読み込み成功時はキャッシュに保存
         if (sprite)
         {
             _loadedSprites[imageName] = sprite;
+        }
+        else
+        {
+            // 読み込み失敗時はハンドルを解放してキャッシュから削除
+            if (handle.IsValid())
+            {
+                Addressables.Release(handle);
+            }
+            _handles.Remove(imageName);
+            
+            Debug.LogWarning($"[AddressableCharacterImageLoader] キャラクター画像 '{imageName}' の読み込みに失敗しました");
         }
         
         return sprite;
