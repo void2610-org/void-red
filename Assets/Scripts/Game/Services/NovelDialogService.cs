@@ -86,17 +86,8 @@ public class NovelDialogService
         var seClipName = GetStringValue(row, 3);
         var customCharSpeed = GetFloatValue(row, 4, -1f);
         
-        // DialogDataを作成
-        var dialogData = new DialogData(speakerName, dialogText, characterImageName, seClipName);
-        
-        // カスタム文字速度は読み込むが、DialogDataでは使用時にcustomCharSpeedフィールドを直接参照
-        if (customCharSpeed > 0)
-        {
-            var field = typeof(DialogData).GetField("customCharSpeed", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            field?.SetValue(dialogData, customCharSpeed);
-        }
-        
-        return dialogData;
+        // DialogDataを作成（カスタム文字速度を含む）
+        return new DialogData(speakerName, dialogText, characterImageName, seClipName, true, customCharSpeed);
     }
     
     /// <summary>
