@@ -10,9 +10,6 @@ public class NovelDialogService
 {
     private const string SPREADSHEET_ID = "1cPwaMiTwriP5eGhxYqIYvdpjJ81xsnwDdBtULMlP82I";
     
-    // シナリオIDとダイアログデータのキャッシュ
-    private readonly Dictionary<string, List<DialogData>> _dialogCache = new();
-    
     /// <summary>
     /// シナリオIDに対応するダイアログデータを取得
     /// </summary>
@@ -20,27 +17,23 @@ public class NovelDialogService
     /// <returns>ダイアログデータのリスト</returns>
     public async UniTask<List<DialogData>> GetDialogDataAsync(string scenarioId)
     {
-        // キャッシュに存在する場合は返却
-        if (_dialogCache.TryGetValue(scenarioId, out var cachedData))
-        {
-            return new List<DialogData>(cachedData);
-        }
-        
         // スプレッドシートからデータを取得
         var sheetData = await GoogleSpreadSheetService.GetSheet(SPREADSHEET_ID, scenarioId);
         
-        if (sheetData == null || sheetData.Count <= 1)
+        if (sheetData == null)
         {
-            return new List<DialogData>();
+            Debug.LogError($"[NovelDialogService] スプレッドシートからシナリオ '{scenarioId}' のデータを取得できませんでした");
+            return null;
+        }
+        
+        if (sheetData.Count <= 1)
+        {
+            Debug.LogError($"[NovelDialogService] シナリオ '{scenarioId}' にデータが存在しません（ヘッダー行のみまたは空）");
+            return null;
         }
         
         // スプレッドシートデータをDialogDataに変換
-        var dialogList = ConvertSheetToDialogData(sheetData);
-        
-        // キャッシュに保存
-        _dialogCache[scenarioId] = new List<DialogData>(dialogList);
-        
-        return dialogList;
+        return ConvertSheetToDialogData(sheetData);
     }
     
     /// <summary>
@@ -96,10 +89,11 @@ public class NovelDialogService
         // DialogDataを作成
         var dialogData = new DialogData(speakerName, dialogText, characterImageName, seClipName);
         
-        // カスタム文字速度を設定
+        // カスタム文字速度は読み込むが、DialogDataでは使用時にcustomCharSpeedフィールドを直接参照
         if (customCharSpeed > 0)
         {
-            dialogData.SetCustomCharSpeed(customCharSpeed);
+            var field = typeof(DialogData).GetField("customCharSpeed", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            field?.SetValue(dialogData, customCharSpeed);
         }
         
         return dialogData;
@@ -137,13 +131,5 @@ public class NovelDialogService
             return result;
         
         return defaultValue;
-    }
-    
-    /// <summary>
-    /// キャッシュをクリア
-    /// </summary>
-    public void ClearCache()
-    {
-        _dialogCache.Clear();
     }
 }

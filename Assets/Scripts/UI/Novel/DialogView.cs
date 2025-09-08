@@ -39,8 +39,6 @@ public class DialogView : MonoBehaviour
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
     
-    // キャラクター画像のコールバック（Presenterから設定）
-    private System.Func<string, UniTask<Sprite>> _loadCharacterImageCallback;
     private string _currentImageName;
     
     // イベント
@@ -61,14 +59,6 @@ public class DialogView : MonoBehaviour
         characterImage.sprite = null;
         
         _isCompleted = false;
-    }
-    
-    /// <summary>
-    /// キャラクター画像読み込みコールバックを設定
-    /// </summary>
-    public void SetCharacterImageLoader(System.Func<string, UniTask<Sprite>> loadCallback)
-    {
-        _loadCharacterImageCallback = loadCallback;
     }
     
     /// <summary>
@@ -112,19 +102,19 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// 単一のダイアログを表示する
     /// </summary>
-    public async UniTask ShowSingleDialog(DialogData dialogData)
+    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null)
     {
         // SE再生
         if (dialogData.HasSE && dialogData.PlaySEOnStart)
         {
-            SeManager.Instance.PlaySe(dialogData.SEClipName);
+            SeManager.Instance.PlaySe(dialogData.SEClipName, important: true);
         }
         
         // 話者名を設定
         SetSpeakerName(dialogData.SpeakerName);
         
         // キャラクター画像を設定
-        await SetCharacterImage(dialogData.CharacterImageName);
+        SetCharacterImage(characterSprite);
         
         // ダイアログテキストをクリア
         dialogText.text = "";
@@ -193,33 +183,17 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// キャラクター画像を設定
     /// </summary>
-    private async UniTask SetCharacterImage(string imageName)
+    private void SetCharacterImage(Sprite sprite)
     {
-        // 同じ画像の場合は処理をスキップ
-        if (_currentImageName == imageName)
-            return;
-        
-        // 前の画像をフェードアウト
-        if (!string.IsNullOrEmpty(_currentImageName))
+        if (sprite != null)
         {
-            await characterImage.FadeOut(0.3f);
-        }
-        
-        _currentImageName = imageName;
-        
-        // 新しい画像を設定
-        if (!string.IsNullOrEmpty(imageName) && _loadCharacterImageCallback != null)
-        {
-            var sprite = await _loadCharacterImageCallback(imageName);
-            if (sprite)
-            {
-                characterImage.sprite = sprite;
-                await characterImage.FadeIn(0.3f);
-            }
+            characterImage.sprite = sprite;
+            characterImage.color = Color.white;
         }
         else
         {
             characterImage.sprite = null;
+            characterImage.color = new Color(1f, 1f, 1f, 0f);
         }
     }
     

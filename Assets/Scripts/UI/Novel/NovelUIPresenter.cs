@@ -82,6 +82,13 @@ public class NovelUIPresenter : MonoBehaviour
             default:
                 // スプレッドシートからシナリオを読み込み
                 dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
+
+                if (dialogList == null)
+                {
+                    Debug.LogError($"シナリオ '{scenarioId}' の読み込みに失敗しました");
+                    await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+                    return;
+                }
                 break;
         }
         
@@ -94,9 +101,6 @@ public class NovelUIPresenter : MonoBehaviour
         
         // キャラクター画像を事前に読み込み
         await PreloadCharacterImages(dialogList);
-        
-        // DialogViewにキャラクター画像読み込みコールバックを設定
-        _dialogView.SetCharacterImageLoader(imageName => _characterImageLoader.LoadCharacterImageAsync(imageName));
         
         // ダイアログシーケンスを開始
         await StartDialogSequence(dialogList);
@@ -132,7 +136,15 @@ public class NovelUIPresenter : MonoBehaviour
         var currentDialog = _currentDialogList[_currentDialogIndex];
         _currentDialogIndex++;
         
-        await _dialogView.ShowSingleDialog(currentDialog);
+        // キャラクター画像を読み込み（事前読み込み済みなのでキャッシュから取得）
+        Sprite characterSprite = null;
+        if (!string.IsNullOrEmpty(currentDialog.CharacterImageName))
+        {
+            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(currentDialog.CharacterImageName);
+        }
+        
+        // 読み込み完了後にViewに渡してダイアログを表示
+        await _dialogView.ShowSingleDialog(currentDialog, characterSprite);
     }
     
     /// <summary>
