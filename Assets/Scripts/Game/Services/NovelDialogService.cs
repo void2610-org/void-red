@@ -26,28 +26,21 @@ public class NovelDialogService
             return new List<DialogData>(cachedData);
         }
         
-        try
-        {
-            // スプレッドシートからデータを取得
-            var sheetData = await GoogleSpreadSheetService.GetSheet(SPREADSHEET_ID, scenarioId);
-            
-            if (sheetData == null || sheetData.Count <= 1)
-            {
-                return new List<DialogData>();
-            }
-            
-            // スプレッドシートデータをDialogDataに変換
-            var dialogList = ConvertSheetToDialogData(sheetData);
-            
-            // キャッシュに保存
-            _dialogCache[scenarioId] = new List<DialogData>(dialogList);
-            
-            return dialogList;
-        }
-        catch (System.Exception ex)
+        // スプレッドシートからデータを取得
+        var sheetData = await GoogleSpreadSheetService.GetSheet(SPREADSHEET_ID, scenarioId);
+        
+        if (sheetData == null || sheetData.Count <= 1)
         {
             return new List<DialogData>();
         }
+        
+        // スプレッドシートデータをDialogDataに変換
+        var dialogList = ConvertSheetToDialogData(sheetData);
+        
+        // キャッシュに保存
+        _dialogCache[scenarioId] = new List<DialogData>(dialogList);
+        
+        return dialogList;
     }
     
     /// <summary>
@@ -67,17 +60,10 @@ public class NovelDialogService
             if (row.Count == 0 || IsEmptyRow(row))
                 continue;
             
-            try
+            var dialogData = CreateDialogDataFromRow(row);
+            if (dialogData != null)
             {
-                var dialogData = CreateDialogDataFromRow(row);
-                if (dialogData != null)
-                {
-                    dialogList.Add(dialogData);
-                }
-            }
-            catch (System.Exception ex)
-            {
-                // エラーが発生した行はスキップ
+                dialogList.Add(dialogData);
             }
         }
         

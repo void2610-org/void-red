@@ -241,7 +241,7 @@ public class DialogView : MonoBehaviour
     {
         if (_isWaitingForNext)
         {
-            await UniTask.Delay(System.TimeSpan.FromSeconds(autoNextDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
+            await UniTask.Delay(TimeSpan.FromSeconds(autoNextDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
         }
     }
     

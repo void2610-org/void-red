@@ -60,53 +60,46 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartScenario(string scenarioId)
     {
-        try
+        List<DialogData> dialogList = null;
+        
+        // ハードコードシナリオの処理
+        switch (scenarioId)
         {
-            List<DialogData> dialogList = null;
-            
-            // ハードコードシナリオの処理
-            switch (scenarioId)
-            {
-                case "prologue1":
-                    dialogList = PrologueProvider.GetPrologueScenario();
-                    break;
-                case "prologue2":
-                    dialogList = PrologueProvider.GetPrologue2Scenario();
-                    break;
-                case "ending":
-                    dialogList = new List<DialogData>
-                    {
-                        new DialogData("", "アルファ版はここまでです。"),
-                        new DialogData("", "プレイしていただきありがとうございます。"),
-                        new DialogData("", "製品版リリースをお待ちください。")
-                    };
-                    break;
-                default:
-                    // スプレッドシートからシナリオを読み込み
-                    dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
-                    break;
-            }
-            
-            // ダイアログリストが有効かチェック
-            if (dialogList == null || dialogList.Count == 0)
-            {
-                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
-                return;
-            }
-            
-            // キャラクター画像を事前に読み込み
-            await PreloadCharacterImages(dialogList);
-            
-            // DialogViewにキャラクター画像読み込みコールバックを設定
-            _dialogView.SetCharacterImageLoader(imageName => _characterImageLoader.LoadCharacterImageAsync(imageName));
-            
-            // ダイアログシーケンスを開始
-            await StartDialogSequence(dialogList);
+            case "prologue1":
+                dialogList = PrologueProvider.GetPrologueScenario();
+                break;
+            case "prologue2":
+                dialogList = PrologueProvider.GetPrologue2Scenario();
+                break;
+            case "ending":
+                dialogList = new List<DialogData>
+                {
+                    new DialogData("", "アルファ版はここまでです。"),
+                    new DialogData("", "プレイしていただきありがとうございます。"),
+                    new DialogData("", "製品版リリースをお待ちください。")
+                };
+                break;
+            default:
+                // スプレッドシートからシナリオを読み込み
+                dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
+                break;
         }
-        catch (System.Exception ex)
+        
+        // ダイアログリストが有効かチェック
+        if (dialogList == null || dialogList.Count == 0)
         {
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+            return;
         }
+        
+        // キャラクター画像を事前に読み込み
+        await PreloadCharacterImages(dialogList);
+        
+        // DialogViewにキャラクター画像読み込みコールバックを設定
+        _dialogView.SetCharacterImageLoader(imageName => _characterImageLoader.LoadCharacterImageAsync(imageName));
+        
+        // ダイアログシーケンスを開始
+        await StartDialogSequence(dialogList);
     }
     
     /// <summary>

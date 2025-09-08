@@ -33,26 +33,19 @@ public class AddressableCharacterImageLoader
             return cachedSprite;
         }
         
-        try
+        // Addressablesから読み込み
+        var handle = Addressables.LoadAssetAsync<Sprite>(imageName);
+        _handles[imageName] = handle;
+        
+        var sprite = await handle.ToUniTask();
+        
+        // キャッシュに保存
+        if (sprite)
         {
-            // Addressablesから読み込み
-            var handle = Addressables.LoadAssetAsync<Sprite>(imageName);
-            _handles[imageName] = handle;
-            
-            var sprite = await handle.ToUniTask();
-            
-            // キャッシュに保存
-            if (sprite)
-            {
-                _loadedSprites[imageName] = sprite;
-            }
-            
-            return sprite;
+            _loadedSprites[imageName] = sprite;
         }
-        catch (System.Exception ex)
-        {
-            return null;
-        }
+        
+        return sprite;
     }
     
     /// <summary>
