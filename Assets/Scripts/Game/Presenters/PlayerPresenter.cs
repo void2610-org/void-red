@@ -368,13 +368,6 @@ public abstract class PlayerPresenter : IDisposable
         _playerModel.SetMentalPower(GameConstants.MAX_MENTAL_POWER);
     }
     
-    // === UI制御 ===
-    
-    /// <summary>
-    /// 手札のインタラクション状態を設定
-    /// </summary>
-    public void SetHandInteractable(bool interactable) => _handView.SetInteractable(interactable);
-    
     /// <summary>
     /// リソースの解放
     /// </summary>

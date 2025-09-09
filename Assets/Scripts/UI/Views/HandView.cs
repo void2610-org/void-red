@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -10,10 +11,12 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class HandView : MonoBehaviour
 {
+    [SerializeField] private bool isEnemyHand;
     [Header("手札設定")]
     [SerializeField] private Transform handContainer;
     [SerializeField] private CardView cardPrefab;
     [SerializeField] private Transform deckPosition;
+    [SerializeField] private Sprite cardBackSprite;
     
     [Header("配置設定")]
     [SerializeField] private float cardSpacing = 100f;
@@ -26,7 +29,6 @@ public class HandView : MonoBehaviour
     private readonly List<CardView> _cardViews = new();
     private readonly CompositeDisposable _modelBindings = new();
     private CardViewFactory _cardViewFactory;
-    private bool _isInteractable = true;
     
     /// <summary>
     /// HandModelをバインド
@@ -47,19 +49,6 @@ public class HandView : MonoBehaviour
             .AddTo(_modelBindings);
     }
     
-    /// <summary>
-    /// インタラクト可能状態を設定 (敵手札用)
-    /// </summary>
-    public void SetInteractable(bool interactable)
-    {
-        _isInteractable = interactable;
-        
-        // 既存のカードにも適用
-        foreach (var cardView in _cardViews)
-        {
-            cardView?.SetInteractable(interactable);
-        }
-    }
     
     /// <summary>
     /// カード表示を更新（差分更新）
@@ -126,8 +115,10 @@ public class HandView : MonoBehaviour
                     _onCardClicked.OnNext(currentIndex);
             },
             gameObject,
-            _isInteractable
+            !isEnemyHand
         );
+        
+        if(isEnemyHand) cardView.SetToBackside(cardBackSprite);
         
         return cardView;
     }
@@ -338,6 +329,12 @@ public class HandView : MonoBehaviour
     private void Awake()
     {
         _cardViewFactory = new CardViewFactory(cardPrefab);
+
+        if (isEnemyHand)
+        {
+            foreach (var cardView in _cardViews)
+                cardView?.SetInteractable(false);
+        }
     }
     
     private void OnDestroy()

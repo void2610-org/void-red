@@ -147,9 +147,6 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(200);
         await _enemy.DrawCardsWithDelay(3, 300);
         
-        // エネミーのカードを非インタラクティブに設定
-        _enemy.SetHandInteractable(false);
-        
         // 敵がアルヴならチュートリアルを表示
         if (_currentEnemyData.EnemyId == "E001") 
             await _uiPresenter.StartTutorial();
