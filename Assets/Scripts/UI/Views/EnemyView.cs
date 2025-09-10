@@ -34,7 +34,7 @@ public class EnemyView : MonoBehaviour
         enemyImage.color = Color.white;
         
         // 背面画像を透明に初期化
-        enemyImageBack.color = Color.clear;
+        enemyImageBack.color = new Color(1, 1, 1, 0);
         
         // 初期状態では非表示
         gameObject.SetActive(false);
@@ -100,8 +100,8 @@ public class EnemyView : MonoBehaviour
         
         // 背面画像に新しいスプライトを設定
         enemyImageBack.sprite = newSprite;
-        enemyImageBack.color = Color.clear;
-        
+        enemyImageBack.color = new Color(1, 1, 1, 0);
+
         // 同時進行のクロスフェード
         var fadeOutFront = enemyImage.FadeOut(crossFadeDuration, Ease.InOutQuad);
             
@@ -117,11 +117,12 @@ public class EnemyView : MonoBehaviour
         (enemyImage.sprite, enemyImageBack.sprite) = (enemyImageBack.sprite, enemyImage.sprite);
 
         enemyImage.color = Color.white;
-        enemyImageBack.color = Color.clear;
+        enemyImageBack.color = new Color(1, 1, 1, 0);
     }
     
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.alpha = 0f;
     }
 }
