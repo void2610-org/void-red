@@ -100,7 +100,7 @@ public class GameManager: IStartable, IDisposable
         _currentEnemyData = _allEnemyData.GetEnemyById(battleNode.EnemyId);
         
         // Discord Rich Presence更新（バトル開始）
-        _discordService?.SetDetails("対戦相手", _currentEnemyData?.EnemyName ?? "不明");
+        _discordService?.SetState("対戦相手", _currentEnemyData?.EnemyName ?? "不明");
         
         // 人格ログ: チャプター開始
         _gameProgressService.StartChapter(_currentEnemyData);
