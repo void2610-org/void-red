@@ -39,6 +39,7 @@ public class RootLifetimeScope : LifetimeScope
         
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
+        builder.RegisterEntryPoint<DiscordService>();
         
         // サウンドマネージャーの初期化
         InitializeSoundManagers();
