@@ -448,6 +448,8 @@ public class GameManager: IStartable, IDisposable
         
         // 結果を表示
         await _uiPresenter.ShowWinLoseResult(result, playerWon);
+        await UniTask.Delay(500);
+        await _uiPresenter.HideBlackOverlay();
         
         // 勝敗確定後のナレーション（プレイヤーの勝敗に基づく）
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
@@ -464,8 +466,6 @@ public class GameManager: IStartable, IDisposable
         // ゲーム結果を統計に記録（進化チェック前に実行）
         _gameProgressService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
         _gameProgressService.EnemyStats.RecordGameResult(!playerWon, _npcMove, _npcCollapse);
-        
-        await _uiPresenter.HideBlackOverlay();
 
         // すべての場合で勝利数をカウントするように変更
         if (UpdateWinsAndCheckBattleEnd(playerWon))
