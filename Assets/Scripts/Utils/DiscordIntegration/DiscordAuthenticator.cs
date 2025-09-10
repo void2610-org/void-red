@@ -18,6 +18,15 @@ public class DiscordAuthenticator
         _client = client;
     }
     
+    /// <summary>
+    /// 認証を開始（自動ログイン→失敗時OAuth）
+    /// </summary>
+    public void StartAuthentication()
+    {
+        if (!TryAutoLogin())
+            StartOAuthFlow();
+    }
+    
     public void StartOAuthFlow() 
     {
         var authorizationVerifier = _client.CreateAuthorizationCodeVerifier();
