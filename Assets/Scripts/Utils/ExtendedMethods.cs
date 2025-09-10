@@ -242,6 +242,30 @@ namespace Void2610.UnityTemplate
         }
         
         /// <summary>
+        /// TextMeshProUGUIの透明度をLitMotionでフェードインさせる
+        /// </summary>
+        public static MotionHandle FadeIn(this TextMeshProUGUI text, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
+        {
+            return LMotion.Create(0f, 1f, duration)
+                .WithEase(ease)
+                .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
+                .BindToColorA(text)
+                .AddTo(text.gameObject);
+        }
+        
+        /// <summary>
+        /// TextMeshProUGUIの透明度をLitMotionでフェードアウトさせる
+        /// </summary>
+        public static MotionHandle FadeOut(this TextMeshProUGUI text, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
+        {
+            return LMotion.Create(1f, 0f, duration)
+                .WithEase(ease)
+                .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
+                .BindToColorA(text)
+                .AddTo(text.gameObject);
+        }
+        
+        /// <summary>
         /// CanvasGroupの透明度をLitMotionでフェードインさせる
         /// </summary>
         public static MotionHandle FadeIn(this CanvasGroup canvasGroup, float duration, Ease ease = Ease.Linear)

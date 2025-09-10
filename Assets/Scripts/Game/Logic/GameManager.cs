@@ -314,9 +314,6 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: 敵ムーブ記録
         _gameProgressService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
         
-        // 結果表示の背景を表示
-        await _uiPresenter.ShowBlackOverlay();
-        
         // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
         var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
         var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
@@ -324,6 +321,8 @@ public class GameManager: IStartable, IDisposable
         
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
+        // 結果表示の背景を表示
+        await _uiPresenter.ShowBlackOverlay();
         
         // 評価フェーズへ
         ChangeState(GameState.Evaluation);
