@@ -14,7 +14,7 @@ using Void2610.UnityTemplate;
 public class TutorialView : MonoBehaviour
 {
     [SerializeField] private RectTransform maskArea;
-    [SerializeField] private TextMeshProUGUI messageText;
+    [SerializeField] private NarrationView narrationView;
     
     private const float FADE_DURATION = 0.3f;
     private const float MASK_TRANSITION_DURATION = 0.5f;
@@ -47,32 +47,27 @@ public class TutorialView : MonoBehaviour
             _currentMaskSizeHandle.Cancel();
 
         // 現在のマスクサイズと新しいマスクサイズをチェック
-        bool isCurrentSizeZero = _currentMaskSize == Vector2.zero;
-        bool isNewSizeZero = step.MaskSize == Vector2.zero;
+        var isCurrentSizeZero = _currentMaskSize == Vector2.zero;
+        var isNewSizeZero = step.MaskSize == Vector2.zero;
         
         if (isCurrentSizeZero && !isNewSizeZero)
         {
-            // ケース1: (0,0) → 非(0,0) - 位置を瞬間移動してサイズアニメーションのみ
+            // (0,0) → 非(0,0) - 位置を瞬間移動してサイズアニメーションのみ
             maskArea.anchoredPosition = step.MaskPosition;
-            _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
-        }
-        else if (!isCurrentSizeZero && isNewSizeZero)
-        {
-            // ケース2: 非(0,0) → (0,0) - サイズアニメーションのみ（縮小）
-            _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
         }
         else
         {
-            // ケース3: その他（非(0,0) → 非(0,0)、同じ値など）- 通常のアニメーション
+            // （非(0,0) → 非(0,0)、同じ値など）- 通常のアニメーション
             _currentMaskPositionHandle = maskArea.MoveToAnchored(step.MaskPosition, MASK_TRANSITION_DURATION, Ease.OutQuart);
-            _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
         }
-        
+
+        _currentMaskSizeHandle = maskArea.SizeTo(step.MaskSize, MASK_TRANSITION_DURATION, Ease.OutQuart);
+
         // 現在のサイズを更新
         _currentMaskSize = step.MaskSize;
         
         // メッセージテキストの更新
-        await messageText.TypewriterAnimation(step.Message, cancellationToken: this.GetCancellationTokenOnDestroy());
+        await narrationView.DisplayNarration(step.Message, autoAdvance: false);
         
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));
@@ -123,7 +118,6 @@ public class TutorialView : MonoBehaviour
         _canvasGroup.alpha = 0f;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
-        messageText.text = "";
         maskArea.anchoredPosition = Vector2.zero;
         maskArea.sizeDelta = Vector2.zero;
     }
