@@ -61,12 +61,6 @@ public class NovelUIPresenter : MonoBehaviour
         // ハードコードシナリオの処理
         switch (scenarioId)
         {
-            case "prologue1":
-                dialogList = PrologueProvider.GetPrologueScenario();
-                break;
-            case "prologue2":
-                dialogList = PrologueProvider.GetPrologue2Scenario();
-                break;
             case "ending":
                 dialogList = new List<DialogData>
                 {
