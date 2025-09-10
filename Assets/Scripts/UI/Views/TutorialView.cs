@@ -100,6 +100,9 @@ public class TutorialView : MonoBehaviour
         if (_currentFadeHandle.IsActive())
             _currentFadeHandle.Cancel();
         
+        // NarrationViewも非表示にする
+        narrationView.HideNarration().Forget();
+        
         // フェードアウト
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_DURATION);
         
