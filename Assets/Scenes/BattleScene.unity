@@ -6830,7 +6830,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5705083265967378476, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -150
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6594449209789681389, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_SizeDelta.x
@@ -6906,7 +6906,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -150
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -7119,6 +7119,10 @@ PrefabInstance:
     - target: {fileID: 7238768428824122212, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
       propertyPath: m_Name
       value: TutorialView
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590883926947206666, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
+      propertyPath: m_Alpha
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

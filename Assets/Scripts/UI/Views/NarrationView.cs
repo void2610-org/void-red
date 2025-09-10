@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using LitMotion;
 using LitMotion.Extensions;
 using System.Threading;
+using System.Collections.Generic;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -13,6 +14,7 @@ using Void2610.UnityTemplate;
 public class NarrationView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI narrationText;
+    [SerializeField] private Image backgroundImage;
     
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_OUT_DURATION = 0.3f;
@@ -48,15 +50,11 @@ public class NarrationView : MonoBehaviour
             
             // 初期状態を設定
             narrationText.gameObject.SetActive(true);
-            narrationText.color = new Color(narrationText.color.r, narrationText.color.g, narrationText.color.b, 0f);
+            narrationText.SetAlpha(0f);
             
-            // テキストのフェードインアニメーション
-            var textColor = narrationText.color;
-            await LMotion.Create(new Color(textColor.r, textColor.g, textColor.b, 0f), new Color(textColor.r, textColor.g, textColor.b, 1f), FADE_IN_DURATION)
-                .WithEase(Ease.OutQuart)
-                .BindToColor(narrationText)
-                .AddTo(gameObject)
-                .ToUniTask(cancellationToken);
+            // backgroundImageとテキストのフェードインを同時実行
+            backgroundImage.FadeIn(FADE_IN_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
+            await narrationText.FadeIn(FADE_IN_DURATION, Ease.OutQuart);
             
             // 1文字ずつ表示するアニメーション
             await narrationText.TypewriterAnimation(message, cancellationToken: cancellationToken);
@@ -64,31 +62,16 @@ public class NarrationView : MonoBehaviour
             // 表示時間を待つ
             await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
             
-            // テキストのフェードアウトアニメーション
-            var textColorOut = narrationText.color;
-            await LMotion.Create(new Color(textColorOut.r, textColorOut.g, textColorOut.b, 1f), new Color(textColorOut.r, textColorOut.g, textColorOut.b, 0f), FADE_OUT_DURATION)
-                .WithEase(Ease.InQuart)
-                .BindToColor(narrationText)
-                .AddTo(gameObject)
-                .ToUniTask(cancellationToken);
-            
-            // 最終クリーンアップ
-            if (narrationText)
-            {
-                narrationText.gameObject.SetActive(false);
-            }
+            // backgroundImageとテキストのフェードアウトを同時実行
+            backgroundImage.FadeOut(FADE_OUT_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+            await narrationText.FadeOut(FADE_OUT_DURATION, Ease.InQuart);
         }
-        catch (System.OperationCanceledException)
-        {
-            // キャンセルされた場合のクリーンアップ
-            if (narrationText)
-            {
-                narrationText.gameObject.SetActive(false);
-            }
-        }
+        catch (System.OperationCanceledException) { }
         finally
         {
             _canvasGroup.alpha = 0f;
+            backgroundImage.SetAlpha(0f);
+            narrationText.gameObject.SetActive(false);
         }
     }
     
@@ -97,6 +80,9 @@ public class NarrationView : MonoBehaviour
         // 初期状態の設定
         _canvasGroup = GetComponent<CanvasGroup>();
         narrationText.gameObject.SetActive(false);
+        
+        // backgroundImageの初期状態を透明に設定
+        backgroundImage.SetAlpha(0f);
     }
     
     
