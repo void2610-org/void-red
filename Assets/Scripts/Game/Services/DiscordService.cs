@@ -25,8 +25,7 @@ public class DiscordService : IStartable, IDisposable
     
     private void OnStatusChanged(Client.Status status, Client.Error error, int errorCode)
     {
-        Debug.Log($"Status changed: {status}");
-        if(error != Client.Error.None) Debug.LogError($"Error: {error}, code: {errorCode}");
+        if(error != Client.Error.None) Debug.LogError($"Discord Error: {error}, code: {errorCode}");
 
         if (status == Client.Status.Ready) 
             _richPresenceService.SetSceneState(SceneType.Title);
@@ -34,7 +33,14 @@ public class DiscordService : IStartable, IDisposable
  
     public void Start()
     {
-        _authenticator.StartOAuthFlow();
+        if (!_authenticator.TryAutoLogin())
+            _authenticator.StartOAuthFlow();
+    }
+    
+    public void Logout()
+    {
+        _authenticator.ClearSavedTokens();
+        _client?.Dispose();
     }
     
     public void Dispose()
