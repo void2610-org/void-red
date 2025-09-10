@@ -5,6 +5,8 @@ using VContainer.Unity;
 
 public class DiscordService : IStartable, IDisposable
 {
+    private const ulong CLIENT_ID = 1415132179377160262;
+    
     private readonly Client _client;
     private readonly DiscordAuthenticator _authenticator;
     private readonly DiscordRichPresenceService _richPresenceService;
@@ -15,6 +17,7 @@ public class DiscordService : IStartable, IDisposable
     public DiscordService()
     {
         _client = new Client();
+        _client.SetApplicationId(CLIENT_ID);
         _authenticator = new DiscordAuthenticator(_client);
         _richPresenceService = new DiscordRichPresenceService(_client);
         
