@@ -10,7 +10,9 @@ public class DiscordRichPresenceService
     {
         _client = client;
         _activity = new Activity();
+        _activity.SetName("VOID RED");
         _activity.SetType(ActivityTypes.Playing);
+        _activity.SetDetailsUrl("https://void-red.void2610.dev/");
     }
     
     public void SetSceneState(SceneType sceneType)
@@ -18,27 +20,29 @@ public class DiscordRichPresenceService
         switch (sceneType)
         {
             case SceneType.Title:
-                _activity.SetState("タイトル");
-                _activity.SetDetails("ゲーム開始を待っています");
+                _activity.SetDetails("タイトル");
+                _activity.SetState("ゲーム開始を待っています");
                 break;
             case SceneType.Home:
-                _activity.SetState("ホーム画面");
-                _activity.SetDetails("メニューを見ています");
+                _activity.SetDetails("ホーム画面");
+                _activity.SetState("メニューを見ています");
                 break;
             case SceneType.Battle:
-                _activity.SetState("バトル中");
+                _activity.SetDetails("バトル中");
+                _activity.SetState("対戦準備中");
                 break;
             case SceneType.Novel:
-                _activity.SetState("ストーリー閲覧中");
+                _activity.SetDetails("ストーリー閲覧中");
+                _activity.SetState("物語を読んでいます");
                 break;
         }
         
         UpdateRichPresence();
     }
     
-    public void SetDetails(string prefix, string details)
+    public void SetState(string prefix, string details)
     {
-        _activity.SetDetails($"{prefix}: {details}");
+        _activity.SetState($"{prefix}: {details}");
         UpdateRichPresence();
     }
     

@@ -12,7 +12,7 @@ public class DiscordService : IStartable, IDisposable
     private readonly DiscordRichPresenceService _richPresenceService;
     
     public void SetSceneState(SceneType sceneType) => _richPresenceService.SetSceneState(sceneType);
-    public void SetDetails(string prefix, string details) => _richPresenceService.SetDetails(prefix, details);
+    public void SetState(string prefix, string details) => _richPresenceService.SetState(prefix, details);
     
     public DiscordService()
     {
