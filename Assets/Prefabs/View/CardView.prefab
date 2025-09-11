@@ -546,5 +546,6 @@ MonoBehaviour:
   cardImage: {fileID: 8111402896225524017}
   cardNameBanner: {fileID: 5344795189781855156}
   cardFrame: {fileID: 7303585836931223984}
+  cardBackImage: {fileID: 1128487489273188331}
   cardNameText: {fileID: 2523552460966807409}
   cardButton: {fileID: 4779874160718359984}

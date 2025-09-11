@@ -20,6 +20,7 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private float crossFadeDuration = 0.4f;
     
     private EnemyData _enemyData;
+    private CanvasGroup _canvasGroup;
     
     /// <summary>
     /// 初期化処理
@@ -29,17 +30,11 @@ public class EnemyView : MonoBehaviour
         _enemyData = enemyData;
         
         // デフォルトスプライトを設定
-        if (enemyImage && _enemyData.DefaultSprite)
-        {
-            enemyImage.sprite = _enemyData.DefaultSprite;
-            enemyImage.color = new Color(1f, 1f, 1f, 1f);
-        }
+        enemyImage.sprite = _enemyData.DefaultSprite;
+        enemyImage.color = Color.white;
         
         // 背面画像を透明に初期化
-        if (enemyImageBack)
-        {
-            enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
-        }
+        enemyImageBack.color = new Color(1, 1, 1, 0);
         
         // 初期状態では非表示
         gameObject.SetActive(false);
@@ -75,18 +70,11 @@ public class EnemyView : MonoBehaviour
     /// </summary>
     public async UniTask Show()
     {
-        if (!gameObject.activeSelf)
-        {
-            gameObject.SetActive(true);
-        }
+        if (!gameObject.activeSelf) gameObject.SetActive(true);
         
         // フェードイン
-        var canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup)
-        {
-            await canvasGroup.FadeIn(fadeDuration, Ease.OutQuad)
-                .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-        }
+        await _canvasGroup.FadeIn(fadeDuration, Ease.OutQuad)
+            .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
     }
     
     /// <summary>
@@ -94,12 +82,8 @@ public class EnemyView : MonoBehaviour
     /// </summary>
     public async UniTask Hide()
     {
-        var canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup)
-        {
-            await canvasGroup.FadeOut(fadeDuration, Ease.InQuad)
-                .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-        }
+        await _canvasGroup.FadeOut(fadeDuration, Ease.InQuad)
+            .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
         
         gameObject.SetActive(false);
     }
@@ -116,8 +100,8 @@ public class EnemyView : MonoBehaviour
         
         // 背面画像に新しいスプライトを設定
         enemyImageBack.sprite = newSprite;
-        enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
-        
+        enemyImageBack.color = new Color(1, 1, 1, 0);
+
         // 同時進行のクロスフェード
         var fadeOutFront = enemyImage.FadeOut(crossFadeDuration, Ease.InOutQuad);
             
@@ -132,7 +116,13 @@ public class EnemyView : MonoBehaviour
         // アニメーション完了後、前面と背面を入れ替え
         (enemyImage.sprite, enemyImageBack.sprite) = (enemyImageBack.sprite, enemyImage.sprite);
 
-        enemyImage.color = new Color(1f, 1f, 1f, 1f);
-        enemyImageBack.color = new Color(1f, 1f, 1f, 0f);
+        enemyImage.color = Color.white;
+        enemyImageBack.color = new Color(1, 1, 1, 0);
+    }
+    
+    private void Awake()
+    {
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.alpha = 0f;
     }
 }
