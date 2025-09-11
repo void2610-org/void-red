@@ -4,18 +4,18 @@ using System;
 
 public class DiscordAuthenticator
 {
-    private const ulong CLIENT_ID = 1415132179377160262;
-    
     private const string REFRESH_TOKEN_KEY = "DiscordRefreshToken";
     private const string ACCESS_TOKEN_KEY = "DiscordAccessToken";
     private const string TOKEN_EXPIRY_KEY = "DiscordTokenExpiry";
     
     private readonly Client _client;
+    private readonly ulong _clientId;
     private string _codeVerifier = "";
     
-    public DiscordAuthenticator(Client client)
+    public DiscordAuthenticator(Client client, ulong clientId)
     {
         _client = client;
+        _clientId = clientId;
     }
     
     /// <summary>
@@ -24,16 +24,16 @@ public class DiscordAuthenticator
     public void StartAuthentication()
     {
         if (!TryAutoLogin())
-            StartOAuthFlow();
+            StartOAuthFlow(_clientId);
     }
-    
-    public void StartOAuthFlow() 
+
+    private void StartOAuthFlow(ulong clientId)
     {
         var authorizationVerifier = _client.CreateAuthorizationCodeVerifier();
         _codeVerifier = authorizationVerifier.Verifier();
         
         var args = new AuthorizationArgs();
-        args.SetClientId(CLIENT_ID);
+        args.SetClientId(clientId);
         args.SetScopes(Client.GetDefaultPresenceScopes());
         args.SetCodeChallenge(authorizationVerifier.Challenge());
         _client.Authorize(args, OnAuthorizeResult);
@@ -73,7 +73,7 @@ public class DiscordAuthenticator
     
     private void RefreshStoredToken(string refreshToken)
     {
-        _client.RefreshToken(CLIENT_ID, refreshToken, (result, newAccessToken, newRefreshToken, _, expiresIn, _) => {
+        _client.RefreshToken(_clientId, refreshToken, (result, newAccessToken, newRefreshToken, _, expiresIn, _) => {
             if (result.Successful() && !string.IsNullOrEmpty(newAccessToken)) {
                 SaveTokens(newAccessToken, newRefreshToken, expiresIn);
                 OnReceivedToken(newAccessToken);
@@ -83,7 +83,7 @@ public class DiscordAuthenticator
     
     private void GetTokenFromCode(string code, string redirectUri) 
     {
-        _client.GetToken(CLIENT_ID,
+        _client.GetToken(_clientId,
             code,
             _codeVerifier,
             redirectUri,
@@ -112,8 +112,8 @@ public class DiscordAuthenticator
         
         PlayerPrefs.Save();
     }
-    
-    public void ClearSavedTokens()
+
+    private void ClearSavedTokens()
     {
         PlayerPrefs.DeleteKey(ACCESS_TOKEN_KEY);
         PlayerPrefs.DeleteKey(REFRESH_TOKEN_KEY);
