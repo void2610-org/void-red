@@ -1,3 +1,4 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
 using UnityEngine;
 using Discord.Sdk;
 using System;
@@ -121,3 +122,4 @@ public class DiscordAuthenticator
         PlayerPrefs.Save();
     }
 }
+#endif

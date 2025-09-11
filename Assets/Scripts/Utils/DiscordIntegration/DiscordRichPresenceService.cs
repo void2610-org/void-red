@@ -1,3 +1,4 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
 using UnityEngine;
 using Discord.Sdk;
 
@@ -54,3 +55,4 @@ public class DiscordRichPresenceService
         });
     }
 }
+#endif
