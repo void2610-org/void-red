@@ -18,6 +18,7 @@ public class GameManager: IStartable, IDisposable
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
+    private readonly DiscordService _discordService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private readonly CompositeDisposable _disposables = new();
@@ -50,7 +51,8 @@ public class GameManager: IStartable, IDisposable
         CardNarrationService cardNarrationService,
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
-        AllEnemyData allEnemyData)
+        AllEnemyData allEnemyData,
+        DiscordService discordService)
     {
         _cardPoolService = cardPoolService;
         _themeService = themeService;
@@ -61,6 +63,7 @@ public class GameManager: IStartable, IDisposable
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _allEnemyData = allEnemyData;
+        _discordService = discordService;
 
         // 崩壊フラグを初期化
         _playerCollapse = false;
@@ -95,6 +98,9 @@ public class GameManager: IStartable, IDisposable
         }
         
         _currentEnemyData = _allEnemyData.GetEnemyById(battleNode.EnemyId);
+        
+        // Discord Rich Presence更新（バトル開始）
+        _discordService?.SetState("対戦相手", _currentEnemyData?.EnemyName ?? "不明");
         
         // 人格ログ: チャプター開始
         _gameProgressService.StartChapter(_currentEnemyData);
