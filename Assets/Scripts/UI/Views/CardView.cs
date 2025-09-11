@@ -17,6 +17,7 @@ public class CardView : MonoBehaviour
     [SerializeField] private Image cardImage;
     [SerializeField] private Image cardNameBanner;
     [SerializeField] private Image cardFrame;
+    [SerializeField] private Image cardBackImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
     
@@ -29,7 +30,16 @@ public class CardView : MonoBehaviour
     
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
     public void UpdateOriginalPosition(Vector2 position) => _originalPosition = position;
-    
+
+    public void SetToBackside(Sprite cardBackSprite)
+    {
+        cardBackImage.sprite = cardBackSprite;
+        cardFrame.color = Color.clear;
+        cardNameBanner.color = Color.clear;
+        cardImage.color = Color.clear;
+        cardNameText.text = string.Empty;
+    }
+
     /// <summary>
     /// カードデータを設定して初期化
     /// </summary>
@@ -210,4 +220,5 @@ public class CardView : MonoBehaviour
         if (cardButton)
             cardButton.onClick.RemoveListener(OnCardClicked);
     }
+
 }

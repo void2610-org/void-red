@@ -147,9 +147,6 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(200);
         await _enemy.DrawCardsWithDelay(3, 300);
         
-        // エネミーのカードを非インタラクティブに設定
-        _enemy.SetHandInteractable(false);
-        
         // 敵がアルヴならチュートリアルを表示
         if (_currentEnemyData.EnemyId == "E001") 
             await _uiPresenter.StartTutorial();
@@ -317,9 +314,6 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: 敵ムーブ記録
         _gameProgressService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
         
-        // 結果表示の背景を表示
-        await _uiPresenter.ShowBlackOverlay();
-        
         // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
         var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
         var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
@@ -327,6 +321,8 @@ public class GameManager: IStartable, IDisposable
         
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
+        // 結果表示の背景を表示
+        await _uiPresenter.ShowBlackOverlay();
         
         // 評価フェーズへ
         ChangeState(GameState.Evaluation);
@@ -452,6 +448,8 @@ public class GameManager: IStartable, IDisposable
         
         // 結果を表示
         await _uiPresenter.ShowWinLoseResult(result, playerWon);
+        await UniTask.Delay(500);
+        await _uiPresenter.HideBlackOverlay();
         
         // 勝敗確定後のナレーション（プレイヤーの勝敗に基づく）
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
@@ -468,8 +466,6 @@ public class GameManager: IStartable, IDisposable
         // ゲーム結果を統計に記録（進化チェック前に実行）
         _gameProgressService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
         _gameProgressService.EnemyStats.RecordGameResult(!playerWon, _npcMove, _npcCollapse);
-        
-        await _uiPresenter.HideBlackOverlay();
 
         // すべての場合で勝利数をカウントするように変更
         if (UpdateWinsAndCheckBattleEnd(playerWon))
