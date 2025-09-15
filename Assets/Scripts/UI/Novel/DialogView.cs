@@ -16,7 +16,6 @@ public class DialogView : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private TextMeshProUGUI speakerNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
-    [SerializeField] private Image backgroundPanel;
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
     
@@ -27,9 +26,6 @@ public class DialogView : MonoBehaviour
     [Header("フェード設定")]
     [SerializeField] private float fadeInDuration = 0.5f;
     [SerializeField] private float fadeOutDuration = 0.5f;
-    
-    [Header("話者名表示設定")]
-    [SerializeField] private GameObject speakerNamePanel;
     
     private bool _isTyping;
     private bool _isWaitingForNext;
@@ -53,7 +49,6 @@ public class DialogView : MonoBehaviour
         dialogText.text = "";
         
         nextIndicator.SetActive(false);
-        speakerNamePanel.SetActive(false);
         characterImage.color = Color.clear;
         characterImage.sprite = null;
     }
@@ -164,16 +159,7 @@ public class DialogView : MonoBehaviour
     private void SetSpeakerName(string speakerName)
     {
         var hasSpeaker = !string.IsNullOrEmpty(speakerName);
-        
-        if (speakerNamePanel)
-        {
-            speakerNamePanel.SetActive(hasSpeaker);
-        }
-        
-        if (speakerNameText)
-        {
-            speakerNameText.text = hasSpeaker ? speakerName : "";
-        }
+        speakerNameText.text = hasSpeaker ? speakerName : "";
     }
     
     /// <summary>
