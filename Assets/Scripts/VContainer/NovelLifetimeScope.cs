@@ -10,5 +10,6 @@ public class NovelLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterComponentInHierarchy<NovelUIPresenter>();
+        builder.RegisterEntryPoint<PausePresenter>().AsSelf();
     }
 }

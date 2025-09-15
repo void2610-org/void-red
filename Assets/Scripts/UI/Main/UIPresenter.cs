@@ -29,9 +29,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly ConfirmationDialogView _confirmationDialogView;
     private EnemyView _enemyView;
     private readonly PersonalityLogView _personalityLogView;
-    private readonly PauseView _pauseView;
     private readonly PersonalityLogButtonView _personalityLogButtonView;
-    private readonly PauseButtonView _pauseButtonView;
     private readonly ScoreView _scoreView;
     private readonly ResultView _resultView;
     private readonly BlackOverlayView _blackOverlayView;
@@ -109,9 +107,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
         _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
         _personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
-        _pauseView = UnityEngine.Object.FindFirstObjectByType<PauseView>();
         _personalityLogButtonView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogButtonView>();
-        _pauseButtonView = UnityEngine.Object.FindFirstObjectByType<PauseButtonView>();
         _scoreView = UnityEngine.Object.FindFirstObjectByType<ScoreView>();
         _resultView = UnityEngine.Object.FindFirstObjectByType<ResultView>();
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
@@ -177,12 +173,6 @@ public class UIPresenter : IStartable, System.IDisposable
         _personalityLogButtonView?.OnButtonClicked.Subscribe(
             _ => _personalityLogView.ShowLog())
             .AddTo(_disposables);
-        _pauseButtonView?.OnButtonClicked.Subscribe(
-                _ => _pauseView.Show())
-            .AddTo(_disposables);
-        _pauseView.OnTitleButtonClicked.Subscribe(
-            _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget()
-            ).AddTo(_disposables);
         _gameOverView.OnRetryClicked.Subscribe(
                 _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle).Forget())
             .AddTo(_disposables);
