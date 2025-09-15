@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using R3;
 using VContainer;
 using Cysharp.Threading.Tasks;
+using TMPro;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -22,6 +23,7 @@ public class HomeUIPresenter : MonoBehaviour
     [SerializeField] private Button dreamButton;
     [SerializeField] private DeckView deckView;
     [SerializeField] private CardLibraryView cardLibraryView;
+    [SerializeField] private TextMeshProUGUI speakingText;
     
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
@@ -50,6 +52,14 @@ public class HomeUIPresenter : MonoBehaviour
         
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
+        
+        InitSpeaking().Forget();
+    }
+
+    private async UniTask InitSpeaking()
+    {
+        await UniTask.Delay(1000);
+        speakingText.TypewriterAnimation("...").Forget();
     }
 
     /// <summary>
