@@ -51,8 +51,6 @@ public class UIPresenter : IStartable, System.IDisposable
     public void ShowPlayButton() => _playButtonView.Show();
     public void HidePlayButton() => _playButtonView.Hide();
     public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
-    public async UniTask<bool> ShowConfirmationDialog(string message, string confirmText = "OK", string cancelText = "キャンセル") 
-        => await _confirmationDialogView.ShowDialog(message, confirmText, cancelText);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
 

@@ -15,6 +15,7 @@ using Void2610.UnityTemplate;
 public class HomeUIPresenter : MonoBehaviour
 {
     [Header("UIコンポーネント")]
+    [SerializeField] private Button settingsButton;
     [SerializeField] private Button titleButton;
     [SerializeField] private Button libraryButton;
     [SerializeField] private Button storyButton;
@@ -29,13 +30,17 @@ public class HomeUIPresenter : MonoBehaviour
     private SceneTransitionManager _sceneTransitionManager;
     private StoryNode _currentNode;
     private AllCardData _allCardData;
+    private ConfirmationDialogService _confirmationDialogService;
+    private SettingsPresenter _settingsPresenter;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager, AllCardData allCardData)
+    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager, AllCardData allCardData, ConfirmationDialogService confirmationDialogService, SettingsPresenter settingsPresenter)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _allCardData = allCardData;
+        _confirmationDialogService = confirmationDialogService;
+        _settingsPresenter = settingsPresenter;
     }
 
     private void Start()
@@ -45,6 +50,7 @@ public class HomeUIPresenter : MonoBehaviour
         dreamButton.interactable = false;
         
         // ボタンイベントの設定
+        settingsButton.OnClickAsObservable().Subscribe(_ => _settingsPresenter.ShowSettings()).AddTo(this);
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
         // deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
