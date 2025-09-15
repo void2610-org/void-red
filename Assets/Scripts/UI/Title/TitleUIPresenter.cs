@@ -13,9 +13,9 @@ public class TitleUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Button startButton;
     [SerializeField] private Button continueButton;
+    [SerializeField] private Button quitButton;
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button reviewFormButton;
-    [SerializeField] private ConfirmationDialogView confirmationDialog;
     
     private SettingsPresenter _settingsPresenter;
     private SceneTransitionManager _sceneTransitionManager;
@@ -35,6 +35,7 @@ public class TitleUIPresenter : MonoBehaviour
     {
         startButton.OnClickAsObservable().Subscribe(_ => OnStartButtonClicked().Forget()).AddTo(this);
         continueButton.OnClickAsObservable().Subscribe(_ => OnContinueButtonClicked()).AddTo(this);
+        quitButton.OnClickAsObservable().Subscribe(_ => OnQuitButtonClicked()).AddTo(this);
         settingsButton.OnClickAsObservable().Subscribe(_ => OnSettingsButtonClicked()).AddTo(this);
         reviewFormButton.OnClickAsObservable().Subscribe(_ => OnReviewFormButtonClicked()).AddTo(this);
         
@@ -72,26 +73,30 @@ public class TitleUIPresenter : MonoBehaviour
         _sceneTransitionManager.TransitionToSceneWithFade(nextScene).Forget();
     }
     
-    /// <summary>
-    /// 続きからボタンがクリックされた時の処理
-    /// </summary>
     private void OnContinueButtonClicked()
     {
         // 続きから開始時は一旦ホームに遷移
         _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
     }
+    
+    private void OnQuitButtonClicked()
+    {
+        if (Application.isEditor)
+        {
+            // エディタ上では再生停止
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+        else
+        {
+            Application.Quit();
+        }
+    }
 
-    /// <summary>
-    /// 設定ボタンがクリックされた時の処理
-    /// </summary>
     private void OnSettingsButtonClicked()
     {
         _settingsPresenter.ShowSettings();
     }
     
-    /// <summary>
-    /// 感想フォームボタンがクリックされた時の処理
-    /// </summary>
     private void OnReviewFormButtonClicked()
     {
         Application.OpenURL("https://docs.google.com/forms/d/e/1FAIpQLSfNMqCyXFzWijWAv__wTpDVRN6AtEfFXpdPxyFcIkMbiq2UKw/viewform");

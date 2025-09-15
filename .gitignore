@@ -88,3 +88,9 @@ crashlytics-build.properties
 Packages/com.singularitygroup.hotreload/
 Assets/StreamingAssets/void-red-c7ec6e87a6c6.json
 Assets/StreamingAssets/void-red-c7ec6e87a6c6.json.meta
+Assets/AddressableAssetsData/link.xml
+Assets/AddressableAssetsData/link.xml.meta
+Assets/Resources/PerformanceTestRunInfo.json
+Assets/Resources/PerformanceTestRunInfo.json.meta
+Assets/Resources/PerformanceTestRunSettings.json
+Assets/Resources/PerformanceTestRunSettings.json.meta
