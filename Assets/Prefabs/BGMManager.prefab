@@ -49,5 +49,5 @@ MonoBehaviour:
   bgmList:
   - name: Title
     audioClip: {fileID: 8300000, guid: e3f47cea037ff4104a0e81704210474c, type: 3}
-    volume: 1
+    volume: 0.1
     bgmType: 0
