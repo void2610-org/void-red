@@ -81,15 +81,11 @@ public class TitleUIPresenter : MonoBehaviour
     
     private void OnQuitButtonClicked()
     {
-        if (Application.isEditor)
-        {
-            // エディタ上では再生停止
-            UnityEditor.EditorApplication.isPlaying = false;
-        }
-        else
-        {
-            Application.Quit();
-        }
+        #if UNITY_EDITOR
+        // エディタ上では再生停止
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+        Application.Quit();
     }
 
     private void OnSettingsButtonClicked()
