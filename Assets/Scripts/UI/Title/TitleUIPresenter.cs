@@ -28,7 +28,7 @@ public class TitleUIPresenter : MonoBehaviour
         _settingsPresenter = settingsPresenter;
         _sceneTransitionManager = sceneTransitionManager;
         _gameProgressService = gameProgressService;
-        confirmationDialogService = confirmationDialogService;
+        _confirmationDialogService = confirmationDialogService;
     }
 
     private void Start()
