@@ -15,10 +15,12 @@ public class HomeUIPresenter : MonoBehaviour
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Button titleButton;
+    [SerializeField] private Button libraryButton;
     [SerializeField] private Button storyButton;
     [SerializeField] private Button deckButton;
+    [SerializeField] private Button personButton;
+    [SerializeField] private Button dreamButton;
     [SerializeField] private DeckView deckView;
-    [SerializeField] private Button libraryButton;
     [SerializeField] private CardLibraryView cardLibraryView;
     
     private GameProgressService _gameProgressService;
@@ -36,10 +38,14 @@ public class HomeUIPresenter : MonoBehaviour
 
     private void Start()
     {
+        // 未実装のボタンを無効化
+        personButton.interactable = false;
+        dreamButton.interactable = false;
+        
         // ボタンイベントの設定
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
-        deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
+        // deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
         libraryButton.OnClickAsObservable().Subscribe(_ => ShowCardLibrary()).AddTo(this);
         
         // ホームBGMを再生

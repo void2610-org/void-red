@@ -229,6 +229,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9037413902010202566, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
   m_PrefabInstance: {fileID: 316264406}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &316264408 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+  m_PrefabInstance: {fileID: 316264406}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -488,6 +499,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9037413902010202566, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
   m_PrefabInstance: {fileID: 558389024}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &558389026 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+  m_PrefabInstance: {fileID: 558389024}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &591170100
 GameObject:
   m_ObjectHideFlags: 0
@@ -914,6 +936,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9037413902010202566, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
   m_PrefabInstance: {fileID: 865001914}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &865001916 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+  m_PrefabInstance: {fileID: 865001914}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &892604985
 GameObject:
   m_ObjectHideFlags: 0
@@ -1416,6 +1449,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9037413902010202566, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
   m_PrefabInstance: {fileID: 1591245445}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1591245447 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+  m_PrefabInstance: {fileID: 1591245445}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1993237498
 GameObject:
   m_ObjectHideFlags: 0
@@ -1445,11 +1489,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6c650e1deca84ab598b2869f51febed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  titleButton: {fileID: 0}
-  storyButton: {fileID: 0}
-  deckButton: {fileID: 0}
+  titleButton: {fileID: 558389026}
+  libraryButton: {fileID: 1591245447}
+  storyButton: {fileID: 865001916}
+  deckButton: {fileID: 1591245447}
+  personButton: {fileID: 2128008697}
+  dreamButton: {fileID: 316264408}
   deckView: {fileID: 960403403}
-  libraryButton: {fileID: 0}
   cardLibraryView: {fileID: 7666474612281180263}
 --- !u!4 &1993237500
 Transform:
@@ -1651,6 +1697,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9037413902010202566, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
   m_PrefabInstance: {fileID: 2128008695}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2128008697 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+  m_PrefabInstance: {fileID: 2128008695}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &458032984137373040
 PrefabInstance:
   m_ObjectHideFlags: 0
