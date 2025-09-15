@@ -13,6 +13,7 @@ public class RootLifetimeScope : LifetimeScope
     [SerializeField] private SeManager seManager;
     [SerializeField] private AllEnemyData allEnemyData;
     [SerializeField] private AllCardData allCardData;
+    [SerializeField] private ConfirmationDialogView confirmationDialogView;
     
     protected override void Configure(IContainerBuilder builder)
     {
@@ -39,6 +40,8 @@ public class RootLifetimeScope : LifetimeScope
         
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
+        builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
+            .WithParameter(confirmationDialogView);
         
         // Discord統合サービス
         builder.Register<DiscordService>(Lifetime.Singleton);

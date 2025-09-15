@@ -20,13 +20,15 @@ public class TitleUIPresenter : MonoBehaviour
     private SettingsPresenter _settingsPresenter;
     private SceneTransitionManager _sceneTransitionManager;
     private GameProgressService _gameProgressService;
+    private ConfirmationDialogService _confirmationDialogService;
     
     [Inject]
-    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionManager sceneTransitionManager, GameProgressService gameProgressService)
+    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionManager sceneTransitionManager, GameProgressService gameProgressService, ConfirmationDialogService confirmationDialogService)
     {
         _settingsPresenter = settingsPresenter;
         _sceneTransitionManager = sceneTransitionManager;
         _gameProgressService = gameProgressService;
+        confirmationDialogService = confirmationDialogService;
     }
 
     private void Start()
@@ -54,7 +56,7 @@ public class TitleUIPresenter : MonoBehaviour
         // セーブデータが存在する場合は確認ダイアログを表示
         if (_gameProgressService.HasSaveData())
         {
-            var confirmed = await confirmationDialog.ShowDialog(
+            var confirmed = await _confirmationDialogService.ShowDialog(
                 "既存のセーブデータが削除されます。よろしいですか？",
                 "はい", 
                 "いいえ"

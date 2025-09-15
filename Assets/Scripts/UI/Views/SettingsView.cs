@@ -17,9 +17,6 @@ public class SettingsView : MonoBehaviour
     [SerializeField] private Transform settingsContainer;
     [SerializeField] private Button closeButton;
     
-    [Header("ダイアログ")]
-    [SerializeField] private ConfirmationDialogView confirmationDialog;
-    
     [Header("設定項目プレハブ")]
     [SerializeField] private GameObject settingsContentContainerPrefab;
     [SerializeField] private GameObject titleTextPrefab;
@@ -33,6 +30,8 @@ public class SettingsView : MonoBehaviour
     private readonly Subject<string> _onButtonClicked = new();
     
     private readonly List<GameObject> _settingUIObjects = new();
+    
+    private ConfirmationDialogService _confirmationDialogService;
     
     /// <summary>
     /// スライダー設定値変更イベント
@@ -95,8 +94,10 @@ public class SettingsView : MonoBehaviour
     /// 外部から設定データを注入してUIを更新
     /// </summary>
     /// <param name="settingsData">設定データ配列</param>
-    public void SetSettings(SettingDisplayData[] settingsData)
+    public void SetSettings(SettingDisplayData[] settingsData, ConfirmationDialogService confirmationDialog)
     {
+        _confirmationDialogService = confirmationDialog;
+        
         // 既存のUI要素をクリア
         ClearSettingsUI();
         
@@ -243,7 +244,7 @@ public class SettingsView : MonoBehaviour
     /// </summary>
     private async UniTaskVoid ShowConfirmationDialog(SettingDisplayData settingData)
     {
-        var result = await confirmationDialog.ShowDialog(
+        var result = await _confirmationDialogService.ShowDialog(
             settingData.confirmationMessage,
             "実行",
             "キャンセル"
