@@ -15,5 +15,8 @@ public class HomeLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<HomeUIPresenter>();
         builder.RegisterInstance(allCardData);
         builder.Register<CardPoolService>(Lifetime.Singleton);
+        
+        // 設定機能
+        builder.RegisterEntryPoint<SettingsPresenter>().AsSelf();
     }
 }

@@ -36,7 +36,7 @@ public class NovelUIPresenter : MonoBehaviour
         _characterImageLoader = characterImageLoader;
     }
     
-    private void Start()
+    private async UniTask Start()
     {
         // DialogViewを取得
         _dialogView = FindFirstObjectByType<DialogView>();
@@ -46,9 +46,25 @@ public class NovelUIPresenter : MonoBehaviour
         _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
-        
-        // シナリオIDに応じて処理を分岐
-        StartScenario(scenarioId).Forget();
+
+        List<DialogData> dialogList;
+        if (scenarioId == "prologue1")
+        {
+            dialogList = PrologueProvider.GetPrologueScenario();
+            await PreloadCharacterImages(dialogList);
+            await StartDialogSequence(dialogList);
+        }
+        else if (scenarioId == "prologue2")
+        {
+            dialogList = PrologueProvider.GetPrologue2Scenario();
+            await PreloadCharacterImages(dialogList);
+            await StartDialogSequence(dialogList);
+        }
+        else
+        {
+            // シナリオIDに応じて処理を分岐
+            // StartScenario(scenarioId).Forget();
+        }
     }
     
     /// <summary>
@@ -130,7 +146,8 @@ public class NovelUIPresenter : MonoBehaviour
         Sprite characterSprite = null;
         if (!string.IsNullOrEmpty(currentDialog.CharacterImageName))
         {
-            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(currentDialog.CharacterImageName);
+            var imageName = "Assets/Sprites/Character/Alv/" + currentDialog.CharacterImageName + ".png";
+            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(imageName);
         }
         
         // 読み込み完了後にViewに渡してダイアログを表示
@@ -158,7 +175,7 @@ public class NovelUIPresenter : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(dialog.CharacterImageName))
             {
-                imageNames.Add(dialog.CharacterImageName);
+                imageNames.Add("Assets/Sprites/Character/Alv/" + dialog.CharacterImageName + ".png");
             }
         }
         

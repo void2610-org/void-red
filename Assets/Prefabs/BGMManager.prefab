@@ -47,7 +47,7 @@ MonoBehaviour:
   playOnStart: 0
   bgmMixerGroup: {fileID: 4012142502108132091, guid: b2ecbb207e05140658f87e606166d8f5, type: 2}
   bgmList:
-  - name: Gymnopedie
-    audioClip: {fileID: 8300000, guid: 9f19f3cb3af664573b627203cf9d10b0, type: 3}
-    volume: 1
+  - name: Title
+    audioClip: {fileID: 8300000, guid: e3f47cea037ff4104a0e81704210474c, type: 3}
+    volume: 0.1
     bgmType: 0
