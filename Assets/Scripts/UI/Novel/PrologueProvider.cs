@@ -131,7 +131,17 @@ public static class PrologueProvider
     {
         return new List<DialogData>
         {
-            new DialogData("システム", "これはプロローグシナリオ2です。")
+            new DialogData("システム", "(プロローグ後半)")
+        };
+    }
+    
+    public static List<DialogData> GetEndingScenario()
+    {
+        return new List<DialogData>
+        {
+            new DialogData("システム", "アルファ版はここまでです。"),
+            new DialogData("システム", "プレイしていただきありがとうございます。"),
+            new DialogData("システム", "製品版リリースをお待ちください。")
         };
     }
 }
