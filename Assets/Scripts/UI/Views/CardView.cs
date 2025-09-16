@@ -27,12 +27,14 @@ public class CardView : MonoBehaviour
     private readonly Subject<CardView> _onClicked = new();
     private Vector2 _originalPosition;
     private RectTransform _rectTransform;
+    private bool _isBackside = false;
     
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
     public void UpdateOriginalPosition(Vector2 position) => _originalPosition = position;
 
     public void SetToBackside(Sprite cardBackSprite)
     {
+        _isBackside = true;
         cardBackImage.sprite = cardBackSprite;
         cardFrame.color = Color.clear;
         cardNameBanner.color = Color.clear;
@@ -185,6 +187,7 @@ public class CardView : MonoBehaviour
     private void UpdateDisplay()
     {
         if (!CardData) return;
+        if (_isBackside) return;
         
         // カード名を設定
         cardNameText.text = CardData.CardName;

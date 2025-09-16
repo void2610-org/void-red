@@ -41,5 +41,5 @@ MonoBehaviour:
     maskPosition: {x: 0, y: 0}
     maskSize: {x: 0, y: 0}
   - message: "\u300C\u4EBA\u683C\u30ED\u30B0\u300D\u3067\u306F\u3053\u308C\u307E\u3067\u306E\u884C\u52D5\u5C65\u6B74\u3092\u78BA\u8A8D\u3067\u304D\u307E\u3059\u3002"
-    maskPosition: {x: 412.5, y: 237.5}
-    maskSize: {x: 175, y: 75}
+    maskPosition: {x: 340, y: 250}
+    maskSize: {x: 160, y: 65}

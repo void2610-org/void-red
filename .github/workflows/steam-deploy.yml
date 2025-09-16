@@ -86,4 +86,4 @@ jobs:
           buildDescription: auto deploy via github actions (${{ steps.short_sha.outputs.sha_short }})
           rootPath: builds
           depot1Path: StandaloneWindows64
-          releaseBranch: prerelease
+          releaseBranch: test
