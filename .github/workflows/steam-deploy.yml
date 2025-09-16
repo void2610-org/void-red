@@ -73,6 +73,8 @@ jobs:
           path: builds/StandaloneWindows64
 
       - name: Deploy to Steam 🎮
+        id: steam_deploy
+        continue-on-error: true
         uses: game-ci/steam-deploy@v3
         with:
           username: ${{ secrets.STEAM_USERNAME }}
