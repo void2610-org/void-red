@@ -32,20 +32,6 @@ jobs:
           # 高速化のため shallow clone を使用
           fetch-depth: 1
 
-      - name: Generate GCP credentials file 🔐
-        run: |
-          # GitHubシークレットからJSONファイルを生成
-          echo "${{ secrets.GCP_KEY }}" > Assets/StreamingAssets/${{ secrets.GCP_KEY_FILE_NAME }}.json
-          
-          # ファイルが正しく作成されたことを確認
-          if [ -f "Assets/StreamingAssets/${{ secrets.GCP_KEY_FILE_NAME }}.json" ]; then
-            echo "✅ GCP credentials file created successfully"
-            echo "📄 File: ${{ secrets.GCP_KEY_FILE_NAME }}.json"
-          else
-            echo "❌ Failed to create GCP credentials file"
-            exit 1
-          fi
-
       - name: Optimize WebGL Build Settings 🔧
         run: |
           # WebGL最適化設定でビルド時間短縮
@@ -64,39 +50,6 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-
             Library-${{ runner.os }}-
-
-      - name: Verify Assets-based SerializeReferenceExtensions 📦
-        run: |
-          echo "🔍 Verifying Assets-based SerializeReferenceExtensions..."
-          
-          # Assets配置の確認
-          echo "📁 Checking Assets/Plugins directory:"
-          ls -la Assets/Plugins/ || echo "❌ No Plugins directory"
-          
-          if [ -d "Assets/Plugins/MackySoft.SerializeReferenceExtensions" ]; then
-            echo "✅ SerializeReferenceExtensions found in Assets"
-            echo "📁 Runtime directory:"
-            ls -la Assets/Plugins/MackySoft.SerializeReferenceExtensions/Runtime/
-            echo "📁 Editor directory:"
-            ls -la Assets/Plugins/MackySoft.SerializeReferenceExtensions/Editor/
-            
-            # 重要なファイルの存在確認
-            if [ -f "Assets/Plugins/MackySoft.SerializeReferenceExtensions/Runtime/SubclassSelectorAttribute.cs" ]; then
-              echo "✅ SubclassSelectorAttribute.cs found"
-            else
-              echo "❌ SubclassSelectorAttribute.cs NOT found"
-            fi
-          else
-            echo "❌ SerializeReferenceExtensions NOT found in Assets"
-          fi
-          
-          # manifest.jsonの確認（Gitパッケージが削除されているか）
-          echo "📄 Checking manifest.json (should not contain serializereference-extensions):"
-          if grep -q "serializereference-extensions" Packages/manifest.json; then
-            echo "❌ Git package reference still exists in manifest.json"
-          else
-            echo "✅ Git package reference removed from manifest.json"
-          fi
 
       - name: Build project 🏗️
         uses: game-ci/unity-builder@v4
