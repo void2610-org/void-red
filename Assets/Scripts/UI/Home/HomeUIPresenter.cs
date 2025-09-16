@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using R3;
 using VContainer;
 using Cysharp.Threading.Tasks;
+using TMPro;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -14,36 +15,55 @@ using Void2610.UnityTemplate;
 public class HomeUIPresenter : MonoBehaviour
 {
     [Header("UIコンポーネント")]
+    [SerializeField] private Button settingsButton;
     [SerializeField] private Button titleButton;
-    [SerializeField] private Button storyButton;
-    [SerializeField] private Button deckButton;
-    [SerializeField] private DeckView deckView;
     [SerializeField] private Button libraryButton;
+    [SerializeField] private Button storyButton;
+    [SerializeField] private Button personButton;
+    [SerializeField] private Button dreamButton;
+    [SerializeField] private DeckView deckView;
     [SerializeField] private CardLibraryView cardLibraryView;
+    [SerializeField] private TextMeshProUGUI speakingText;
     
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
     private StoryNode _currentNode;
     private AllCardData _allCardData;
+    private ConfirmationDialogService _confirmationDialogService;
+    private SettingsPresenter _settingsPresenter;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager, AllCardData allCardData)
+    public void Construct(GameProgressService gameProgressService, SceneTransitionManager sceneTransitionManager, AllCardData allCardData, ConfirmationDialogService confirmationDialogService, SettingsPresenter settingsPresenter)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _allCardData = allCardData;
+        _confirmationDialogService = confirmationDialogService;
+        _settingsPresenter = settingsPresenter;
     }
 
     private void Start()
     {
+        // 未実装のボタンを無効化
+        personButton.interactable = false;
+        dreamButton.interactable = false;
+        
         // ボタンイベントの設定
+        settingsButton.OnClickAsObservable().Subscribe(_ => _settingsPresenter.ShowSettings()).AddTo(this);
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
-        deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
         libraryButton.OnClickAsObservable().Subscribe(_ => ShowCardLibrary()).AddTo(this);
         
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
+        
+        InitSpeaking().Forget();
+    }
+
+    private async UniTask InitSpeaking()
+    {
+        await UniTask.Delay(1000);
+        speakingText.TypewriterAnimation("...").Forget();
     }
 
     /// <summary>

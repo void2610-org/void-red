@@ -13,11 +13,13 @@ public class SettingsPresenter : IStartable, IDisposable
 {
     private SettingsView _settingsView;
     private readonly SettingsManager _settingsManager;
+    private readonly ConfirmationDialogService _confirmationDialogService;
     private readonly CompositeDisposable _disposables = new();
     
-    public SettingsPresenter(SettingsManager settingsManager)
+    public SettingsPresenter(SettingsManager settingsManager, ConfirmationDialogService confirmationDialogService)
     {
         _settingsManager = settingsManager;
+        _confirmationDialogService = confirmationDialogService;
     }
     
     public void Start()
@@ -82,7 +84,7 @@ public class SettingsPresenter : IStartable, IDisposable
     private void RefreshSettingsView()
     {
         var settingsData = _settingsManager.Settings.Select(ConvertToDisplayData).ToArray();
-        _settingsView.SetSettings(settingsData);
+        _settingsView.SetSettings(settingsData, _confirmationDialogService);
     }
     
     /// <summary>

@@ -49,6 +49,7 @@ public class BattleLifetimeScope : LifetimeScope
         // === エントリーポイントとPresenterの登録 ===
         
         builder.RegisterEntryPoint<UIPresenter>().AsSelf();
+        builder.RegisterEntryPoint<PausePresenter>().AsSelf();
         builder.RegisterEntryPoint<GameManager>();
     }
 }
