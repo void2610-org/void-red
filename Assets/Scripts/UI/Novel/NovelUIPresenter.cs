@@ -146,8 +146,8 @@ public class NovelUIPresenter : MonoBehaviour
         Sprite characterSprite = null;
         if (!string.IsNullOrEmpty(currentDialog.CharacterImageName))
         {
-            var iamgeName = "Assets/Sprites/Character/Alv/" + currentDialog.CharacterImageName + ".png";
-            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(iamgeName);
+            var imageName = "Assets/Sprites/Character/Alv/" + currentDialog.CharacterImageName + ".png";
+            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(imageName);
         }
         
         // 読み込み完了後にViewに渡してダイアログを表示
