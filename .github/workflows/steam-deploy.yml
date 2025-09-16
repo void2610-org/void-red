@@ -71,6 +71,10 @@ jobs:
           name: windows-build
           path: builds/StandaloneWindows64
 
+      - name: Get short SHA 🔢
+        id: short_sha
+        run: echo "sha_short=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+      
       - name: Deploy to Steam 🎮
         id: steam_deploy
         continue-on-error: true
@@ -79,7 +83,7 @@ jobs:
           username: ${{ secrets.STEAM_USERNAME }}
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
           appId: ${{ secrets.STEAM_APP_ID }}
-          buildDescription: auto deploy via github actions (${{ github.sha }})
+          buildDescription: auto deploy via github actions (${{ steps.short_sha.outputs.sha_short }})
           rootPath: builds
           depot1Path: StandaloneWindows64
           releaseBranch: prerelease
