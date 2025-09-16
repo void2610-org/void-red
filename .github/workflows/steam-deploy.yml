@@ -1,0 +1,84 @@
+name: Steam Deploy 🎮
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: Build Windows 🪟
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free up disk space 🧹
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo apt-get clean
+          docker system prune --all --force
+          df -h
+
+      - name: Checkout repository 📥
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library 📦
+        uses: actions/cache@v4
+        with:
+          path: |
+            Library
+            Temp/UnityLockfile
+          key: Library-Windows-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Windows-${{ runner.os }}-
+            Library-${{ runner.os }}-
+
+      - name: Build Windows project 🏗️
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL:   ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneWindows64
+          unityVersion:   6000.0.30f1
+          allowDirtyBuild: true
+          buildsPath:     builds
+          buildName:      void-red
+
+      - name: Upload Windows build artifact 📤
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: builds/StandaloneWindows64
+          retention-days: 1
+
+  deploy-steam:
+    name: Deploy to Steam 🚀
+    needs: build-windows
+    runs-on: ubuntu-latest
+    environment:
+      name: steam-production
+      url: https://store.steampowered.com/app/${{ secrets.STEAM_APP_ID }}
+    
+    steps:
+      - name: Download Windows build 📥
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: builds/StandaloneWindows64
+
+      - name: Deploy to Steam 🎮
+        uses: game-ci/steam-deploy@v3
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          appId: ${{ secrets.STEAM_APP_ID }}
+          buildDescription: auto deploy via github actions (${{ github.sha }})
+          rootPath: builds
+          depot1Path: StandaloneWindows64
+          releaseBranch: prerelease
