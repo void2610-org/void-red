@@ -156,10 +156,6 @@ public class GameProgressService
             case 2:
                 nextNode = new NovelNode("prologue2");
                 break;
-            // 敵2は分岐 - バトル後はホームに戻る
-            case 3:
-                nextNode = new BattleNode(Random.Range(0f,1f) > 0.5f ? "E002" : "E003");
-                break;
             default:
                 // この先は未定
                 nextNode = new NovelNode("ending");

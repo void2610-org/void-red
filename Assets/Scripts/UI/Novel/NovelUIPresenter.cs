@@ -47,24 +47,19 @@ public class NovelUIPresenter : MonoBehaviour
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
+        // アルファ版はハードコードでシナリオを提供
         List<DialogData> dialogList;
-        if (scenarioId == "prologue1")
-        {
-            dialogList = PrologueProvider.GetPrologueScenario();
-            await PreloadCharacterImages(dialogList);
-            await StartDialogSequence(dialogList);
-        }
-        else if (scenarioId == "prologue2")
-        {
-            dialogList = PrologueProvider.GetPrologue2Scenario();
-            await PreloadCharacterImages(dialogList);
-            await StartDialogSequence(dialogList);
-        }
+        if (scenarioId == "prologue1") dialogList = PrologueProvider.GetPrologueScenario();
+        else if (scenarioId == "prologue2") dialogList = PrologueProvider.GetPrologue2Scenario();
+        else if (scenarioId == "ending") dialogList = PrologueProvider.GetEndingScenario();
         else
         {
-            // シナリオIDに応じて処理を分岐
+            // 実際はシナリオIDに応じて処理を分岐
             // StartScenario(scenarioId).Forget();
+            return;
         }
+        await PreloadCharacterImages(dialogList);
+        await StartDialogSequence(dialogList);
     }
     
     /// <summary>
@@ -72,42 +67,19 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartScenario(string scenarioId)
     {
-        List<DialogData> dialogList;
-        
-        // ハードコードシナリオの処理
-        switch (scenarioId)
-        {
-            case "ending":
-                dialogList = new List<DialogData>
-                {
-                    new DialogData("", "アルファ版はここまでです。"),
-                    new DialogData("", "プレイしていただきありがとうございます。"),
-                    new DialogData("", "製品版リリースをお待ちください。")
-                };
-                break;
-            default:
-                // スプレッドシートからシナリオを読み込み
-                dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
+        // スプレッドシートからシナリオを読み込み
+        var dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
 
-                if (dialogList == null)
-                {
-                    Debug.LogError($"シナリオ '{scenarioId}' の読み込みに失敗しました");
-                    await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
-                    return;
-                }
-                break;
-        }
-        
         // ダイアログリストが有効かチェック
         if (dialogList == null || dialogList.Count == 0)
         {
+            Debug.LogError($"シナリオ '{scenarioId}' の読み込みに失敗しました");
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
         
         // キャラクター画像を事前に読み込み
         await PreloadCharacterImages(dialogList);
-        
         // ダイアログシーケンスを開始
         await StartDialogSequence(dialogList);
     }
