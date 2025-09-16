@@ -63,7 +63,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: steam-production
-      url: https://store.steampowered.com/app/${{ secrets.STEAM_APP_ID }}
     
     steps:
       - name: Download Windows build 📥
