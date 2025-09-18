@@ -57,9 +57,49 @@ jobs:
           path: builds/StandaloneWindows64
           retention-days: 1
 
+  build-mac:
+    name: Build Mac 🍎
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository 📥
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library 📦
+        uses: actions/cache@v4
+        with:
+          path: |
+            Library
+            Temp/UnityLockfile
+          key: Library-Mac-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Mac-${{ runner.os }}-
+            Library-${{ runner.os }}-
+
+      - name: Build Mac project 🏗️
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL:   ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneOSX
+          unityVersion:   6000.0.30f1
+          allowDirtyBuild: true
+          buildsPath:     builds
+          buildName:      void-red
+
+      - name: Upload Mac build artifact 📤
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-build
+          path: builds/StandaloneOSX
+          retention-days: 1
+
   deploy-steam:
     name: Deploy to Steam 🚀
-    needs: build-windows
+    needs: [build-windows, build-mac]
     runs-on: ubuntu-latest
     environment:
       name: steam-production
@@ -70,6 +110,12 @@ jobs:
         with:
           name: windows-build
           path: builds/StandaloneWindows64
+
+      - name: Download Mac build 📥
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-build
+          path: builds/StandaloneOSX
 
       - name: Get short SHA 🔢
         id: short_sha
@@ -86,4 +132,5 @@ jobs:
           buildDescription: auto deploy via github actions (${{ steps.short_sha.outputs.sha_short }})
           rootPath: builds
           depot1Path: StandaloneWindows64
+          depot2Path: StandaloneOSX
           releaseBranch: test
