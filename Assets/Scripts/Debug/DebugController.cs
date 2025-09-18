@@ -57,12 +57,14 @@ public class DebugController : MonoBehaviour
             if (success) Debug.Log("[Debug] セーブファイル削除完了");
         }
         
+        #if !UNITY_WEBGL || UNITY_EDITOR
         if (resetSteamStats)
         {
             var success = _steamService.ResetAllStats();
             if (success) Debug.Log("[Debug] Steamの実績・統計情報をリセットしました");
             else Debug.LogWarning("[Debug] Steamの実績・統計情報のリセットに失敗しました");
         }
+        #endif
     }
     
     private void OnValidate()
