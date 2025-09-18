@@ -1,4 +1,4 @@
-#if !(UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX) || !UNITY_EDITOR
+#if !(UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX) && !UNITY_EDITOR
 #define DISABLESTEAMWORKS
 #endif
 
@@ -35,6 +35,40 @@ public class SteamService : IDisposable, ITickable
 		if (!SteamUserStats.SetAchievement(achieveType.ToString()))
 		{
 			Debug.LogError("[Steamworks.NET] Failed to set achievement: " + achieveType);
+			return false;
+		}
+		if (!SteamUserStats.StoreStats())
+		{
+			Debug.LogError("[Steamworks.NET] Failed to store stats");
+			return false;
+		}
+		return true;
+	}
+	
+	public bool SetStat(SteamStatType statType, int value)
+	{
+		if (!_initialized) return false;
+		
+		if (!SteamUserStats.SetStat(statType.ToString(), value))
+		{
+			Debug.LogError("[Steamworks.NET] Failed to set stat: " + statType);
+			return false;
+		}
+		if (!SteamUserStats.StoreStats())
+		{
+			Debug.LogError("[Steamworks.NET] Failed to store stats");
+			return false;
+		}
+		return true;
+	}
+	
+	public bool SetStat(SteamStatType statType, float value)
+	{
+		if (!_initialized) return false;
+		
+		if (!SteamUserStats.SetStat(statType.ToString(), value))
+		{
+			Debug.LogError("[Steamworks.NET] Failed to set stat: " + statType);
 			return false;
 		}
 		if (!SteamUserStats.StoreStats())

@@ -71,6 +71,7 @@ public class TitleUIPresenter : MonoBehaviour
         }
         
         _gameProgressService.ResetToDefaultData();
+        _steamService.SetStat(SteamStatType.START_GAME_COUNT, 1);
         
         // 新規開始時は次のノードに直接遷移
         var nextScene = _gameProgressService.GetNextSceneType();
