@@ -1273,6 +1273,7 @@ MonoBehaviour:
   timeScale: 10
   showSaveInfo: 0
   startWithFreshData: 0
+  resetSteamStats: 1
 --- !u!1001 &1780273427886845125
 PrefabInstance:
   m_ObjectHideFlags: 0
