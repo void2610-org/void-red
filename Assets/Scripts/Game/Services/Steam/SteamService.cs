@@ -16,7 +16,6 @@ public class SteamService : IDisposable, ITickable
 	
 	private static bool _everInitialized;
 	private bool _initialized;
-	private SteamAPIWarningMessageHook_t _steamAPIWarningMessageHook;
 
 	public static bool Initialized => _everInitialized;
 	
@@ -28,6 +27,10 @@ public class SteamService : IDisposable, ITickable
 	public SteamService()
 	{
 		Init();
+		// SteamAPIの警告メッセージをUnityのコンソールに出力する
+		// 起動時引数に-debug_steamapiが含まれている場合にのみ有効
+		SteamAPIWarningMessageHook_t steamAPIWarningMessageHook = SteamAPIDebugTextHook;
+		SteamClient.SetWarningMessageHook(steamAPIWarningMessageHook);
 	}
 	
 	public bool UnlockAchievement(SteamAchieveType achieveType)
