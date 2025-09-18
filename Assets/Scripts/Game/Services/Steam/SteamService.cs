@@ -17,6 +17,8 @@ public class SteamService : IDisposable, ITickable
 	private static bool _everInitialized;
 	private bool _initialized;
 	private SteamAPIWarningMessageHook_t _steamAPIWarningMessageHook;
+
+	public static bool Initialized => _everInitialized;
 	
 	[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
 	protected static void SteamAPIDebugTextHook(int nSeverity, System.Text.StringBuilder pchDebugText) {
@@ -31,104 +33,44 @@ public class SteamService : IDisposable, ITickable
 	public bool UnlockAchievement(SteamAchieveType achieveType)
 	{
 		if (!_initialized) return false;
-		
-		if (!SteamUserStats.SetAchievement(achieveType.ToString()))
-		{
-			Debug.LogError("[Steamworks.NET] 実績解除に失敗: " + achieveType);
-			return false;
-		}
-		if (!SteamUserStats.StoreStats())
-		{
-			Debug.LogError("[Steamworks.NET] 実績情報の保存に失敗");
-			return false;
-		}
-		Debug.Log("[Steamworks.NET] 実績解除: " + achieveType);
+		if (!SteamUserStats.SetAchievement(achieveType.ToString())) return false;
+		if (!SteamUserStats.StoreStats()) return false;
 		return true;
 	}
 	
 	public bool SetStat(SteamStatType statType, int value)
 	{
 		if (!_initialized) return false;
-		
-		if (!SteamUserStats.SetStat(statType.ToString(), value))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の設定に失敗: " + statType);
-			return false;
-		}
-		if (!SteamUserStats.StoreStats())
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の保存に失敗");
-			return false;
-		}
-		Debug.Log("[Steamworks.NET] 統計情報設定: " + statType + " = " + value);
+		if (!SteamUserStats.SetStat(statType.ToString(), value)) return false;
+		if (!SteamUserStats.StoreStats()) return false;
 		return true;
 	}
 	
 	public bool SetStat(SteamStatType statType, float value)
 	{
 		if (!_initialized) return false;
-		
-		if (!SteamUserStats.SetStat(statType.ToString(), value))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の設定に失敗: " + statType);
-			return false;
-		}
-		if (!SteamUserStats.StoreStats())
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の保存に失敗");
-			return false;
-		}
-		Debug.Log("[Steamworks.NET] 統計情報設定: " + statType + " = " + value);
+		if (!SteamUserStats.SetStat(statType.ToString(), value)) return false;
+		if (!SteamUserStats.StoreStats()) return false;
 		return true;
 	}
 	
 	public bool AddStat(SteamStatType statType, int value)
 	{
 		if (!_initialized) return false;
-		
-		if (!SteamUserStats.GetStat(statType.ToString(), out int currentValue))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の取得に失敗: " + statType);
-			return false;
-		}
+		if (!SteamUserStats.GetStat(statType.ToString(), out int currentValue)) return false;
 		currentValue += value;
-		
-		if (!SteamUserStats.SetStat(statType.ToString(), currentValue))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の設定に失敗: " + statType);
-			return false;
-		}
-		if (!SteamUserStats.StoreStats())
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の保存に失敗");
-			return false;
-		}
-		Debug.Log("[Steamworks.NET] 統計情報加算: " + statType + " = " + currentValue);
+		if (!SteamUserStats.SetStat(statType.ToString(), currentValue)) return false;
+		if (!SteamUserStats.StoreStats()) return false;
 		return true;
 	}
 	
 	public bool AddStat(SteamStatType statType, float value)
 	{
 		if (!_initialized) return false;
-		
-		if (!SteamUserStats.GetStat(statType.ToString(), out float currentValue))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の取得に失敗: " + statType);
-			return false;
-		}
+		if (!SteamUserStats.GetStat(statType.ToString(), out float currentValue)) return false;
 		currentValue += value;
-		
-		if (!SteamUserStats.SetStat(statType.ToString(), currentValue))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の設定に失敗: " + statType);
-			return false;
-		}
-		if (!SteamUserStats.StoreStats())
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の保存に失敗");
-			return false;
-		}
-		Debug.Log("[Steamworks.NET] 統計情報加算: " + statType + " = " + currentValue);
+		if (!SteamUserStats.SetStat(statType.ToString(), currentValue)) return false;
+		if (!SteamUserStats.StoreStats()) return false;
 		return true;
 	}
 	
@@ -136,26 +78,14 @@ public class SteamService : IDisposable, ITickable
 	{
 		value = 0;
 		if (!_initialized) return false;
-		
-		if (!SteamUserStats.GetStat(statType.ToString(), out value))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の取得に失敗: " + statType);
-			return false;
-		}
-		return true;
+		return SteamUserStats.GetStat(statType.ToString(), out value);
 	}
 	
 	public bool GetStat(SteamStatType statType, out float value)
 	{
 		value = 0f;
 		if (!_initialized) return false;
-		
-		if (!SteamUserStats.GetStat(statType.ToString(), out value))
-		{
-			Debug.LogError("[Steamworks.NET] 統計情報の取得に失敗: " + statType);
-			return false;
-		}
-		return true;
+		return SteamUserStats.GetStat(statType.ToString(), out value);
 	}
 
 	private void Init()
@@ -203,6 +133,15 @@ public class SteamService : IDisposable, ITickable
 		SteamAPI.Shutdown();
 		_initialized = false;
 		_everInitialized = false;
+	}
+	
+	/// <summary>
+	/// [デバッグ用] 全ての実績と統計情報をリセットする
+	/// </summary>
+	public bool ResetAllStats(bool achievementsToo = true)
+	{
+		if (!_initialized) return false;
+		return SteamUserStats.ResetAllStats(achievementsToo);
 	}
 
 #else

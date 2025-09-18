@@ -15,20 +15,26 @@ public class DebugController : MonoBehaviour
     [SerializeField] private bool showSaveInfo = false;
     [SerializeField] private bool startWithFreshData = false; // 毎回新しいセーブデータで始める
     
+    [Header("Steam連携")]
+    [SerializeField] private bool resetSteamStats = false; // Steamの実績・統計情報をリセットする
+    
     private readonly ReactiveProperty<bool> _fastModeProperty = new();
     private readonly ReactiveProperty<float> _timeScaleProperty = new();
     
     private GameProgressService _gameProgressService;
     private SaveDataManager _saveDataManager;
+    private SteamService _steamService;
     
     [Inject]
-    public void Construct(GameProgressService gameProgressService, SaveDataManager saveDataManager)
+    public void Construct(GameProgressService gameProgressService, SaveDataManager saveDataManager, SteamService steamService)
     {
         _gameProgressService = gameProgressService;
         _saveDataManager = saveDataManager;
+        _steamService = steamService;
+        Init();
     }
     
-    private void Awake()
+    private void Init()
     {
         if (!Application.isEditor)
         {
@@ -45,13 +51,17 @@ public class DebugController : MonoBehaviour
             .Subscribe(scale => Time.timeScale = scale)
             .AddTo(this);
         
-        if (startWithFreshData && _saveDataManager != null)
+        if (startWithFreshData)
         {
             var success = _saveDataManager.DeleteSaveFile();
-            if (success) 
-            {
-                Debug.Log("[Debug] セーブファイル削除完了");
-            }
+            if (success) Debug.Log("[Debug] セーブファイル削除完了");
+        }
+        
+        if (resetSteamStats)
+        {
+            var success = _steamService.ResetAllStats();
+            if (success) Debug.Log("[Debug] Steamの実績・統計情報をリセットしました");
+            else Debug.LogWarning("[Debug] Steamの実績・統計情報のリセットに失敗しました");
         }
     }
     
