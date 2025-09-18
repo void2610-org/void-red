@@ -160,6 +160,7 @@ public class SteamService : IDisposable, ITickable
 	public bool AddStat(SteamStatType statType, float value) => false;
 	public bool GetStat(SteamStatType statType, out int value) { value = 0; return false; }
 	public bool GetStat(SteamStatType statType, out float value) { value = 0f; return false; }
+	public bool ResetAllStats(bool achievementsToo = true) => false;
 	public void Tick() { }
 	public void Dispose() { }
 #endif
