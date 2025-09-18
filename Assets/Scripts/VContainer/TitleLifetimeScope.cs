@@ -11,5 +11,6 @@ public class TitleLifetimeScope : LifetimeScope
     {
         builder.RegisterEntryPoint<SettingsPresenter>().AsSelf();
         builder.RegisterComponentInHierarchy<TitleUIPresenter>();
+        builder.RegisterComponentInHierarchy<DebugController>();
     }
 }
