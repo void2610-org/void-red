@@ -43,6 +43,8 @@ public class RootLifetimeScope : LifetimeScope
         builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
             .WithParameter(confirmationDialogView);
         
+        // Steam統合サービス
+        builder.RegisterEntryPoint<SteamService>().AsSelf();
         // Discord統合サービス
         builder.Register<DiscordService>(Lifetime.Singleton);
         
