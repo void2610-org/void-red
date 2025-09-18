@@ -27,7 +27,7 @@ public class SaveDataManager
             var json = JsonUtility.ToJson(saveData, true);
             var success = DataPersistence.SaveData(SAVE_DATA_KEY, json);
             
-            if (success) Debug.Log($"[SaveDataManager] ゲームデータセーブ成功: {saveData.GetDebugInfo()}");
+            if (success) Debug.Log($"[SaveDataManager] ゲームデータセーブ成功: {Application.persistentDataPath}");
             else Debug.LogError("[SaveDataManager] ゲームデータセーブ失敗");
             
             return success;
