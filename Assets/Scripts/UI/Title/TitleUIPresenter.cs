@@ -21,14 +21,16 @@ public class TitleUIPresenter : MonoBehaviour
     private SceneTransitionManager _sceneTransitionManager;
     private GameProgressService _gameProgressService;
     private ConfirmationDialogService _confirmationDialogService;
+    private SteamService _steamService;
     
     [Inject]
-    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionManager sceneTransitionManager, GameProgressService gameProgressService, ConfirmationDialogService confirmationDialogService)
+    public void Construct(SettingsPresenter settingsPresenter, SceneTransitionManager sceneTransitionManager, GameProgressService gameProgressService, ConfirmationDialogService confirmationDialogService, SteamService steamService)
     {
         _settingsPresenter = settingsPresenter;
         _sceneTransitionManager = sceneTransitionManager;
         _gameProgressService = gameProgressService;
         _confirmationDialogService = confirmationDialogService;
+        _steamService = steamService;
     }
 
     private void Start()
@@ -47,6 +49,8 @@ public class TitleUIPresenter : MonoBehaviour
             .AddTo(this);
         
         BgmManager.Instance.PlayRandomBGM(BgmType.Title);
+        
+        _steamService.UnlockAchievement(SteamAchieveType.FIRST_BOOT);
     }
 
     /// <summary>
