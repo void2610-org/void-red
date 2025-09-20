@@ -26,13 +26,8 @@ public class NovelDialogService
     public async UniTask<List<DialogData>> GetDialogDataAsync(string scenarioId)
     {
         if (_useLocalExcel)
-        {
             return await GetDialogDataFromExcel(scenarioId);
-        }
-        else
-        {
-            return await GetDialogDataFromSpreadsheet(scenarioId);
-        }
+        return await GetDialogDataFromSpreadsheet(scenarioId);
     }
     
     /// <summary>
