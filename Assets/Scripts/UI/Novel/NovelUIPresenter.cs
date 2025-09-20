@@ -16,7 +16,8 @@ public class NovelUIPresenter : MonoBehaviour
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
     private NovelDialogService _novelDialogService;
-    private AddressableCharacterImageLoader _characterImageLoader;
+    private AddressableImageLoader _characterImageLoader;
+    private ConfirmationDialogService _confirmationDialogService;
     private DialogView _dialogView;
     
     // ダイアログ制御用
@@ -28,12 +29,14 @@ public class NovelUIPresenter : MonoBehaviour
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
         NovelDialogService novelDialogService,
-        AddressableCharacterImageLoader characterImageLoader)
+        AddressableImageLoader characterImageLoader,
+        ConfirmationDialogService confirmationDialogService)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _novelDialogService = novelDialogService;
         _characterImageLoader = characterImageLoader;
+        _confirmationDialogService = confirmationDialogService;
     }
     
     private async UniTask Start()
@@ -44,6 +47,7 @@ public class NovelUIPresenter : MonoBehaviour
         // Viewイベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
+        _dialogView.OnSkipRequested += () => SkipAllDialogs().Forget();
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
@@ -118,12 +122,18 @@ public class NovelUIPresenter : MonoBehaviour
         Sprite characterSprite = null;
         if (!string.IsNullOrEmpty(currentDialog.CharacterImageName))
         {
-            var imageName = "Assets/Sprites/Character/Alv/" + currentDialog.CharacterImageName + ".png";
-            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(imageName);
+            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(currentDialog.CharacterImageName);
+        }
+        
+        // 背景画像を読み込み
+        Sprite backgroundSprite = null;
+        if (!string.IsNullOrEmpty(currentDialog.BackgroundImageName))
+        {
+            backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(currentDialog.BackgroundImageName);
         }
         
         // 読み込み完了後にViewに渡してダイアログを表示
-        await _dialogView.ShowSingleDialog(currentDialog, characterSprite);
+        await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite);
     }
     
     /// <summary>
@@ -136,26 +146,59 @@ public class NovelUIPresenter : MonoBehaviour
     }
     
     /// <summary>
-    /// ダイアログリストに含まれるキャラクター画像を事前に読み込み
+    /// 全ダイアログをスキップして即座に完了
+    /// </summary>
+    private async UniTaskVoid SkipAllDialogs()
+    {
+        var confirmed = await _confirmationDialogService.ShowDialog(
+            "現在のシナリオをスキップしますか？",
+            "スキップ",
+            "キャンセル"
+        );
+        
+        if (!confirmed) return;
+        
+        // 残りのダイアログを全てスキップ
+        _currentDialogIndex = _currentDialogList.Count;
+        // ダイアログ完了を表示
+        await _dialogView.ShowDialogComplete();
+    }
+    
+    /// <summary>
+    /// ダイアログリストに含まれるキャラクター画像と背景画像を事前に読み込み
     /// </summary>
     private async UniTask PreloadCharacterImages(List<DialogData> dialogList)
     {
-        var imageNames = new HashSet<string>();
+        var characterImageNames = new HashSet<string>();
+        var backgroundImageNames = new HashSet<string>();
         
         // ダイアログリストから使用される画像名を抽出
         foreach (var dialog in dialogList)
         {
             if (!string.IsNullOrEmpty(dialog.CharacterImageName))
             {
-                imageNames.Add("Assets/Sprites/Character/Alv/" + dialog.CharacterImageName + ".png");
+                characterImageNames.Add(dialog.CharacterImageName);
+            }
+            
+            if (!string.IsNullOrEmpty(dialog.BackgroundImageName))
+            {
+                backgroundImageNames.Add(dialog.BackgroundImageName);
             }
         }
         
         // 画像を並列で読み込み
         var loadTasks = new List<UniTask>();
-        foreach (var imageName in imageNames)
+        
+        // キャラクター画像の読み込み
+        foreach (var imageName in characterImageNames)
         {
             loadTasks.Add(_characterImageLoader.LoadCharacterImageAsync(imageName).AsUniTask());
+        }
+        
+        // 背景画像の読み込み
+        foreach (var imageName in backgroundImageNames)
+        {
+            loadTasks.Add(_characterImageLoader.LoadBackgroundImageAsync(imageName).AsUniTask());
         }
         
         if (loadTasks.Count > 0)

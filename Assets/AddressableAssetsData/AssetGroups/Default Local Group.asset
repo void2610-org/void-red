@@ -40,8 +40,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5cc508a20954849d990a6d6215fe001f
+    m_Address: Assets/Sprites/Background/Lobby_Dark.jpg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 662dbee2ec75a47adbf1ffd469ff3af9
     m_Address: Assets/Sprites/Character/Alv/2-4.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7737af78a4df84e9084c26a3b969b8b1
+    m_Address: Assets/Sprites/Background/Lobby.jpg
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
