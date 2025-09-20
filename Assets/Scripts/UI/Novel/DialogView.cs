@@ -5,6 +5,7 @@ using TMPro;
 using LitMotion;
 using Cysharp.Threading.Tasks;
 using Void2610.UnityTemplate;
+using R3;
 
 /// <summary>
 /// 単一のダイアログ表示を担当するViewクラス
@@ -18,6 +19,9 @@ public class DialogView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
+    
+    [Header("操作ボタン")]
+    [SerializeField] private Button skipButton;
     
     [Header("文字送り設定")]
     [SerializeField] private float defaultCharSpeed = 0.05f; // デフォルトの1文字表示間隔（秒）
@@ -39,6 +43,7 @@ public class DialogView : MonoBehaviour
     // イベント
     public event Action OnDialogCompleted;
     public event Action OnUserClickDetected;
+    public event Action OnSkipRequested;
     
     private void Awake()
     {
@@ -51,6 +56,8 @@ public class DialogView : MonoBehaviour
         nextIndicator.SetActive(false);
         characterImage.color = Color.clear;
         characterImage.sprite = null;
+        
+        skipButton.OnClickAsObservable().Subscribe(_ => OnSkipRequested?.Invoke()).AddTo(this);
     }
     
     /// <summary>

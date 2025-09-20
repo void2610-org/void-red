@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ConfirmationDialogService
 {
-    private ConfirmationDialogView _confirmationDialogViewPrefab;
+    private readonly ConfirmationDialogView _confirmationDialogViewPrefab;
     private ConfirmationDialogView _dialogInstance;
 
     public ConfirmationDialogService(ConfirmationDialogView confirmationDialogView)

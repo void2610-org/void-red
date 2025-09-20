@@ -17,6 +17,7 @@ public class NovelUIPresenter : MonoBehaviour
     private SceneTransitionManager _sceneTransitionManager;
     private NovelDialogService _novelDialogService;
     private AddressableCharacterImageLoader _characterImageLoader;
+    private ConfirmationDialogService _confirmationDialogService;
     private DialogView _dialogView;
     
     // ダイアログ制御用
@@ -28,12 +29,14 @@ public class NovelUIPresenter : MonoBehaviour
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
         NovelDialogService novelDialogService,
-        AddressableCharacterImageLoader characterImageLoader)
+        AddressableCharacterImageLoader characterImageLoader,
+        ConfirmationDialogService confirmationDialogService)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _novelDialogService = novelDialogService;
         _characterImageLoader = characterImageLoader;
+        _confirmationDialogService = confirmationDialogService;
     }
     
     private async UniTask Start()
@@ -44,6 +47,7 @@ public class NovelUIPresenter : MonoBehaviour
         // Viewイベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
+        _dialogView.OnSkipRequested += () => SkipAllDialogs().Forget();
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
@@ -133,6 +137,25 @@ public class NovelUIPresenter : MonoBehaviour
     {
         // 次のダイアログへ進む
         await ShowNextDialog();
+    }
+    
+    /// <summary>
+    /// 全ダイアログをスキップして即座に完了
+    /// </summary>
+    private async UniTaskVoid SkipAllDialogs()
+    {
+        var confirmed = await _confirmationDialogService.ShowDialog(
+            "現在のシナリオをスキップしますか？",
+            "スキップ",
+            "キャンセル"
+        );
+        
+        if (!confirmed) return;
+        
+        // 残りのダイアログを全てスキップ
+        _currentDialogIndex = _currentDialogList.Count;
+        // ダイアログ完了を表示
+        await _dialogView.ShowDialogComplete();
     }
     
     /// <summary>
