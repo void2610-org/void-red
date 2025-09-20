@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using ExcelDataReader;
@@ -51,8 +52,13 @@ public class ExcelDialogLoader
         return await UniTask.RunOnThreadPool(() =>
         {
             using var stream = new MemoryStream(fileBytes);
-            using var reader = ExcelReaderFactory.CreateReader(stream);
             
+            // System.Text.Encoding.CodePagesプロバイダーを登録（Encoding 1252エラー対策）
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            // ExcelReaderConfigurationでエンコーディングを設定
+            var configuration = new ExcelReaderConfiguration { FallbackEncoding = Encoding.GetEncoding(1252) };
+            
+            using var reader = ExcelReaderFactory.CreateReader(stream, configuration);
             var dataSet = reader.AsDataSet();
             var dataTable = dataSet.Tables[sheetName];
             
