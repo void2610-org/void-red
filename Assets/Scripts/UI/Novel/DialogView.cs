@@ -44,6 +44,7 @@ public class DialogView : MonoBehaviour
     private bool _isWaitingForNext;
     private bool _isAutoMode;
     private CancellationTokenSource _waitCancellationTokenSource;
+    private DialogData _currentDialogData;
     
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
@@ -118,6 +119,9 @@ public class DialogView : MonoBehaviour
     /// </summary>
     public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null, Sprite backgroundSprite = null)
     {
+        // 現在のダイアログデータを保存
+        _currentDialogData = dialogData;
+        
         // SE再生
         if (dialogData.HasSe)
         {
@@ -159,7 +163,7 @@ public class DialogView : MonoBehaviour
         ShowNextIndicator();
         
         // 自動進行またはユーザー入力待ち
-        if (_isAutoMode || dialogData.AutoAdvance)
+        if (_isAutoMode || dialogData.HasAutoAdvance)
         {
             await WaitForNextWithTimeout();
         }
@@ -257,7 +261,9 @@ public class DialogView : MonoBehaviour
             _waitCancellationTokenSource = new CancellationTokenSource();
             try
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(autoNextDelay), cancellationToken: _waitCancellationTokenSource.Token);
+                // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
+                var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
+                await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: _waitCancellationTokenSource.Token);
                 
                 // タイムアウト後もまだ待機中の場合は自動で進む
                 if (_isWaitingForNext)
@@ -287,7 +293,9 @@ public class DialogView : MonoBehaviour
         
         try
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(autoNextDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
+            // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
+            var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
+            await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: this.GetCancellationTokenOnDestroy());
             
             if (_isWaitingForNext && _isAutoMode)
             {

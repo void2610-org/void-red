@@ -27,7 +27,7 @@ public enum DialogParameterType
     CustomCharSpeed,
     
     /// <summary>
-    /// 自動で次に進むかどうか（bool）
+    /// 自動で次に進むまでの時間（float、0以下の場合は自動進行なし）
     /// </summary>
     AutoAdvance
 }
@@ -61,7 +61,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.BackgroundImageName => typeof(string),
             DialogParameterType.SeClipName => typeof(string),
             DialogParameterType.CustomCharSpeed => typeof(float),
-            DialogParameterType.AutoAdvance => typeof(bool),
+            DialogParameterType.AutoAdvance => typeof(float),
             _ => typeof(string)
         };
     }
@@ -85,7 +85,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.BackgroundImageName => valueString,
             DialogParameterType.SeClipName => valueString,
             DialogParameterType.CustomCharSpeed => float.TryParse(valueString, out var floatValue) ? floatValue : -1f,
-            DialogParameterType.AutoAdvance => bool.TryParse(valueString, out var autoValue) && autoValue,
+            DialogParameterType.AutoAdvance => float.TryParse(valueString, out var autoValue) ? autoValue : -1f,
             _ => valueString
         };
     }
@@ -103,7 +103,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.BackgroundImageName => "",
             DialogParameterType.SeClipName => "",
             DialogParameterType.CustomCharSpeed => -1f,
-            DialogParameterType.AutoAdvance => false,
+            DialogParameterType.AutoAdvance => -1f,
             _ => ""
         };
     }
