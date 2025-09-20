@@ -47,9 +47,14 @@ public class DialogData
     public float CustomCharSpeed => GetParameterValue<float>(DialogParameterType.CustomCharSpeed, -1f);
     
     /// <summary>
-    /// 自動で次に進むかどうか
+    /// 自動で次に進むまでの時間（秒、-1の場合は自動進行なし）
     /// </summary>
-    public bool AutoAdvance => GetParameterValue<bool>(DialogParameterType.AutoAdvance, false);
+    public float AutoAdvance => GetParameterValue<float>(DialogParameterType.AutoAdvance, -1f);
+    
+    /// <summary>
+    /// 自動進行が有効かどうか
+    /// </summary>
+    public bool HasAutoAdvance => AutoAdvance > 0f;
     
     /// <summary>
     /// SEが設定されているかどうか
