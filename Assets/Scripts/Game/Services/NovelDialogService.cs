@@ -10,18 +10,11 @@ public class NovelDialogService
 {
     private const string SPREADSHEET_ID = "1cPwaMiTwriP5eGhxYqIYvdpjJ81xsnwDdBtULMlP82I";
     private readonly ExcelDialogLoader _excelDialogLoader;
+    private readonly bool _useLocalExcel; // trueでローカルExcel、falseでスプレッドシート
     
-    /// <summary>
-    /// Excel/スプレッドシートの切り替えフラグ（外部から設定可能）
-    /// </summary>
-    public bool UseLocalExcel { get; set; } = true; // trueでローカルExcel、falseでスプレッドシート
-    
-    /// <summary>
-    /// コンストラクタ（依存性注入対応）
-    /// </summary>
-    /// <param name="excelDialogLoader">ExcelDialogLoader（VContainerから注入）</param>
-    public NovelDialogService(ExcelDialogLoader excelDialogLoader)
+    public NovelDialogService(ExcelDialogLoader excelDialogLoader, bool useLocalExcel)
     {
+        _useLocalExcel = useLocalExcel;
         _excelDialogLoader = excelDialogLoader;
     }
     
@@ -32,7 +25,7 @@ public class NovelDialogService
     /// <returns>ダイアログデータのリスト</returns>
     public async UniTask<List<DialogData>> GetDialogDataAsync(string scenarioId)
     {
-        if (UseLocalExcel) // プロパティを使用
+        if (_useLocalExcel)
         {
             return await GetDialogDataFromExcel(scenarioId);
         }

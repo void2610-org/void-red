@@ -29,9 +29,8 @@ public class ExcelDialogLoader
         
         try
         {
-            // ファイルをバイト配列として読み込み（WebGLでも動作）
-            var fileBytes = await LoadFileAsync(filePath);
-            
+            // ファイルをバイト配列として読み込み
+            var fileBytes = await UniTask.RunOnThreadPool(() => File.ReadAllBytes(filePath));
             // Excelデータを解析
             var dialogData = await ParseExcelDataAsync(fileBytes, sheetName);
             
@@ -42,28 +41,6 @@ public class ExcelDialogLoader
             Debug.LogError($"[ExcelDialogLoader] Excelファイルの読み込みでエラーが発生: {ex.Message}");
             return null;
         }
-    }
-    
-    /// <summary>
-    /// ファイルを非同期で読み込み
-    /// </summary>
-    private async UniTask<byte[]> LoadFileAsync(string filePath)
-    {
-        // WebGL対応: UnityWebRequestを使用
-        #if UNITY_WEBGL && !UNITY_EDITOR
-        using var request = UnityEngine.Networking.UnityWebRequest.Get(filePath);
-        await request.SendWebRequest();
-        
-        if (request.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
-        {
-            throw new System.Exception($"ファイル読み込みエラー: {request.error}");
-        }
-        
-        return request.downloadHandler.data;
-        #else
-        // エディター・スタンドアロン: File.ReadAllBytesを非同期実行
-        return await UniTask.RunOnThreadPool(() => File.ReadAllBytes(filePath));
-        #endif
     }
     
     /// <summary>
