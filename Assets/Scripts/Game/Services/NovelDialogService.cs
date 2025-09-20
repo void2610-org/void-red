@@ -9,13 +9,11 @@ using UnityEngine;
 public class NovelDialogService
 {
     private const string SPREADSHEET_ID = "1cPwaMiTwriP5eGhxYqIYvdpjJ81xsnwDdBtULMlP82I";
-    private readonly ExcelDialogLoader _excelDialogLoader;
     private readonly bool _useLocalExcel; // trueでローカルExcel、falseでスプレッドシート
     
-    public NovelDialogService(ExcelDialogLoader excelDialogLoader, bool useLocalExcel)
+    public NovelDialogService(bool useLocalExcel)
     {
         _useLocalExcel = useLocalExcel;
-        _excelDialogLoader = excelDialogLoader;
     }
     
     /// <summary>
@@ -35,7 +33,8 @@ public class NovelDialogService
     /// </summary>
     private async UniTask<List<DialogData>> GetDialogDataFromExcel(string scenarioId)
     {
-        var dialogData = await _excelDialogLoader.LoadDialogDataAsync(scenarioId);
+        var excelDialogLoader = new ExcelDialogLoader();
+        var dialogData = await excelDialogLoader.LoadDialogDataAsync(scenarioId);
         
         if (dialogData == null)
         {

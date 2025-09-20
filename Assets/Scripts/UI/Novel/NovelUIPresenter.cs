@@ -14,7 +14,7 @@ public class NovelUIPresenter : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scenarioIdText;
     
     [Header("データソース設定")]
-    [SerializeField] private bool useAlphaHardcode = false; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
+    [SerializeField] private bool useAlphaHardcode; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
     [SerializeField] private bool useLocalExcel = true; // trueでExcel、falseでスプレッドシート（useAlphaHardcode=falseの時に有効）
     
     private GameProgressService _gameProgressService;
@@ -32,13 +32,12 @@ public class NovelUIPresenter : MonoBehaviour
     public void Construct(
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
-        AddressableImageLoader characterImageLoader,
         ConfirmationDialogService confirmationDialogService)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _characterImageLoader = characterImageLoader;
         _confirmationDialogService = confirmationDialogService;
+        _characterImageLoader = new AddressableImageLoader();
     }
     
     private async UniTask Start()
@@ -56,7 +55,7 @@ public class NovelUIPresenter : MonoBehaviour
         useLocalExcel = true;
         #endif
         
-        _novelDialogService = new NovelDialogService(new ExcelDialogLoader(), useLocalExcel);
+        _novelDialogService = new NovelDialogService(useLocalExcel);
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
