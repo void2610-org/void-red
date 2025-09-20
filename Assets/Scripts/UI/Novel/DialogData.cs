@@ -62,9 +62,9 @@ public class DialogData
     public bool HasBackgroundImage => !string.IsNullOrEmpty(BackgroundImageName);
     
     /// <summary>
-    /// デフォルト文字速度を使用するかどうか
+    /// カスタム文字速度が設定されているかどうか
     /// </summary>
-    public bool UseDefaultCharSpeed => CustomCharSpeed < 0f;
+    public bool HasCustomCharSpeed => CustomCharSpeed > 0f;
     
     /// <summary>
     /// コンストラクタ（動的パラメータ対応版）
