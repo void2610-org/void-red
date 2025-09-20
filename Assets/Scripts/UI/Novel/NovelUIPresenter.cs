@@ -14,7 +14,8 @@ public class NovelUIPresenter : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scenarioIdText;
     
     [Header("データソース設定")]
-    [SerializeField] private bool useAlphaHardcode = true; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
+    [SerializeField] private bool useAlphaHardcode = false; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
+    [SerializeField] private bool useLocalExcel = true; // trueでExcel、falseでスプレッドシート（useAlphaHardcode=falseの時に有効）
     
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
@@ -73,6 +74,9 @@ public class NovelUIPresenter : MonoBehaviour
         }
         else
         {
+            // NovelDialogServiceにExcel/スプレッドシート設定を適用
+            _novelDialogService.UseLocalExcel = useLocalExcel;
+            
             // Excel/スプレッドシートからシナリオを読み込み
             StartScenario(scenarioId).Forget();
         }
