@@ -22,6 +22,7 @@ public class DialogView : MonoBehaviour
     
     [Header("操作ボタン")]
     [SerializeField] private Button skipButton;
+    [SerializeField] private Button clickAreaButton;
     
     [Header("文字送り設定")]
     [SerializeField] private float defaultCharSpeed = 0.05f; // デフォルトの1文字表示間隔（秒）
@@ -34,7 +35,6 @@ public class DialogView : MonoBehaviour
     private bool _isTyping;
     private bool _isWaitingForNext;
     
-    private MotionHandle _typewriterMotion;
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
     
@@ -58,6 +58,8 @@ public class DialogView : MonoBehaviour
         characterImage.sprite = null;
         
         skipButton.OnClickAsObservable().Subscribe(_ => OnSkipRequested?.Invoke()).AddTo(this);
+        
+        clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
     }
     
     /// <summary>
@@ -200,32 +202,18 @@ public class DialogView : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// マウスクリック検知
-    /// </summary>
-    private void Update()
-    {
-        // マウスクリックまたはタッチ入力を検知
-        if (Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
-        {
-            OnClick();
-        }
-    }
     
     /// <summary>
     /// クリック時の処理
     /// </summary>
     private void OnClick()
     {
-        // CanvasGroup が非アクティブな場合は無視
-        if (canvasGroup.alpha == 0f || !canvasGroup.interactable)
-            return;
+        if (canvasGroup.alpha == 0f || !canvasGroup.interactable) return;
+        if (_isTyping) return;
+        if (!_isWaitingForNext) return;
             
-        if (!_isTyping && _isWaitingForNext)
-        {
-            _isWaitingForNext = false;
-            OnUserClickDetected?.Invoke();
-        }
+        _isWaitingForNext = false;
+        OnUserClickDetected?.Invoke();
     }
     
     /// <summary>
@@ -292,8 +280,6 @@ public class DialogView : MonoBehaviour
     
     private void OnDestroy()
     {
-        if (_typewriterMotion.IsActive())
-            _typewriterMotion.Cancel();
         if (_fadeMotion.IsActive())
             _fadeMotion.Cancel();
         if (_indicatorMotion.IsActive())
