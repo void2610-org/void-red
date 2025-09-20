@@ -36,7 +36,7 @@ public class RootLifetimeScope : LifetimeScope
         
         // ノベルシステム関連サービス
         builder.Register<NovelDialogService>(Lifetime.Singleton);
-        builder.Register<AddressableCharacterImageLoader>(Lifetime.Singleton);
+        builder.Register<AddressableImageLoader>(Lifetime.Singleton);
         
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
