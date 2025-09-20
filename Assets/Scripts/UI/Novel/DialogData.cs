@@ -31,9 +31,14 @@ public class DialogData
     public string CharacterImageName => GetParameterValue<string>(DialogParameterType.CharacterImageName, characterImageName);
     
     /// <summary>
+    /// 背景画像の名前
+    /// </summary>
+    public string BackgroundImageName => GetParameterValue<string>(DialogParameterType.BackgroundImageName, "");
+    
+    /// <summary>
     /// 再生するSEのクリップ名
     /// </summary>
-    public string SeClipName => GetParameterValue<string>(DialogParameterType.SEClipName, "");
+    public string SeClipName => GetParameterValue<string>(DialogParameterType.SeClipName, "");
     
     
     /// <summary>
@@ -50,6 +55,11 @@ public class DialogData
     /// SEが設定されているかどうか
     /// </summary>
     public bool HasSe => !string.IsNullOrEmpty(SeClipName);
+    
+    /// <summary>
+    /// 背景画像が設定されているかどうか
+    /// </summary>
+    public bool HasBackgroundImage => !string.IsNullOrEmpty(BackgroundImageName);
     
     /// <summary>
     /// デフォルト文字速度を使用するかどうか

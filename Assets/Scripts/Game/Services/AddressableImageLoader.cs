@@ -67,7 +67,7 @@ public class AddressableImageLoader
     /// <returns>読み込まれたSprite（失敗時はnull）</returns>
     public async UniTask<Sprite> LoadBackgroundImageAsync(string imageName)
     {
-        var path = "Assets/Sprites/Background/" + imageName + ".png";
+        var path = "Assets/Sprites/Background/" + imageName + ".jpg";
         return await LoadImageAsync(path);
     }
     

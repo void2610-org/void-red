@@ -20,6 +20,7 @@ public class DialogView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
+    [SerializeField] private Image backgroundImage;
     
     [Header("操作ボタン")]
     [SerializeField] private Button autoButton;
@@ -115,7 +116,7 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// 単一のダイアログを表示する
     /// </summary>
-    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null)
+    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null, Sprite backgroundSprite = null)
     {
         // SE再生
         if (dialogData.HasSe)
@@ -128,6 +129,9 @@ public class DialogView : MonoBehaviour
         
         // キャラクター画像を設定
         SetCharacterImage(characterSprite);
+        
+        // 背景画像を設定（nullの場合は現状維持）
+        SetBackgroundImage(backgroundSprite);
         
         // ダイアログテキストをクリア
         dialogText.text = "";
@@ -210,6 +214,16 @@ public class DialogView : MonoBehaviour
     {
             characterImage.sprite = sprite;
             characterImage.color = sprite ? Color.white : Color.clear;
+    }
+    
+    /// <summary>
+    /// 背景画像を設定
+    /// </summary>
+    /// <param name="backgroundSprite">背景画像のSprite（nullの場合は現状維持）</param>
+    private void SetBackgroundImage(Sprite backgroundSprite)
+    {
+        // Spriteが指定されている場合のみ設定
+        if (backgroundSprite) backgroundImage.sprite = backgroundSprite;
     }
     
     /// <summary>
