@@ -32,13 +32,11 @@ public class NovelUIPresenter : MonoBehaviour
     public void Construct(
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
-        NovelDialogService novelDialogService,
         AddressableImageLoader characterImageLoader,
         ConfirmationDialogService confirmationDialogService)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _novelDialogService = novelDialogService;
         _characterImageLoader = characterImageLoader;
         _confirmationDialogService = confirmationDialogService;
     }
@@ -52,6 +50,13 @@ public class NovelUIPresenter : MonoBehaviour
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
         _dialogView.OnSkipRequested += () => SkipAllDialogs().Forget();
+        
+        // ビルドでは必ずローカルExcelを使用
+        #if !UNITY_EDITOR
+        useLocalExcel = true;
+        #endif
+        
+        _novelDialogService = new NovelDialogService(new ExcelDialogLoader(), useLocalExcel);
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
@@ -74,9 +79,6 @@ public class NovelUIPresenter : MonoBehaviour
         }
         else
         {
-            // NovelDialogServiceにExcel/スプレッドシート設定を適用
-            _novelDialogService.UseLocalExcel = useLocalExcel;
-            
             // Excel/スプレッドシートからシナリオを読み込み
             StartScenario(scenarioId).Forget();
         }

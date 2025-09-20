@@ -15,6 +15,5 @@ public class NovelLifetimeScope : LifetimeScope
         
         // Excel読み込み関連サービス
         builder.Register<ExcelDialogLoader>(Lifetime.Singleton);
-        builder.Register<NovelDialogService>(Lifetime.Singleton);
     }
 }
