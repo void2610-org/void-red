@@ -40,7 +40,6 @@ public class DialogData
     /// </summary>
     public string SeClipName => GetParameterValue<string>(DialogParameterType.SeClipName, "");
     
-    
     /// <summary>
     /// カスタム文字速度（-1の場合はデフォルト速度）
     /// </summary>

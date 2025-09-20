@@ -135,7 +135,8 @@ public class DialogView : MonoBehaviour
         SetCharacterImage(characterSprite);
         
         // 背景画像を設定（nullの場合は現状維持）
-        SetBackgroundImage(backgroundSprite);
+        if (dialogData.HasBackgroundImage && backgroundSprite) 
+            backgroundImage.sprite = backgroundSprite;
         
         // ダイアログテキストをクリア
         dialogText.text = "";
@@ -218,16 +219,6 @@ public class DialogView : MonoBehaviour
     {
             characterImage.sprite = sprite;
             characterImage.color = sprite ? Color.white : Color.clear;
-    }
-    
-    /// <summary>
-    /// 背景画像を設定
-    /// </summary>
-    /// <param name="backgroundSprite">背景画像のSprite（nullの場合は現状維持）</param>
-    private void SetBackgroundImage(Sprite backgroundSprite)
-    {
-        // Spriteが指定されている場合のみ設定
-        if (backgroundSprite) backgroundImage.sprite = backgroundSprite;
     }
     
     /// <summary>
