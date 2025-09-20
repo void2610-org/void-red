@@ -9,22 +9,11 @@ using UnityEngine;
 [Serializable]
 public class DialogData
 {
-    [Header("セリフ情報")]
     [SerializeField] private string speakerName;
-    [SerializeField, TextArea(3, 5)] private string dialogText;
+    [SerializeField] private string dialogText;
+    [SerializeField] private string characterImageName;
     
-    [Header("画像情報")]
-    [SerializeField] private string characterImageName; // キャラクター画像の名前
-    
-    [Header("音響効果")]
-    [SerializeField] private string seClipName;
-    
-    [Header("表示設定")]
-    [SerializeField] private float customCharSpeed; // -1の場合はデフォルト速度を使用
-    [SerializeField] private bool autoAdvance = false; // 自動で次に進むかどうか
-    
-    [Header("動的パラメータ")]
-    [SerializeField] private Dictionary<DialogParameterType, object> parameters = new Dictionary<DialogParameterType, object>();
+    private Dictionary<DialogParameterType, object> _parameters;
     
     /// <summary>
     /// 話者名
@@ -44,63 +33,51 @@ public class DialogData
     /// <summary>
     /// 再生するSEのクリップ名
     /// </summary>
-    public string SeClipName => GetParameterValue<string>(DialogParameterType.SEClipName, seClipName);
+    public string SeClipName => GetParameterValue<string>(DialogParameterType.SEClipName, "");
     
     
     /// <summary>
     /// カスタム文字速度（-1の場合はデフォルト速度）
     /// </summary>
-    public float CustomCharSpeed => GetParameterValue<float>(DialogParameterType.CustomCharSpeed, customCharSpeed);
+    public float CustomCharSpeed => GetParameterValue<float>(DialogParameterType.CustomCharSpeed, -1f);
     
     /// <summary>
     /// 自動で次に進むかどうか
     /// </summary>
-    public bool AutoAdvance => GetParameterValue<bool>(DialogParameterType.AutoAdvance, autoAdvance);
-    
-    
-    /// <summary>
-    /// セリフに有効なテキストが含まれているかどうか
-    /// </summary>
-    public bool HasValidText => !string.IsNullOrEmpty(dialogText);
+    public bool AutoAdvance => GetParameterValue<bool>(DialogParameterType.AutoAdvance, false);
     
     /// <summary>
     /// SEが設定されているかどうか
     /// </summary>
-    public bool HasSe => !string.IsNullOrEmpty(seClipName);
+    public bool HasSe => !string.IsNullOrEmpty(SeClipName);
     
     /// <summary>
     /// デフォルト文字速度を使用するかどうか
     /// </summary>
-    public bool UseDefaultCharSpeed => customCharSpeed < 0f;
+    public bool UseDefaultCharSpeed => CustomCharSpeed < 0f;
     
     /// <summary>
-    /// コンストラクタ（従来の固定パラメータ用）
-    /// </summary>
-    public DialogData(string speakerName, string dialogText, string characterImageName = "", string seClipName = "", float customCharSpeed = -1f)
-    {
-        this.speakerName = speakerName;
-        this.dialogText = dialogText;
-        this.characterImageName = characterImageName;
-        this.seClipName = seClipName;
-        this.customCharSpeed = customCharSpeed;
-        this.autoAdvance = false;
-        this.parameters = new Dictionary<DialogParameterType, object>();
-    }
-    
-    /// <summary>
-    /// コンストラクタ（動的パラメータ対応）
+    /// コンストラクタ（動的パラメータ対応版）
     /// </summary>
     public DialogData(string speakerName, string dialogText, Dictionary<DialogParameterType, object> parameters)
     {
         this.speakerName = speakerName;
         this.dialogText = dialogText;
-        this.parameters = parameters ?? new Dictionary<DialogParameterType, object>();
-        
-        // デフォルト値を設定（後方互換性のため）
         this.characterImageName = "";
-        this.seClipName = "";
-        this.customCharSpeed = -1f;
-        this.autoAdvance = false;
+        
+        this._parameters = parameters ?? new Dictionary<DialogParameterType, object>();
+    }
+    
+    /// <summary>
+    /// コンストラクタ（簡易版）
+    /// </summary>
+    public DialogData(string speakerName, string dialogText, string characterImageName = "")
+    {
+        this.speakerName = speakerName;
+        this.dialogText = dialogText;
+        this.characterImageName = characterImageName;
+        
+        this._parameters = new Dictionary<DialogParameterType, object>();
     }
     
     /// <summary>
@@ -112,7 +89,7 @@ public class DialogData
     /// <returns>パラメータ値またはデフォルト値</returns>
     private T GetParameterValue<T>(DialogParameterType parameterType, T defaultValue)
     {
-        if (parameters.TryGetValue(parameterType, out var value) && value is T typedValue)
+        if (_parameters.TryGetValue(parameterType, out var value) && value is T typedValue)
         {
             return typedValue;
         }
@@ -126,7 +103,7 @@ public class DialogData
     /// <param name="value">設定する値</param>
     public void SetParameter(DialogParameterType parameterType, object value)
     {
-        parameters[parameterType] = value;
+        _parameters[parameterType] = value;
     }
     
     /// <summary>
@@ -136,6 +113,6 @@ public class DialogData
     /// <returns>設定されている場合はtrue</returns>
     public bool HasParameter(DialogParameterType parameterType)
     {
-        return parameters.ContainsKey(parameterType);
+        return _parameters.ContainsKey(parameterType);
     }
 }

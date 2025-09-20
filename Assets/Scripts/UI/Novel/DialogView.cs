@@ -118,9 +118,9 @@ public class DialogView : MonoBehaviour
     public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null)
     {
         // SE再生
-        if (dialogData.HasSE && dialogData.PlaySEOnStart)
+        if (dialogData.HasSe)
         {
-            SeManager.Instance.PlaySe(dialogData.SEClipName, important: true);
+            SeManager.Instance.PlaySe(dialogData.SeClipName, important: true);
         }
         
         // 話者名を設定
@@ -142,7 +142,7 @@ public class DialogView : MonoBehaviour
         _isWaitingForNext = false;
         
         // 文字速度を決定
-        var charSpeed = dialogData.CustomCharSpeed > 0 ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
+        var charSpeed = dialogData.UseDefaultCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
         
         await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
         await UniTask.Yield();
