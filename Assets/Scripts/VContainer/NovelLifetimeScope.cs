@@ -12,8 +12,5 @@ public class NovelLifetimeScope : LifetimeScope
         // UI Presenter
         builder.RegisterComponentInHierarchy<NovelUIPresenter>();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
-        
-        // Excel読み込み関連サービス
-        builder.Register<ExcelDialogLoader>(Lifetime.Singleton);
     }
 }
