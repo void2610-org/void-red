@@ -381,7 +381,7 @@ namespace Void2610.UnityTemplate
                 {
                     // クリック検知タスクとアニメーションタスクを並行実行
                     var animationTask = motion.ToUniTask(cancellationToken);
-                    var clickTask = UniTask.WaitUntil(() => Input.GetMouseButtonDown(0), cancellationToken: cancellationToken);
+                    var clickTask = UniTask.WaitUntil(() => Input.GetMouseButtonUp(0), cancellationToken: cancellationToken);
                     
                     // どちらかが完了したら処理を進める
                     var winIndex = await UniTask.WhenAny(animationTask, clickTask);
