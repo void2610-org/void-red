@@ -146,7 +146,7 @@ public class DialogView : MonoBehaviour
         _isWaitingForNext = false;
         
         // 文字速度を決定
-        var charSpeed = dialogData.UseDefaultCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
+        var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
         
         await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
         await UniTask.Yield();
