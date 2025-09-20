@@ -5,9 +5,9 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 /// <summary>
-/// Addressablesを使用してキャラクター画像を動的に読み込むサービス
+/// Addressablesを使用して画像（キャラクター・背景等）を動的に読み込むサービス
 /// </summary>
-public class AddressableCharacterImageLoader
+public class AddressableImageLoader
 {
     // 読み込み済み画像のキャッシュ
     private readonly Dictionary<string, Sprite> _loadedSprites = new();
@@ -16,11 +16,11 @@ public class AddressableCharacterImageLoader
     private readonly Dictionary<string, AsyncOperationHandle<Sprite>> _handles = new();
     
     /// <summary>
-    /// キャラクター画像を非同期で読み込む
+    /// 画像を非同期で読み込む（汎用）
     /// </summary>
     /// <param name="imageName">画像名（Addressableキー）</param>
     /// <returns>読み込まれたSprite（失敗時はnull）</returns>
-    public async UniTask<Sprite> LoadCharacterImageAsync(string imageName)
+    private async UniTask<Sprite> LoadImageAsync(string imageName)
     {
         if (string.IsNullOrEmpty(imageName)) return null;
         
@@ -45,15 +45,37 @@ public class AddressableCharacterImageLoader
         if (handle.IsValid()) Addressables.Release(handle);
         _handles.Remove(imageName);
         
-        Debug.LogWarning($"[AddressableCharacterImageLoader] キャラクター画像 '{imageName}' の読み込みに失敗しました");
+        Debug.LogWarning($"[AddressableImageLoader] '{imageName}' の読み込みに失敗しました");
         return null;
+    }
+    
+    /// <summary>
+    /// キャラクター画像を非同期で読み込む
+    /// </summary>
+    /// <param name="imageName">画像名（Addressableキー）</param>
+    /// <returns>読み込まれたSprite（失敗時はnull）</returns>
+    public async UniTask<Sprite> LoadCharacterImageAsync(string imageName)
+    {
+        var path = "Assets/Sprites/Character/" + imageName + ".png";
+        return await LoadImageAsync(path);
+    }
+    
+    /// <summary>
+    /// 背景画像を非同期で読み込む
+    /// </summary>
+    /// <param name="imageName">画像名（Addressableキー）</param>
+    /// <returns>読み込まれたSprite（失敗時はnull）</returns>
+    public async UniTask<Sprite> LoadBackgroundImageAsync(string imageName)
+    {
+        var path = "Assets/Sprites/Background/" + imageName + ".jpg";
+        return await LoadImageAsync(path);
     }
     
     /// <summary>
     /// 指定した画像をキャッシュから削除し、メモリを解放
     /// </summary>
     /// <param name="imageName">解放する画像名</param>
-    public void UnloadCharacterImage(string imageName)
+    private void UnloadImage(string imageName)
     {
         if (string.IsNullOrEmpty(imageName)) return;
         
@@ -69,9 +91,21 @@ public class AddressableCharacterImageLoader
     }
     
     /// <summary>
+    /// 指定した画像をキャッシュから削除し、メモリを解放（キャラクター画像用）
+    /// </summary>
+    /// <param name="imageName">解放する画像名</param>
+    public void UnloadCharacterImage(string imageName) => UnloadImage(imageName);
+    
+    /// <summary>
+    /// 指定した画像をキャッシュから削除し、メモリを解放（背景画像用）
+    /// </summary>
+    /// <param name="imageName">解放する画像名</param>
+    public void UnloadBackgroundImage(string imageName) => UnloadImage(imageName);
+    
+    /// <summary>
     /// 全ての読み込み済み画像をキャッシュから削除し、メモリを解放
     /// </summary>
-    public void UnloadAllCharacterImages()
+    public void UnloadAllImages()
     {
         // 全てのハンドルを解放
         foreach (var kvp in _handles)
@@ -83,6 +117,11 @@ public class AddressableCharacterImageLoader
         _handles.Clear();
         _loadedSprites.Clear();
     }
+    
+    /// <summary>
+    /// 全ての読み込み済み画像をキャッシュから削除し、メモリを解放（後方互換性）
+    /// </summary>
+    public void UnloadAllCharacterImages() => UnloadAllImages();
     
     /// <summary>
     /// 指定した画像がキャッシュに存在するかチェック

@@ -20,6 +20,7 @@ public class DialogView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
+    [SerializeField] private Image backgroundImage;
     
     [Header("操作ボタン")]
     [SerializeField] private Button autoButton;
@@ -43,6 +44,7 @@ public class DialogView : MonoBehaviour
     private bool _isWaitingForNext;
     private bool _isAutoMode;
     private CancellationTokenSource _waitCancellationTokenSource;
+    private DialogData _currentDialogData;
     
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
@@ -115,12 +117,15 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// 単一のダイアログを表示する
     /// </summary>
-    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null)
+    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null, Sprite backgroundSprite = null)
     {
+        // 現在のダイアログデータを保存
+        _currentDialogData = dialogData;
+        
         // SE再生
-        if (dialogData.HasSE && dialogData.PlaySEOnStart)
+        if (dialogData.HasSe)
         {
-            SeManager.Instance.PlaySe(dialogData.SEClipName, important: true);
+            SeManager.Instance.PlaySe(dialogData.SeClipName, important: true);
         }
         
         // 話者名を設定
@@ -128,6 +133,10 @@ public class DialogView : MonoBehaviour
         
         // キャラクター画像を設定
         SetCharacterImage(characterSprite);
+        
+        // 背景画像を設定（nullの場合は現状維持）
+        if (dialogData.HasBackgroundImage && backgroundSprite) 
+            backgroundImage.sprite = backgroundSprite;
         
         // ダイアログテキストをクリア
         dialogText.text = "";
@@ -142,7 +151,7 @@ public class DialogView : MonoBehaviour
         _isWaitingForNext = false;
         
         // 文字速度を決定
-        var charSpeed = dialogData.UseDefaultCharSpeed ? defaultCharSpeed : dialogData.CustomCharSpeed;
+        var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
         
         await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
         await UniTask.Yield();
@@ -155,7 +164,7 @@ public class DialogView : MonoBehaviour
         ShowNextIndicator();
         
         // 自動進行またはユーザー入力待ち
-        if (_isAutoMode || dialogData.AutoAdvance)
+        if (_isAutoMode || dialogData.HasAutoAdvance)
         {
             await WaitForNextWithTimeout();
         }
@@ -243,7 +252,9 @@ public class DialogView : MonoBehaviour
             _waitCancellationTokenSource = new CancellationTokenSource();
             try
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(autoNextDelay), cancellationToken: _waitCancellationTokenSource.Token);
+                // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
+                var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
+                await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: _waitCancellationTokenSource.Token);
                 
                 // タイムアウト後もまだ待機中の場合は自動で進む
                 if (_isWaitingForNext)
@@ -273,7 +284,9 @@ public class DialogView : MonoBehaviour
         
         try
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(autoNextDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
+            // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
+            var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
+            await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: this.GetCancellationTokenOnDestroy());
             
             if (_isWaitingForNext && _isAutoMode)
             {

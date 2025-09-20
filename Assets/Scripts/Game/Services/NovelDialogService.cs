@@ -38,7 +38,7 @@ public class NovelDialogService
     
     /// <summary>
     /// スプレッドシートデータをDialogDataのリストに変換
-    /// 列構成: SpeakerName | DialogText | CharacterImageName | SEClipName | CustomCharSpeed
+    /// 列構成: SpeakerName | DialogText | パラメータタイプ | パラメータ値 | パラメータタイプ | パラメータ値 ...
     /// </summary>
     private List<DialogData> ConvertSheetToDialogData(IList<IList<object>> sheetData)
     {
@@ -62,6 +62,7 @@ public class NovelDialogService
     
     /// <summary>
     /// スプレッドシートの1行からDialogDataを作成
+    /// 基本情報（SpeakerName, DialogText）の後、動的パラメータを解析
     /// </summary>
     private DialogData CreateDialogDataFromRow(IList<object> row)
     {
@@ -74,13 +75,47 @@ public class NovelDialogService
         // セリフが空の場合はスキップ
         if (string.IsNullOrEmpty(dialogText)) return null;
         
-        // オプション情報
-        var characterImageName = GetStringValue(row, 2);
-        var seClipName = GetStringValue(row, 3);
-        var customCharSpeed = GetFloatValue(row, 4, -1f);
+        // 動的パラメータを解析（3列目以降）
+        var parameters = ParseDynamicParameters(row, 2);
         
         // DialogDataを作成
-        return new DialogData(speakerName, dialogText, characterImageName, seClipName, true, customCharSpeed);
+        return new DialogData(speakerName, dialogText, parameters);
+    }
+    
+    /// <summary>
+    /// 動的パラメータを解析してDictionaryを作成
+    /// パラメータタイプとパラメータ値のペアを処理
+    /// </summary>
+    /// <param name="row">スプレッドシート行データ</param>
+    /// <param name="startIndex">パラメータ解析開始インデックス</param>
+    /// <returns>パラメータのDictionary</returns>
+    private Dictionary<DialogParameterType, object> ParseDynamicParameters(IList<object> row, int startIndex)
+    {
+        var parameters = new Dictionary<DialogParameterType, object>();
+        
+        // パラメータタイプとパラメータ値のペアを解析
+        for (var i = startIndex; i < row.Count - 1; i += 2)
+        {
+            var parameterTypeString = GetStringValue(row, i);
+            var parameterValueString = GetStringValue(row, i + 1);
+            
+            // 空のパラメータタイプはスキップ
+            if (string.IsNullOrEmpty(parameterTypeString)) continue;
+            
+            // パラメータタイプを変換
+            if (DialogParameterTypeExtensions.TryParseParameterType(parameterTypeString, out var parameterType))
+            {
+                // 値を適切な型に変換
+                var convertedValue = parameterType.ConvertValue(parameterValueString);
+                parameters[parameterType] = convertedValue;
+            }
+            else
+            {
+                Debug.LogWarning($"[NovelDialogService] 不明なパラメータタイプ: {parameterTypeString}");
+            }
+        }
+        
+        return parameters;
     }
     
     /// <summary>
@@ -104,16 +139,4 @@ public class NovelDialogService
         return index < row.Count ? row[index]?.ToString() ?? "" : "";
     }
     
-    /// <summary>
-    /// 安全にfloat値を取得
-    /// </summary>
-    private float GetFloatValue(IList<object> row, int index, float defaultValue)
-    {
-        if (index >= row.Count) return defaultValue;
-        
-        if (float.TryParse(row[index]?.ToString(), out var result))
-            return result;
-        
-        return defaultValue;
-    }
 }
