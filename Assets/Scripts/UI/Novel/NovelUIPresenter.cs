@@ -51,8 +51,6 @@ public class NovelUIPresenter : MonoBehaviour
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
-        StartScenario("test").Forget();
-        return;
         // アルファ版はハードコードでシナリオを提供
         List<DialogData> dialogList;
         if (scenarioId == "prologue1") dialogList = PrologueProvider.GetPrologueScenario();
