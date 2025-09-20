@@ -122,7 +122,7 @@ public class NovelUIPresenter : MonoBehaviour
         Sprite characterSprite = null;
         if (!string.IsNullOrEmpty(currentDialog.CharacterImageName))
         {
-            characterSprite = await _characterImageLoader.LoadCharacterImageAsync("Alv/" + currentDialog.CharacterImageName);
+            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(currentDialog.CharacterImageName);
         }
         
         // 背景画像を読み込み
@@ -177,7 +177,7 @@ public class NovelUIPresenter : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(dialog.CharacterImageName))
             {
-                characterImageNames.Add("Alv/" + dialog.CharacterImageName);
+                characterImageNames.Add(dialog.CharacterImageName);
             }
             
             if (!string.IsNullOrEmpty(dialog.BackgroundImageName))
