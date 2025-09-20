@@ -268,10 +268,14 @@ MonoBehaviour:
   dialogText: {fileID: 1666317025185700510}
   nextIndicator: {fileID: 5656026911901862804}
   characterImage: {fileID: 4576503207100050310}
+  autoButton: {fileID: 1526341870938500661}
+  autoButtonText: {fileID: 170024925333391186}
   skipButton: {fileID: 5212691118759172586}
   clickAreaButton: {fileID: 2661722687809795713}
+  autoButtonNormalColor: {r: 1, g: 1, b: 1, a: 1}
+  autoButtonActiveColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   defaultCharSpeed: 0.05
-  autoNextDelay: 3
+  autoNextDelay: 2
   fadeInDuration: 0.5
   fadeOutDuration: 0.5
 --- !u!225 &4422162762152353045
@@ -713,7 +717,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 445, y: 95}
+  m_AnchoredPosition: {x: 435, y: 95}
   m_SizeDelta: {x: 125, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5054602409354446786
@@ -1055,7 +1059,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 6623523037583543242}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
