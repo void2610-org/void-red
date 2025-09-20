@@ -12,9 +12,14 @@ public enum DialogParameterType
     CharacterImageName,
     
     /// <summary>
+    /// 背景画像名（string）
+    /// </summary>
+    BackgroundImageName,
+    
+    /// <summary>
     /// SEクリップ名（string）
     /// </summary>
-    SEClipName,
+    SeClipName,
     
     /// <summary>
     /// カスタム文字速度（float）
@@ -53,7 +58,8 @@ public static class DialogParameterTypeExtensions
         return parameterType switch
         {
             DialogParameterType.CharacterImageName => typeof(string),
-            DialogParameterType.SEClipName => typeof(string),
+            DialogParameterType.BackgroundImageName => typeof(string),
+            DialogParameterType.SeClipName => typeof(string),
             DialogParameterType.CustomCharSpeed => typeof(float),
             DialogParameterType.AutoAdvance => typeof(bool),
             _ => typeof(string)
@@ -76,9 +82,10 @@ public static class DialogParameterTypeExtensions
         return parameterType switch
         {
             DialogParameterType.CharacterImageName => valueString,
-            DialogParameterType.SEClipName => valueString,
+            DialogParameterType.BackgroundImageName => valueString,
+            DialogParameterType.SeClipName => valueString,
             DialogParameterType.CustomCharSpeed => float.TryParse(valueString, out var floatValue) ? floatValue : -1f,
-            DialogParameterType.AutoAdvance => bool.TryParse(valueString, out var autoValue) ? autoValue : false,
+            DialogParameterType.AutoAdvance => bool.TryParse(valueString, out var autoValue) && autoValue,
             _ => valueString
         };
     }
@@ -93,7 +100,8 @@ public static class DialogParameterTypeExtensions
         return parameterType switch
         {
             DialogParameterType.CharacterImageName => "",
-            DialogParameterType.SEClipName => "",
+            DialogParameterType.BackgroundImageName => "",
+            DialogParameterType.SeClipName => "",
             DialogParameterType.CustomCharSpeed => -1f,
             DialogParameterType.AutoAdvance => false,
             _ => ""
