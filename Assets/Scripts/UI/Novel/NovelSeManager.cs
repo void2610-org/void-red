@@ -93,5 +93,6 @@ public class NovelSeManager : MonoBehaviour
     protected void Awake()
     {
         _seAudioSource = gameObject.AddComponent<AudioSource>();
+        _seAudioSource.outputAudioMixerGroup = seMixerGroup;
     }
 }
