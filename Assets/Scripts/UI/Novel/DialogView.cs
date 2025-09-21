@@ -122,12 +122,6 @@ public class DialogView : MonoBehaviour
         // 現在のダイアログデータを保存
         _currentDialogData = dialogData;
         
-        // SE再生
-        if (dialogData.HasSe)
-        {
-            SeManager.Instance.PlaySe(dialogData.SeClipName, important: true);
-        }
-        
         // 話者名を設定
         SetSpeakerName(dialogData.SpeakerName);
         
