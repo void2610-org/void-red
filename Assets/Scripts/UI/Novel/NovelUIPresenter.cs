@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using VContainer;
 using Cysharp.Threading.Tasks;
+using R3;
 
 /// <summary>
 /// ノベルシーンのUI管理を担当するプレゼンター
@@ -22,6 +23,7 @@ public class NovelUIPresenter : MonoBehaviour
     private NovelDialogService _novelDialogService;
     private AddressableImageLoader _characterImageLoader;
     private ConfirmationDialogService _confirmationDialogService;
+    private SettingsManager _settingsManager;
     private DialogView _dialogView;
     
     // ダイアログ制御用
@@ -32,11 +34,13 @@ public class NovelUIPresenter : MonoBehaviour
     public void Construct(
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
-        ConfirmationDialogService confirmationDialogService)
+        ConfirmationDialogService confirmationDialogService,
+        SettingsManager settingsManager)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
+        _settingsManager = settingsManager;
         _characterImageLoader = new AddressableImageLoader();
     }
     
@@ -56,6 +60,10 @@ public class NovelUIPresenter : MonoBehaviour
         #endif
         
         _novelDialogService = new NovelDialogService(useLocalExcel);
+        
+        // SE音量設定を適用
+        var seSetting = _settingsManager.GetSetting<SliderSetting>("SE音量");
+        novelSeManager.SeVolume = seSetting.CurrentValue;
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
