@@ -277,7 +277,7 @@ MonoBehaviour:
   autoButtonNormalColor: {r: 1, g: 1, b: 1, a: 1}
   autoButtonActiveColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   defaultCharSpeed: 0.05
-  autoNextDelay: 2
+  autoNextDelay: 2.5
   fadeInDuration: 0.5
   fadeOutDuration: 0.5
 --- !u!225 &4422162762152353045
@@ -1003,7 +1003,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

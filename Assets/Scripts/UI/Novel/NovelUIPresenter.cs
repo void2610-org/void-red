@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using VContainer;
 using Cysharp.Threading.Tasks;
+using R3;
 
 /// <summary>
 /// ノベルシーンのUI管理を担当するプレゼンター
@@ -10,8 +11,8 @@ using Cysharp.Threading.Tasks;
 /// </summary>
 public class NovelUIPresenter : MonoBehaviour
 {
-    [Header("UIコンポーネント")]
     [SerializeField] private TextMeshProUGUI scenarioIdText;
+    [SerializeField] private NovelSeManager novelSeManager;
     
     [Header("データソース設定")]
     [SerializeField] private bool useAlphaHardcode; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
@@ -22,6 +23,7 @@ public class NovelUIPresenter : MonoBehaviour
     private NovelDialogService _novelDialogService;
     private AddressableImageLoader _characterImageLoader;
     private ConfirmationDialogService _confirmationDialogService;
+    private SettingsManager _settingsManager;
     private DialogView _dialogView;
     
     // ダイアログ制御用
@@ -32,11 +34,13 @@ public class NovelUIPresenter : MonoBehaviour
     public void Construct(
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
-        ConfirmationDialogService confirmationDialogService)
+        ConfirmationDialogService confirmationDialogService,
+        SettingsManager settingsManager)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
+        _settingsManager = settingsManager;
         _characterImageLoader = new AddressableImageLoader();
     }
     
@@ -56,6 +60,10 @@ public class NovelUIPresenter : MonoBehaviour
         #endif
         
         _novelDialogService = new NovelDialogService(useLocalExcel);
+        
+        // SE音量設定を適用
+        var seSetting = _settingsManager.GetSetting<SliderSetting>("SE音量");
+        novelSeManager.SeVolume = seSetting.CurrentValue;
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
@@ -149,8 +157,17 @@ public class NovelUIPresenter : MonoBehaviour
             backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(currentDialog.BackgroundImageName);
         }
         
+        // SE再生と再生時間の取得
+        novelSeManager.StopSe();
+        var seWaitTime = 0f;
+        if (currentDialog.HasSe)
+        {
+            // SEのクリップ長を取得（オートモード時のため）
+            seWaitTime = novelSeManager.PlaySe(currentDialog.SeClipName);
+        }
+        
         // 読み込み完了後にViewに渡してダイアログを表示
-        await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite);
+        await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite, seWaitTime);
     }
     
     /// <summary>

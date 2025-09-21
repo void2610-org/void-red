@@ -41,7 +41,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5cc508a20954849d990a6d6215fe001f
-    m_Address: Assets/Sprites/Background/Lobby_Dark.jpg
+    m_Address: Assets/Sprites/Background/LobbyDark.jpg
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -52,6 +52,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7737af78a4df84e9084c26a3b969b8b1
     m_Address: Assets/Sprites/Background/Lobby.jpg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 821d81242acae4bd488aa3d2521265c9
+    m_Address: Assets/Sprites/Background/Black.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
