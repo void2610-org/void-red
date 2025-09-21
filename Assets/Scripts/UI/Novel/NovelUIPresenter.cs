@@ -10,8 +10,8 @@ using Cysharp.Threading.Tasks;
 /// </summary>
 public class NovelUIPresenter : MonoBehaviour
 {
-    [Header("UIコンポーネント")]
     [SerializeField] private TextMeshProUGUI scenarioIdText;
+    [SerializeField] private NovelSeManager novelSeManager;
     
     [Header("データソース設定")]
     [SerializeField] private bool useAlphaHardcode; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
@@ -147,6 +147,13 @@ public class NovelUIPresenter : MonoBehaviour
         if (!string.IsNullOrEmpty(currentDialog.BackgroundImageName))
         {
             backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(currentDialog.BackgroundImageName);
+        }
+        
+        // SE再生
+        novelSeManager.StopSe();
+        if (currentDialog.HasSe)
+        {
+            novelSeManager.PlaySe(currentDialog.SeClipName);
         }
         
         // 読み込み完了後にViewに渡してダイアログを表示
