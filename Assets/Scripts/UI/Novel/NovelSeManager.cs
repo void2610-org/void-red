@@ -43,15 +43,15 @@ public class NovelSeManager : MonoBehaviour
     /// <param name="seName">SE名</param>
     /// <param name="volume">音量倍率</param>
     /// <param name="pitch">ピッチ（-1でランダム）</param>
-    /// <param name="important">重要なSEフラグ</param>
-    public void PlaySe(string seName, float volume = 1.0f, float pitch = -1.0f)
+    /// <returns>再生時間（秒）</returns>
+    public float PlaySe(string seName, float volume = 1.0f, float pitch = -1.0f)
     {
         var data = soundData.FirstOrDefault(t => t.name == seName);
         
         if (data == null) 
         {
             Debug.LogWarning($"SE '{seName}' が見つかりません。");
-            return;
+            return 0f;
         }
 
         _seAudioSource.clip = data.audioClip;
@@ -60,6 +60,7 @@ public class NovelSeManager : MonoBehaviour
         // ピッチがマイナスの場合はランダム化
         _seAudioSource.pitch = pitch < 0.0f ? Random.Range(0.8f, 1.2f) : pitch;
         _seAudioSource.Play();
+        return data.audioClip.length / _seAudioSource.pitch;
     }
 
     /// <summary>

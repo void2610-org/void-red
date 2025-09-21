@@ -157,15 +157,17 @@ public class NovelUIPresenter : MonoBehaviour
             backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(currentDialog.BackgroundImageName);
         }
         
-        // SE再生
+        // SE再生と再生時間の取得
         novelSeManager.StopSe();
+        var seWaitTime = 0f;
         if (currentDialog.HasSe)
         {
-            novelSeManager.PlaySe(currentDialog.SeClipName);
+            // SEのクリップ長を取得（オートモード時のため）
+            seWaitTime = novelSeManager.PlaySe(currentDialog.SeClipName);
         }
         
         // 読み込み完了後にViewに渡してダイアログを表示
-        await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite);
+        await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite, seWaitTime);
     }
     
     /// <summary>
