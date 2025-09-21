@@ -13,6 +13,10 @@ public class NovelUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private TextMeshProUGUI scenarioIdText;
     
+    [Header("データソース設定")]
+    [SerializeField] private bool useAlphaHardcode; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
+    [SerializeField] private bool useLocalExcel = true; // trueでExcel、falseでスプレッドシート（useAlphaHardcode=falseの時に有効）
+    
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
     private NovelDialogService _novelDialogService;
@@ -28,15 +32,12 @@ public class NovelUIPresenter : MonoBehaviour
     public void Construct(
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
-        NovelDialogService novelDialogService,
-        AddressableImageLoader characterImageLoader,
         ConfirmationDialogService confirmationDialogService)
     {
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _novelDialogService = novelDialogService;
-        _characterImageLoader = characterImageLoader;
         _confirmationDialogService = confirmationDialogService;
+        _characterImageLoader = new AddressableImageLoader();
     }
     
     private async UniTask Start()
@@ -48,30 +49,46 @@ public class NovelUIPresenter : MonoBehaviour
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
         _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
         _dialogView.OnSkipRequested += () => SkipAllDialogs().Forget();
+        
+        // ビルドでは必ずローカルExcelを使用
+        #if !UNITY_EDITOR
+        useLocalExcel = true;
+        #endif
+        
+        _novelDialogService = new NovelDialogService(useLocalExcel);
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
-        // アルファ版はハードコードでシナリオを提供
+        // データソース設定により処理を分岐
         List<DialogData> dialogList;
-        if (scenarioId == "prologue1") dialogList = PrologueProvider.GetPrologueScenario();
-        else if (scenarioId == "prologue2") dialogList = PrologueProvider.GetPrologue2Scenario();
-        else if (scenarioId == "ending") dialogList = PrologueProvider.GetEndingScenario();
+        if (useAlphaHardcode)
+        {
+            // アルファ版はハードコードでシナリオを提供
+            if (scenarioId == "prologue1") dialogList = PrologueProvider.GetPrologueScenario();
+            else if (scenarioId == "prologue2") dialogList = PrologueProvider.GetPrologue2Scenario();
+            else if (scenarioId == "ending") dialogList = PrologueProvider.GetEndingScenario();
+            else
+            {
+                Debug.LogWarning($"ハードコード未対応のシナリオID: {scenarioId}");
+                return;
+            }
+            
+            await PreloadCharacterImages(dialogList);
+            await StartDialogSequence(dialogList);
+        }
         else
         {
-            // 実際はシナリオIDに応じて処理を分岐
-            // StartScenario(scenarioId).Forget();
-            return;
+            // Excel/スプレッドシートからシナリオを読み込み
+            StartScenario(scenarioId).Forget();
         }
-        await PreloadCharacterImages(dialogList);
-        await StartDialogSequence(dialogList);
     }
     
     /// <summary>
-    /// シナリオIDに応じてシナリオを開始
+    /// シナリオIDに応じてシナリオを開始（Excel/スプレッドシート読み込み）
     /// </summary>
     private async UniTaskVoid StartScenario(string scenarioId)
     {
-        // スプレッドシートからシナリオを読み込み
+        // Excel/スプレッドシートからシナリオを読み込み
         var dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
 
         // ダイアログリストが有効かチェック

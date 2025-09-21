@@ -1002,6 +1002,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scenarioIdText: {fileID: 1590943567}
+  useAlphaHardcode: 0
+  useLocalExcel: 1
 --- !u!4 &1548393576
 Transform:
   m_ObjectHideFlags: 0

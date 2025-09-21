@@ -3,12 +3,18 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
-/// Googleスプレッドシートからノベルダイアログデータを取得・管理するサービス
-/// シナリオIDごとにシートを分けて管理
+/// ノベルダイアログデータを取得・管理するサービス
+/// スプレッドシートまたはローカルExcelファイルから読み込み
 /// </summary>
 public class NovelDialogService
 {
     private const string SPREADSHEET_ID = "1cPwaMiTwriP5eGhxYqIYvdpjJ81xsnwDdBtULMlP82I";
+    private readonly bool _useLocalExcel; // trueでローカルExcel、falseでスプレッドシート
+    
+    public NovelDialogService(bool useLocalExcel)
+    {
+        _useLocalExcel = useLocalExcel;
+    }
     
     /// <summary>
     /// シナリオIDに対応するダイアログデータを取得
@@ -16,6 +22,36 @@ public class NovelDialogService
     /// <param name="scenarioId">シナリオID（シート名として使用）</param>
     /// <returns>ダイアログデータのリスト</returns>
     public async UniTask<List<DialogData>> GetDialogDataAsync(string scenarioId)
+    {
+        if (_useLocalExcel)
+            return await GetDialogDataFromExcel(scenarioId);
+        return await GetDialogDataFromSpreadsheet(scenarioId);
+    }
+    
+    /// <summary>
+    /// ローカルExcelファイルからダイアログデータを取得
+    /// </summary>
+    private async UniTask<List<DialogData>> GetDialogDataFromExcel(string scenarioId)
+    {
+        #if UNITY_WEBGL && !UNITY_EDITOR
+        return new List<DialogData> { new("System", $"WebGL環境ではシナリオを使用できません。 シナリオID: {scenarioId}") };
+        #endif
+        var excelDialogLoader = new ExcelDialogLoader();
+        var dialogData = await excelDialogLoader.LoadDialogDataAsync(scenarioId);
+        
+        if (dialogData == null)
+        {
+            Debug.LogError($"[NovelDialogService] ローカルExcelからシナリオ '{scenarioId}' のデータを取得できませんでした");
+            return null;
+        }
+        
+        return dialogData;
+    }
+    
+    /// <summary>
+    /// Googleスプレッドシートからダイアログデータを取得
+    /// </summary>
+    private async UniTask<List<DialogData>> GetDialogDataFromSpreadsheet(string scenarioId)
     {
         // スプレッドシートからデータを取得
         var sheetData = await GoogleSpreadSheetService.GetSheet(SPREADSHEET_ID, scenarioId);
