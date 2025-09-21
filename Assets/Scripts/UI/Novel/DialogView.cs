@@ -50,6 +50,7 @@ public class DialogView : MonoBehaviour
     private MotionHandle _indicatorMotion;
     
     private string _currentImageName;
+    private float _additionalWaitTime;
     
     // イベント
     public event Action OnDialogCompleted;
@@ -117,16 +118,15 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// 単一のダイアログを表示する
     /// </summary>
-    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null, Sprite backgroundSprite = null)
+    /// <param name="dialogData">ダイアログデータ</param>
+    /// <param name="characterSprite">キャラクター画像</param>
+    /// <param name="backgroundSprite">背景画像</param>
+    /// <param name="additionalWaitTime">追加の待機時間（SE再生時間など）</param>
+    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null, Sprite backgroundSprite = null, float additionalWaitTime = 0f)
     {
         // 現在のダイアログデータを保存
         _currentDialogData = dialogData;
-        
-        // SE再生
-        if (dialogData.HasSe)
-        {
-            SeManager.Instance.PlaySe(dialogData.SeClipName, important: true);
-        }
+        _additionalWaitTime = additionalWaitTime;
         
         // 話者名を設定
         SetSpeakerName(dialogData.SpeakerName);
@@ -252,6 +252,15 @@ public class DialogView : MonoBehaviour
             _waitCancellationTokenSource = new CancellationTokenSource();
             try
             {
+                // SE再生時間がある場合は先に待つ
+                if (_additionalWaitTime > 0f)
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(_additionalWaitTime), cancellationToken: _waitCancellationTokenSource.Token);
+                    
+                    // 待機後もまだ待機中の場合のみ続行
+                    if (!_isWaitingForNext) return;
+                }
+                
                 // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
                 var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
                 await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: _waitCancellationTokenSource.Token);
@@ -284,6 +293,15 @@ public class DialogView : MonoBehaviour
         
         try
         {
+            // 追加の待機時間（SE再生時間など）がある場合は待つ
+            if (_additionalWaitTime > 0f)
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(_additionalWaitTime), cancellationToken: this.GetCancellationTokenOnDestroy());
+                
+                // 待機後も待機中かつオートモードの場合のみ進む
+                if (!_isWaitingForNext || !_isAutoMode) return;
+            }
+            
             // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
             var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
             await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: this.GetCancellationTokenOnDestroy());
