@@ -202,6 +202,7 @@ public class CardView : MonoBehaviour
         
         // BackUIEffectのTransitionRateをTween
         var targetCollapseChance = Mathf.Clamp01(collapseChance * 1.75f);
+        targetCollapseChance = Mathf.Lerp(1f, 0.9f, targetCollapseChance);
         _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, targetCollapseChance, 0.3f)
             .WithEase(Ease.OutCubic)
             .Bind(value => backUIEffect.transitionRate = value);
@@ -224,7 +225,7 @@ public class CardView : MonoBehaviour
         if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
         
         // リセット値へのTween
-        _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, 0f, 0.2f)
+        _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, 1f, 0.2f)
             .WithEase(Ease.OutCubic)
             .Bind(value => backUIEffect.transitionRate = value);
         
@@ -254,6 +255,7 @@ public class CardView : MonoBehaviour
         // バナーとフレームの色をCardDataの色に設定
         cardNameBanner.color = CardData.Color;
         cardFrame.color = CardData.Color;
+        backUIEffect.transitionColor = CardData.Color * 1.5f;
     }
     
     /// <summary>
