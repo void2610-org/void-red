@@ -185,6 +185,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ContinueButton
       objectReference: {fileID: 0}
+    - target: {fileID: 1160536877475633329, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: clickSe
+      value: 
+      objectReference: {fileID: 8300000, guid: a364758702fb148cea6d309a5f18378f, type: 3}
     - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_text
       value: "\u3064\u3065\u304D\u304B\u3089"
@@ -416,6 +420,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: QuitButton
       objectReference: {fileID: 0}
+    - target: {fileID: 1160536877475633329, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: clickSe
+      value: 
+      objectReference: {fileID: 8300000, guid: a364758702fb148cea6d309a5f18378f, type: 3}
     - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_text
       value: "\u304A\u308F\u308B"
@@ -1503,6 +1511,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StartButton
       objectReference: {fileID: 0}
+    - target: {fileID: 1160536877475633329, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: clickSe
+      value: 
+      objectReference: {fileID: 8300000, guid: a364758702fb148cea6d309a5f18378f, type: 3}
     - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_text
       value: "\u306F\u3058\u3081\u304B\u3089"

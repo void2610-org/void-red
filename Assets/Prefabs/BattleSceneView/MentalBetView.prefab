@@ -271,12 +271,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hoverSe: {fileID: 0}
   hoverVolume: 1
-  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickSe: {fileID: 8300000, guid: 8da87a6ab6429438a849c7dc8a3006bc, type: 3}
   clickVolume: 0.4
   randomizePitch: 1
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
+  isImportantButton: 0
 --- !u!1 &5740506420832140141
 GameObject:
   m_ObjectHideFlags: 0
@@ -548,12 +549,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hoverSe: {fileID: 0}
   hoverVolume: 1
-  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickSe: {fileID: 8300000, guid: 8da87a6ab6429438a849c7dc8a3006bc, type: 3}
   clickVolume: 0.4
   randomizePitch: 1
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
+  isImportantButton: 0
 --- !u!1 &8098553619123313452
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,6 +697,7 @@ MonoBehaviour:
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
+  isImportantButton: 0
 --- !u!1 &8666813248599168925
 GameObject:
   m_ObjectHideFlags: 0

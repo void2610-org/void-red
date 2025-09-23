@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 6553310805573549762}
   - component: {fileID: 5281689288419495851}
   - component: {fileID: 5785379708118396500}
+  - component: {fileID: 2777246499329813}
   m_Layer: 5
   m_Name: PrevButton
   m_TagString: Untagged
@@ -268,6 +269,27 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2777246499329813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3214259645718923488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 8da87a6ab6429438a849c7dc8a3006bc, type: 3}
+  clickVolume: 1
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
+  isImportantButton: 0
 --- !u!1 &5171491111989156406
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,6 +302,7 @@ GameObject:
   - component: {fileID: 513160351334487009}
   - component: {fileID: 6567367705975803770}
   - component: {fileID: 7425128508549208146}
+  - component: {fileID: 2566497720703713297}
   m_Layer: 5
   m_Name: NextButton
   m_TagString: Untagged
@@ -400,6 +423,27 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2566497720703713297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5171491111989156406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 8da87a6ab6429438a849c7dc8a3006bc, type: 3}
+  clickVolume: 1
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
+  isImportantButton: 0
 --- !u!1 &7336120262016937810
 GameObject:
   m_ObjectHideFlags: 0
