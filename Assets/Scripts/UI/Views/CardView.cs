@@ -190,15 +190,10 @@ public class CardView : MonoBehaviour
     public void UpdateCollapseVisual(float collapseChance, float themeMatchRate)
     {
         if (!CardData || _isBackside) return;
-        Debug.Log($"UpdateCollapseVisual: Card={CardData.CardName}, CollapseChance={collapseChance}, ThemeMatchRate={themeMatchRate}");
-        
-        // テーマ合致度による補正（合致度が高いほど崩壊の影響を軽減）
-        var adjustedCollapseEffect = collapseChance * (1f - themeMatchRate * 0.5f);
         
         // 崩壊確率に基づいてTransitionRateを設定
-        // 崩壊確率0%: TransitionRate = 0
-        // 崩壊確率100%: TransitionRate = 0.4
-        uiEffect.transitionRate = adjustedCollapseEffect * 0.45f;
+        collapseChance = Mathf.Clamp01(collapseChance * 1.75f);
+        uiEffect.transitionRate = collapseChance * 0.5f;
     }
     
     /// <summary>
