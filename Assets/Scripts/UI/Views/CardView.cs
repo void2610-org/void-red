@@ -178,7 +178,7 @@ public class CardView : MonoBehaviour
         // 位置のアニメーション
         _rectTransform.MoveToAnchored(targetPos, 0.2f, Ease.OutCubic);
         
-        if (highlight) SeManager.Instance.PlaySe("Card");
+        if (highlight) SeManager.Instance.PlaySe("CardSelect");
     }
     
     /// <summary>
