@@ -277,7 +277,7 @@ MonoBehaviour:
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
-  isImportantButton: 0
+  isImportantButton: 1
 --- !u!1 &5740506420832140141
 GameObject:
   m_ObjectHideFlags: 0
@@ -555,7 +555,7 @@ MonoBehaviour:
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
-  isImportantButton: 0
+  isImportantButton: 1
 --- !u!1 &8098553619123313452
 GameObject:
   m_ObjectHideFlags: 0
