@@ -1,10 +1,10 @@
+using Coffee.UIEffects;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
 using Cysharp.Threading.Tasks;
 using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -20,6 +20,8 @@ public class CardView : MonoBehaviour
     [SerializeField] private Image cardBackImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
+    [SerializeField] private UIEffect backUIEffect;
+    [SerializeField] private UIEffect edgeUIEffect;
     
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked => _onClicked;
@@ -28,6 +30,10 @@ public class CardView : MonoBehaviour
     private Vector2 _originalPosition;
     private RectTransform _rectTransform;
     private bool _isBackside = false;
+    
+    // Tween管理用
+    private MotionHandle _backTransitionTween;
+    private MotionHandle _edgeColorTween;
     
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
     public void UpdateOriginalPosition(Vector2 position) => _originalPosition = position;
@@ -182,6 +188,53 @@ public class CardView : MonoBehaviour
     }
     
     /// <summary>
+    /// 崩壊確率とテーマ合致度に基づいて崩壊エフェクトのTransitionRateを更新
+    /// </summary>
+    /// <param name="collapseChance">崩壊確率（0.0～1.0）</param>
+    /// <param name="themeMatchRate">テーマ合致率（0.0～1.0）</param>
+    public void UpdateCollapseVisual(float collapseChance, float themeMatchRate)
+    {
+        if (!CardData || _isBackside) return;
+        
+        // 既存のTweenをキャンセル
+        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
+        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
+        
+        // BackUIEffectのTransitionRateをTween
+        var targetCollapseChance = Mathf.Clamp01(collapseChance * 1.75f);
+        targetCollapseChance = Mathf.Lerp(1f, 0.9f, targetCollapseChance);
+        _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, targetCollapseChance, 0.3f)
+            .WithEase(Ease.OutCubic)
+            .Bind(value => backUIEffect.transitionRate = value);
+        
+        // EdgeUIEffectのColorをTween
+        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, themeMatchRate * 5f, 0.3f)
+            .WithEase(Ease.OutCubic)
+            .Bind(v => edgeUIEffect.edgeColor = Color.white * v);
+    }
+    
+    /// <summary>
+    /// 崩壊エフェクトをリセット（選択解除時用）
+    /// </summary>
+    public void ResetCollapseVisual()
+    {
+        if (!CardData || _isBackside) return;
+        
+        // 既存のTweenをキャンセル
+        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
+        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
+        
+        // リセット値へのTween
+        _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, 1f, 0.2f)
+            .WithEase(Ease.OutCubic)
+            .Bind(value => backUIEffect.transitionRate = value);
+        
+        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor, Color.white, 0.2f)
+            .WithEase(Ease.OutCubic)
+            .Bind(color => edgeUIEffect.edgeColor = color);
+    }
+    
+    /// <summary>
     /// 表示を更新
     /// </summary>
     private void UpdateDisplay()
@@ -202,6 +255,7 @@ public class CardView : MonoBehaviour
         // バナーとフレームの色をCardDataの色に設定
         cardNameBanner.color = CardData.Color;
         cardFrame.color = CardData.Color;
+        backUIEffect.transitionColor = CardData.Color * 1.5f;
     }
     
     /// <summary>
@@ -219,6 +273,10 @@ public class CardView : MonoBehaviour
     
     private void OnDestroy()
     {
+        // Tweenのクリーンアップ
+        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
+        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
+        
         _onClicked?.Dispose();
         if (cardButton)
             cardButton.onClick.RemoveListener(OnCardClicked);
