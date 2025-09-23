@@ -20,7 +20,8 @@ public class CardView : MonoBehaviour
     [SerializeField] private Image cardBackImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
-    [SerializeField] private UIEffect uiEffect;
+    [SerializeField] private UIEffect backUIEffect;
+    [SerializeField] private UIEffect edgeUIEffect;
     
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked => _onClicked;
@@ -191,9 +192,13 @@ public class CardView : MonoBehaviour
     {
         if (!CardData || _isBackside) return;
         
+        // テーマ合致度に基づいてEdgeShinyWidthを設定
+        var hdrValue = themeMatchRate * 5f;
+        edgeUIEffect.edgeColor = Color.white * hdrValue;
+        
         // 崩壊確率に基づいてTransitionRateを設定
         collapseChance = Mathf.Clamp01(collapseChance * 1.75f);
-        uiEffect.transitionRate = collapseChance * 0.5f;
+        backUIEffect.transitionRate = collapseChance * 0.5f;
     }
     
     /// <summary>
@@ -202,7 +207,8 @@ public class CardView : MonoBehaviour
     public void ResetCollapseVisual()
     {
         if (!CardData || _isBackside) return;
-        uiEffect.transitionRate = 0f;
+        backUIEffect.transitionRate = 0f;
+        edgeUIEffect.edgeColor = Color.white;
     }
     
     /// <summary>
