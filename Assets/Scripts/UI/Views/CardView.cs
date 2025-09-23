@@ -31,6 +31,10 @@ public class CardView : MonoBehaviour
     private RectTransform _rectTransform;
     private bool _isBackside = false;
     
+    // Tween管理用
+    private MotionHandle _backTransitionTween;
+    private MotionHandle _edgeColorTween;
+    
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
     public void UpdateOriginalPosition(Vector2 position) => _originalPosition = position;
 
@@ -192,13 +196,20 @@ public class CardView : MonoBehaviour
     {
         if (!CardData || _isBackside) return;
         
-        // テーマ合致度に基づいてEdgeShinyWidthを設定
-        var hdrValue = themeMatchRate * 5f;
-        edgeUIEffect.edgeColor = Color.white * hdrValue;
+        // 既存のTweenをキャンセル
+        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
+        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
         
-        // 崩壊確率に基づいてTransitionRateを設定
-        collapseChance = Mathf.Clamp01(collapseChance * 1.75f);
-        backUIEffect.transitionRate = collapseChance * 0.5f;
+        // BackUIEffectのTransitionRateをTween
+        var targetCollapseChance = Mathf.Clamp01(collapseChance * 1.75f);
+        _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, targetCollapseChance, 0.3f)
+            .WithEase(Ease.OutCubic)
+            .Bind(value => backUIEffect.transitionRate = value);
+        
+        // EdgeUIEffectのColorをTween
+        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, themeMatchRate * 5f, 0.3f)
+            .WithEase(Ease.OutCubic)
+            .Bind(v => edgeUIEffect.edgeColor = Color.white * v);
     }
     
     /// <summary>
@@ -207,8 +218,19 @@ public class CardView : MonoBehaviour
     public void ResetCollapseVisual()
     {
         if (!CardData || _isBackside) return;
-        backUIEffect.transitionRate = 0f;
-        edgeUIEffect.edgeColor = Color.white;
+        
+        // 既存のTweenをキャンセル
+        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
+        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
+        
+        // リセット値へのTween
+        _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, 0f, 0.2f)
+            .WithEase(Ease.OutCubic)
+            .Bind(value => backUIEffect.transitionRate = value);
+        
+        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor, Color.white, 0.2f)
+            .WithEase(Ease.OutCubic)
+            .Bind(color => edgeUIEffect.edgeColor = color);
     }
     
     /// <summary>
@@ -249,6 +271,10 @@ public class CardView : MonoBehaviour
     
     private void OnDestroy()
     {
+        // Tweenのクリーンアップ
+        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
+        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
+        
         _onClicked?.Dispose();
         if (cardButton)
             cardButton.onClick.RemoveListener(OnCardClicked);
