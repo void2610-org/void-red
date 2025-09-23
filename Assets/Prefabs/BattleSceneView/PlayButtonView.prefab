@@ -273,7 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hoverSe: {fileID: 0}
   hoverVolume: 1
-  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickSe: {fileID: 8300000, guid: 29dfd37bc306841e08a076788055dcb5, type: 3}
   clickVolume: 0.4
   randomizePitch: 1
   minPitch: 0.9
