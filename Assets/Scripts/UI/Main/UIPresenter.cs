@@ -41,8 +41,15 @@ public class UIPresenter : IStartable, System.IDisposable
     private bool _isEnemySpriteManualMode;
     private readonly TutorialPresenter _tutorialPresenter;
     private readonly SceneTransitionManager _sceneTransitionManager;
+    private ThemeData _currentTheme;
+    private readonly HandView _playerHandView;
 
-    public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
+    public void SetTheme(ThemeData theme)
+    {
+        _currentTheme = theme;
+        _themeView.DisplayTheme(theme.Title);
+    }
+    
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
     public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
@@ -113,6 +120,10 @@ public class UIPresenter : IStartable, System.IDisposable
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
         _tutorialPresenter = new TutorialPresenter(tutorialData);
         _sceneTransitionManager = sceneTransitionManager;
+        
+        // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
+        var handViews = Object.FindObjectsByType<HandView>(FindObjectsSortMode.None);
+        _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
@@ -146,6 +157,31 @@ public class UIPresenter : IStartable, System.IDisposable
         _playerMentalPowerView.UpdateDisplay(currentMentalPower, GameConstants.MAX_MENTAL_POWER);
     }
     
+    /// <summary>
+    /// 選択されたカードの崩壊ビジュアルを更新
+    /// </summary>
+    private void UpdateCardCollapseVisual(CardModel cardModel, int selectedIndex)
+    {
+        // 崩壊確率を計算
+        var move = new PlayerMove(cardModel.Data, _selectedPlayStyle, _mentalBetValue);
+        var collapseChance = CollapseJudge.CalculateCollapseChance(move);
+        
+        // テーマ合致度を計算（属性倍率を利用）
+        var themeMatchRate = _currentTheme.GetMultiplier(cardModel.Data.Attribute);
+        // 1.0〜2.0の範囲を0.0〜1.0に正規化（1.0未満は0、2.0で1.0）
+        themeMatchRate = Mathf.Clamp01((themeMatchRate - 1.0f));
+        // HandViewのメソッドを使用して色を更新
+        _playerHandView.UpdateCardCollapseVisual(selectedIndex, collapseChance, themeMatchRate);
+    }
+    
+    /// <summary>
+    /// 全カードの崩壊ビジュアルをリセット
+    /// </summary>
+    private void ResetAllCardCollapseVisuals()
+    {
+        _playerHandView.ResetAllCardCollapseVisuals();
+    }
+    
     private void SetupViewEvents()
     {
         // プレイスタイル選択イベント
@@ -166,6 +202,25 @@ public class UIPresenter : IStartable, System.IDisposable
             if (cardModel != null && cardModel.Data) _enemyView.UpdateSpriteForAttribute(cardModel.Data.Attribute).Forget();
             else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
+        
+        // 崩壊ビジュアル更新に関する全てのイベントを統合
+        var cardSelectionChange = _player.SelectedCard.Select(_ => Unit.Default);
+        var cardIndexChange = _player.SelectedIndex.Select(_ => Unit.Default);
+        var playStyleChange = _playStyleView.PlayStyleSelected.Select(_ => Unit.Default);
+        var mentalBetChange = _mentalBetView.MentalBetChanged.Select(_ => Unit.Default);
+        
+        // 全ての変更イベントをマージして崩壊ビジュアルを更新
+        Observable.Merge(cardSelectionChange, cardIndexChange, playStyleChange, mentalBetChange)
+            .Subscribe(_ => 
+            {
+                ResetAllCardCollapseVisuals();
+                var card = _player.SelectedCard.CurrentValue;
+                var index = _player.SelectedIndex.CurrentValue;
+                if (card != null && index >= 0)
+                {
+                    UpdateCardCollapseVisual(card, index);
+                }
+            }).AddTo(_disposables);
     }
     
     private void SetUpButtonEvents()
