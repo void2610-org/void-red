@@ -58,7 +58,6 @@ public class SettingsManager : IDisposable
         
         // SE音量テスト
         var seTestSetting = new ButtonSetting("SE音量テスト", "現在のSE音量で効果音を再生します", "再生");
-        seTestSetting.ButtonAction = () => SeManager.Instance.PlaySe("Test");
         _settings.Add(seTestSetting);
         
         // フルスクリーン切り替え

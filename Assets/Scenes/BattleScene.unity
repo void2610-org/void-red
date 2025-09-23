@@ -6935,6 +6935,78 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[1].name
+      value: CardDraw
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[2].name
+      value: Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[3].name
+      value: Gavel
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[4].name
+      value: ScoreOpen
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[5].name
+      value: WheelOfHandPlay
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[6].name
+      value: Dialog
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[8].name
+      value: Decision
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[9].name
+      value: Start
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[9].volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[1].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 0ad91a6b8ec084af486d7f9ca0f75982, type: 3}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[2].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 9d8989d9447d6455ba208d9aef4891f3, type: 3}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[3].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 69491017449d44c06b29425b44cce3ed, type: 3}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[4].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: ea0af777a6bbd41879afe8eabde6bd7a, type: 3}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[5].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 991c8c361b37644128d6a4855cff9f34, type: 3}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[6].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: b35d02ce93242465399575ea7a805e4d, type: 3}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[8].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 29dfd37bc306841e08a076788055dcb5, type: 3}
+    - target: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
+      propertyPath: soundData.Array.data[9].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: a364758702fb148cea6d309a5f18378f, type: 3}
     - target: {fileID: 3451508683690145921, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
       propertyPath: m_Name
       value: SEManager

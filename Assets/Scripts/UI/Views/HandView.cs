@@ -238,7 +238,7 @@ public class HandView : MonoBehaviour
     /// </summary>
     private async UniTask PlayDrawAnimation(CardView cardView)
     {
-        SeManager.Instance.PlaySe("Card");
+        SeManager.Instance.PlaySe("CardDraw");
         
         // デッキ位置をhandContainer基準の座標に変換
         var deckLocalPos = GetDeckLocalPosition();
