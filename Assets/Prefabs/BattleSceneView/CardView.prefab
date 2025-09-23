@@ -777,4 +777,4 @@ MonoBehaviour:
   cardBackImage: {fileID: 1128487489273188331}
   cardNameText: {fileID: 2523552460966807409}
   cardButton: {fileID: 4779874160718359984}
-  uiEffectImage: {fileID: 8052934996988192906}
+  uiEffect: {fileID: 8712856333045659218}

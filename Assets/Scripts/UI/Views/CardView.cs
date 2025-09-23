@@ -1,10 +1,10 @@
+using Coffee.UIEffects;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
 using Cysharp.Threading.Tasks;
 using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -20,6 +20,7 @@ public class CardView : MonoBehaviour
     [SerializeField] private Image cardBackImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
+    [SerializeField] private UIEffect uiEffect;
     
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked => _onClicked;
@@ -179,6 +180,34 @@ public class CardView : MonoBehaviour
         _rectTransform.MoveToAnchored(targetPos, 0.2f, Ease.OutCubic);
         
         if (highlight) SeManager.Instance.PlaySe("CardSelect");
+    }
+    
+    /// <summary>
+    /// 崩壊確率とテーマ合致度に基づいて崩壊エフェクトのTransitionRateを更新
+    /// </summary>
+    /// <param name="collapseChance">崩壊確率（0.0～1.0）</param>
+    /// <param name="themeMatchRate">テーマ合致率（0.0～1.0）</param>
+    public void UpdateCollapseVisual(float collapseChance, float themeMatchRate)
+    {
+        if (!CardData || _isBackside) return;
+        Debug.Log($"UpdateCollapseVisual: Card={CardData.CardName}, CollapseChance={collapseChance}, ThemeMatchRate={themeMatchRate}");
+        
+        // テーマ合致度による補正（合致度が高いほど崩壊の影響を軽減）
+        var adjustedCollapseEffect = collapseChance * (1f - themeMatchRate * 0.5f);
+        
+        // 崩壊確率に基づいてTransitionRateを設定
+        // 崩壊確率0%: TransitionRate = 0
+        // 崩壊確率100%: TransitionRate = 0.4
+        uiEffect.transitionRate = adjustedCollapseEffect * 0.45f;
+    }
+    
+    /// <summary>
+    /// 崩壊エフェクトをリセット（選択解除時用）
+    /// </summary>
+    public void ResetCollapseVisual()
+    {
+        if (!CardData || _isBackside) return;
+        uiEffect.transitionRate = 0f;
     }
     
     /// <summary>

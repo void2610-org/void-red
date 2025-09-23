@@ -299,6 +299,27 @@ public class HandView : MonoBehaviour
     }
     
     /// <summary>
+    /// 指定インデックスのカードの崩壊ビジュアルを更新
+    /// </summary>
+    /// <param name="index">カードのインデックス</param>
+    /// <param name="collapseChance">崩壊確率（0.0～1.0）</param>
+    /// <param name="themeMatchRate">テーマ合致率（0.0～1.0）</param>
+    public void UpdateCardCollapseVisual(int index, float collapseChance, float themeMatchRate)
+    {
+        if (index < 0 || index >= _cardViews.Count) return;
+        _cardViews[index].UpdateCollapseVisual(collapseChance, themeMatchRate);
+    }
+    
+    /// <summary>
+    /// 全カードの崩壊ビジュアルをリセット
+    /// </summary>
+    public void ResetAllCardCollapseVisuals()
+    {
+        foreach (var cardView in _cardViews) 
+            cardView.ResetCollapseVisual();
+    }
+    
+    /// <summary>
     /// デッキ位置をhandContainer基準のローカル座標に変換
     /// </summary>
     private Vector2 GetDeckLocalPosition()
