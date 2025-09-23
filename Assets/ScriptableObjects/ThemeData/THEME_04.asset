@@ -14,16 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   title: "\u5883\u754C\u306E\u304B\u305F\u3061"
   attributeMultipliers:
-    _serializedList:
+    serializedList:
     - key: 0
-      value: 1
+      value: 2
     - key: 1
-      value: 1.2
+      value: 2
     - key: 2
-      value: 1.2
+      value: 2
     - key: 3
-      value: 1.5
+      value: 2
     - key: 4
-      value: 1.1
+      value: 2
     - key: 5
-      value: 1
+      value: 2

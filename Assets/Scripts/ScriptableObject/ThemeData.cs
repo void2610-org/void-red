@@ -21,6 +21,6 @@ public class ThemeData : ScriptableObject
     /// <returns>スコア倍率（設定されていない場合は1.0）</returns>
     public float GetMultiplier(CardAttribute attribute)
     {
-        return attributeMultipliers.TryGetValue(attribute, out float multiplier) ? multiplier : 1.0f;
+        return attributeMultipliers.TryGetValue(attribute, out var multiplier) ? multiplier : 1.0f;
     }
 }
