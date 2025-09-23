@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   title: "\u5FD8\u308C\u305F\u3064\u3082\u308A\u306E\u8A18\u61B6"
   attributeMultipliers:
-    _serializedList:
+    serializedList:
     - key: 0
       value: 1.1
     - key: 1

@@ -28,7 +28,7 @@ public static class CollapseJudge
     /// </summary>
     /// <param name="move">プレイヤーの手</param>
     /// <returns>崩壊確率（0.0～1.0）</returns>
-    private static float CalculateCollapseChance(PlayerMove move)
+    public static float CalculateCollapseChance(PlayerMove move)
     {
         if (move == null || !move.SelectedCard) return 0f;
 
