@@ -60,10 +60,10 @@ public class ScoreView : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
        
-        SeManager.Instance.PlaySe("Envelope");
+        SeManager.Instance.PlaySe("ScoreOpen");
         await SlideInFromRight();
         await UniTask.Delay(500);
-        SeManager.Instance.PlaySe("Envelope");
+        SeManager.Instance.PlaySe("ScoreOpen");
         await SlideInFromLeft();
         
         // 指定時間待機

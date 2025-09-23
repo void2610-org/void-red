@@ -46,7 +46,7 @@ public class PlayStyleView : MonoBehaviour
     {
         if (_isRotating) return;
 
-        SeManager.Instance.PlaySe("Wheel");
+        SeManager.Instance.PlaySe("WheelOfPlayStyle");
         
         _isRotating = true;
         var previousIndex = _currentIndex;
