@@ -14,7 +14,10 @@ public class UIPresenter : IStartable, System.IDisposable
     [Inject] private readonly ThemeService _themeService;
     [Inject] private readonly GameProgressService _gameProgressService;
     
-    public Observable<Unit> PlayButtonClicked => _playButtonView.PlayButtonClicked;
+    public Observable<Unit> PlayButtonClicked => Observable.Merge(
+        _playButtonView.PlayButtonClicked,
+        _cardDetailView.PlayButtonClicked.Do(_ => _cardDetailView.Hide())
+    );
     
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
