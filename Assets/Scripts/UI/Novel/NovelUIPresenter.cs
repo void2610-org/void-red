@@ -25,6 +25,7 @@ public class NovelUIPresenter : MonoBehaviour
     private ConfirmationDialogService _confirmationDialogService;
     private SettingsManager _settingsManager;
     private DialogView _dialogView;
+    private ItemGetEffectView _itemGetEffectView;
     
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
@@ -48,6 +49,9 @@ public class NovelUIPresenter : MonoBehaviour
     {
         // DialogViewを取得
         _dialogView = FindFirstObjectByType<DialogView>();
+        
+        // ItemGetEffectViewを取得
+        _itemGetEffectView = FindFirstObjectByType<ItemGetEffectView>();
         
         // Viewイベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
@@ -198,12 +202,17 @@ public class NovelUIPresenter : MonoBehaviour
             itemSprite = await _characterImageLoader.LoadCharacterImageAsync(itemGetData.ItemImageName);
         }
         
-        // アイテム取得演出Viewを表示（将来実装予定）
-        // TODO: ItemGetEffectViewを作成してここで呼び出す
-        // await ShowItemGetEffectView(itemSprite, itemGetData.ItemName, itemGetData.ItemDescription);
-        
-        // 仮実装：ログ出力（スプレッドシート読み込みテスト用）
-        Debug.Log($"[recommend] [アイテム取得演出] アイテム名: '{itemGetData.ItemName}', 説明: '{itemGetData.ItemDescription}', 画像: '{itemGetData.ItemImageName}', 画像読み込み: {(itemSprite != null ? "成功" : "失敗")}");
+        // ItemGetEffectViewが存在する場合は実際の演出を表示
+        if (_itemGetEffectView != null)
+        {
+            await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
+        }
+        else
+        {
+            // フォールバック：ログ出力
+            Debug.LogWarning($"[NovelUIPresenter] ItemGetEffectViewが見つかりません。アイテム取得演出をスキップします。");
+            Debug.Log($"[アイテム取得演出] アイテム名: '{itemGetData.ItemName}', 説明: '{itemGetData.ItemDescription}', 画像: '{itemGetData.ItemImageName}'");
+        }
     }
     
     /// <summary>
