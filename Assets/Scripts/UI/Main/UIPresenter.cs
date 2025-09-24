@@ -33,6 +33,8 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly ScoreView _scoreView;
     private readonly ResultView _resultView;
     private readonly BlackOverlayView _blackOverlayView;
+    private readonly CardDetailButtonView _cardDetailButtonView;
+    private readonly CardDetailView _cardDetailView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
@@ -86,6 +88,18 @@ public class UIPresenter : IStartable, System.IDisposable
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
     public async UniTask StartTutorial() => await _tutorialPresenter.StartTutorial();
     
+    /// <summary>
+    /// 選択されたカードの詳細を表示
+    /// </summary>
+    private void ShowCardDetail()
+    {
+        var selectedCard = _player.SelectedCard.CurrentValue;
+        if (selectedCard?.Data != null)
+        {
+            _cardDetailView.ShowCardDetail(selectedCard.Data);
+        }
+    }
+    
     public UIPresenter(Player player, Enemy enemy, TutorialData tutorialData, SceneTransitionManager sceneTransitionManager)
     {
         _player = player;
@@ -118,6 +132,8 @@ public class UIPresenter : IStartable, System.IDisposable
         _scoreView = UnityEngine.Object.FindFirstObjectByType<ScoreView>();
         _resultView = UnityEngine.Object.FindFirstObjectByType<ResultView>();
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
+        _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
+        _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _tutorialPresenter = new TutorialPresenter(tutorialData);
         _sceneTransitionManager = sceneTransitionManager;
         
@@ -162,6 +178,8 @@ public class UIPresenter : IStartable, System.IDisposable
     /// </summary>
     private void UpdateCardCollapseVisual(CardModel cardModel, int selectedIndex)
     {
+        if (_currentTheme == null) return;
+        
         // 崩壊確率を計算
         var move = new PlayerMove(cardModel.Data, _selectedPlayStyle, _mentalBetValue);
         var collapseChance = CollapseJudge.CalculateCollapseChance(move);
@@ -203,6 +221,19 @@ public class UIPresenter : IStartable, System.IDisposable
             else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
         
+        // プレイヤーのカード選択を監視して詳細ボタンの表示制御
+        _player.SelectedCard.Subscribe(cardModel =>
+        {
+            if (cardModel != null && cardModel.Data)
+            {
+                _cardDetailButtonView?.Show();
+            }
+            else
+            {
+                _cardDetailButtonView?.Hide();
+            }
+        }).AddTo(_disposables);
+        
         // 崩壊ビジュアル更新に関する全てのイベントを統合
         var cardSelectionChange = _player.SelectedCard.Select(_ => Unit.Default);
         var cardIndexChange = _player.SelectedIndex.Select(_ => Unit.Default);
@@ -233,6 +264,9 @@ public class UIPresenter : IStartable, System.IDisposable
             .AddTo(_disposables);
         _gameOverView.OnTitleClicked.Subscribe(
                 _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget())
+            .AddTo(_disposables);
+        _cardDetailButtonView?.DetailButtonClicked.Subscribe(
+                _ => ShowCardDetail())
             .AddTo(_disposables);
     }
     
