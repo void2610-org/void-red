@@ -12,13 +12,17 @@ public class CardDetailView : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private GameObject detailPanel;
     [SerializeField] private Button closeButton;
+    [SerializeField] private Button playButton;
     [SerializeField] private DeckCardView cardView;
     [SerializeField] private TextMeshProUGUI attributeText;
     [SerializeField] private TextMeshProUGUI scoreMultiplierText;
     [SerializeField] private TextMeshProUGUI collapseThresholdText;
     [SerializeField] private TextMeshProUGUI evolutionInfoText;
     
+    public Observable<Unit> PlayButtonClicked => _playButtonClicked;
+    
     private readonly CompositeDisposable _disposables = new();
+    private readonly Subject<Unit> _playButtonClicked = new();
     
     /// <summary>
     /// カード詳細を表示
@@ -38,7 +42,7 @@ public class CardDetailView : MonoBehaviour
     /// <summary>
     /// カード詳細を非表示
     /// </summary>
-    private void Hide()
+    public void Hide()
     {
         detailPanel.SetActive(false);
     }
@@ -88,10 +92,19 @@ public class CardDetailView : MonoBehaviour
         evolutionInfoText.text = evolutionInfo.TrimEnd('\n');
     }
     
+    /// <summary>
+    /// プレイボタンクリック時の処理
+    /// </summary>
+    private void OnPlayButtonClicked()
+    {
+        _playButtonClicked.OnNext(Unit.Default);
+    }
+    
     private void Awake()
     {
         // ボタンイベントの設定
         closeButton.OnClickAsObservable().Subscribe(_ => Hide()).AddTo(_disposables);
+        playButton.OnClickAsObservable().Subscribe(_ => OnPlayButtonClicked()).AddTo(_disposables);
         
         // 初期状態では非表示
         Hide();
@@ -99,6 +112,7 @@ public class CardDetailView : MonoBehaviour
     
     private void OnDestroy()
     {
+        _playButtonClicked?.Dispose();
         _disposables?.Dispose();
     }
 }
