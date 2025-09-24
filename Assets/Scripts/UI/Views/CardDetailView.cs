@@ -76,12 +76,12 @@ public class CardDetailView : MonoBehaviour
         
         if (cardData.CanEvolve)
         {
-            evolutionInfo += $"進化先: {cardData.EvolutionTarget.CardName}\n";
+            evolutionInfo += $"進化先: {cardData.EvolutionTarget?.CardName}\n";
         }
         
         if (cardData.CanDegrade)
         {
-            evolutionInfo += $"劣化先: {cardData.DegradationTarget.CardName}\n";
+            evolutionInfo += $"劣化先: {cardData.DegradationTarget?.CardName}\n";
         }
         
         if (string.IsNullOrEmpty(evolutionInfo))
