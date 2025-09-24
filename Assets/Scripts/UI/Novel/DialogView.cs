@@ -400,6 +400,15 @@ public class DialogView : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// DialogViewの操作可能状態を設定（アイテム取得演出中の制御用）
+    /// </summary>
+    /// <param name="interactable">操作可能かどうか</param>
+    public void SetInteractable(bool interactable)
+    {
+        canvasGroup.interactable = interactable;
+    }
+    
     private void UpdateAutoButtonColor()
     {
         autoButtonText.color = _isAutoMode ? autoButtonActiveColor : autoButtonNormalColor;
