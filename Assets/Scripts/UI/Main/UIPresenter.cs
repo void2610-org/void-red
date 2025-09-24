@@ -100,6 +100,17 @@ public class UIPresenter : IStartable, System.IDisposable
         }
     }
     
+    /// <summary>
+    /// 詳細ボタンの表示状態を現在の選択状態に基づいて更新
+    /// </summary>
+    private void UpdateDetailButtonVisibility()
+    {
+        if (_player.SelectedCard.CurrentValue != null)
+            _cardDetailButtonView?.Show();
+        else
+            _cardDetailButtonView?.Hide();
+    }
+    
     public UIPresenter(Player player, Enemy enemy, TutorialData tutorialData, SceneTransitionManager sceneTransitionManager)
     {
         _player = player;
@@ -283,6 +294,9 @@ public class UIPresenter : IStartable, System.IDisposable
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
         UpdateMentalBetDisplay();
+        
+        // 詳細ボタンの初期状態を設定
+        UpdateDetailButtonVisibility();
     }
 
     public void Dispose()
