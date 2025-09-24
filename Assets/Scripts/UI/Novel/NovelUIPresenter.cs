@@ -30,6 +30,7 @@ public class NovelUIPresenter : MonoBehaviour
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
+    private bool _isShowingItemGetEffect; // アイテム取得演出表示中フラグ
     
     [Inject]
     public void Construct(
@@ -172,12 +173,6 @@ public class NovelUIPresenter : MonoBehaviour
         
         // 読み込み完了後にViewに渡してダイアログを表示
         await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite, seWaitTime);
-        
-        // アイテム取得演出がある場合は表示
-        if (currentDialog.HasGetItem)
-        {
-            await ShowItemGetEffect(currentDialog);
-        }
     }
     
     /// <summary>
@@ -220,7 +215,38 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid HandleUserClick()
     {
-        // 次のダイアログへ進む
+        // アイテム取得演出中はクリックを無視
+        if (_isShowingItemGetEffect)
+        {
+            return;
+        }
+        
+        // 前のダイアログ（現在のインデックス-1）にアイテム取得演出があるかチェック
+        var previousDialogIndex = _currentDialogIndex - 1;
+        if (previousDialogIndex >= 0 && previousDialogIndex < _currentDialogList.Count)
+        {
+            var previousDialog = _currentDialogList[previousDialogIndex];
+            if (previousDialog.HasGetItem)
+            {
+                _isShowingItemGetEffect = true;
+                
+                // DialogViewのクリックを無効化
+                _dialogView.SetInteractable(false);
+                
+                await ShowItemGetEffect(previousDialog);
+                
+                // DialogViewのクリックを有効化
+                _dialogView.SetInteractable(true);
+                
+                _isShowingItemGetEffect = false;
+                
+                // 演出完了後、次のダイアログへ進む
+                await ShowNextDialog();
+                return;
+            }
+        }
+        
+        // 通常の次のダイアログへ進む
         await ShowNextDialog();
     }
     
@@ -229,6 +255,12 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid SkipAllDialogs()
     {
+        // アイテム取得演出中はスキップを無視
+        if (_isShowingItemGetEffect)
+        {
+            return;
+        }
+        
         var confirmed = await _confirmationDialogService.ShowDialog(
             "現在のシナリオをスキップしますか？",
             "スキップ",
