@@ -116,8 +116,7 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.blocksRaycasts = true;
         
         // フェードインアニメーション
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
+        CancelActiveMotions();
         
         _fadeMotion = LMotion.Create(0f, 1f, fadeInDuration)
             .WithEase(Ease.OutCubic)
@@ -127,9 +126,6 @@ public class ItemGetEffectView : MonoBehaviour
         // アイテム画像のスケールアニメーション
         if (itemImage != null)
         {
-            if (_scaleMotion.IsActive())
-                _scaleMotion.Cancel();
-            
             _scaleMotion = LMotion.Create(itemImageStartScale, itemImageEndScale, itemScaleAnimationDuration)
                 .WithEase(Ease.OutBack) // バックイーズで少し弾むような演出
                 .WithDelay(0.2f) // フェードインの後に開始
@@ -163,8 +159,7 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.interactable = false;
         
         // フェードアウトアニメーション
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
+        CancelActiveMotions();
         
         _fadeMotion = LMotion.Create(1f, 0f, fadeOutDuration)
             .WithEase(Ease.InCubic)
@@ -187,12 +182,19 @@ public class ItemGetEffectView : MonoBehaviour
         _isWaitingForClick = false;
     }
     
-    private void OnDestroy()
+    /// <summary>
+    /// アクティブなアニメーションを全てキャンセル
+    /// </summary>
+    private void CancelActiveMotions()
     {
         if (_fadeMotion.IsActive())
             _fadeMotion.Cancel();
-        
         if (_scaleMotion.IsActive())
             _scaleMotion.Cancel();
+    }
+    
+    private void OnDestroy()
+    {
+        CancelActiveMotions();
     }
 }
