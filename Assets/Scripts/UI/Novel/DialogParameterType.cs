@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// ダイアログパラメータのタイプを定義するenum
@@ -29,7 +30,12 @@ public enum DialogParameterType
     /// <summary>
     /// 自動で次に進むまでの時間（float、0以下の場合は自動進行なし）
     /// </summary>
-    AutoAdvance
+    AutoAdvance,
+    
+    /// <summary>
+    /// アイテム取得演出（List&lt;string&gt; - 画像名,アイテム名,アイテム説明）
+    /// </summary>
+    GetItem
 }
 
 /// <summary>
@@ -62,6 +68,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.SeClipName => typeof(string),
             DialogParameterType.CustomCharSpeed => typeof(float),
             DialogParameterType.AutoAdvance => typeof(float),
+            DialogParameterType.GetItem => typeof(List<string>),
             _ => typeof(string)
         };
     }
@@ -86,6 +93,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.SeClipName => valueString,
             DialogParameterType.CustomCharSpeed => float.TryParse(valueString, out var floatValue) ? floatValue : -1f,
             DialogParameterType.AutoAdvance => float.TryParse(valueString, out var autoValue) ? autoValue : -1f,
+            DialogParameterType.GetItem => ParseCommaSeparatedList(valueString),
             _ => valueString
         };
     }
@@ -104,7 +112,31 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.SeClipName => "",
             DialogParameterType.CustomCharSpeed => -1f,
             DialogParameterType.AutoAdvance => -1f,
+            DialogParameterType.GetItem => new List<string>(),
             _ => ""
         };
+    }
+    
+    /// <summary>
+    /// カンマ区切りの文字列をList&lt;string&gt;に変換
+    /// </summary>
+    /// <param name="commaSeparatedString">カンマ区切りの文字列</param>
+    /// <returns>文字列のリスト</returns>
+    private static List<string> ParseCommaSeparatedList(string commaSeparatedString)
+    {
+        if (string.IsNullOrEmpty(commaSeparatedString))
+            return new List<string>();
+        
+        var items = new List<string>();
+        var parts = commaSeparatedString.Split(',');
+        
+        foreach (var part in parts)
+        {
+            var trimmedPart = part.Trim();
+            if (!string.IsNullOrEmpty(trimmedPart))
+                items.Add(trimmedPart);
+        }
+        
+        return items;
     }
 }
