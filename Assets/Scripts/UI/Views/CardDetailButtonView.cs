@@ -20,10 +20,6 @@ public class CardDetailButtonView : MonoBehaviour
     private void Awake()
     {
         detailButton.onClick.AddListener(OnDetailButtonClicked);
-    }
-    
-    private void Start()
-    {
         Hide(); // 初期状態では非表示
     }
     
