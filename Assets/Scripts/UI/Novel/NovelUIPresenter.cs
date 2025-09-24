@@ -168,6 +168,42 @@ public class NovelUIPresenter : MonoBehaviour
         
         // 読み込み完了後にViewに渡してダイアログを表示
         await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite, seWaitTime);
+        
+        // アイテム取得演出がある場合は表示
+        if (currentDialog.HasGetItem)
+        {
+            await ShowItemGetEffect(currentDialog);
+        }
+    }
+    
+    /// <summary>
+    /// アイテム取得演出を表示
+    /// </summary>
+    /// <param name="dialogData">アイテム取得情報を含むダイアログデータ</param>
+    private async UniTask ShowItemGetEffect(DialogData dialogData)
+    {
+        // アイテムデータを作成
+        var itemGetData = ItemGetData.FromDialogData(dialogData);
+        if (itemGetData == null)
+        {
+            Debug.LogWarning("[NovelUIPresenter] アイテム取得演出データの作成に失敗しました");
+            return;
+        }
+        
+        // アイテム画像を読み込み
+        Sprite itemSprite = null;
+        if (!string.IsNullOrEmpty(itemGetData.ItemImageName))
+        {
+            // アイテム画像はキャラクター画像ローダーを使用
+            itemSprite = await _characterImageLoader.LoadCharacterImageAsync(itemGetData.ItemImageName);
+        }
+        
+        // アイテム取得演出Viewを表示（将来実装予定）
+        // TODO: ItemGetEffectViewを作成してここで呼び出す
+        // await ShowItemGetEffectView(itemSprite, itemGetData.ItemName, itemGetData.ItemDescription);
+        
+        // 仮実装：ログ出力（スプレッドシート読み込みテスト用）
+        Debug.Log($"[recommend] [アイテム取得演出] アイテム名: '{itemGetData.ItemName}', 説明: '{itemGetData.ItemDescription}', 画像: '{itemGetData.ItemImageName}', 画像読み込み: {(itemSprite != null ? "成功" : "失敗")}");
     }
     
     /// <summary>
