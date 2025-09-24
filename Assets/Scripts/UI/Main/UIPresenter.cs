@@ -238,14 +238,7 @@ public class UIPresenter : IStartable, System.IDisposable
         // プレイヤーのカード選択を監視して詳細ボタンの表示制御
         _player.SelectedCard.Subscribe(cardModel =>
         {
-            if (cardModel != null && cardModel.Data)
-            {
-                _cardDetailButtonView?.Show();
-            }
-            else
-            {
-                _cardDetailButtonView?.Hide();
-            }
+            UpdateDetailButtonVisibility();
         }).AddTo(_disposables);
         
         // 崩壊ビジュアル更新に関する全てのイベントを統合
