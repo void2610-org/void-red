@@ -14,7 +14,8 @@ using Void2610.UnityTemplate;
 public class TutorialView : MonoBehaviour
 {
     [SerializeField] private RectTransform maskArea;
-    [SerializeField] private NarrationView narrationView;
+    [SerializeField] private NarrationView playerNarrationView;
+    [SerializeField] private NarrationView enemyNarrationView;
     
     private const float FADE_DURATION = 0.3f;
     private const float MASK_TRANSITION_DURATION = 0.5f;
@@ -67,6 +68,7 @@ public class TutorialView : MonoBehaviour
         _currentMaskSize = step.MaskSize;
         
         // メッセージテキストの更新
+        var narrationView = step.IsPlayerDialog ? playerNarrationView : enemyNarrationView;
         await narrationView.DisplayNarration(step.Message, autoAdvance: false);
         
         // アニメーション完了を待つ
@@ -101,7 +103,8 @@ public class TutorialView : MonoBehaviour
             _currentFadeHandle.Cancel();
         
         // NarrationViewも非表示にする
-        narrationView.HideNarration().Forget();
+        playerNarrationView.HideNarration().Forget();
+        enemyNarrationView.HideNarration().Forget();
         
         // フェードアウト
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_DURATION);
