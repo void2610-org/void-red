@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 using R3;
 
 /// <summary>
@@ -10,26 +9,12 @@ public class PlayButtonView : MonoBehaviour
 {
     [SerializeField] private Button playButton;
 
-    public Observable<Unit> PlayButtonClicked => _playButtonClicked;
+    public Observable<Unit> PlayButtonClicked => playButton.OnClickAsObservable();
     public void Show() => playButton.gameObject.SetActive(true);
     public void Hide() => playButton.gameObject.SetActive(false);
     
-    private void OnPlayButtonClicked() => _playButtonClicked.OnNext(Unit.Default);
-    private readonly Subject<Unit> _playButtonClicked = new();
-    
     private void Awake()
     {
-        playButton.onClick.AddListener(OnPlayButtonClicked);
-    }
-    
-    private void Start()
-    {
         Hide(); // 初期状態では非表示
-    }
-    
-    private void OnDestroy()
-    {
-        _playButtonClicked?.Dispose();
-        playButton.onClick.RemoveListener(OnPlayButtonClicked);
     }
 }
