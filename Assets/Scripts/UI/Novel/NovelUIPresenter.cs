@@ -31,6 +31,7 @@ public class NovelUIPresenter : MonoBehaviour
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
     private bool _isShowingItemGetEffect; // アイテム取得演出表示中フラグ
+    private readonly CompositeDisposable _disposables = new();
     
     [Inject]
     public void Construct(
@@ -55,8 +56,12 @@ public class NovelUIPresenter : MonoBehaviour
         _itemGetEffectView = FindFirstObjectByType<ItemGetEffectView>();
         
         // Viewイベントを購読
-        _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
-        _dialogView.OnSkipRequested += () => SkipAllDialogs().Forget();
+        _dialogView.OnDialogCompleted
+            .Subscribe(_ => OnDialogCompleted().Forget())
+            .AddTo(_disposables);
+        _dialogView.OnSkipRequested
+            .Subscribe(_ => SkipAllDialogs().Forget())
+            .AddTo(_disposables);
         
         // ビルドでは必ずローカルExcelを使用
         #if !UNITY_EDITOR
@@ -333,6 +338,9 @@ public class NovelUIPresenter : MonoBehaviour
     
     private void OnDestroy()
     {
+        // 購読を一括解除
+        _disposables?.Dispose();
+        
         // 画像のメモリを解放
         _addressableImageLoader?.UnloadAllImages();
     }
