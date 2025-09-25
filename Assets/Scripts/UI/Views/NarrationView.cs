@@ -125,6 +125,7 @@ public class NarrationView : MonoBehaviour
     {
         // 初期状態の設定
         _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.alpha = 0f;  // CanvasGroup全体を透明に初期化
         narrationText.gameObject.SetActive(false);
         
         // backgroundImageの初期状態を透明に設定
