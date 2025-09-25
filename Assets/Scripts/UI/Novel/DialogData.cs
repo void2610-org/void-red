@@ -71,6 +71,31 @@ public class DialogData
     public bool HasCustomCharSpeed => CustomCharSpeed > 0f;
     
     /// <summary>
+    /// アイテム取得情報
+    /// </summary>
+    public ItemGetData GetItemData => GetParameterValue<ItemGetData>(DialogParameterType.GetItem, null);
+    
+    /// <summary>
+    /// アイテム取得演出があるかどうか
+    /// </summary>
+    public bool HasGetItem => GetItemData != null;
+    
+    /// <summary>
+    /// アイテムの画像名を取得
+    /// </summary>
+    public string GetItemImageName => GetItemData?.ItemImageName ?? "";
+    
+    /// <summary>
+    /// アイテム名を取得
+    /// </summary>
+    public string GetItemName => GetItemData?.ItemName ?? "";
+    
+    /// <summary>
+    /// アイテムの説明を取得
+    /// </summary>
+    public string GetItemDescription => GetItemData?.ItemDescription ?? "";
+    
+    /// <summary>
     /// コンストラクタ（動的パラメータ対応版）
     /// </summary>
     public DialogData(string speakerName, string dialogText, Dictionary<DialogParameterType, object> parameters)
@@ -103,9 +128,15 @@ public class DialogData
     /// <returns>パラメータ値またはデフォルト値</returns>
     private T GetParameterValue<T>(DialogParameterType parameterType, T defaultValue)
     {
-        if (_parameters.TryGetValue(parameterType, out var value) && value is T typedValue)
+        if (_parameters.TryGetValue(parameterType, out var value))
         {
-            return typedValue;
+            // 値がnullかつTがnull許容型の場合
+            if (value == null && !typeof(T).IsValueType)
+                return (T)(object)null;
+            
+            // その他の型の場合
+            if (value is T typedValue)
+                return typedValue;
         }
         return defaultValue;
     }

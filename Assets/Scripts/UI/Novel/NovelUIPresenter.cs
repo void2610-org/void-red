@@ -21,14 +21,16 @@ public class NovelUIPresenter : MonoBehaviour
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
     private NovelDialogService _novelDialogService;
-    private AddressableImageLoader _characterImageLoader;
+    private AddressableImageLoader _addressableImageLoader;
     private ConfirmationDialogService _confirmationDialogService;
     private SettingsManager _settingsManager;
     private DialogView _dialogView;
+    private ItemGetEffectView _itemGetEffectView;
     
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
+    private bool _isShowingItemGetEffect; // アイテム取得演出表示中フラグ
     
     [Inject]
     public void Construct(
@@ -41,7 +43,7 @@ public class NovelUIPresenter : MonoBehaviour
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
         _settingsManager = settingsManager;
-        _characterImageLoader = new AddressableImageLoader();
+        _addressableImageLoader = new AddressableImageLoader();
     }
     
     private async UniTask Start()
@@ -49,9 +51,11 @@ public class NovelUIPresenter : MonoBehaviour
         // DialogViewを取得
         _dialogView = FindFirstObjectByType<DialogView>();
         
+        // ItemGetEffectViewを取得
+        _itemGetEffectView = FindFirstObjectByType<ItemGetEffectView>();
+        
         // Viewイベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
-        _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
         _dialogView.OnSkipRequested += () => SkipAllDialogs().Forget();
         
         // ビルドでは必ずローカルExcelを使用
@@ -124,59 +128,93 @@ public class NovelUIPresenter : MonoBehaviour
         // フェードイン
         await _dialogView.FadeIn();
         
-        // 最初のダイアログを表示
-        await ShowNextDialog();
+        // 全てのダイアログを順番に処理
+        while (_currentDialogIndex < _currentDialogList.Count)
+        {
+            var currentDialog = _currentDialogList[_currentDialogIndex];
+            
+            // ダイアログを表示（完了まで待機）
+            await ShowSingleDialog(currentDialog);
+            
+            // アイテム取得演出がある場合は実行
+            if (currentDialog.HasGetItem)
+            {
+                await ShowItemGetEffect(currentDialog);
+            }
+            
+            _currentDialogIndex++;
+        }
+        
+        // 全てのダイアログが完了
+        await _dialogView.ShowDialogComplete();
     }
     
     /// <summary>
-    /// 次のダイアログを表示
+    /// 単一のダイアログを表示（完了まで待機）
     /// </summary>
-    private async UniTask ShowNextDialog()
+    private async UniTask ShowSingleDialog(DialogData dialogData)
     {
-        if (_currentDialogIndex >= _currentDialogList.Count)
-        {
-            // すべてのダイアログを表示完了
-            await _dialogView.ShowDialogComplete();
-            return;
-        }
-        
-        var currentDialog = _currentDialogList[_currentDialogIndex];
-        _currentDialogIndex++;
-        
         // キャラクター画像を読み込み（事前読み込み済みなのでキャッシュから取得）
         Sprite characterSprite = null;
-        if (!string.IsNullOrEmpty(currentDialog.CharacterImageName))
+        if (!string.IsNullOrEmpty(dialogData.CharacterImageName))
         {
-            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(currentDialog.CharacterImageName);
+            characterSprite = await _addressableImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
         }
         
         // 背景画像を読み込み
         Sprite backgroundSprite = null;
-        if (!string.IsNullOrEmpty(currentDialog.BackgroundImageName))
+        if (!string.IsNullOrEmpty(dialogData.BackgroundImageName))
         {
-            backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(currentDialog.BackgroundImageName);
+            backgroundSprite = await _addressableImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
         }
         
         // SE再生と再生時間の取得
         novelSeManager.StopSe();
         var seWaitTime = 0f;
-        if (currentDialog.HasSe)
+        if (dialogData.HasSe)
         {
             // SEのクリップ長を取得（オートモード時のため）
-            seWaitTime = novelSeManager.PlaySe(currentDialog.SeClipName);
+            seWaitTime = novelSeManager.PlaySe(dialogData.SeClipName);
         }
         
-        // 読み込み完了後にViewに渡してダイアログを表示
-        await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite, seWaitTime);
+        // ダイアログを表示（完了まで待機）
+        await _dialogView.ShowSingleDialog(dialogData, characterSprite, backgroundSprite, seWaitTime);
     }
     
     /// <summary>
-    /// ユーザークリック処理
+    /// アイテム取得演出を表示
     /// </summary>
-    private async UniTaskVoid HandleUserClick()
+    /// <param name="dialogData">アイテム取得情報を含むダイアログデータ</param>
+    private async UniTask ShowItemGetEffect(DialogData dialogData)
     {
-        // 次のダイアログへ進む
-        await ShowNextDialog();
+        // アイテムデータを取得
+        var itemGetData = dialogData.GetItemData;
+        if (itemGetData == null)
+        {
+            Debug.LogWarning("[NovelUIPresenter] アイテム取得データが存在しません");
+            return;
+        }
+        
+        _isShowingItemGetEffect = true;
+        
+        // DialogViewのクリックを無効化
+        _dialogView.SetInteractable(false);
+        
+        // アイテム画像を読み込み
+        Sprite itemSprite = null;
+        if (!string.IsNullOrEmpty(itemGetData.ItemImageName))
+        {
+            // アイテム画像を読み込み
+            itemSprite = await _addressableImageLoader.LoadItemImageAsync(itemGetData.ItemImageName);
+        }
+        
+        // アイテム取得演出を実行
+        await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
+        
+        // DialogViewのクリックを有効化
+        _dialogView.SetInteractable(true);
+        
+        _isShowingItemGetEffect = false;
     }
     
     /// <summary>
@@ -184,6 +222,12 @@ public class NovelUIPresenter : MonoBehaviour
     /// </summary>
     private async UniTaskVoid SkipAllDialogs()
     {
+        // アイテム取得演出中はスキップを無視
+        if (_isShowingItemGetEffect)
+        {
+            return;
+        }
+        
         var confirmed = await _confirmationDialogService.ShowDialog(
             "現在のシナリオをスキップしますか？",
             "スキップ",
@@ -192,19 +236,19 @@ public class NovelUIPresenter : MonoBehaviour
         
         if (!confirmed) return;
         
-        // 残りのダイアログを全てスキップ
+        // ダイアログループを強制終了してダイアログ完了を表示
         _currentDialogIndex = _currentDialogList.Count;
-        // ダイアログ完了を表示
         await _dialogView.ShowDialogComplete();
     }
     
     /// <summary>
-    /// ダイアログリストに含まれるキャラクター画像と背景画像を事前に読み込み
+    /// ダイアログリストに含まれるキャラクター画像、背景画像、アイテム画像を事前に読み込み
     /// </summary>
     private async UniTask PreloadCharacterImages(List<DialogData> dialogList)
     {
         var characterImageNames = new HashSet<string>();
         var backgroundImageNames = new HashSet<string>();
+        var itemImageNames = new HashSet<string>();
         
         // ダイアログリストから使用される画像名を抽出
         foreach (var dialog in dialogList)
@@ -218,6 +262,12 @@ public class NovelUIPresenter : MonoBehaviour
             {
                 backgroundImageNames.Add(dialog.BackgroundImageName);
             }
+            
+            // アイテム画像名を抽出
+            if (dialog.HasGetItem && !string.IsNullOrEmpty(dialog.GetItemData.ItemImageName))
+            {
+                itemImageNames.Add(dialog.GetItemData.ItemImageName);
+            }
         }
         
         // 画像を並列で読み込み
@@ -226,13 +276,19 @@ public class NovelUIPresenter : MonoBehaviour
         // キャラクター画像の読み込み
         foreach (var imageName in characterImageNames)
         {
-            loadTasks.Add(_characterImageLoader.LoadCharacterImageAsync(imageName).AsUniTask());
+            loadTasks.Add(_addressableImageLoader.LoadCharacterImageAsync(imageName).AsUniTask());
         }
         
         // 背景画像の読み込み
         foreach (var imageName in backgroundImageNames)
         {
-            loadTasks.Add(_characterImageLoader.LoadBackgroundImageAsync(imageName).AsUniTask());
+            loadTasks.Add(_addressableImageLoader.LoadBackgroundImageAsync(imageName).AsUniTask());
+        }
+        
+        // アイテム画像の読み込み
+        foreach (var imageName in itemImageNames)
+        {
+            loadTasks.Add(_addressableImageLoader.LoadItemImageAsync(imageName).AsUniTask());
         }
         
         if (loadTasks.Count > 0)
@@ -277,7 +333,7 @@ public class NovelUIPresenter : MonoBehaviour
     
     private void OnDestroy()
     {
-        // キャラクター画像のメモリを解放
-        _characterImageLoader?.UnloadAllCharacterImages();
+        // 画像のメモリを解放
+        _addressableImageLoader?.UnloadAllImages();
     }
 }
