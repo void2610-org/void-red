@@ -21,7 +21,7 @@ public class NovelUIPresenter : MonoBehaviour
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
     private NovelDialogService _novelDialogService;
-    private AddressableImageLoader _characterImageLoader;
+    private AddressableImageLoader _addressableImageLoader;
     private ConfirmationDialogService _confirmationDialogService;
     private SettingsManager _settingsManager;
     private DialogView _dialogView;
@@ -43,7 +43,7 @@ public class NovelUIPresenter : MonoBehaviour
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
         _settingsManager = settingsManager;
-        _characterImageLoader = new AddressableImageLoader();
+        _addressableImageLoader = new AddressableImageLoader();
     }
     
     private async UniTask Start()
@@ -159,14 +159,14 @@ public class NovelUIPresenter : MonoBehaviour
         Sprite characterSprite = null;
         if (!string.IsNullOrEmpty(dialogData.CharacterImageName))
         {
-            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
+            characterSprite = await _addressableImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
         }
         
         // 背景画像を読み込み
         Sprite backgroundSprite = null;
         if (!string.IsNullOrEmpty(dialogData.BackgroundImageName))
         {
-            backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
+            backgroundSprite = await _addressableImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
         }
         
         // SE再生と再生時間の取得
@@ -205,8 +205,8 @@ public class NovelUIPresenter : MonoBehaviour
         Sprite itemSprite = null;
         if (!string.IsNullOrEmpty(itemGetData.ItemImageName))
         {
-            // アイテム画像はキャラクター画像ローダーを使用
-            itemSprite = await _characterImageLoader.LoadCharacterImageAsync(itemGetData.ItemImageName);
+            // アイテム画像を読み込み
+            itemSprite = await _addressableImageLoader.LoadItemImageAsync(itemGetData.ItemImageName);
         }
         
         // アイテム取得演出を実行
@@ -258,12 +258,13 @@ public class NovelUIPresenter : MonoBehaviour
     }
     
     /// <summary>
-    /// ダイアログリストに含まれるキャラクター画像と背景画像を事前に読み込み
+    /// ダイアログリストに含まれるキャラクター画像、背景画像、アイテム画像を事前に読み込み
     /// </summary>
     private async UniTask PreloadCharacterImages(List<DialogData> dialogList)
     {
         var characterImageNames = new HashSet<string>();
         var backgroundImageNames = new HashSet<string>();
+        var itemImageNames = new HashSet<string>();
         
         // ダイアログリストから使用される画像名を抽出
         foreach (var dialog in dialogList)
@@ -277,6 +278,12 @@ public class NovelUIPresenter : MonoBehaviour
             {
                 backgroundImageNames.Add(dialog.BackgroundImageName);
             }
+            
+            // アイテム画像名を抽出
+            if (dialog.HasGetItem && !string.IsNullOrEmpty(dialog.GetItemData.ItemImageName))
+            {
+                itemImageNames.Add(dialog.GetItemData.ItemImageName);
+            }
         }
         
         // 画像を並列で読み込み
@@ -285,13 +292,19 @@ public class NovelUIPresenter : MonoBehaviour
         // キャラクター画像の読み込み
         foreach (var imageName in characterImageNames)
         {
-            loadTasks.Add(_characterImageLoader.LoadCharacterImageAsync(imageName).AsUniTask());
+            loadTasks.Add(_addressableImageLoader.LoadCharacterImageAsync(imageName).AsUniTask());
         }
         
         // 背景画像の読み込み
         foreach (var imageName in backgroundImageNames)
         {
-            loadTasks.Add(_characterImageLoader.LoadBackgroundImageAsync(imageName).AsUniTask());
+            loadTasks.Add(_addressableImageLoader.LoadBackgroundImageAsync(imageName).AsUniTask());
+        }
+        
+        // アイテム画像の読み込み
+        foreach (var imageName in itemImageNames)
+        {
+            loadTasks.Add(_addressableImageLoader.LoadItemImageAsync(imageName).AsUniTask());
         }
         
         if (loadTasks.Count > 0)
@@ -336,7 +349,7 @@ public class NovelUIPresenter : MonoBehaviour
     
     private void OnDestroy()
     {
-        // キャラクター画像のメモリを解放
-        _characterImageLoader?.UnloadAllCharacterImages();
+        // 画像のメモリを解放
+        _addressableImageLoader?.UnloadAllImages();
     }
 }

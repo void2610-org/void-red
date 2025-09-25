@@ -72,6 +72,17 @@ public class AddressableImageLoader
     }
     
     /// <summary>
+    /// アイテム画像を非同期で読み込む
+    /// </summary>
+    /// <param name="imageName">画像名（Addressableキー）</param>
+    /// <returns>読み込まれたSprite（失敗時はnull）</returns>
+    public async UniTask<Sprite> LoadItemImageAsync(string imageName)
+    {
+        var path = "Assets/Sprites/Item/" + imageName + ".png";
+        return await LoadImageAsync(path);
+    }
+    
+    /// <summary>
     /// 指定した画像をキャッシュから削除し、メモリを解放
     /// </summary>
     /// <param name="imageName">解放する画像名</param>
