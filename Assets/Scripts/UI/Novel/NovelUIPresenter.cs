@@ -333,7 +333,11 @@ public class NovelUIPresenter : MonoBehaviour
     
     private void OnDestroy()
     {
+        // イベント購読を解除
+        _dialogView.OnDialogCompleted -= () => OnDialogCompleted().Forget();
+        _dialogView.OnSkipRequested -= () => SkipAllDialogs().Forget();
+        
         // 画像のメモリを解放
-        _addressableImageLoader?.UnloadAllImages();
+        _addressableImageLoader?.UnloadAllCharacterImages();
     }
 }

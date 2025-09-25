@@ -109,7 +109,7 @@ public class ItemGetEffectView : MonoBehaviour
             .AddTo(this);
         
         // アニメーション完了まで待機
-        await _fadeMotion.ToUniTask();
+        await UniTask.WhenAll(_fadeMotion.ToUniTask(), _scaleMotion.ToUniTask());
         
         // クリック可能にする
         effectPanelCanvasGroup.interactable = true;
