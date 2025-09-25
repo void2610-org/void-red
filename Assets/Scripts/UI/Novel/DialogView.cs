@@ -53,9 +53,13 @@ public class DialogView : MonoBehaviour
     private float _additionalWaitTime;
     
     // イベント
-    public event Action OnDialogCompleted;
-    public event Action OnUserClickDetected;
-    public event Action OnSkipRequested;
+    private readonly Subject<Unit> _onDialogCompleted = new();
+    private readonly Subject<Unit> _onUserClickDetected = new();
+    private readonly Subject<Unit> _onSkipRequested = new();
+    
+    public Observable<Unit> OnDialogCompleted => _onDialogCompleted;
+    public Observable<Unit> OnUserClickDetected => _onUserClickDetected;
+    public Observable<Unit> OnSkipRequested => _onSkipRequested;
     
     private void Awake()
     {
@@ -70,7 +74,7 @@ public class DialogView : MonoBehaviour
         characterImage.sprite = null;
         
         autoButton.OnClickAsObservable().Subscribe(_ => ToggleAutoMode()).AddTo(this);
-        skipButton.OnClickAsObservable().Subscribe(_ => OnSkipRequested?.Invoke()).AddTo(this);
+        skipButton.OnClickAsObservable().Subscribe(_ => _onSkipRequested.OnNext(Unit.Default)).AddTo(this);
         clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
         
         // オートボタンの初期色を設定
@@ -177,7 +181,7 @@ public class DialogView : MonoBehaviour
     public async UniTask ShowDialogComplete()
     {
         await FadeOut();
-        OnDialogCompleted?.Invoke();
+        _onDialogCompleted.OnNext(Unit.Default);
     }
     
     /// <summary>
@@ -266,7 +270,7 @@ public class DialogView : MonoBehaviour
                 if (_isWaitingForNext)
                 {
                     _isWaitingForNext = false;
-                    OnUserClickDetected?.Invoke();
+                    _onUserClickDetected.OnNext(Unit.Default);
                 }
             }
             catch (OperationCanceledException)
@@ -306,7 +310,7 @@ public class DialogView : MonoBehaviour
             if (_isWaitingForNext && _isAutoMode)
             {
                 _isWaitingForNext = false;
-                OnUserClickDetected?.Invoke();
+                _onUserClickDetected.OnNext(Unit.Default);
             }
         }
         catch (OperationCanceledException) { }
@@ -332,7 +336,7 @@ public class DialogView : MonoBehaviour
         
         // 通常モードのクリックで次へ進む
         _isWaitingForNext = false;
-        OnUserClickDetected?.Invoke();
+        _onUserClickDetected.OnNext(Unit.Default);
     }
     
     /// <summary>
@@ -427,5 +431,10 @@ public class DialogView : MonoBehaviour
         
         _waitCancellationTokenSource?.Cancel();
         _waitCancellationTokenSource?.Dispose();
+        
+        // R3のSubjectを解放
+        _onDialogCompleted?.Dispose();
+        _onUserClickDetected?.Dispose();
+        _onSkipRequested?.Dispose();
     }
 }
