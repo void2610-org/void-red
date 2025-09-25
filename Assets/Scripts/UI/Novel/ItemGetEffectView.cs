@@ -30,7 +30,6 @@ public class ItemGetEffectView : MonoBehaviour
     
     private MotionHandle _fadeMotion;
     private MotionHandle _scaleMotion;
-    private bool _isAnimating;
     private bool _isWaitingForClick;
     
     // イベント
@@ -44,16 +43,13 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.blocksRaycasts = false;
         
         // 背景オーバーレイの色を設定
-        if (backgroundOverlay != null)
-            backgroundOverlay.color = backgroundOverlayColor;
+        backgroundOverlay.color = backgroundOverlayColor;
         
         // アイテム画像の初期スケールを設定
-        if (itemImage != null)
-            itemImage.transform.localScale = itemImageStartScale;
+        itemImage.transform.localScale = itemImageStartScale;
         
         // クリックイベントを購読
-        if (clickAreaButton != null)
-            clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
+        clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
     }
     
     /// <summary>
@@ -63,10 +59,6 @@ public class ItemGetEffectView : MonoBehaviour
     /// <param name="itemSprite">アイテムの画像</param>
     public async UniTask ShowItemGetEffect(ItemGetData itemGetData, Sprite itemSprite = null)
     {
-        if (_isAnimating) return;
-        
-        _isAnimating = true;
-        
         // UI要素を設定
         SetupUIElements(itemGetData, itemSprite);
         
@@ -79,8 +71,6 @@ public class ItemGetEffectView : MonoBehaviour
         // 演出を終了
         await PlayHideAnimation();
         
-        _isAnimating = false;
-        
         // イベント発火
         OnEffectCompleted?.Invoke();
     }
@@ -91,20 +81,15 @@ public class ItemGetEffectView : MonoBehaviour
     private void SetupUIElements(ItemGetData itemGetData, Sprite itemSprite)
     {
         // アイテム名を設定
-        if (itemNameText != null)
-            itemNameText.text = itemGetData.ItemName;
+        itemNameText.text = itemGetData.ItemName;
         
         // アイテム説明を設定
-        if (itemDescriptionText != null)
-            itemDescriptionText.text = itemGetData.ItemDescription;
+        itemDescriptionText.text = itemGetData.ItemDescription;
         
         // アイテム画像を設定
-        if (itemImage != null)
-        {
-            itemImage.sprite = itemSprite;
-            itemImage.color = itemSprite != null ? Color.white : Color.clear;
-            itemImage.transform.localScale = itemImageStartScale;
-        }
+        itemImage.sprite = itemSprite;
+        itemImage.color = itemSprite != null ? Color.white : Color.clear;
+        itemImage.transform.localScale = itemImageStartScale;
     }
     
     /// <summary>
@@ -124,14 +109,11 @@ public class ItemGetEffectView : MonoBehaviour
             .AddTo(this);
         
         // アイテム画像のスケールアニメーション
-        if (itemImage != null)
-        {
-            _scaleMotion = LMotion.Create(itemImageStartScale, itemImageEndScale, itemScaleAnimationDuration)
-                .WithEase(Ease.OutBack) // バックイーズで少し弾むような演出
-                .WithDelay(0.2f) // フェードインの後に開始
-                .Bind(scale => itemImage.transform.localScale = scale)
-                .AddTo(this);
-        }
+        _scaleMotion = LMotion.Create(itemImageStartScale, itemImageEndScale, itemScaleAnimationDuration)
+            .WithEase(Ease.OutBack) // バックイーズで少し弾むような演出
+            .WithDelay(0.2f) // フェードインの後に開始
+            .Bind(scale => itemImage.transform.localScale = scale)
+            .AddTo(this);
         
         // アニメーション完了まで待機
         await _fadeMotion.ToUniTask();
@@ -176,7 +158,7 @@ public class ItemGetEffectView : MonoBehaviour
     /// </summary>
     private void OnClick()
     {
-        if (!_isAnimating || !effectPanelCanvasGroup.interactable || !_isWaitingForClick) return;
+        if (!effectPanelCanvasGroup.interactable || !_isWaitingForClick) return;
         
         // 入力待ちを終了
         _isWaitingForClick = false;

@@ -209,17 +209,8 @@ public class NovelUIPresenter : MonoBehaviour
             itemSprite = await _characterImageLoader.LoadCharacterImageAsync(itemGetData.ItemImageName);
         }
         
-        // ItemGetEffectViewが存在する場合は実際の演出を表示
-        if (_itemGetEffectView != null)
-        {
-            await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
-        }
-        else
-        {
-            // フォールバック：ログ出力
-            Debug.LogWarning($"[NovelUIPresenter] ItemGetEffectViewが見つかりません。アイテム取得演出をスキップします。");
-            Debug.Log($"[アイテム取得演出] アイテム名: '{itemGetData.ItemName}', 説明: '{itemGetData.ItemDescription}', 画像: '{itemGetData.ItemImageName}'");
-        }
+        // アイテム取得演出を実行
+        await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
         
         // DialogViewのクリックを有効化
         _dialogView.SetInteractable(true);
