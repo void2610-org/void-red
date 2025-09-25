@@ -56,7 +56,6 @@ public class NovelUIPresenter : MonoBehaviour
         
         // Viewイベントを購読
         _dialogView.OnDialogCompleted += () => OnDialogCompleted().Forget();
-        _dialogView.OnUserClickDetected += () => HandleUserClick().Forget();
         _dialogView.OnSkipRequested += () => SkipAllDialogs().Forget();
         
         // ビルドでは必ずローカルExcelを使用
@@ -216,21 +215,6 @@ public class NovelUIPresenter : MonoBehaviour
         _dialogView.SetInteractable(true);
         
         _isShowingItemGetEffect = false;
-    }
-    
-    /// <summary>
-    /// ユーザークリック処理
-    /// </summary>
-    private async UniTaskVoid HandleUserClick()
-    {
-        // アイテム取得演出中はクリックを無視
-        if (_isShowingItemGetEffect)
-        {
-            return;
-        }
-        
-        // 通常のクリックは DialogView 内で処理される
-        // このメソッドはスキップボタンなど特別な処理のみ担当
     }
     
     /// <summary>
