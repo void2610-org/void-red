@@ -338,6 +338,6 @@ public class NovelUIPresenter : MonoBehaviour
         _dialogView.OnSkipRequested -= () => SkipAllDialogs().Forget();
         
         // 画像のメモリを解放
-        _addressableImageLoader?.UnloadAllCharacterImages();
+        _addressableImageLoader?.UnloadAllImages();
     }
 }
