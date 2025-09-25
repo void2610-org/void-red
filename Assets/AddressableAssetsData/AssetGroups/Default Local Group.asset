@@ -35,6 +35,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4e74d9ad0a6bf5b48bbae5a747d6de38
+    m_Address: Assets/Sprites/Item/doll.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5ab3d58af953648619198c0ebb508f72
     m_Address: Assets/Sprites/Character/Alv/2-1.png
     m_ReadOnly: 0
