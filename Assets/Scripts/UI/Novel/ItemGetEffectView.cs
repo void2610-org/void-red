@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -31,9 +30,6 @@ public class ItemGetEffectView : MonoBehaviour
     private MotionHandle _fadeMotion;
     private MotionHandle _scaleMotion;
     private bool _isWaitingForClick;
-    
-    // イベント
-    public event Action OnEffectCompleted;
     
     private void Awake()
     {
@@ -70,9 +66,6 @@ public class ItemGetEffectView : MonoBehaviour
         
         // 演出を終了
         await PlayHideAnimation();
-        
-        // イベント発火
-        OnEffectCompleted?.Invoke();
     }
     
     /// <summary>
