@@ -11,23 +11,14 @@ public class TutorialStep
 {
     [TextArea(3, 5)]
     [SerializeField] private string message;
+    [SerializeField] private bool isPlayerDialog;
     
     [SerializeField] private Vector2 maskPosition;
     [SerializeField] private Vector2 maskSize = new(200, 100);
     
-    /// <summary>
-    /// 表示するメッセージテキスト
-    /// </summary>
     public string Message => message;
-    
-    /// <summary>
-    /// マスク領域の中心座標
-    /// </summary>
+    public bool IsPlayerDialog => isPlayerDialog;
     public Vector2 MaskPosition => maskPosition;
-    
-    /// <summary>
-    /// マスク領域のサイズ
-    /// </summary>
     public Vector2 MaskSize => maskSize;
 }
 
