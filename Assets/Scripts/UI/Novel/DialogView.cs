@@ -433,8 +433,8 @@ public class DialogView : MonoBehaviour
         _waitCancellationTokenSource?.Dispose();
         
         // R3のSubjectを解放
-        _onDialogCompleted?.Dispose();
-        _onUserClickDetected?.Dispose();
-        _onSkipRequested?.Dispose();
+        _onDialogCompleted.Dispose();
+        _onUserClickDetected.Dispose();
+        _onSkipRequested.Dispose();
     }
 }
