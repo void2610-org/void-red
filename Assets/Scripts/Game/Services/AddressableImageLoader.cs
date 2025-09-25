@@ -130,11 +130,6 @@ public class AddressableImageLoader
     }
     
     /// <summary>
-    /// 全ての読み込み済み画像をキャッシュから削除し、メモリを解放（後方互換性）
-    /// </summary>
-    public void UnloadAllCharacterImages() => UnloadAllImages();
-    
-    /// <summary>
     /// 指定した画像がキャッシュに存在するかチェック
     /// </summary>
     /// <param name="imageName">確認する画像名</param>
