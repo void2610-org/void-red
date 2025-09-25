@@ -85,8 +85,7 @@ public class DialogView : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
         
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
+        CancelActiveMotions();
         
         _fadeMotion = LMotion.Create(0f, 1f, fadeInDuration)
             .WithEase(Ease.OutCubic)
@@ -104,8 +103,7 @@ public class DialogView : MonoBehaviour
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
         
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
+        CancelActiveMotions();
         
         _fadeMotion = LMotion.Create(1f, 0f, fadeOutDuration)
             .WithEase(Ease.InCubic)
@@ -143,8 +141,7 @@ public class DialogView : MonoBehaviour
         
         // インジケーターを非表示
         nextIndicator.SetActive(false);
-        if (_indicatorMotion.IsActive())
-            _indicatorMotion.Cancel();
+        CancelActiveMotions();
         
         // 文字送りアニメーションを開始
         _isTyping = true;
@@ -346,8 +343,7 @@ public class DialogView : MonoBehaviour
         nextIndicator.SetActive(true);
         PositionIndicatorAtLastCharacter();
         
-        if (_indicatorMotion.IsActive())
-            _indicatorMotion.Cancel();
+        CancelActiveMotions();
         
         var rectTransform = nextIndicator.GetComponent<RectTransform>();
         if (rectTransform)
@@ -400,6 +396,26 @@ public class DialogView : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// DialogViewの操作可能状態を設定（アイテム取得演出中の制御用）
+    /// </summary>
+    /// <param name="interactable">操作可能かどうか</param>
+    public void SetInteractable(bool interactable)
+    {
+        canvasGroup.interactable = interactable;
+    }
+    
+    /// <summary>
+    /// アクティブなアニメーションを全てキャンセル
+    /// </summary>
+    private void CancelActiveMotions()
+    {
+        if (_fadeMotion.IsActive())
+            _fadeMotion.Cancel();
+        if (_indicatorMotion.IsActive())
+            _indicatorMotion.Cancel();
+    }
+    
     private void UpdateAutoButtonColor()
     {
         autoButtonText.color = _isAutoMode ? autoButtonActiveColor : autoButtonNormalColor;
@@ -407,10 +423,7 @@ public class DialogView : MonoBehaviour
     
     private void OnDestroy()
     {
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
-        if (_indicatorMotion.IsActive())
-            _indicatorMotion.Cancel();
+        CancelActiveMotions();
         
         _waitCancellationTokenSource?.Cancel();
         _waitCancellationTokenSource?.Dispose();

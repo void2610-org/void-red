@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// ダイアログパラメータのタイプを定義するenum
@@ -29,7 +30,12 @@ public enum DialogParameterType
     /// <summary>
     /// 自動で次に進むまでの時間（float、0以下の場合は自動進行なし）
     /// </summary>
-    AutoAdvance
+    AutoAdvance,
+    
+    /// <summary>
+    /// アイテム取得演出（ItemGetData - 画像名,アイテム名,アイテム説明）
+    /// </summary>
+    GetItem
 }
 
 /// <summary>
@@ -62,6 +68,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.SeClipName => typeof(string),
             DialogParameterType.CustomCharSpeed => typeof(float),
             DialogParameterType.AutoAdvance => typeof(float),
+            DialogParameterType.GetItem => typeof(ItemGetData),
             _ => typeof(string)
         };
     }
@@ -86,6 +93,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.SeClipName => valueString,
             DialogParameterType.CustomCharSpeed => float.TryParse(valueString, out var floatValue) ? floatValue : -1f,
             DialogParameterType.AutoAdvance => float.TryParse(valueString, out var autoValue) ? autoValue : -1f,
+            DialogParameterType.GetItem => ItemGetData.FromCommaSeparatedString(valueString),
             _ => valueString
         };
     }
@@ -104,6 +112,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.SeClipName => "",
             DialogParameterType.CustomCharSpeed => -1f,
             DialogParameterType.AutoAdvance => -1f,
+            DialogParameterType.GetItem => null,
             _ => ""
         };
     }
