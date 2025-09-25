@@ -69,6 +69,8 @@ public class TutorialView : MonoBehaviour
         
         // メッセージテキストの更新
         var narrationView = step.IsPlayerDialog ? playerNarrationView : enemyNarrationView;
+        var disableView = step.IsPlayerDialog ? enemyNarrationView : playerNarrationView;
+        await disableView.HideNarration();  // 使用しない方を確実に非表示にしてから進む
         await narrationView.DisplayNarration(step.Message, autoAdvance: false);
         
         // アニメーション完了を待つ
