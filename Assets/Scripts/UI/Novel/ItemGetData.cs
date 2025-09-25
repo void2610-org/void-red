@@ -39,19 +39,26 @@ public class ItemGetData
     }
     
     /// <summary>
-    /// DialogDataからItemGetDataを作成
+    /// カンマ区切り文字列からItemGetDataを作成
     /// </summary>
-    /// <param name="dialogData">ダイアログデータ</param>
+    /// <param name="commaSeparatedValue">カンマ区切り文字列 ("アイテム画像名,アイテム名,アイテム説明")</param>
     /// <returns>アイテム取得データ、または作成できない場合はnull</returns>
-    public static ItemGetData FromDialogData(DialogData dialogData)
+    public static ItemGetData FromCommaSeparatedString(string commaSeparatedValue)
     {
-        if (!dialogData.HasGetItem)
+        if (string.IsNullOrEmpty(commaSeparatedValue))
             return null;
         
-        return new ItemGetData(
-            dialogData.GetItemImageName,
-            dialogData.GetItemName,
-            dialogData.GetItemDescription
-        );
+        var parts = commaSeparatedValue.Split(',');
+        if (parts.Length < 3)
+        {
+            Debug.LogWarning($"[ItemGetData] 不正なGetItemパラメータ形式です。: '{commaSeparatedValue}'");
+            return null;
+        }
+        
+        var imageName = parts[0].Trim();
+        var name = parts[1].Trim();
+        var description = parts[2].Trim();
+        
+        return new ItemGetData(imageName, name, description);
     }
 }

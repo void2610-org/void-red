@@ -181,11 +181,11 @@ public class NovelUIPresenter : MonoBehaviour
     /// <param name="dialogData">アイテム取得情報を含むダイアログデータ</param>
     private async UniTask ShowItemGetEffect(DialogData dialogData)
     {
-        // アイテムデータを作成
-        var itemGetData = ItemGetData.FromDialogData(dialogData);
+        // アイテムデータを取得
+        var itemGetData = dialogData.GetItemData;
         if (itemGetData == null)
         {
-            Debug.LogWarning("[NovelUIPresenter] アイテム取得演出データの作成に失敗しました");
+            Debug.LogWarning("[NovelUIPresenter] アイテム取得データが存在しません");
             return;
         }
         

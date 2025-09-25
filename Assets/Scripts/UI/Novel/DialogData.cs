@@ -71,29 +71,29 @@ public class DialogData
     public bool HasCustomCharSpeed => CustomCharSpeed > 0f;
     
     /// <summary>
-    /// アイテム取得情報（画像名,アイテム名,アイテム説明のリスト）
+    /// アイテム取得情報
     /// </summary>
-    public List<string> GetItemData => GetParameterValue<List<string>>(DialogParameterType.GetItem, new List<string>());
+    public ItemGetData GetItemData => GetParameterValue<ItemGetData>(DialogParameterType.GetItem, null);
     
     /// <summary>
     /// アイテム取得演出があるかどうか
     /// </summary>
-    public bool HasGetItem => GetItemData.Count >= 3; // 最低でも画像名、アイテム名、説明が必要
+    public bool HasGetItem => GetItemData != null;
     
     /// <summary>
-    /// アイテムの画像名を取得（GetItemDataの0番目）
+    /// アイテムの画像名を取得
     /// </summary>
-    public string GetItemImageName => HasGetItem ? GetItemData[0] : "";
+    public string GetItemImageName => GetItemData?.ItemImageName ?? "";
     
     /// <summary>
-    /// アイテム名を取得（GetItemDataの1番目）
+    /// アイテム名を取得
     /// </summary>
-    public string GetItemName => HasGetItem ? GetItemData[1] : "";
+    public string GetItemName => GetItemData?.ItemName ?? "";
     
     /// <summary>
-    /// アイテムの説明を取得（GetItemDataの2番目）
+    /// アイテムの説明を取得
     /// </summary>
-    public string GetItemDescription => HasGetItem ? GetItemData[2] : "";
+    public string GetItemDescription => GetItemData?.ItemDescription ?? "";
     
     /// <summary>
     /// コンストラクタ（動的パラメータ対応版）
@@ -130,9 +130,9 @@ public class DialogData
     {
         if (_parameters.TryGetValue(parameterType, out var value))
         {
-            // List<string>型の場合の特別処理
-            if (typeof(T) == typeof(List<string>) && value is List<string> listValue)
-                return (T)(object)listValue;
+            // 値がnullかつTがnull許容型の場合
+            if (value == null && !typeof(T).IsValueType)
+                return (T)(object)null;
             
             // その他の型の場合
             if (value is T typedValue)
