@@ -129,50 +129,57 @@ public class NovelUIPresenter : MonoBehaviour
         // フェードイン
         await _dialogView.FadeIn();
         
-        // 最初のダイアログを表示
-        await ShowNextDialog();
+        // 全てのダイアログを順番に処理
+        while (_currentDialogIndex < _currentDialogList.Count)
+        {
+            var currentDialog = _currentDialogList[_currentDialogIndex];
+            
+            // ダイアログを表示（完了まで待機）
+            await ShowSingleDialog(currentDialog);
+            
+            // アイテム取得演出がある場合は実行
+            if (currentDialog.HasGetItem)
+            {
+                await ShowItemGetEffect(currentDialog);
+            }
+            
+            _currentDialogIndex++;
+        }
+        
+        // 全てのダイアログが完了
+        await _dialogView.ShowDialogComplete();
     }
     
     /// <summary>
-    /// 次のダイアログを表示
+    /// 単一のダイアログを表示（完了まで待機）
     /// </summary>
-    private async UniTask ShowNextDialog()
+    private async UniTask ShowSingleDialog(DialogData dialogData)
     {
-        if (_currentDialogIndex >= _currentDialogList.Count)
-        {
-            // すべてのダイアログを表示完了
-            await _dialogView.ShowDialogComplete();
-            return;
-        }
-        
-        var currentDialog = _currentDialogList[_currentDialogIndex];
-        _currentDialogIndex++;
-        
         // キャラクター画像を読み込み（事前読み込み済みなのでキャッシュから取得）
         Sprite characterSprite = null;
-        if (!string.IsNullOrEmpty(currentDialog.CharacterImageName))
+        if (!string.IsNullOrEmpty(dialogData.CharacterImageName))
         {
-            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(currentDialog.CharacterImageName);
+            characterSprite = await _characterImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
         }
         
         // 背景画像を読み込み
         Sprite backgroundSprite = null;
-        if (!string.IsNullOrEmpty(currentDialog.BackgroundImageName))
+        if (!string.IsNullOrEmpty(dialogData.BackgroundImageName))
         {
-            backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(currentDialog.BackgroundImageName);
+            backgroundSprite = await _characterImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
         }
         
         // SE再生と再生時間の取得
         novelSeManager.StopSe();
         var seWaitTime = 0f;
-        if (currentDialog.HasSe)
+        if (dialogData.HasSe)
         {
             // SEのクリップ長を取得（オートモード時のため）
-            seWaitTime = novelSeManager.PlaySe(currentDialog.SeClipName);
+            seWaitTime = novelSeManager.PlaySe(dialogData.SeClipName);
         }
         
-        // 読み込み完了後にViewに渡してダイアログを表示
-        await _dialogView.ShowSingleDialog(currentDialog, characterSprite, backgroundSprite, seWaitTime);
+        // ダイアログを表示（完了まで待機）
+        await _dialogView.ShowSingleDialog(dialogData, characterSprite, backgroundSprite, seWaitTime);
     }
     
     /// <summary>
@@ -188,6 +195,11 @@ public class NovelUIPresenter : MonoBehaviour
             Debug.LogWarning("[NovelUIPresenter] アイテム取得データが存在しません");
             return;
         }
+        
+        _isShowingItemGetEffect = true;
+        
+        // DialogViewのクリックを無効化
+        _dialogView.SetInteractable(false);
         
         // アイテム画像を読み込み
         Sprite itemSprite = null;
@@ -208,6 +220,11 @@ public class NovelUIPresenter : MonoBehaviour
             Debug.LogWarning($"[NovelUIPresenter] ItemGetEffectViewが見つかりません。アイテム取得演出をスキップします。");
             Debug.Log($"[アイテム取得演出] アイテム名: '{itemGetData.ItemName}', 説明: '{itemGetData.ItemDescription}', 画像: '{itemGetData.ItemImageName}'");
         }
+        
+        // DialogViewのクリックを有効化
+        _dialogView.SetInteractable(true);
+        
+        _isShowingItemGetEffect = false;
     }
     
     /// <summary>
@@ -221,33 +238,8 @@ public class NovelUIPresenter : MonoBehaviour
             return;
         }
         
-        // 前のダイアログ（現在のインデックス-1）にアイテム取得演出があるかチェック
-        var previousDialogIndex = _currentDialogIndex - 1;
-        if (previousDialogIndex >= 0 && previousDialogIndex < _currentDialogList.Count)
-        {
-            var previousDialog = _currentDialogList[previousDialogIndex];
-            if (previousDialog.HasGetItem)
-            {
-                _isShowingItemGetEffect = true;
-                
-                // DialogViewのクリックを無効化
-                _dialogView.SetInteractable(false);
-                
-                await ShowItemGetEffect(previousDialog);
-                
-                // DialogViewのクリックを有効化
-                _dialogView.SetInteractable(true);
-                
-                _isShowingItemGetEffect = false;
-                
-                // 演出完了後、次のダイアログへ進む
-                await ShowNextDialog();
-                return;
-            }
-        }
-        
-        // 通常の次のダイアログへ進む
-        await ShowNextDialog();
+        // 通常のクリックは DialogView 内で処理される
+        // このメソッドはスキップボタンなど特別な処理のみ担当
     }
     
     /// <summary>
@@ -269,9 +261,8 @@ public class NovelUIPresenter : MonoBehaviour
         
         if (!confirmed) return;
         
-        // 残りのダイアログを全てスキップ
+        // ダイアログループを強制終了してダイアログ完了を表示
         _currentDialogIndex = _currentDialogList.Count;
-        // ダイアログ完了を表示
         await _dialogView.ShowDialogComplete();
     }
     
