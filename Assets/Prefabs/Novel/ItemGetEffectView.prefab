@@ -209,6 +209,7 @@ MonoBehaviour:
   itemNameText: {fileID: 3585343621302263956}
   itemDescriptionText: {fileID: 1974914831620345280}
   clickAreaButton: {fileID: 8603677644794512773}
+  particle: {fileID: 980277984750444853}
   fadeInDuration: 0.5
   fadeOutDuration: 0.03
   itemScaleAnimationDuration: 0.6
@@ -722,6 +723,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e42a3909298c143e98b9f094af448b18, type: 3}
+--- !u!198 &980277984750444853 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
+  m_PrefabInstance: {fileID: 5487147919367923189}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7825281197899207102 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2359525839665738827, guid: e42a3909298c143e98b9f094af448b18, type: 3}
