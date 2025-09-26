@@ -58,7 +58,7 @@ public class ItemGetEffectView : MonoBehaviour
     public async UniTask ShowItemGetEffect(ItemGetData itemGetData, Sprite itemSprite = null)
     {
         // フェードインアニメーション
-        await effectPanelCanvasGroup.FadeIn(fadeOutDuration, Ease.InCubic);
+        await effectPanelCanvasGroup.FadeIn(fadeInDuration, Ease.InCubic);
         await UniTask.Delay(500);
         
         // UI要素を設定
