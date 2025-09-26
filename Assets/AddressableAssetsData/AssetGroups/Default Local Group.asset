@@ -35,11 +35,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4e74d9ad0a6bf5b48bbae5a747d6de38
-    m_Address: Assets/Sprites/Item/doll.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5ab3d58af953648619198c0ebb508f72
     m_Address: Assets/Sprites/Character/Alv/2-1.png
     m_ReadOnly: 0
@@ -72,6 +67,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b605c2f9307684c0fad67f28322427f6
     m_Address: Assets/Sprites/Character/Alv/1-2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0f1638c2065946f6a9e5a16984e4a2d
+    m_Address: Assets/Sprites/Item/Card.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
