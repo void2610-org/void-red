@@ -479,7 +479,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 5}
   m_SizeDelta: {x: 673, y: 612}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &951607814882670713
@@ -804,16 +804,28 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
+      propertyPath: ClampVelocityModule.dampen
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
+      propertyPath: ClampVelocityModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
+      propertyPath: NoiseModule.strength.scalar
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
       propertyPath: InitialModule.startSpeed.scalar
-      value: 0.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 5.5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
       propertyPath: InitialModule.startSpeed.minScalar
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4736914172743075008, guid: e42a3909298c143e98b9f094af448b18, type: 3}
       propertyPath: InitialModule.startLifetime.minScalar
