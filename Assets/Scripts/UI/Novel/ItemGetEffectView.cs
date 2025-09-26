@@ -4,6 +4,7 @@ using TMPro;
 using LitMotion;
 using Cysharp.Threading.Tasks;
 using R3;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// アイテム取得演出を表示するViewクラス
@@ -14,6 +15,7 @@ public class ItemGetEffectView : MonoBehaviour
     [Header("UI要素")]
     [SerializeField] private CanvasGroup effectPanelCanvasGroup;
     [SerializeField] private Image backgroundOverlay;
+    [SerializeField] private Image itemImageBackground;
     [SerializeField] private Image itemImage;
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
@@ -28,8 +30,6 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private Vector3 itemImageEndScale = Vector3.one;
     [SerializeField] private Color backgroundOverlayColor = new Color(0f, 0f, 0f, 0.7f);
     
-    private MotionHandle _fadeMotion;
-    private MotionHandle _scaleMotion;
     private bool _isWaitingForClick;
     
     private void Awake()
@@ -39,11 +39,12 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.interactable = false;
         effectPanelCanvasGroup.blocksRaycasts = false;
         
-        // 背景オーバーレイの色を設定
         backgroundOverlay.color = backgroundOverlayColor;
-        
-        // アイテム画像の初期スケールを設定
+        itemImageBackground.color = Color.clear;
         itemImage.transform.localScale = itemImageStartScale;
+
+        itemNameText.text = "";
+        itemDescriptionText.text = "";
         
         // クリックイベントを購読
         clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
@@ -56,19 +57,20 @@ public class ItemGetEffectView : MonoBehaviour
     /// <param name="itemSprite">アイテムの画像</param>
     public async UniTask ShowItemGetEffect(ItemGetData itemGetData, Sprite itemSprite = null)
     {
+        // フェードインアニメーション
+        await effectPanelCanvasGroup.FadeIn(fadeOutDuration, Ease.InCubic);
+        await UniTask.Delay(500);
+        
         // UI要素を設定
         SetupUIElements(itemGetData, itemSprite);
-        particle.Clear();
-        particle.Play();
         
         // 演出を開始
         await PlayShowAnimation();
-        
         // ユーザーの入力待ち
         await WaitForUserInput();
-        
         // 演出を終了
         await PlayHideAnimation();
+        
         particle.Stop();
         particle.Clear();
     }
@@ -98,23 +100,14 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.interactable = false;
         effectPanelCanvasGroup.blocksRaycasts = true;
         
-        // フェードインアニメーション
-        CancelActiveMotions();
-        
-        _fadeMotion = LMotion.Create(0f, 1f, fadeInDuration)
+        particle.Play();
+        LMotion.Create(Color.clear,  Color.white, 1f)
             .WithEase(Ease.OutCubic)
-            .Bind(alpha => effectPanelCanvasGroup.alpha = alpha)
+            .Bind(color => itemImageBackground.color = color)
             .AddTo(this);
         
         // アイテム画像のスケールアニメーション
-        _scaleMotion = LMotion.Create(itemImageStartScale, itemImageEndScale, itemScaleAnimationDuration)
-            .WithEase(Ease.OutBack) // バックイーズで少し弾むような演出
-            .WithDelay(0.2f) // フェードインの後に開始
-            .Bind(scale => itemImage.transform.localScale = scale)
-            .AddTo(this);
-        
-        // アニメーション完了まで待機
-        await UniTask.WhenAll(_fadeMotion.ToUniTask(), _scaleMotion.ToUniTask());
+        await itemImage.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
         
         // クリック可能にする
         effectPanelCanvasGroup.interactable = true;
@@ -138,15 +131,7 @@ public class ItemGetEffectView : MonoBehaviour
     {
         effectPanelCanvasGroup.interactable = false;
         
-        // フェードアウトアニメーション
-        CancelActiveMotions();
-        
-        _fadeMotion = LMotion.Create(1f, 0f, fadeOutDuration)
-            .WithEase(Ease.InCubic)
-            .Bind(alpha => effectPanelCanvasGroup.alpha = alpha)
-            .AddTo(this);
-        
-        await _fadeMotion.ToUniTask();
+        await effectPanelCanvasGroup.FadeOut(fadeOutDuration, Ease.InCubic);
         
         effectPanelCanvasGroup.blocksRaycasts = false;
     }
@@ -160,21 +145,5 @@ public class ItemGetEffectView : MonoBehaviour
         
         // 入力待ちを終了
         _isWaitingForClick = false;
-    }
-    
-    /// <summary>
-    /// アクティブなアニメーションを全てキャンセル
-    /// </summary>
-    private void CancelActiveMotions()
-    {
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
-        if (_scaleMotion.IsActive())
-            _scaleMotion.Cancel();
-    }
-    
-    private void OnDestroy()
-    {
-        CancelActiveMotions();
     }
 }
