@@ -18,6 +18,7 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
     [SerializeField] private Button clickAreaButton;
+    [SerializeField] private ParticleSystem particle;
     
     [Header("アニメーション設定")]
     [SerializeField] private float fadeInDuration = 0.5f;
@@ -57,6 +58,8 @@ public class ItemGetEffectView : MonoBehaviour
     {
         // UI要素を設定
         SetupUIElements(itemGetData, itemSprite);
+        particle.Clear();
+        particle.Play();
         
         // 演出を開始
         await PlayShowAnimation();
@@ -66,6 +69,8 @@ public class ItemGetEffectView : MonoBehaviour
         
         // 演出を終了
         await PlayHideAnimation();
+        particle.Stop();
+        particle.Clear();
     }
     
     /// <summary>
