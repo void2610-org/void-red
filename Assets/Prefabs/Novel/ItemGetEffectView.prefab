@@ -210,6 +210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPanelCanvasGroup: {fileID: 1531548254736131740}
   backgroundOverlay: {fileID: 1738895566987506883}
+  itemImageBackground: {fileID: 3925035554352081791}
   itemImage: {fileID: 472515793224077498}
   itemNameText: {fileID: 3585343621302263956}
   itemDescriptionText: {fileID: 1974914831620345280}
