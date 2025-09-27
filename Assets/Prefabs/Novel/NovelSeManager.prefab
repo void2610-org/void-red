@@ -55,7 +55,7 @@ MonoBehaviour:
   - name: Footstep
     audioClip: {fileID: 8300000, guid: 6fca10ddade3146e59837bcf39a2b7c9, type: 3}
     volume: 1
-  - name: Item1
+  - name: ItemGet
     audioClip: {fileID: 8300000, guid: e99e940c75bc441ad9e865c216eae354, type: 3}
     volume: 1
   - name: Item2
