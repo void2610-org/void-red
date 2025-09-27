@@ -34,6 +34,10 @@ public class RootLifetimeScope : LifetimeScope
         // ゲーム進行管理（全機能統合）
         builder.Register<GameProgressService>(Lifetime.Singleton);
         
+        // UIナビゲーション管理
+        builder.RegisterEntryPoint<MouseHoverUISelector>();
+        builder.RegisterEntryPoint<SafeNavigationManager>();
+        
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
         builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
