@@ -78,6 +78,7 @@ public class NovelUIPresenter : IStartable
         _novelSeManager.SeVolume = seSetting.CurrentValue;
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
+        Debug.Log($"[NovelUIPresenter] シナリオ開始: {scenarioId}");
 
         // Excel/スプレッドシートからシナリオを読み込み
         await StartScenario(scenarioId);
@@ -100,8 +101,10 @@ public class NovelUIPresenter : IStartable
         }
         
         // キャラクター画像を事前に読み込み
+        Debug.Log("[NovelUIPresenter] キャラクター画像を事前読み込み中...");
         await PreloadCharacterImages(dialogList);
         // ダイアログシーケンスを開始
+        Debug.Log("[NovelUIPresenter] ダイアログシーケンスを開始");
         await StartDialogSequence(dialogList);
     }
     
