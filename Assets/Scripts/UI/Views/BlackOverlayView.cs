@@ -48,12 +48,7 @@ public class BlackOverlayView : MonoBehaviour
         gameObject.SetActive(true);
         IsVisible = true;
         
-        var currentColor = _overlayImage.color;
-        var targetColor = new Color(0f, 0f, 0f, maxOpacity);
-        _currentFadeHandle = LMotion.Create(currentColor, targetColor, fadeInDuration)
-            .WithEase(Ease.OutQuart)
-            .BindToColor(_overlayImage)
-            .AddTo(gameObject);
+        _currentFadeHandle = _overlayImage.ColorTo(new Color(0f, 0f, 0f, maxOpacity), fadeInDuration, Ease.OutQuart);
         
         await _currentFadeHandle.ToUniTask();
     }
@@ -70,12 +65,7 @@ public class BlackOverlayView : MonoBehaviour
         
         IsVisible = false;
         
-        var currentColor = _overlayImage.color;
-        var targetColor = new Color(0f, 0f, 0f, 0f);
-        _currentFadeHandle = LMotion.Create(currentColor, targetColor, fadeOutDuration)
-            .WithEase(Ease.InQuart)
-            .BindToColor(_overlayImage)
-            .AddTo(gameObject);
+        _currentFadeHandle = _overlayImage.ColorTo(new Color(0f, 0f, 0f, 0f), fadeOutDuration, Ease.InQuart);
         
         await _currentFadeHandle.ToUniTask();
         
