@@ -153,6 +153,7 @@ MonoBehaviour:
   quitButton: {fileID: 1601408879}
   settingsButton: {fileID: 1378728799}
   reviewFormButton: {fileID: 1780273427886845130}
+  continueButtonText: {fileID: 1758427027}
 --- !u!4 &21796593
 Transform:
   m_ObjectHideFlags: 0
@@ -495,11 +496,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9037413902010202566, guid: e150d8b8da6b047e3aeb9c685efeb4ba, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 160
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 9037413902010202566, guid: e150d8b8da6b047e3aeb9c685efeb4ba, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 30
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 9037413902010202566, guid: e150d8b8da6b047e3aeb9c685efeb4ba, type: 3}
       propertyPath: m_LocalScale.x
@@ -791,7 +792,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1153,7 +1154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1396,6 +1397,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abb52b1a925d94b5c87565507a70d245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1758427027 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1376291353251977134, guid: e150d8b8da6b047e3aeb9c685efeb4ba, type: 3}
+  m_PrefabInstance: {fileID: 324093268}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1942087285
 GameObject:
   m_ObjectHideFlags: 0
@@ -1407,6 +1419,7 @@ GameObject:
   - component: {fileID: 1942087287}
   - component: {fileID: 1942087286}
   - component: {fileID: 1942087288}
+  - component: {fileID: 1942087289}
   m_Layer: 0
   m_Name: DebugLogDisplay
   m_TagString: Untagged
@@ -1466,6 +1479,19 @@ MonoBehaviour:
   showSaveInfo: 0
   startWithFreshData: 0
   resetSteamStats: 1
+--- !u!114 &1942087289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942087285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4909fdb0bf824fe78a89ee7afdd226fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetObject: {fileID: 0}
 --- !u!1 &1980022221
 GameObject:
   m_ObjectHideFlags: 0
@@ -1582,7 +1608,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1614,10 +1640,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
-    - target: {fileID: 5471233299316477036, guid: 4ee912fd8c06e462583056c093bc81d9, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 5471233299316477036, guid: 4ee912fd8c06e462583056c093bc81d9, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
@@ -1742,6 +1764,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 1513382969174154763, guid: 145c8ebe97ab04f52b221ec961b1dc25, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4939305253589568464, guid: 145c8ebe97ab04f52b221ec961b1dc25, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

@@ -12,7 +12,6 @@ using Void2610.UnityTemplate;
 [RequireComponent(typeof(Selectable))]
 public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandler
 {
-    [Header("グロー設定")]
     [SerializeField] private Image glowImage;
     [SerializeField] private float fadeInDuration = 0.2f;
     [SerializeField] private float fadeOutDuration = 0.15f;
