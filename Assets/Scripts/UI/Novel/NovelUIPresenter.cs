@@ -23,26 +23,20 @@ public class NovelUIPresenter : IStartable
     private ItemGetEffectView _itemGetEffectView;
     private NovelSeManager _novelSeManager;
     
-    // 設定
-    private bool _useAlphaHardcode;
-    private readonly bool _useLocalExcel;
-    
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
     private bool _isShowingItemGetEffect; // アイテム取得演出表示中フラグ
     private readonly CompositeDisposable _disposables = new();
     
-    public NovelUIPresenter(bool useAlphaHardcode, bool useLocalExcel)
+    public NovelUIPresenter(bool useLocalExcel)
     {
-        _useAlphaHardcode = useAlphaHardcode;
-        _useLocalExcel = useLocalExcel;
-        _novelDialogService = new NovelDialogService(_useLocalExcel);
-        
         // ビルドでは必ずローカルExcelを使用
         #if !UNITY_EDITOR
         useLocalExcel = true;
         #endif
+        
+        _novelDialogService = new NovelDialogService(useLocalExcel);
     }
     
     [Inject]
@@ -85,28 +79,8 @@ public class NovelUIPresenter : IStartable
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
 
-        // データソース設定により処理を分岐
-        List<DialogData> dialogList;
-        if (_useAlphaHardcode)
-        {
-            // アルファ版はハードコードでシナリオを提供
-            if (scenarioId == "prologue1") dialogList = PrologueProvider.GetPrologueScenario();
-            else if (scenarioId == "prologue2") dialogList = PrologueProvider.GetPrologue2Scenario();
-            else if (scenarioId == "ending") dialogList = PrologueProvider.GetEndingScenario();
-            else
-            {
-                Debug.LogWarning($"ハードコード未対応のシナリオID: {scenarioId}");
-                return;
-            }
-            
-            await PreloadCharacterImages(dialogList);
-            await StartDialogSequence(dialogList);
-        }
-        else
-        {
-            // Excel/スプレッドシートからシナリオを読み込み
-            await StartScenario(scenarioId);
-        }
+        // Excel/スプレッドシートからシナリオを読み込み
+        await StartScenario(scenarioId);
     }
     
     /// <summary>
