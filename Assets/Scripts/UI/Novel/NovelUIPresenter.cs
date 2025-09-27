@@ -200,6 +200,7 @@ public class NovelUIPresenter : IStartable
         }
         
         // アイテム取得演出を実行
+        _novelSeManager.WaitAndPlaySe("ItemGet", delayTime:1f, pitch: 1f);
         await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
         
         // DialogViewのクリックを有効化
