@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using R3;
 using VContainer;
 using Cysharp.Threading.Tasks;
@@ -51,6 +52,10 @@ public class TitleUIPresenter : MonoBehaviour
         BgmManager.Instance.PlayRandomBGM(BgmType.Title);
         
         _steamService.UnlockAchievement(SteamAchieveType.FIRST_BOOT);
+        
+        // セーブデータがある場合は「つづきから」、ない場合は「はじめから」を選択
+        var buttonToSelect = _gameProgressService.HasSaveData() ? continueButton : startButton;
+        EventSystem.current.SetSelectedGameObject(buttonToSelect.gameObject);
     }
 
     /// <summary>
