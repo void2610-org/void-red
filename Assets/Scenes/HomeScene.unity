@@ -1355,17 +1355,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9037413902010202566, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
   m_PrefabInstance: {fileID: 1138033811}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1138033814 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9024825807648402152, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
-  m_PrefabInstance: {fileID: 1138033811}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1200725266
 GameObject:
   m_ObjectHideFlags: 0
@@ -1467,6 +1456,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1533597610 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8781312253566003751, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+  m_PrefabInstance: {fileID: 1138033811}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb52b1a925d94b5c87565507a70d245, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1542407236
 GameObject:
   m_ObjectHideFlags: 0
@@ -1935,11 +1935,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6c650e1deca84ab598b2869f51febed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settingsButton: {fileID: 1138033814}
+  settingsButton: {fileID: 1533597610}
   titleButton: {fileID: 558389026}
   libraryButton: {fileID: 1591245447}
   storyButton: {fileID: 865001916}
-  deckButton: {fileID: 1591245447}
   personButton: {fileID: 2128008697}
   dreamButton: {fileID: 316264408}
   deckView: {fileID: 960403403}
