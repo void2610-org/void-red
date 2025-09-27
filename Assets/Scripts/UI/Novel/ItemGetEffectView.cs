@@ -23,8 +23,7 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private ParticleSystem particle;
     
     [Header("アニメーション設定")]
-    [SerializeField] private float fadeInDuration = 0.5f;
-    [SerializeField] private float fadeOutDuration = 0.3f;
+    [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float itemScaleAnimationDuration = 0.6f;
     [SerializeField] private Vector3 itemImageStartScale = Vector3.zero;
     [SerializeField] private Vector3 itemImageEndScale = Vector3.one;
@@ -46,6 +45,9 @@ public class ItemGetEffectView : MonoBehaviour
         itemNameText.text = "";
         itemDescriptionText.text = "";
         
+        particle.Stop();
+        particle.Clear();
+        
         // クリックイベントを購読
         clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
     }
@@ -58,7 +60,7 @@ public class ItemGetEffectView : MonoBehaviour
     public async UniTask ShowItemGetEffect(ItemGetData itemGetData, Sprite itemSprite = null)
     {
         // フェードインアニメーション
-        await effectPanelCanvasGroup.FadeIn(fadeInDuration, Ease.InCubic);
+        await effectPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
         await UniTask.Delay(500);
         
         // UI要素を設定
@@ -130,9 +132,7 @@ public class ItemGetEffectView : MonoBehaviour
     private async UniTask PlayHideAnimation()
     {
         effectPanelCanvasGroup.interactable = false;
-        
-        await effectPanelCanvasGroup.FadeOut(fadeOutDuration, Ease.InCubic);
-        
+        await effectPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
         effectPanelCanvasGroup.blocksRaycasts = false;
     }
     
