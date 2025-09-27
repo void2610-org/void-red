@@ -40,7 +40,7 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
     /// </summary>
     public void OnDeselect(BaseEventData eventData)
     {
-        if (_currentMotion.IsActive())_currentMotion.Cancel();
+        if (_currentMotion.IsActive()) _currentMotion.Cancel();
         _currentMotion = glowImage.FadeOut(fadeOutDuration, fadeOutEase);
     }
     
