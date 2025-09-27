@@ -103,10 +103,8 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.blocksRaycasts = true;
         
         particle.Play();
-        LMotion.Create(Color.clear,  Color.white, 1f)
-            .WithEase(Ease.OutCubic)
-            .Bind(color => itemImageBackground.color = color)
-            .AddTo(this);
+        itemImageBackground.color = Color.clear;
+        itemImageBackground.ColorTo(Color.white, 1f, Ease.OutCubic);
         
         // アイテム画像のスケールアニメーション
         await itemImage.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);

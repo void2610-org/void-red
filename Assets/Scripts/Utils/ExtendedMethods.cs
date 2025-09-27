@@ -242,6 +242,18 @@ namespace Void2610.UnityTemplate
         }
         
         /// <summary>
+        /// Imageの色をLitMotionで変更する
+        /// </summary>
+        public static MotionHandle ColorTo(this Image image, Color targetColor, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
+        {
+            return LMotion.Create(image.color, targetColor, duration)
+                .WithEase(ease)
+                .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
+                .BindToColor(image)
+                .AddTo(image.gameObject);
+        }
+        
+        /// <summary>
         /// TextMeshProUGUIの透明度をLitMotionでフェードインさせる
         /// </summary>
         public static MotionHandle FadeIn(this TextMeshProUGUI text, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
