@@ -985,8 +985,7 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   novelSeManager: {fileID: 1113668051}
-  useAlphaHardcode: 0
-  useLocalExcel: 0
+  useLocalExcel: 1
 --- !u!1001 &1721305999
 PrefabInstance:
   m_ObjectHideFlags: 0
