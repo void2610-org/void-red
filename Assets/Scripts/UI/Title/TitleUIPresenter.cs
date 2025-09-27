@@ -18,6 +18,8 @@ public class TitleUIPresenter : MonoBehaviour
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button reviewFormButton;
     
+    [SerializeField] private TMPro.TextMeshProUGUI continueButtonText;
+    
     private SettingsPresenter _settingsPresenter;
     private SceneTransitionManager _sceneTransitionManager;
     private GameProgressService _gameProgressService;
