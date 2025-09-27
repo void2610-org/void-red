@@ -1,3 +1,4 @@
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -7,9 +8,16 @@ using VContainer.Unity;
 /// </summary>
 public class NovelLifetimeScope : LifetimeScope
 {
+    [SerializeField] private NovelSeManager novelSeManager;
+    
+    [SerializeField] private bool useAlphaHardcode; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
+    [SerializeField] private bool useLocalExcel = true; // trueでExcel、falseでスプレッドシート（useAlphaHardcode=falseの時に有効）
+    
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterComponentInHierarchy<NovelUIPresenter>();
+        builder.RegisterInstance(novelSeManager);
+        
+        builder.RegisterEntryPoint<NovelUIPresenter>().WithParameter(useAlphaHardcode).WithParameter(useLocalExcel).AsSelf();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
     }
 }
