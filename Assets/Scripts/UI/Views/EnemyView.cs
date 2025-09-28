@@ -16,6 +16,7 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private Image enemyImageBack;
     
     [Header("アニメーション設定")]
+    [SerializeField] private Color imageColor = Color.white;
     [SerializeField] private float fadeDuration = 0.3f;
     [SerializeField] private float crossFadeDuration = 0.4f;
     
@@ -31,7 +32,7 @@ public class EnemyView : MonoBehaviour
         
         // デフォルトスプライトを設定
         enemyImage.sprite = _enemyData.DefaultSprite;
-        enemyImage.color = Color.white;
+        enemyImage.color = imageColor;
         
         // 背面画像を透明に初期化
         enemyImageBack.color = new Color(1, 1, 1, 0);
@@ -116,7 +117,7 @@ public class EnemyView : MonoBehaviour
         // アニメーション完了後、前面と背面を入れ替え
         (enemyImage.sprite, enemyImageBack.sprite) = (enemyImageBack.sprite, enemyImage.sprite);
 
-        enemyImage.color = Color.white;
+        enemyImage.color = imageColor;
         enemyImageBack.color = new Color(1, 1, 1, 0);
     }
     
