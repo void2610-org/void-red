@@ -27,9 +27,13 @@ public class SafeNavigationManager : ITickable
     {
         var currentGroup = currentSelected.GetComponentInParent<CanvasGroup>();
         var previousGroup = previousSelected.GetComponentInParent<CanvasGroup>();
-        var result = (currentGroup && previousGroup && currentGroup == previousGroup);
-
-        return result;
+        
+        if (currentGroup == null && previousGroup == null)
+        {
+            return true; // 両方ともCanvasGroupがない場合は同じとみなす
+        }
+        
+        return currentGroup == previousGroup;
     }
     
     public void Tick()
