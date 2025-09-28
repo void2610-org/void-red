@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using R3;
 using VContainer;
 using Cysharp.Threading.Tasks;
@@ -16,6 +17,8 @@ public class TitleUIPresenter : MonoBehaviour
     [SerializeField] private Button quitButton;
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button reviewFormButton;
+    
+    [SerializeField] private TMPro.TextMeshProUGUI continueButtonText;
     
     private SettingsPresenter _settingsPresenter;
     private SceneTransitionManager _sceneTransitionManager;
@@ -42,15 +45,21 @@ public class TitleUIPresenter : MonoBehaviour
         reviewFormButton.OnClickAsObservable().Subscribe(_ => OnReviewFormButtonClicked()).AddTo(this);
         
         // セーブデータの有無によるボタン状態管理
-        continueButton.interactable = _gameProgressService.HasSaveData();
+        var hasSaveData = _gameProgressService.HasSaveData();
+        SetContinueButtonState(hasSaveData);
+        
         _gameProgressService.OnDataSaved
             .Select(_ => _gameProgressService.HasSaveData())
-            .Subscribe(b => continueButton.interactable = b)
+            .Subscribe(SetContinueButtonState)
             .AddTo(this);
         
         BgmManager.Instance.PlayRandomBGM(BgmType.Title);
         
         _steamService.UnlockAchievement(SteamAchieveType.FIRST_BOOT);
+        
+        // セーブデータがある場合は「つづきから」、ない場合は「はじめから」を選択
+        var buttonToSelect = _gameProgressService.HasSaveData() ? continueButton : startButton;
+        EventSystem.current.SetSelectedGameObject(buttonToSelect.gameObject);
     }
 
     /// <summary>
@@ -103,5 +112,14 @@ public class TitleUIPresenter : MonoBehaviour
     private void OnReviewFormButtonClicked()
     {
         Application.OpenURL("https://docs.google.com/forms/d/e/1FAIpQLSfNMqCyXFzWijWAv__wTpDVRN6AtEfFXpdPxyFcIkMbiq2UKw/viewform");
+    }
+    
+    /// <summary>
+    /// つづきからボタンの状態を設定（テキストカラーも含む）
+    /// </summary>
+    private void SetContinueButtonState(bool e)
+    {
+        continueButton.interactable = e;
+        continueButtonText.color = e ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
     }
 }

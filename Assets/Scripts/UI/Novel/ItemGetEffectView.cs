@@ -61,7 +61,6 @@ public class ItemGetEffectView : MonoBehaviour
     {
         // フェードインアニメーション
         await effectPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
-        await UniTask.Delay(500);
         
         // UI要素を設定
         SetupUIElements(itemGetData, itemSprite);
@@ -102,11 +101,11 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.interactable = false;
         effectPanelCanvasGroup.blocksRaycasts = true;
         
+        await UniTask.Delay(350);
         particle.Play();
-        LMotion.Create(Color.clear,  Color.white, 1f)
-            .WithEase(Ease.OutCubic)
-            .Bind(color => itemImageBackground.color = color)
-            .AddTo(this);
+        await UniTask.Delay(150);
+        itemImageBackground.color = Color.clear;
+        itemImageBackground.ColorTo(Color.white, 1f, Ease.OutCubic);
         
         // アイテム画像のスケールアニメーション
         await itemImage.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
