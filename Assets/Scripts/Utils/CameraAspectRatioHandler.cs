@@ -36,6 +36,7 @@ namespace Void2610.UnityTemplate
 
         private void Update()
         {
+            Debug.Log($"Screen: {Screen.width}x{Screen.height}, Aspect: {(float)Screen.width / Screen.height}, TargetAspect: {_targetAspect}");
             // 画面サイズが変更されたかチェック
             if (Mathf.Abs(Screen.width - _lastScreenWidth) > 0.1f || 
                 Mathf.Abs(Screen.height - _lastScreenHeight) > 0.1f)
