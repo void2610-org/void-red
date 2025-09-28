@@ -91,10 +91,7 @@ public class DialogView : MonoBehaviour
         
         CancelActiveMotions();
         
-        _fadeMotion = LMotion.Create(0f, 1f, fadeInDuration)
-            .WithEase(Ease.OutCubic)
-            .Bind(alpha => canvasGroup.alpha = alpha)
-            .AddTo(this);
+        _fadeMotion = canvasGroup.FadeIn(fadeInDuration, Ease.OutCubic).AddTo(this);
         
         await _fadeMotion.ToUniTask();
     }
@@ -109,10 +106,7 @@ public class DialogView : MonoBehaviour
         
         CancelActiveMotions();
         
-        _fadeMotion = LMotion.Create(1f, 0f, fadeOutDuration)
-            .WithEase(Ease.InCubic)
-            .Bind(alpha => canvasGroup.alpha = alpha)
-            .AddTo(this);
+        _fadeMotion = canvasGroup.FadeOut(fadeOutDuration, Ease.InCubic).AddTo(this);
         
         await _fadeMotion.ToUniTask();
     }

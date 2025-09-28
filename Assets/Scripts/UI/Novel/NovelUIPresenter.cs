@@ -1,23 +1,18 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using VContainer;
 using Cysharp.Threading.Tasks;
 using R3;
+using VContainer.Unity;
 
 /// <summary>
 /// ノベルシーンのUI管理を担当するプレゼンター
 /// ダイアログの進行制御とViewの管理を行う
 /// </summary>
-public class NovelUIPresenter : MonoBehaviour
+public class NovelUIPresenter : IStartable
 {
-    [SerializeField] private TextMeshProUGUI scenarioIdText;
-    [SerializeField] private NovelSeManager novelSeManager;
-    
-    [Header("データソース設定")]
-    [SerializeField] private bool useAlphaHardcode; // trueでアルファ版ハードコード、falseでサービス経由（Excel/スプレッドシート）
-    [SerializeField] private bool useLocalExcel = true; // trueでExcel、falseでスプレッドシート（useAlphaHardcode=falseの時に有効）
-    
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
     private NovelDialogService _novelDialogService;
@@ -26,6 +21,7 @@ public class NovelUIPresenter : MonoBehaviour
     private SettingsManager _settingsManager;
     private DialogView _dialogView;
     private ItemGetEffectView _itemGetEffectView;
+    private NovelSeManager _novelSeManager;
     
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
@@ -33,13 +29,25 @@ public class NovelUIPresenter : MonoBehaviour
     private bool _isShowingItemGetEffect; // アイテム取得演出表示中フラグ
     private readonly CompositeDisposable _disposables = new();
     
+    public NovelUIPresenter(bool useLocalExcel)
+    {
+        // ビルドでは必ずローカルExcelを使用
+        #if !UNITY_EDITOR
+        useLocalExcel = true;
+        #endif
+        
+        _novelDialogService = new NovelDialogService(useLocalExcel);
+    }
+    
     [Inject]
     public void Construct(
+        NovelSeManager novelSeManager,
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
         ConfirmationDialogService confirmationDialogService,
         SettingsManager settingsManager)
     {
+        _novelSeManager = novelSeManager;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
@@ -47,13 +55,15 @@ public class NovelUIPresenter : MonoBehaviour
         _addressableImageLoader = new AddressableImageLoader();
     }
     
-    private async UniTask Start()
+    public void Start()
     {
-        // DialogViewを取得
-        _dialogView = FindFirstObjectByType<DialogView>();
-        
-        // ItemGetEffectViewを取得
-        _itemGetEffectView = FindFirstObjectByType<ItemGetEffectView>();
+        Initialize().Forget();
+    }
+    
+    private async UniTaskVoid Initialize()
+    {
+        _dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
+        _itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
         
         // Viewイベントを購読
         _dialogView.OnDialogCompleted
@@ -63,47 +73,21 @@ public class NovelUIPresenter : MonoBehaviour
             .Subscribe(_ => SkipAllDialogs().Forget())
             .AddTo(_disposables);
         
-        // ビルドでは必ずローカルExcelを使用
-        #if !UNITY_EDITOR
-        useLocalExcel = true;
-        #endif
-        
-        _novelDialogService = new NovelDialogService(useLocalExcel);
-        
         // SE音量設定を適用
         var seSetting = _settingsManager.GetSetting<SliderSetting>("SE音量");
-        novelSeManager.SeVolume = seSetting.CurrentValue;
+        _novelSeManager.SeVolume = seSetting.CurrentValue;
 
         var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
+        Debug.Log($"[NovelUIPresenter] シナリオ開始: {scenarioId}");
 
-        // データソース設定により処理を分岐
-        List<DialogData> dialogList;
-        if (useAlphaHardcode)
-        {
-            // アルファ版はハードコードでシナリオを提供
-            if (scenarioId == "prologue1") dialogList = PrologueProvider.GetPrologueScenario();
-            else if (scenarioId == "prologue2") dialogList = PrologueProvider.GetPrologue2Scenario();
-            else if (scenarioId == "ending") dialogList = PrologueProvider.GetEndingScenario();
-            else
-            {
-                Debug.LogWarning($"ハードコード未対応のシナリオID: {scenarioId}");
-                return;
-            }
-            
-            await PreloadCharacterImages(dialogList);
-            await StartDialogSequence(dialogList);
-        }
-        else
-        {
-            // Excel/スプレッドシートからシナリオを読み込み
-            StartScenario(scenarioId).Forget();
-        }
+        // Excel/スプレッドシートからシナリオを読み込み
+        await StartScenario(scenarioId);
     }
     
     /// <summary>
     /// シナリオIDに応じてシナリオを開始（Excel/スプレッドシート読み込み）
     /// </summary>
-    private async UniTaskVoid StartScenario(string scenarioId)
+    private async UniTask StartScenario(string scenarioId)
     {
         // Excel/スプレッドシートからシナリオを読み込み
         var dialogList = await _novelDialogService.GetDialogDataAsync(scenarioId);
@@ -117,8 +101,10 @@ public class NovelUIPresenter : MonoBehaviour
         }
         
         // キャラクター画像を事前に読み込み
+        Debug.Log("[NovelUIPresenter] キャラクター画像を事前読み込み中...");
         await PreloadCharacterImages(dialogList);
         // ダイアログシーケンスを開始
+        Debug.Log("[NovelUIPresenter] ダイアログシーケンスを開始");
         await StartDialogSequence(dialogList);
     }
     
@@ -174,12 +160,12 @@ public class NovelUIPresenter : MonoBehaviour
         }
         
         // SE再生と再生時間の取得
-        novelSeManager.StopSe();
+        _novelSeManager.StopSe();
         var seWaitTime = 0f;
         if (dialogData.HasSe)
         {
             // SEのクリップ長を取得（オートモード時のため）
-            seWaitTime = novelSeManager.PlaySe(dialogData.SeClipName);
+            seWaitTime = _novelSeManager.PlaySe(dialogData.SeClipName);
         }
         
         // ダイアログを表示（完了まで待機）
@@ -214,6 +200,7 @@ public class NovelUIPresenter : MonoBehaviour
         }
         
         // アイテム取得演出を実行
+        _novelSeManager.WaitAndPlaySe("ItemGet", delayTime:1f, pitch: 1f);
         await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
         
         // DialogViewのクリックを有効化
