@@ -222,7 +222,7 @@ namespace Void2610.UnityTemplate
         /// </summary>
         public static MotionHandle FadeIn(this Image image, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
         {
-            return LMotion.Create(0f, 1f, duration)
+            return LMotion.Create(image.color.a, 1f, duration)
                 .WithEase(ease)
                 .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
                 .BindToColorA(image)
@@ -234,7 +234,7 @@ namespace Void2610.UnityTemplate
         /// </summary>
         public static MotionHandle FadeOut(this Image image, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
         {
-            return LMotion.Create(1f, 0f, duration)
+            return LMotion.Create(image.color.a, 0f, duration)
                 .WithEase(ease)
                 .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
                 .BindToColorA(image)
