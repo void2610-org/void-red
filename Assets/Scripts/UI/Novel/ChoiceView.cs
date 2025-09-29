@@ -23,10 +23,6 @@ public class ChoiceView : MonoBehaviour
     private bool _isWaitingForChoice;
     private int _selectedChoiceIndex = -1;
     
-    // 選択結果通知用
-    private readonly Subject<int> _onChoiceSelected = new();
-    public Observable<int> OnChoiceSelected => _onChoiceSelected;
-    
     private void Awake()
     {
         // ChoicePanelの初期状態を設定
@@ -109,8 +105,7 @@ public class ChoiceView : MonoBehaviour
     {
         foreach (var button in _choiceButtons)
         {
-            if (button != null)
-                Destroy(button.gameObject);
+            Destroy(button.gameObject);
         }
         _choiceButtons.Clear();
     }
@@ -162,14 +157,10 @@ public class ChoiceView : MonoBehaviour
         
         _selectedChoiceIndex = choiceIndex;
         _isWaitingForChoice = false;
-        
-        // 選択結果を通知
-        _onChoiceSelected.OnNext(choiceIndex);
     }
     
     private void OnDestroy()
     {
         ClearChoiceButtons();
-        _onChoiceSelected?.Dispose();
     }
 }
