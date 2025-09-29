@@ -21,12 +21,14 @@ public class NovelUIPresenter : IStartable
     private SettingsManager _settingsManager;
     private DialogView _dialogView;
     private ItemGetEffectView _itemGetEffectView;
+    private ChoiceView _choiceView;
     private NovelSeManager _novelSeManager;
     
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
     private bool _isShowingItemGetEffect; // アイテム取得演出表示中フラグ
+    private bool _isShowingChoiceEffect; // 選択肢表示中フラグ
     private readonly CompositeDisposable _disposables = new();
     
     public NovelUIPresenter(bool useLocalExcel)
@@ -64,6 +66,7 @@ public class NovelUIPresenter : IStartable
     {
         _dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
         _itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
+        _choiceView = UnityEngine.Object.FindAnyObjectByType<ChoiceView>();
         
         // Viewイベントを購読
         _dialogView.OnDialogCompleted
@@ -131,6 +134,12 @@ public class NovelUIPresenter : IStartable
             if (currentDialog.HasGetItem)
             {
                 await ShowItemGetEffect(currentDialog);
+            }
+            
+            // 選択肢表示がある場合は実行
+            if (currentDialog.HasChoice)
+            {
+                await ShowChoiceEffect(currentDialog);
             }
             
             _currentDialogIndex++;
@@ -210,12 +219,43 @@ public class NovelUIPresenter : IStartable
     }
     
     /// <summary>
+    /// 選択肢表示を実行
+    /// </summary>
+    /// <param name="dialogData">選択肢情報を含むダイアログデータ</param>
+    private async UniTask ShowChoiceEffect(DialogData dialogData)
+    {
+        // 選択肢データを取得
+        var choiceData = dialogData.ChoiceData;
+        if (choiceData == null)
+        {
+            Debug.LogWarning("[NovelUIPresenter] 選択肢データが存在しません");
+            return;
+        }
+        
+        _isShowingChoiceEffect = true;
+        
+        // DialogViewのクリックを無効化
+        _dialogView.SetInteractable(false);
+        
+        // 選択肢を表示して結果を取得
+        var selectedIndex = await _choiceView.ShowChoice(choiceData);
+        
+        // 選択結果をログ出力
+        Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
+        
+        // DialogViewのクリックを有効化
+        _dialogView.SetInteractable(true);
+        
+        _isShowingChoiceEffect = false;
+    }
+    
+    /// <summary>
     /// 全ダイアログをスキップして即座に完了
     /// </summary>
     private async UniTaskVoid SkipAllDialogs()
     {
-        // アイテム取得演出中はスキップを無視
-        if (_isShowingItemGetEffect)
+        // アイテム取得演出中または選択肢表示中はスキップを無視
+        if (_isShowingItemGetEffect || _isShowingChoiceEffect)
         {
             return;
         }
