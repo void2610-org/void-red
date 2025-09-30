@@ -12,13 +12,6 @@ public class BattleLifetimeScope : LifetimeScope
     private Player _player;
     private Enemy _enemy;
     
-    private void RegisterAllData()
-    {
-        #if UNITY_EDITOR
-        allThemeData.RegisterAllThemes();
-        #endif
-    }
-    
     protected override void Configure(IContainerBuilder builder)
     {
         // === プレイヤーの初期化（2層構造） ===
@@ -36,9 +29,6 @@ public class BattleLifetimeScope : LifetimeScope
         
         // === データとサービスの登録 ===
         
-        builder.RegisterInstance(allThemeData);
-        RegisterAllData();
-        builder.Register<ThemeService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
         
         // 人格ログサービス（バトルシーン専用）

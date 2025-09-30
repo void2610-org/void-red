@@ -11,7 +11,6 @@ using VContainer.Unity;
 public class UIPresenter : IStartable, System.IDisposable
 {
     [Inject] private readonly CardPoolService _cardPoolService;
-    [Inject] private readonly ThemeService _themeService;
     [Inject] private readonly GameProgressService _gameProgressService;
     
     public Observable<Unit> PlayButtonClicked => Observable.Merge(
