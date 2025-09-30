@@ -105,7 +105,7 @@ public class ItemGetEffectView : MonoBehaviour
         particle.Play();
         await UniTask.Delay(150);
         itemImageBackground.color = Color.clear;
-        itemImageBackground.ColorTo(Color.white, 1f, Ease.OutCubic);
+        itemImageBackground.ColorTo(Color.white, 1f, Ease.OutCubic).ToUniTask().Forget();
         
         // アイテム画像のスケールアニメーション
         await itemImage.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
