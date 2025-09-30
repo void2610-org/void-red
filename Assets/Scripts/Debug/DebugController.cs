@@ -90,21 +90,6 @@ public class DebugController : MonoBehaviour
         var saveExists = _saveDataManager.SaveFileExists();
         GUILayout.Label($"セーブファイル: {(saveExists ? "存在" : "なし")}");
         
-        // フラグ状態表示
-        GUILayout.Label($"新データ開始: {(startWithFreshData ? "ON" : "OFF")}");
-        
-        // プレイヤー統計情報表示（現在のゲーム状態を表示）
-        GUILayout.Label($"精神力: {_gameProgressService.GetPlayerMentalPower()}");
-        
-        if (GUILayout.Button("セーブファイル削除"))
-        {
-            var success = _saveDataManager.DeleteSaveFile();
-            if (success) 
-            {
-                _gameProgressService.ResetToDefaultData();
-            }
-        }
-        
         GUILayout.EndVertical();
         GUILayout.EndArea();
     }
