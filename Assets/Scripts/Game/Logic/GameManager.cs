@@ -16,6 +16,7 @@ public class GameManager: IStartable, IDisposable
     private readonly Enemy _enemy;
     private readonly CardNarrationService _cardNarrationService;
     private readonly GameProgressService _gameProgressService;
+    private readonly PersonalityLogService _personalityLogService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
     private readonly DiscordService _discordService;
@@ -49,6 +50,7 @@ public class GameManager: IStartable, IDisposable
         Enemy enemy,
         CardNarrationService cardNarrationService,
         GameProgressService gameProgressService,
+        PersonalityLogService personalityLogService,
         SceneTransitionManager sceneTransitionManager,
         AllEnemyData allEnemyData,
         DiscordService discordService)
@@ -60,6 +62,7 @@ public class GameManager: IStartable, IDisposable
         _enemy = enemy;
         _cardNarrationService = cardNarrationService;
         _gameProgressService = gameProgressService;
+        _personalityLogService = personalityLogService;
         _sceneTransitionManager = sceneTransitionManager;
         _allEnemyData = allEnemyData;
         _discordService = discordService;
@@ -88,6 +91,9 @@ public class GameManager: IStartable, IDisposable
         // 敵の統計をリセット
         _gameProgressService.ResetEnemyStats();
         
+        // 人格ログデータをセーブデータからロード
+        _personalityLogService.SetPersonalityLogData(_gameProgressService.GetPersonalityLogData());
+        
         // GameProgressServiceから敵データを取得
         var currentNode = _gameProgressService.GetCurrentNode();
         if (currentNode is not BattleNode battleNode)
@@ -102,14 +108,7 @@ public class GameManager: IStartable, IDisposable
         _discordService?.SetState("対戦相手", _currentEnemyData?.EnemyName ?? "不明");
         
         // 人格ログ: チャプター開始
-        _gameProgressService.StartChapter(_currentEnemyData);
-        
-        // セーブデータは既にGameProgressServiceで自動ロード済み
-        if (isInitialStart)
-        {
-            // プレイヤーの精神力を復元
-            _player.SetMentalPower(_gameProgressService.GetPlayerMentalPower());
-        }
+        _personalityLogService.StartChapter(_currentEnemyData);
         
         // 次の敵への進行の場合は手札を戻す演出
         if (!isInitialStart)
@@ -209,7 +208,7 @@ public class GameManager: IStartable, IDisposable
         if (_isDisposed) return;
         
         // 人格ログ: ターン開始
-        _gameProgressService.StartTurn();
+        _personalityLogService.StartTurn();
         
         // ランダムなお題を選択
         var newTheme = _themeService.GetRandomTheme();
@@ -280,7 +279,7 @@ public class GameManager: IStartable, IDisposable
         _gameProgressService.RecordCardView(finalSelectedCard.Data);
         
         // 人格ログ: プレイヤームーブ記録
-        _gameProgressService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
+        _personalityLogService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
         
         await UniTask.Delay(500);
         ChangeState(GameState.EnemyCardSelection);
@@ -317,7 +316,7 @@ public class GameManager: IStartable, IDisposable
         _gameProgressService.RecordCardView(npcCard.Data);
         
         // 人格ログ: 敵ムーブ記録
-        _gameProgressService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
+        _personalityLogService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
         
         // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
         var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
@@ -491,7 +490,7 @@ public class GameManager: IStartable, IDisposable
             await _player.CollapseSelectedCard();
             
             if (playerCollapseCard != null)
-                _gameProgressService.LogCardCollapse("player", playerCollapseCard.Data);
+                _personalityLogService.LogCardCollapse("player", playerCollapseCard.Data);
         }
         else
         {
@@ -507,7 +506,7 @@ public class GameManager: IStartable, IDisposable
                     _player.ReplaceCard(selectedCard, playerCardAfterEvolution);
                     
                     // 人格ログ: プレイヤーカード進化イベント記録
-                    _gameProgressService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
+                    _personalityLogService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
                     await _uiPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
                 }
                 
@@ -515,7 +514,7 @@ public class GameManager: IStartable, IDisposable
                 if (_currentEnemyData && _currentEnemyData.ResonanceCard && selectedCard.Data == _currentEnemyData.ResonanceCard)
                 {
                     // 人格ログ: 共鳴イベント記録
-                    _gameProgressService.LogResonance("Player", selectedCard.Data);
+                    _personalityLogService.LogResonance("Player", selectedCard.Data);
                     await _uiPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
                 }
                 
@@ -531,7 +530,7 @@ public class GameManager: IStartable, IDisposable
             _enemy.PlaySelectedCard(true);
             
             if (npcCollapseCard != null)
-                _gameProgressService.LogCardCollapse("enemy", npcCollapseCard.Data);
+                _personalityLogService.LogCardCollapse("enemy", npcCollapseCard.Data);
         }
         else
         {
@@ -548,7 +547,7 @@ public class GameManager: IStartable, IDisposable
                     _enemy.ReplaceCard(selectedEnemyCard, npcCardAfterEvolution);
                     
                     // 人格ログ: NPCカード進化イベント記録
-                    _gameProgressService.LogCardEvolution("enemy", selectedEnemyCard.Data, npcCardAfterEvolution);
+                    _personalityLogService.LogCardEvolution("enemy", selectedEnemyCard.Data, npcCardAfterEvolution);
                     await _uiPresenter.ShowAnnouncement($"対戦相手の {selectedEnemyCard.Data.CardName} が {npcCardAfterEvolution.CardName} に変化");
                 }
                 
@@ -571,7 +570,7 @@ public class GameManager: IStartable, IDisposable
         await UniTask.Delay(1000);
         
         // 人格ログ: ターン終了
-        _gameProgressService.EndTurn();
+        _personalityLogService.EndTurn();
         
         _isProcessing = false;
         
@@ -639,7 +638,10 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowAnnouncement(battleResult, 3f);
         
         // 人格ログ: チャプター完了
-        _gameProgressService.CompleteChapter();
+        _personalityLogService.CompleteChapter();
+        
+        // 人格ログデータをGameProgressServiceに更新（セーブのため）
+        _gameProgressService.UpdatePersonalityLogData(_personalityLogService.GetPersonalityLogData());
         
         // バトル結果をGameProgressServiceに報告してストーリー進行（セーブ前に実行）
         var playerWon = _playerWins >= WINS_TO_VICTORY;
@@ -650,7 +652,6 @@ public class GameManager: IStartable, IDisposable
         var currentNode = _gameProgressService.GetCurrentNode();
         
         // 現在のバトル結果を記録
-        _gameProgressService.UpdatePlayerMentalPower(_player.MentalPower.CurrentValue);
         _gameProgressService.RecordBattleResultAndSave(playerWon);
         Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
         

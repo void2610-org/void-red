@@ -24,12 +24,8 @@ public class GameProgressService
     private EvolutionStatsData _evolutionStats = new();
     private EnemyStats _enemyStats = new();
     
-    // 人格ログ
-    private PersonalityLogData _personalityLog = new();
-    private MoveLog _currentPlayerMove;
-    private MoveLog _currentEnemyMove;
-    private readonly List<TurnEvent> _currentEvents = new();
-    private ChapterLog _currentChapter;
+    // 人格ログデータ（セーブ・ロード用）
+    private PersonalityLogData _personalityLogData = new();
     
     // 閲覧済みカード
     private readonly HashSet<string> _viewedCardIds = new();
@@ -70,7 +66,7 @@ public class GameProgressService
         _evolutionStats = loadedData.EvolutionStats ?? new EvolutionStatsData();
         
         // 人格ログのロード
-        _personalityLog = loadedData.PersonalityLog ?? new PersonalityLogData();
+        _personalityLogData = loadedData.PersonalityLog ?? new PersonalityLogData();
         
         // 閲覧済みカードをメモリにロード
         _viewedCardIds.Clear();
@@ -116,11 +112,7 @@ public class GameProgressService
         _enemyStats = new EnemyStats();
         
         // 人格ログをリセット
-        _personalityLog = new PersonalityLogData();
-        _currentPlayerMove = null;
-        _currentEnemyMove = null;
-        _currentEvents.Clear();
-        _currentChapter = null;
+        _personalityLogData = new PersonalityLogData();
         
         // リセット後に即座にセーブファイルに反映
         SaveAndPersist();
@@ -237,7 +229,7 @@ public class GameProgressService
         
         // 進化統計データと人格ログデータを設定
         saveData.UpdateEvolutionStats(_evolutionStats);
-        saveData.UpdatePersonalityLog(_personalityLog);
+        saveData.UpdatePersonalityLog(_personalityLogData);
         
         // 閲覧済みカードをセーブデータに追加
         foreach (var cardId in _viewedCardIds)
@@ -246,24 +238,6 @@ public class GameProgressService
         }
         
         return saveData;
-    }
-    
-    // === プレイヤー状態管理メソッド ===
-    
-    /// <summary>
-    /// プレイヤーの精神力を取得
-    /// </summary>
-    public int GetPlayerMentalPower()
-    {
-        return _currentMentalPower;
-    }
-    
-    /// <summary>
-    /// プレイヤーの精神力を更新
-    /// </summary>
-    public void UpdatePlayerMentalPower(int mentalPower)
-    {
-        _currentMentalPower = Mathf.Clamp(mentalPower, 0, GameConstants.MAX_MENTAL_POWER);
     }
     
     /// <summary>
@@ -409,98 +383,24 @@ public class GameProgressService
     /// </summary>
     public Observable<Unit> OnDataSaved => _onDataSaved;
     
-    // === 人格ログ管理メソッド ===
+    // === 人格ログデータ連携メソッド ===
     
     /// <summary>
-    /// 新しいチャプターを開始
+    /// 人格ログデータを更新（PersonalityLogServiceから取得してセーブ用に保持）
     /// </summary>
-    public void StartChapter(EnemyData enemyData)
+    /// <param name="personalityLogData">更新する人格ログデータ</param>
+    public void UpdatePersonalityLogData(PersonalityLogData personalityLogData)
     {
-        _currentChapter = _personalityLog.StartNewChapter(enemyData);
+        _personalityLogData = personalityLogData ?? new PersonalityLogData();
     }
     
     /// <summary>
-    /// チャプターを完了
+    /// 人格ログデータを取得（PersonalityLogServiceの初期化用）
     /// </summary>
-    public void CompleteChapter()
-    {
-        if (_currentChapter != null)
-        {
-            _currentChapter.CompleteChapter();
-        }
-    }
-    
-    /// <summary>
-    /// 新しいターンを開始
-    /// </summary>
-    public void StartTurn()
-    {
-        _currentPlayerMove = null;
-        _currentEnemyMove = null;
-        _currentEvents.Clear();
-    }
-    
-    /// <summary>
-    /// ターンを終了
-    /// </summary>
-    public void EndTurn()
-    {
-        if (_currentChapter != null)
-        {
-            var turnLog = new TurnLog(_currentPlayerMove, _currentEnemyMove, _currentEvents);
-            _currentChapter.AddTurn(turnLog);
-        }
-    }
-    
-    /// <summary>
-    /// プレイヤーのムーブを記録
-    /// </summary>
-    public void LogPlayerMove(PlayerMove move, int currentMentalPower)
-    {
-        _currentPlayerMove = new MoveLog(move, currentMentalPower);
-    }
-    
-    /// <summary>
-    /// 敵のムーブを記録
-    /// </summary>
-    public void LogEnemyMove(PlayerMove move, int currentMentalPower)
-    {
-        _currentEnemyMove = new MoveLog(move, currentMentalPower);
-    }
-    
-    /// <summary>
-    /// 共鳴イベントを記録
-    /// </summary>
-    public void LogResonance(string actorId, CardData resonanceCard)
-    {
-        var resonanceEvent = new ResonanceEvent(actorId, resonanceCard);
-        _currentEvents.Add(resonanceEvent);
-    }
-    
-    /// <summary>
-    /// カード進化イベントを記録
-    /// </summary>
-    public void LogCardEvolution(string actorId, CardData fromCard, CardData toCard)
-    {
-        var evolutionEvent = new CardEvolutionEvent(actorId, fromCard, toCard);
-        _currentEvents.Add(evolutionEvent);
-    }
-    
-    /// <summary>
-    /// カード崩壊イベントを記録
-    /// </summary>
-    public void LogCardCollapse(string actorId, CardData collapseCard)
-    {
-        var collapseEvent = new CardCollapseEvent(actorId, collapseCard);
-        _currentEvents.Add(collapseEvent);
-    }
-    
-    /// <summary>
-    /// 人格ログデータを取得
-    /// </summary>
+    /// <returns>保存されている人格ログデータ</returns>
     public PersonalityLogData GetPersonalityLogData()
     {
-        return _personalityLog;
+        return _personalityLogData;
     }
     
     /// <summary>
