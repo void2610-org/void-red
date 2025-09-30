@@ -35,7 +35,12 @@ public enum DialogParameterType
     /// <summary>
     /// アイテム取得演出（ItemGetData - 画像名,アイテム名,アイテム説明）
     /// </summary>
-    GetItem
+    GetItem,
+    
+    /// <summary>
+    /// 選択肢表示（ChoiceData - 質問文,選択肢1,選択肢2,...)
+    /// </summary>
+    Choice
 }
 
 /// <summary>
@@ -69,6 +74,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.CustomCharSpeed => typeof(float),
             DialogParameterType.AutoAdvance => typeof(float),
             DialogParameterType.GetItem => typeof(ItemGetData),
+            DialogParameterType.Choice => typeof(ChoiceData),
             _ => typeof(string)
         };
     }
@@ -94,6 +100,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.CustomCharSpeed => float.TryParse(valueString, out var floatValue) ? floatValue : -1f,
             DialogParameterType.AutoAdvance => float.TryParse(valueString, out var autoValue) ? autoValue : -1f,
             DialogParameterType.GetItem => ItemGetData.FromCommaSeparatedString(valueString),
+            DialogParameterType.Choice => ChoiceData.FromCommaSeparatedString(valueString),
             _ => valueString
         };
     }
@@ -113,6 +120,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.CustomCharSpeed => -1f,
             DialogParameterType.AutoAdvance => -1f,
             DialogParameterType.GetItem => null,
+            DialogParameterType.Choice => null,
             _ => ""
         };
     }

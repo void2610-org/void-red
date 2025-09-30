@@ -96,6 +96,26 @@ public class DialogData
     public string GetItemDescription => GetItemData?.ItemDescription ?? "";
     
     /// <summary>
+    /// 選択肢データ
+    /// </summary>
+    public ChoiceData ChoiceData => GetParameterValue<ChoiceData>(DialogParameterType.Choice, null);
+    
+    /// <summary>
+    /// 選択肢表示があるかどうか
+    /// </summary>
+    public bool HasChoice => ChoiceData != null;
+    
+    /// <summary>
+    /// 選択肢の質問文を取得
+    /// </summary>
+    public string ChoiceQuestion => ChoiceData?.Question ?? "";
+    
+    /// <summary>
+    /// 選択肢のリストを取得
+    /// </summary>
+    public List<string> ChoiceOptions => ChoiceData?.Options ?? new List<string>();
+    
+    /// <summary>
     /// コンストラクタ（動的パラメータ対応版）
     /// </summary>
     public DialogData(string speakerName, string dialogText, Dictionary<DialogParameterType, object> parameters)
