@@ -206,17 +206,45 @@ public class GameManager: IStartable, IDisposable
     private void HandleThemeAnnouncement()
     {
         if (_isDisposed) return;
-        
+
         // 人格ログ: ターン開始
         _personalityLogService.StartTurn();
-        
+
         // ランダムなお題を選択
         var newTheme = _themeService.GetRandomTheme();
         if (!TrySetReactiveProperty(_currentTheme, newTheme)) return;
-        
+
         _uiPresenter.SetTheme(_currentTheme.Value);
-        
-        DelayedStateChangeAsync(GameState.PlayerCardSelection, 0.3f).Forget();
+
+        // 会話シーケンスを表示してからカード選択へ
+        ShowThemeDialoguesAsync().Forget();
+    }
+
+    /// <summary>
+    /// テーマ会話を順次表示
+    /// </summary>
+    private async UniTask ShowThemeDialoguesAsync()
+    {
+        if (_currentTheme.Value == null || _currentTheme.Value.Dialogues == null)
+        {
+            await UniTask.Delay(300);
+            ChangeState(GameState.PlayerCardSelection);
+            return;
+        }
+
+        // 各会話を順次表示
+        foreach (var dialogue in _currentTheme.Value.Dialogues)
+        {
+            if (string.IsNullOrEmpty(dialogue.Message)) continue;
+
+            if (dialogue.IsPlayer)
+                await _uiPresenter.ShowNarration(dialogue.Message);
+            else
+                await _uiPresenter.ShowEnemyNarration(dialogue.Message);
+        }
+
+        await UniTask.Delay(300);
+        ChangeState(GameState.PlayerCardSelection);
     }
     
     /// <summary>
