@@ -10,24 +10,24 @@ using VContainer.Unity;
 /// </summary>
 public class PausePresenter : IStartable, System.IDisposable
 {
-    private readonly PauseView _pauseView;
-    private readonly PauseButtonView _pauseButtonView;
+    private PauseView _pauseView;
+    private PauseButtonView _pauseButtonView;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly CompositeDisposable _disposables = new();
 
     public PausePresenter(SceneTransitionManager sceneTransitionManager)
     {
         _sceneTransitionManager = sceneTransitionManager;
-        
-        // ビューの取得
-        _pauseView = Object.FindFirstObjectByType<PauseView>();
-        _pauseButtonView = Object.FindFirstObjectByType<PauseButtonView>();
     }
 
     public void Start()
     {
+        // ビューの取得
+        _pauseView = Object.FindFirstObjectByType<PauseView>();
+        _pauseButtonView = Object.FindFirstObjectByType<PauseButtonView>();
+        
         // ポーズボタンのイベント設定
-        _pauseButtonView?.OnButtonClicked.Subscribe(
+        _pauseButtonView.OnButtonClicked.Subscribe(
             _ => _pauseView.Show())
             .AddTo(_disposables);
         
