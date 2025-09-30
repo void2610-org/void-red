@@ -65,7 +65,6 @@ public class GameProgressService
         }
         
         // プレイヤー状態のロード
-        _currentMentalPower = loadedData.CurrentMentalPower;
         _currentDeck.Clear();
         _currentDeck.AddRange(loadedData.SavedDeck);
         _evolutionStats = loadedData.EvolutionStats ?? new EvolutionStatsData();
@@ -234,7 +233,6 @@ public class GameProgressService
         saveData.UpdateGameProgress(_currentStep, _results);
         
         // プレイヤー状態を設定
-        saveData.UpdateMentalPower(_currentMentalPower);
         saveData.UpdateDeck(_currentDeck);
         
         // 進化統計データと人格ログデータを設定
