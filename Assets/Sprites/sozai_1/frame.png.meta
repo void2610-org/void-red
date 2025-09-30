@@ -1,40 +1,64 @@
 fileFormatVersion: 2
-guid: bcb0f365a494e40b1b7a4bc608643b79
+guid: fac1e74b5a160423aa8f7926985a3b42
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7501387830980884940
-    second: frame_0
+      213: -7315129854088189037
+    second: frame_battle_0
   - first:
-      213: -1292133977623532453
-    second: frame_1
+      213: 1483371497142823757
+    second: frame_battle_1
   - first:
-      213: 1067268738093248773
-    second: frame_2
+      213: 3053619327207740158
+    second: frame_battle_2
   - first:
-      213: 4142243115213046903
-    second: frame_3
+      213: 4279263220906847136
+    second: frame_battle_3
   - first:
-      213: 4885123736680896423
-    second: frame_4
+      213: -7488729957009189713
+    second: frame_battle_4
   - first:
-      213: 6324591119161340219
-    second: frame_5
+      213: -546725801079975069
+    second: frame_battle_5
   - first:
-      213: 1871951282191127577
-    second: frame_6
+      213: -6165122403023755934
+    second: frame_battle_6
   - first:
-      213: 5311199380433355387
-    second: frame_7
+      213: -814867065045879160
+    second: frame_battle_7
   - first:
-      213: -6374213456928915919
-    second: frame_8
+      213: -3106360191007898605
+    second: frame_battle_8
   - first:
-      213: -369970159423461853
-    second: frame_9
+      213: 9028049664891091395
+    second: frame_battle_9
   - first:
-      213: -7160256121808793437
-    second: frame_10
+      213: 7943149012446621180
+    second: frame_battle_10
+  - first:
+      213: 4241738640006715404
+    second: frame_battle_11
+  - first:
+      213: -2427814108712006393
+    second: frame_battle_12
+  - first:
+      213: -3752333798118503305
+    second: frame_battle_13
+  - first:
+      213: -2708827311713919837
+    second: frame_battle_14
+  - first:
+      213: 5974973868528128430
+    second: frame_battle_15
+  - first:
+      213: 2059777991364939394
+    second: frame_battle_16
+  - first:
+      213: 5565208794108079554
+    second: frame_battle_17
+  - first:
+      213: 6563019539795457607
+    second: frame_battle_18
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -143,11 +167,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: frame_0
+      name: frame_battle_0
       rect:
         serializedVersion: 2
         x: 3
-        y: 480
+        y: 664
         width: 31
         height: 34
       alignment: 0
@@ -158,18 +182,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cc9bd0cfc784a1860800000000000000
-      internalID: 7501387830980884940
+      spriteID: 39be739a7207b7a90800000000000000
+      internalID: -7315129854088189037
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_1
+      name: frame_battle_1
       rect:
         serializedVersion: 2
         x: 12
-        y: 513
+        y: 697
         width: 14
         height: 14
       alignment: 0
@@ -180,18 +204,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b5c698d4efa611ee0800000000000000
-      internalID: -1292133977623532453
+      spriteID: d4b2325748ef59410800000000000000
+      internalID: 1483371497142823757
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_2
+      name: frame_battle_2
       rect:
         serializedVersion: 2
         x: 26
-        y: 503
+        y: 687
         width: 33
         height: 32
       alignment: 0
@@ -202,18 +226,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5017ded3343bfce00800000000000000
-      internalID: 1067268738093248773
+      spriteID: ef21c7d6992a06a20800000000000000
+      internalID: 3053619327207740158
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_3
+      name: frame_battle_3
       rect:
         serializedVersion: 2
         x: 63
-        y: 442
+        y: 626
         width: 1156
         height: 94
       alignment: 0
@@ -224,18 +248,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 774c49faa243c7930800000000000000
-      internalID: 4142243115213046903
+      spriteID: 0abeb861a3ff26b30800000000000000
+      internalID: 4279263220906847136
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_4
+      name: frame_battle_4
       rect:
         serializedVersion: 2
         x: 1222
-        y: 503
+        y: 687
         width: 34
         height: 32
       alignment: 0
@@ -246,18 +270,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7a791b0f7227bc340800000000000000
-      internalID: 4885123736680896423
+      spriteID: fa414a5f7cfa21890800000000000000
+      internalID: -7488729957009189713
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_5
+      name: frame_battle_5
       rect:
         serializedVersion: 2
         x: 1248
-        y: 480
+        y: 664
         width: 31
         height: 34
       alignment: 0
@@ -268,18 +292,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b31b33f1d1675c750800000000000000
-      internalID: 6324591119161340219
+      spriteID: 3635615d7c3a968f0800000000000000
+      internalID: -546725801079975069
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_6
+      name: frame_battle_6
       rect:
         serializedVersion: 2
         x: 1256
-        y: 513
+        y: 697
         width: 14
         height: 14
       alignment: 0
@@ -290,20 +314,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 914d6dbe5c18af910800000000000000
-      internalID: 1871951282191127577
+      spriteID: 26567f2b6d5117aa0800000000000000
+      internalID: -6165122403023755934
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_7
+      name: frame_battle_7
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 60
         width: 11
-        height: 479
+        height: 599
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -312,20 +336,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b72410252bb25b940800000000000000
-      internalID: 5311199380433355387
+      spriteID: 88676c0c8b201b4f0800000000000000
+      internalID: -814867065045879160
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_8
+      name: frame_battle_8
       rect:
         serializedVersion: 2
         x: 17
-        y: 17
+        y: 60
         width: 7
-        height: 462
+        height: 599
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -334,20 +358,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 13ebc3902ae3a87a0800000000000000
-      internalID: -6374213456928915919
+      spriteID: 3144f8e4dddf3e4d0800000000000000
+      internalID: -3106360191007898605
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_9
+      name: frame_battle_9
       rect:
         serializedVersion: 2
         x: 1256
-        y: 17
+        y: 60
         width: 7
-        height: 462
+        height: 599
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -356,20 +380,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 326e116a91a9ddaf0800000000000000
-      internalID: -369970159423461853
+      spriteID: 3c9fa6a66531a4d70800000000000000
+      internalID: 9028049664891091395
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_10
+      name: frame_battle_10
       rect:
         serializedVersion: 2
         x: 1269
-        y: 0
+        y: 60
         width: 11
-        height: 479
+        height: 599
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -378,8 +402,184 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3a055ce6ef8a1ac90800000000000000
-      internalID: -7160256121808793437
+      spriteID: cfd20e431fbbb3e60800000000000000
+      internalID: 7943149012446621180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_11
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 22
+        width: 31
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0816a3c1deadda30800000000000000
+      internalID: 4241738640006715404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_12
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 9
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70d0a856eebae4ed0800000000000000
+      internalID: -2427814108712006393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_13
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 1
+        width: 33
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77c44749a480debc0800000000000000
+      internalID: -3752333798118503305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_14
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 17
+        width: 1156
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ac5a6779ef486ad0800000000000000
+      internalID: -2708827311713919837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_15
+      rect:
+        serializedVersion: 2
+        x: 1222
+        y: 1
+        width: 34
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea15cdf931f5be250800000000000000
+      internalID: 5974973868528128430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_16
+      rect:
+        serializedVersion: 2
+        x: 1248
+        y: 22
+        width: 31
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28e89738b2dc59c10800000000000000
+      internalID: 2059777991364939394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_17
+      rect:
+        serializedVersion: 2
+        x: 1256
+        y: 9
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cd21b999e79b3d40800000000000000
+      internalID: 5565208794108079554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_battle_18
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 0
+        width: 1156
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 746b473cf77841b50800000000000000
+      internalID: 6563019539795457607
       vertices: []
       indices: 
       edges: []
@@ -398,17 +598,25 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      frame_0: 7501387830980884940
-      frame_1: -1292133977623532453
-      frame_10: -7160256121808793437
-      frame_2: 1067268738093248773
-      frame_3: 4142243115213046903
-      frame_4: 4885123736680896423
-      frame_5: 6324591119161340219
-      frame_6: 1871951282191127577
-      frame_7: 5311199380433355387
-      frame_8: -6374213456928915919
-      frame_9: -369970159423461853
+      frame_battle_0: -7315129854088189037
+      frame_battle_1: 1483371497142823757
+      frame_battle_10: 7943149012446621180
+      frame_battle_11: 4241738640006715404
+      frame_battle_12: -2427814108712006393
+      frame_battle_13: -3752333798118503305
+      frame_battle_14: -2708827311713919837
+      frame_battle_15: 5974973868528128430
+      frame_battle_16: 2059777991364939394
+      frame_battle_17: 5565208794108079554
+      frame_battle_18: 6563019539795457607
+      frame_battle_2: 3053619327207740158
+      frame_battle_3: 4279263220906847136
+      frame_battle_4: -7488729957009189713
+      frame_battle_5: -546725801079975069
+      frame_battle_6: -6165122403023755934
+      frame_battle_7: -814867065045879160
+      frame_battle_8: -3106360191007898605
+      frame_battle_9: 9028049664891091395
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

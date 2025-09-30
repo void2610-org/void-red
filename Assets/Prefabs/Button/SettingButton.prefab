@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 09a3ed425b89744a3bd76f362adea755, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fcc2363c735104b0bbb846350eaacca3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -233,10 +233,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   glowImage: {fileID: 430306468468257771}
-  fadeInDuration: 0.2
-  fadeOutDuration: 0.15
-  fadeInEase: 8
-  fadeOutEase: 8
 --- !u!1 &5296151442689732600
 GameObject:
   m_ObjectHideFlags: 0
