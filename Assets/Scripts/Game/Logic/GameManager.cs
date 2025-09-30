@@ -10,7 +10,6 @@ public class GameManager: IStartable, IDisposable
     public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
     
     private readonly CardPoolService _cardPoolService;
-    private readonly ThemeService _themeService;
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
@@ -44,7 +43,6 @@ public class GameManager: IStartable, IDisposable
     /// </summary>
     public GameManager(
         CardPoolService cardPoolService,
-        ThemeService themeService,
         UIPresenter uiPresenter,
         Player player,
         Enemy enemy,
@@ -56,7 +54,6 @@ public class GameManager: IStartable, IDisposable
         DiscordService discordService)
     {
         _cardPoolService = cardPoolService;
-        _themeService = themeService;
         _uiPresenter = uiPresenter;
         _player = player;
         _enemy = enemy;
@@ -223,11 +220,6 @@ public class GameManager: IStartable, IDisposable
         {
             var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
             newTheme = _currentEnemyData.MinorThemes[randomIndex];
-        }
-        // フォールバック: 既存のThemeServiceを使用
-        else
-        {
-            newTheme = _themeService.GetRandomTheme();
         }
 
         if (!TrySetReactiveProperty(_currentTheme, newTheme)) return;
