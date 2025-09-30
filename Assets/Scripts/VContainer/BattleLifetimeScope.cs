@@ -41,6 +41,9 @@ public class BattleLifetimeScope : LifetimeScope
         builder.Register<ThemeService>(Lifetime.Singleton);
         builder.Register<CardNarrationService>(Lifetime.Singleton);
         
+        // 人格ログサービス（バトルシーン専用）
+        builder.Register<PersonalityLogService>(Lifetime.Singleton);
+        
         
         // === チュートリアルデータの登録 ===
         

@@ -28,7 +28,6 @@ public class SavedCard
 public class GameSaveData
 {
     [Header("基礎ゲームデータ")]
-    [SerializeField] private int currentMentalPower = GameConstants.MAX_MENTAL_POWER;
     [SerializeField] private List<SavedCard> savedDeck = new();
     
     [Header("ゲーム進行データ")]
@@ -46,19 +45,10 @@ public class GameSaveData
     [SerializeField] private List<string> viewedCardIds = new();
     
     // プロパティ
-    public int CurrentMentalPower => currentMentalPower;
     public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
     public EvolutionStatsData EvolutionStats => evolutionStats;
     public PersonalityLogData PersonalityLog => personalityLog;
-    
-    /// <summary>
-    /// 精神力を更新
-    /// </summary>
-    public void UpdateMentalPower(int mentalPower)
-    {
-        currentMentalPower = Mathf.Clamp(mentalPower, 0, GameConstants.MAX_MENTAL_POWER);
-    }
     
     /// <summary>
     /// デッキ情報を更新
@@ -153,6 +143,6 @@ public class GameSaveData
     /// </summary>
     public string GetDebugInfo()
     {
-        return $"Step: {currentStep}, MentalPower: {currentMentalPower}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}";
+        return $"Step: {currentStep}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}";
     }
 }
