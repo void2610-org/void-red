@@ -210,8 +210,26 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: ターン開始
         _personalityLogService.StartTurn();
 
-        // ランダムなお題を選択
-        var newTheme = _themeService.GetRandomTheme();
+        // 勝利数に基づいてテーマを選択
+        ThemeData newTheme = null;
+
+        // どちらかが2勝している場合は大テーマを使用
+        if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData?.MajorTheme != null)
+        {
+            newTheme = _currentEnemyData.MajorTheme;
+        }
+        // 小テーマが設定されている場合はランダムに選択
+        else if (_currentEnemyData?.MinorThemes != null && _currentEnemyData.MinorThemes.Count > 0)
+        {
+            var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
+            newTheme = _currentEnemyData.MinorThemes[randomIndex];
+        }
+        // フォールバック: 既存のThemeServiceを使用
+        else
+        {
+            newTheme = _themeService.GetRandomTheme();
+        }
+
         if (!TrySetReactiveProperty(_currentTheme, newTheme)) return;
 
         _uiPresenter.SetTheme(_currentTheme.Value);
