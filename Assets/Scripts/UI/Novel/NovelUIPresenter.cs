@@ -27,8 +27,6 @@ public class NovelUIPresenter : IStartable
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
-    private bool _isShowingItemGetEffect; // アイテム取得演出表示中フラグ
-    private bool _isShowingChoiceEffect; // 選択肢表示中フラグ
     private readonly CompositeDisposable _disposables = new();
     
     public NovelUIPresenter(bool useLocalExcel)
@@ -195,9 +193,6 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
-        _isShowingItemGetEffect = true;
-        
-        // DialogViewのクリックを無効化
         _dialogView.SetInteractable(false);
         
         // アイテム画像を読み込み
@@ -212,10 +207,7 @@ public class NovelUIPresenter : IStartable
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime:1f, pitch: 1f);
         await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
         
-        // DialogViewのクリックを有効化
         _dialogView.SetInteractable(true);
-        
-        _isShowingItemGetEffect = false;
     }
     
     /// <summary>
@@ -232,9 +224,6 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
-        _isShowingChoiceEffect = true;
-        
-        // DialogViewのクリックを無効化
         _dialogView.SetInteractable(false);
         
         // 選択肢を表示して結果を取得
@@ -243,10 +232,7 @@ public class NovelUIPresenter : IStartable
         // 選択結果をログ出力
         Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
         
-        // DialogViewのクリックを有効化
         _dialogView.SetInteractable(true);
-        
-        _isShowingChoiceEffect = false;
     }
     
     /// <summary>
@@ -254,12 +240,6 @@ public class NovelUIPresenter : IStartable
     /// </summary>
     private async UniTaskVoid SkipAllDialogs()
     {
-        // アイテム取得演出中または選択肢表示中はスキップを無視
-        if (_isShowingItemGetEffect || _isShowingChoiceEffect)
-        {
-            return;
-        }
-        
         var confirmed = await _confirmationDialogService.ShowDialog(
             "現在のシナリオをスキップしますか？",
             "スキップ",
