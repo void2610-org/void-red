@@ -27,3 +27,10 @@ MonoBehaviour:
       value: 1.1
     - key: 5
       value: 0.9
+  dialogues:
+  - isPlayer: 0
+    message: "\u3042\u3044\u3046\u3048\u304A"
+  - isPlayer: 0
+    message: "\u304B\u304D\u304F\u3051\u3053"
+  - isPlayer: 1
+    message: "\u304B\u304D\u304F\u3051\u3053"
