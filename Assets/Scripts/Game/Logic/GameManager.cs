@@ -21,7 +21,6 @@ public class GameManager: IStartable, IDisposable
     private readonly DiscordService _discordService;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
-    private readonly CompositeDisposable _disposables = new();
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
     private bool _isProcessing;
@@ -741,7 +740,6 @@ public class GameManager: IStartable, IDisposable
     public void Dispose()
     {
         _isDisposed = true;
-        _disposables?.Dispose();
         _currentState?.Dispose();
         _currentTheme?.Dispose();
     }
