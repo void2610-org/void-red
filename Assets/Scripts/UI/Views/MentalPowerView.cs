@@ -51,6 +51,8 @@ public class MentalPowerView : MonoBehaviour
     {
         _mentalFireMaterial = Instantiate(mentalStateImage.material);
         mentalStateImage.material = _mentalFireMaterial;
+        
+        UpdateDisplay(20, 20);
     }
 
     private void OnDestroy()
