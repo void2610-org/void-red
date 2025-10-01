@@ -228,9 +228,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mentalPowerText: {fileID: 996941127505191294}
   mentalStateImage: {fileID: 3540298938563778505}
-  highMentalColor: {r: 0, g: 13.562199, b: 47.93726, a: 1}
-  midMentalColor: {r: 47.93726, g: 47.93726, b: 0.751957, a: 1}
-  lowMentalColor: {r: 47.93726, g: 4.6786895, b: 0, a: 1}
+  highMentalColor: {r: 0, g: 6.7810993, b: 23.96863, a: 1}
+  midMentalColor: {r: 23.96863, g: 23.96863, b: 0.3759785, a: 1}
+  lowMentalColor: {r: 23.96863, g: 2.3393447, b: 0, a: 1}
   colorTransitionDuration: 0.5
 --- !u!1001 &2955795395524926970
 PrefabInstance:

@@ -77,7 +77,7 @@ Material:
     - _TimeOffset: 5
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 0, g: 1.6952748, b: 5.9921575, a: 1}
+    - _Color: {r: 0, g: 6.7810993, b: 23.96863, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
