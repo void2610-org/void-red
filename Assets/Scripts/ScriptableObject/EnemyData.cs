@@ -28,7 +28,11 @@ public class EnemyData : ScriptableObject
     
     [Header("共鳴システム")]
     [SerializeField] private CardData resonanceCard;
-    
+
+    [Header("テーマ設定")]
+    [SerializeField] private ThemeData majorTheme; // 大テーマ（どちらかが2勝時）
+    [SerializeField] private List<ThemeData> minorThemes = new(); // 小テーマ（通常時）
+
     // プロパティ
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
@@ -38,6 +42,8 @@ public class EnemyData : ScriptableObject
     public int InitialMentalPower => initialMentalPower;
     public List<CardData> InitialDeck => initialDeck;
     public CardData ResonanceCard => resonanceCard;
+    public ThemeData MajorTheme => majorTheme;
+    public List<ThemeData> MinorThemes => minorThemes;
     
     /// <summary>
     /// 指定された属性に対応するSpriteを取得

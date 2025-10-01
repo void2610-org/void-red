@@ -27,3 +27,10 @@ MonoBehaviour:
       value: 1.4
     - key: 5
       value: 1.1
+  dialogues:
+  - isPlayer: 0
+    message: "\u3053\u308C\u306F\u5C0F\u30C6\u30FC\u30DE\u3067\u3059"
+  - isPlayer: 1
+    message: "\u30C6\u30B9\u30C8\u30C6\u30B9\u30C8"
+  - isPlayer: 0
+    message: "\u30C6\u30B9\u30C8\u30C6\u30B9\u30C8"

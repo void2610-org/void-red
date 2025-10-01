@@ -1,16 +1,16 @@
 fileFormatVersion: 2
-guid: 06d306c24c046459385e060a93d0130c
+guid: e42782208191d44b18b885abd14c847e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1262251718116677307
-    second: hand_back_0
+      213: 1457655165437335790
+    second: hand_back_k_0
   - first:
-      213: 4428392321312060247
-    second: hand_back_1
+      213: -4025005948165942248
+    second: hand_back_k_1
   - first:
-      213: -2372512026087369991
-    second: hand_back_2
+      213: 4933702996133479029
+    second: hand_back_k_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -119,13 +119,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hand_back_0
+      name: hand_back_k_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 42
+        y: 43
         width: 229
-        height: 156
+        height: 155
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,18 +134,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 549678400c49b7ee0800000000000000
-      internalID: -1262251718116677307
+      spriteID: ee8d7e466a1aa3410800000000000000
+      internalID: 1457655165437335790
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: hand_back_1
+      name: hand_back_k_1
       rect:
         serializedVersion: 2
         x: 87
-        y: 8
+        y: 9
         width: 150
         height: 130
       alignment: 0
@@ -156,20 +156,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7537fd58a5fc47d30800000000000000
-      internalID: 4428392321312060247
+      spriteID: 8141cb06a6e4428c0800000000000000
+      internalID: -4025005948165942248
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: hand_back_2
+      name: hand_back_k_2
       rect:
         serializedVersion: 2
         x: 213
         y: 0
         width: 278
-        height: 181
+        height: 182
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,8 +178,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9f258b3e1e4231fd0800000000000000
-      internalID: -2372512026087369991
+      spriteID: 57201df2cb8087440800000000000000
+      internalID: 4933702996133479029
       vertices: []
       indices: 
       edges: []
@@ -198,9 +198,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hand_back_0: -1262251718116677307
-      hand_back_1: 4428392321312060247
-      hand_back_2: -2372512026087369991
+      hand_back_k_0: 1457655165437335790
+      hand_back_k_1: -4025005948165942248
+      hand_back_k_2: 4933702996133479029
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
