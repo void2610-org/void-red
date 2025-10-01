@@ -9,11 +9,11 @@ public class MentalPowerView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI mentalPowerText;
     [SerializeField] private Image mentalStateImage;
+    [ColorUsage(false, true), SerializeField] private Color highMentalColor = Color.blue;
+    [ColorUsage(false, true), SerializeField] private Color midMentalColor = Color.yellow;
+    [ColorUsage(false, true), SerializeField] private Color lowMentalColor = Color.red;
     
-    [Header("精神力状態スプライト")]
-    [SerializeField] private Sprite lowMentalSprite;   // 低精神力時のスプライト（0-33%）
-    [SerializeField] private Sprite midMentalSprite;   // 中精神力時のスプライト（34-66%）
-    [SerializeField] private Sprite highMentalSprite;  // 高精神力時のスプライト（67-100%）
+    private Material _mentalFireMaterial;
     
     /// <summary>
     /// 精神力表示を更新（現在値と割合でスプライトを切り替え）
@@ -23,22 +23,19 @@ public class MentalPowerView : MonoBehaviour
         mentalPowerText.text = currentMentalPower.ToString();
         
         // 割合を計算（0.0～1.0）
-        float ratio = (float)currentMentalPower / maxMentalPower;
-        
-        // 割合に応じて適切なスプライトを設定
-        if (!mentalStateImage) return;
+        var ratio = (float)currentMentalPower / maxMentalPower;
         
         if (ratio <= 0.33f)
-        {
-            mentalStateImage.sprite = lowMentalSprite;
-        }
+            _mentalFireMaterial.color = lowMentalColor;
         else if (ratio <= 0.66f)
-        {
-            mentalStateImage.sprite = midMentalSprite;
-        }
+            _mentalFireMaterial.color = midMentalColor;
         else
-        {
-            mentalStateImage.sprite = highMentalSprite;
-        }
+            _mentalFireMaterial.color = highMentalColor;
+    }
+
+    private void Awake()
+    {
+        _mentalFireMaterial = Instantiate(mentalStateImage.material);
+        mentalStateImage.material = _mentalFireMaterial;
     }
 }
