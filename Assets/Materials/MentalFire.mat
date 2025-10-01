@@ -42,7 +42,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 64425a0153dba4c9da0654909ea9b16c, type: 3}
+        m_Texture: {fileID: 2800000, guid: e569e10d110b9489faa5d2a833cf1edb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskTex:
@@ -68,7 +68,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _EnableExternalAlpha: 0
-    - _Lerp: 0.4
+    - _Lerp: 0.1
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Speed: 2
