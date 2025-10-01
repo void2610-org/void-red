@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MentalFire
+  m_Name: MentalFire2
   m_Shader: {fileID: -6465566751694194690, guid: b737a0c6f1ac04d95a2258d8c0ae80a6, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -73,7 +73,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Speed: 5
-    - _TimeOffset: 0
+    - _TimeOffset: 100
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 0, g: 2.3215683, b: 5.992157, a: 1}

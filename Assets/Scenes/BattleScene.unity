@@ -5407,8 +5407,8 @@ RectTransform:
   - {fileID: 696993723}
   - {fileID: 493031570}
   - {fileID: 1051276008}
-  - {fileID: 946482749}
   - {fileID: 1142675609}
+  - {fileID: 946482749}
   - {fileID: 1124826946}
   - {fileID: 359829453}
   - {fileID: 397660102}
@@ -6090,6 +6090,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8161964196290750984, guid: db20cbf4a2e2e44129d940890d2f5a2c, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: d75aeb61f2e384b81b7ab7acd1b23581, type: 2}
     - target: {fileID: 9223205478302197101, guid: db20cbf4a2e2e44129d940890d2f5a2c, type: 3}
       propertyPath: m_Name
       value: EnemyMentalPowerView
@@ -7730,7 +7734,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1034335263714762411, guid: 36760557ee03c4895bde1db15ad018bd, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0000306179
+      value: 0.000100243655
       objectReference: {fileID: 0}
     - target: {fileID: 1696922760874012574, guid: 36760557ee03c4895bde1db15ad018bd, type: 3}
       propertyPath: m_SizeDelta.y
@@ -7846,7 +7850,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7671079500737958713, guid: 36760557ee03c4895bde1db15ad018bd, type: 3}
       propertyPath: m_Size
-      value: 0.9955362
+      value: 0.99993306
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
