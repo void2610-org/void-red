@@ -69,14 +69,15 @@ Material:
     m_Floats:
     - _Alpha: 1
     - _EnableExternalAlpha: 0
+    - _HDR: 1
     - _Lerp: 0.2
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Speed: 5
+    - _Speed: 2.5
     - _TimeOffset: 0
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 0, g: 2.3215683, b: 5.992157, a: 1}
+    - _Color: {r: 1.4980391, g: 0, b: 0.01563434, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
