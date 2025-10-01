@@ -67,6 +67,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Alpha: 0.35
     - _EnableExternalAlpha: 0
     - _Lerp: 0.2
     - _QueueControl: 0
@@ -74,7 +75,7 @@ Material:
     - _Speed: 2
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 0, g: 396.73288, b: 1023.99994, a: 1}
+    - _Color: {r: 0, g: 0.58039206, b: 1.4980392, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

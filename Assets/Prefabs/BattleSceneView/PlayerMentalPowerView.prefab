@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mentalPowerText: {fileID: 996941127505191294}
-  mentalStateImage: {fileID: 6203390685328660355}
+  mentalStateImage: {fileID: 0}
   lowMentalSprite: {fileID: 21300000, guid: 133635675393d431dacf5ec394458042, type: 3}
   midMentalSprite: {fileID: 21300000, guid: f61b8acea268b4a4dbc9d48a81e57be1, type: 3}
   highMentalSprite: {fileID: 21300000, guid: 405bf0c5909a946989f5702b6b806830, type: 3}
@@ -305,7 +305,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -333,14 +333,3 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
   m_PrefabInstance: {fileID: 2955795395524926970}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6203390685328660355 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9156880954156173945, guid: 549e08f5fe0244753986a698450ef753, type: 3}
-  m_PrefabInstance: {fileID: 2955795395524926970}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
