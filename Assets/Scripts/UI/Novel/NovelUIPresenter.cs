@@ -27,6 +27,9 @@ public class NovelUIPresenter : IStartable
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
+    private bool _isShowingItemGetEffect;
+    private bool _isShowingChoiceEffect;
+    private int _choiceCounter;
     private readonly CompositeDisposable _disposables = new();
     
     public NovelUIPresenter(bool useLocalExcel)
@@ -116,6 +119,7 @@ public class NovelUIPresenter : IStartable
     {
         _currentDialogList = dialogList;
         _currentDialogIndex = 0;
+        _choiceCounter = 0;
         
         // フェードイン
         await _dialogView.FadeIn();
@@ -224,15 +228,26 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
+        _isShowingChoiceEffect = true;
+        
         _dialogView.SetInteractable(false);
         
         // 選択肢を表示して結果を取得
         var selectedIndex = await _choiceView.ShowChoice(choiceData);
         
+        // 選択結果をGameProgressServiceに記録
+        var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
+        _gameProgressService.RecordNovelChoiceAndSave(scenarioId, _choiceCounter, selectedIndex);
+        
+        // 選択肢番号をインクリメント
+        _choiceCounter++;
+        
         // 選択結果をログ出力
         Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
         
         _dialogView.SetInteractable(true);
+        
+        _isShowingChoiceEffect = false;
     }
     
     /// <summary>
