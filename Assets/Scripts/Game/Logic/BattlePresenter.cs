@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using VContainer.Unity;
 using UnityEngine;
 
-public class BattlePresenter: IStartable, IDisposable
+public class BattlePresenter: IStartable
 {
     private readonly CardPoolService _cardPoolService;
     private readonly UIPresenter _uiPresenter;
@@ -17,11 +17,9 @@ public class BattlePresenter: IStartable, IDisposable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
     private readonly DiscordService _discordService;
-    private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
-    private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
+    private ThemeData _currentTheme;
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
-    private bool _isDisposed;
     
     // バトル勝利数管理
     private int _playerWins;
@@ -159,9 +157,6 @@ public class BattlePresenter: IStartable, IDisposable
     /// </summary>
     private void ChangeState(GameState newState)
     {
-        if (_isDisposed) return;
-        
-        _currentState.Value = newState;
         switch (newState)
         {
             case GameState.ThemeAnnouncement:
@@ -197,8 +192,6 @@ public class BattlePresenter: IStartable, IDisposable
     /// </summary>
     private void HandleThemeAnnouncement()
     {
-        if (_isDisposed) return;
-
         // 人格ログ: ターン開始
         _personalityLogService.StartTurn();
 
@@ -217,9 +210,9 @@ public class BattlePresenter: IStartable, IDisposable
             newTheme = _currentEnemyData.MinorThemes[randomIndex];
         }
 
-        _currentTheme.Value = newTheme;
+        _currentTheme = newTheme;
 
-        _uiPresenter.SetTheme(_currentTheme.Value);
+        _uiPresenter.SetTheme(_currentTheme);
 
         // 会話シーケンスを表示してからカード選択へ
         ShowThemeDialoguesAsync().Forget();
@@ -230,7 +223,7 @@ public class BattlePresenter: IStartable, IDisposable
     /// </summary>
     private async UniTask ShowThemeDialoguesAsync()
     {
-        if (_currentTheme.Value == null || _currentTheme.Value.Dialogues == null)
+        if (_currentTheme == null || _currentTheme.Dialogues == null)
         {
             await UniTask.Delay(300);
             ChangeState(GameState.PlayerCardSelection);
@@ -238,7 +231,7 @@ public class BattlePresenter: IStartable, IDisposable
         }
 
         // 各会話を順次表示
-        foreach (var dialogue in _currentTheme.Value.Dialogues)
+        foreach (var dialogue in _currentTheme.Dialogues)
         {
             if (string.IsNullOrEmpty(dialogue.Message)) continue;
 
@@ -261,10 +254,6 @@ public class BattlePresenter: IStartable, IDisposable
         while (true)
         {
             await UniTask.Yield();
-            
-            // ゲーム状態が変わったら終了
-            if (_currentState.Value != GameState.PlayerCardSelection)
-                return;
             
             var selectedCard = _player.SelectedCard.CurrentValue;
             if (selectedCard == null) continue;
@@ -354,11 +343,8 @@ public class BattlePresenter: IStartable, IDisposable
     private async UniTask HandleEvaluation()
     {
         // スコアを計算（テーマ倍率 × 精神ベット）
-        var currentTheme = _currentTheme.CurrentValue;
-        if (!currentTheme) return;
-        
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, currentTheme);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _currentTheme);
         
         // 評価結果をスコア専用Viewで同時表示
         await _uiPresenter.ShowScores(playerScore, npcScore);
@@ -397,10 +383,8 @@ public class BattlePresenter: IStartable, IDisposable
     /// </summary>
     private async UniTask HandleResultDisplay()
     {
-        var currentTheme = _currentTheme.CurrentValue;
-        
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, currentTheme);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _currentTheme);
 
         // 崩壊結果を考慮した勝敗決定
         string result;
@@ -449,10 +433,7 @@ public class BattlePresenter: IStartable, IDisposable
         await _uiPresenter.HideBlackOverlay();
 
         // プレイヤー勝利時は現在のテーマを記録
-        if (playerWon && currentTheme != null)
-        {
-            _wonThemes.Add(currentTheme);
-        }
+        if (playerWon) _wonThemes.Add(_currentTheme);
         
         // 勝敗確定後のナレーション（プレイヤーの勝敗に基づく）
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
@@ -581,16 +562,9 @@ public class BattlePresenter: IStartable, IDisposable
     private bool CheckGameOverConditions()
     {
         // プレイヤーの精神力が0になったか
-        if (_player.MentalPower.CurrentValue <= 0)
-        {
-            return true;
-        }
-        
+        if (_player.MentalPower.CurrentValue <= 0) return true;
         // プレイヤーの全カードが崩壊したかどうか
-        if (_player.IsAllCardsCollapsed)
-        {
-            return true;
-        }
+        if (_player.IsAllCardsCollapsed) return true;
         
         return false;
     }
@@ -664,15 +638,5 @@ public class BattlePresenter: IStartable, IDisposable
         
         // ゲームオーバー画面を表示
         await _uiPresenter.ShowGameOverScreen(gameOverReason);
-    }
-    
-    /// <summary>
-    /// リソースの解放
-    /// </summary>
-    public void Dispose()
-    {
-        _isDisposed = true;
-        _currentState?.Dispose();
-        _currentTheme?.Dispose();
     }
 }
