@@ -16,8 +16,7 @@ public class NarrationView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI narrationText;
     [SerializeField] private Image backgroundImage;
     
-    private const float FADE_IN_DURATION = 0.3f;
-    private const float FADE_OUT_DURATION = 0.3f;
+    private const float FADE_DURATION = 0.3f;
     
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentNarrationCts;
@@ -53,8 +52,8 @@ public class NarrationView : MonoBehaviour
             narrationText.SetAlpha(0f);
             
             // backgroundImageとテキストのフェードインを同時実行
-            backgroundImage.FadeIn(FADE_IN_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
-            await narrationText.FadeIn(FADE_IN_DURATION, Ease.OutQuart);
+            backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
+            await narrationText.FadeIn(FADE_DURATION, Ease.OutQuart);
             
             // 1文字ずつ表示するアニメーション
             await narrationText.TypewriterAnimation(message, cancellationToken: cancellationToken);
@@ -66,26 +65,11 @@ public class NarrationView : MonoBehaviour
                 await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
                 
                 // backgroundImageとテキストのフェードアウトを同時実行
-                backgroundImage.FadeOut(FADE_OUT_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-                await narrationText.FadeOut(FADE_OUT_DURATION, Ease.InQuart);
-            }
-            else
-            {
-                // 手動進行の場合は表示を維持（呼び出し側で制御）
-                // フェードアウトは行わない
+                backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+                await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
             }
         }
         catch (System.OperationCanceledException) { }
-        finally
-        {
-            // autoAdvanceがfalseの場合は表示を維持
-            if (autoAdvance)
-            {
-                _canvasGroup.alpha = 0f;
-                backgroundImage.SetAlpha(0f);
-                narrationText.gameObject.SetActive(false);
-            }
-        }
     }
     
     /// <summary>
@@ -109,8 +93,8 @@ public class NarrationView : MonoBehaviour
         try
         {
             // backgroundImageとテキストのフェードアウトを同時実行
-            backgroundImage.FadeOut(FADE_OUT_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-            await narrationText.FadeOut(FADE_OUT_DURATION, Ease.InQuart);
+            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+            await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
         }
         catch (System.OperationCanceledException) { }
         finally

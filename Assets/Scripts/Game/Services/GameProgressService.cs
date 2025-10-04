@@ -19,7 +19,6 @@ public class GameProgressService
     private int _currentStep;
     
     // プレイヤー状態
-    private int _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
     private readonly List<SavedCard> _currentDeck = new();
     private EvolutionStatsData _evolutionStats = new();
     private EnemyStats _enemyStats = new();
@@ -113,7 +112,6 @@ public class GameProgressService
         _currentNode = GetNextNode(); // 現在のノードを初期化
         
         // プレイヤー状態をリセット
-        _currentMentalPower = GameConstants.MAX_MENTAL_POWER;
         _currentDeck.Clear();
         _evolutionStats = new EvolutionStatsData();
         _enemyStats = new EnemyStats();

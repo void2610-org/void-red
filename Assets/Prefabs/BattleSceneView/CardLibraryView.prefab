@@ -260,7 +260,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5435219371793749136
 RectTransform:
   m_ObjectHideFlags: 0
@@ -524,7 +524,7 @@ MonoBehaviour:
   closeButton: {fileID: 8507088020441161181}
   scrollRect: {fileID: 6362972301616104690}
   contentContainer: {fileID: 6597918954721080472}
-  cardPrefab: {fileID: 222389743591641200, guid: 2b4e137523755496d95da1b089d11431, type: 3}
+  cardPrefab: {fileID: 1019977483416546224, guid: 4bcef9ab048c64ec1b0422b435240502, type: 3}
   statisticsText: {fileID: 2927856651136737927}
 --- !u!1001 &806601982529337141
 PrefabInstance:

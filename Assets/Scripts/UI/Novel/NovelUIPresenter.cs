@@ -175,7 +175,7 @@ public class NovelUIPresenter : IStartable
         if (dialogData.HasSe)
         {
             // SEのクリップ長を取得（オートモード時のため）
-            seWaitTime = _novelSeManager.PlaySe(dialogData.SeClipName);
+            seWaitTime = _novelSeManager.PlaySe(dialogData.SeClipName, volume: 0.5f);
         }
         
         // ダイアログを表示（完了まで待機）
