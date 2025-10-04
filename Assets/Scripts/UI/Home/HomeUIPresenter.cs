@@ -62,6 +62,11 @@ public class HomeUIPresenter : MonoBehaviour
             .Subscribe(cardData => cardDetailView.ShowCardDetail(cardData))
             .AddTo(this);
 
+        // CardLibraryViewのカードクリックイベントを購読
+        cardLibraryView.OnCardClicked
+            .Subscribe(cardData => cardDetailView.ShowCardDetail(cardData))
+            .AddTo(this);
+
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
 

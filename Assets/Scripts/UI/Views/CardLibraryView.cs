@@ -18,10 +18,13 @@ public class CardLibraryView : MonoBehaviour
     [SerializeField] private Transform contentContainer;
     [SerializeField] private DeckCardView cardPrefab;
     [SerializeField] private TextMeshProUGUI statisticsText;
-    
+
+    public Observable<CardData> OnCardClicked => _onCardClicked;
+
     private readonly List<DeckCardView> _cardViews = new();
     private readonly CompositeDisposable _disposables = new();
-    
+    private readonly Subject<CardData> _onCardClicked = new();
+
     // AllCardDataを保持
     private AllCardData _allCardData;
     
@@ -84,8 +87,13 @@ public class CardLibraryView : MonoBehaviour
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
         var cardModel = new CardModel(cardData);
-        cardView.Initialize(cardModel, isUnviewed ? CardDisplayState.Normal : CardDisplayState.Veiled);
-        
+        cardView.Initialize(cardModel, isUnviewed ? CardDisplayState.Veiled : CardDisplayState.Normal);
+
+        // カードクリックイベントを購読
+        cardView.OnCardClicked
+            .Subscribe(clickedCardData => _onCardClicked.OnNext(clickedCardData))
+            .AddTo(_disposables);
+
         _cardViews.Add(cardView);
     }
     
@@ -113,5 +121,6 @@ public class CardLibraryView : MonoBehaviour
     private void OnDestroy()
     {
         _disposables?.Dispose();
+        _onCardClicked?.Dispose();
     }
 }
