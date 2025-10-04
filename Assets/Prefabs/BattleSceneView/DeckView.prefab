@@ -873,7 +873,7 @@ MonoBehaviour:
   closeButton: {fileID: 6806473404806937252}
   scrollRect: {fileID: 342908872033609423}
   contentContainer: {fileID: 7472949856167710533}
-  cardPrefab: {fileID: 222389743591641200, guid: 2b4e137523755496d95da1b089d11431, type: 3}
+  cardPrefab: {fileID: 1019977483416546224, guid: 4bcef9ab048c64ec1b0422b435240502, type: 3}
   totalCardsText: {fileID: 3745893969117355878}
   activeCardsText: {fileID: 5400033278086803300}
   collapsedCardsText: {fileID: 4805688459166434173}

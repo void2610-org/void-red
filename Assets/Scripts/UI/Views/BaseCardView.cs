@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Coffee.UIEffects;
 
 /// <summary>
 /// CardView と DeckCardView の共通基底クラス
@@ -13,6 +14,8 @@ public abstract class BaseCardView : MonoBehaviour
     protected abstract TextMeshProUGUI CardNameText { get; }
     protected abstract Image CardBanner { get; }
     protected abstract Image CardFrame { get; }
+    protected abstract UIEffect BackUIEffect { get; }
+    protected abstract UIEffect EdgeUIEffect { get; }
 
     // CardData取得メソッド（各サブクラスで実装）
     protected abstract CardData GetCardData();

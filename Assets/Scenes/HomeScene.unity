@@ -2470,10 +2470,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3281456432169995484, guid: 8d023df5fdb7e4b0cb851cf977fbcaa4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8451384843221407306, guid: 8d023df5fdb7e4b0cb851cf977fbcaa4, type: 3}
       propertyPath: m_Name
       value: CardLibraryView
