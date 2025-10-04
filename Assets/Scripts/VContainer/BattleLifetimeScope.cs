@@ -43,6 +43,6 @@ public class BattleLifetimeScope : LifetimeScope
         
         builder.RegisterEntryPoint<UIPresenter>().AsSelf();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
-        builder.RegisterEntryPoint<GameManager>();
+        builder.RegisterEntryPoint<BattlePresenter>();
     }
 }
