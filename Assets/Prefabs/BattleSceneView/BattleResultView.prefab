@@ -345,6 +345,7 @@ MonoBehaviour:
   panel: {fileID: 3452198864497732248}
   resultText: {fileID: 7511352069240582350}
   scoreText: {fileID: 8399734459124903749}
+  acquiredMemoryText: {fileID: 493879848852773429}
   homeButton: {fileID: 3009815427528057457}
 --- !u!1 &5412691077503837370
 GameObject:
@@ -380,7 +381,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -5}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 400, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5793723651776246132
@@ -411,7 +412,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: AcquiredMemory
+  m_text: "\u7372\u5F97\u3057\u305F\u8A18\u61B6"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
   m_sharedMaterial: {fileID: 1947302341603136683, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}

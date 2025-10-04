@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +15,8 @@ public class BattleResultView : MonoBehaviour
 {
     [SerializeField] private GameObject panel;
     [SerializeField] private TextMeshProUGUI resultText;
-    [SerializeField] private TextMeshProUGUI scoreText; 
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI acquiredMemoryText;
     [SerializeField] private Button homeButton;
 
     /// <summary>
@@ -22,15 +25,27 @@ public class BattleResultView : MonoBehaviour
     /// <param name="playerWon">プレイヤーが勝利したかどうか</param>
     /// <param name="playerWins">プレイヤーの勝利数</param>
     /// <param name="enemyWins">敵の勝利数</param>
-    public async UniTask ShowAndWaitBattleResult(bool playerWon, int playerWins, int enemyWins)
+    /// <param name="wonThemes">勝利したテーマのリスト</param>
+    public async UniTask ShowAndWaitBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes)
     {
-        // テキストと色を設定
+        // テキストを設定
         resultText.text = playerWon ? "勝利！" : "敗北...";
         scoreText.text = $"{playerWins} - {enemyWins}";
-        
+
+        // 勝利したテーマを表示
+        if (wonThemes.Count > 0)
+        {
+            var themeNames = string.Join("\n", wonThemes.Select(t => $"・{t.Title}"));
+            acquiredMemoryText.text = themeNames;
+        }
+        else
+        {
+            acquiredMemoryText.text = "なし";
+        }
+
         panel.gameObject.SetActive(true);
-		
-	await homeButton.OnClickAsync();
+
+        await homeButton.OnClickAsync();
     }
 
     /// <summary>
