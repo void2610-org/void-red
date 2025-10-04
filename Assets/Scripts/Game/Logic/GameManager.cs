@@ -666,24 +666,19 @@ public class GameManager: IStartable, IDisposable
     private async UniTask HandleBattleEndAsync()
     {
         _isProcessing = true;
-        
-        var battleResult = "";
-        if (_playerWins >= WINS_TO_VICTORY)
-            battleResult = $"バトルに勝利しました！ ({_playerWins}-{_enemyWins})";
-        else if (_enemyWins >= WINS_TO_VICTORY)
-            battleResult = $"バトルに敗北しました... ({_playerWins}-{_enemyWins})";
-        
-        await _uiPresenter.ShowAnnouncement(battleResult, 3f);
+
+        // バトル結果を判定
+        var playerWon = _playerWins >= WINS_TO_VICTORY;
+
+        // バトル結果画面を表示
+        await _uiPresenter.ShowAndWaitBattleResult(playerWon, _playerWins, _enemyWins);
         
         // 人格ログ: チャプター完了
         _personalityLogService.CompleteChapter();
         
         // 人格ログデータをGameProgressServiceに更新（セーブのため）
         _gameProgressService.UpdatePersonalityLogData(_personalityLogService.GetPersonalityLogData());
-        
-        // バトル結果をGameProgressServiceに報告してストーリー進行（セーブ前に実行）
-        var playerWon = _playerWins >= WINS_TO_VICTORY;
-        
+
         // プレイヤーのデッキ変更をセーブ（バトル終了時のみ）
         _player.SaveDeckChanges();
         
