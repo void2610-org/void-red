@@ -76,9 +76,6 @@ public class BattlePresenter: IStartable
         await _cardNarrationService.InitializeAsync();
         await UniTask.Delay(500);
         
-        // 敵の統計をリセット
-        _gameProgressService.ResetEnemyStats();
-        
         // 人格ログデータをセーブデータからロード
         _personalityLogService.SetPersonalityLogData(_gameProgressService.GetPersonalityLogData());
         
@@ -444,7 +441,6 @@ public class BattlePresenter: IStartable
         
         // ゲーム結果を統計に記録（進化チェック前に実行）
         _gameProgressService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
-        _gameProgressService.EnemyStats.RecordGameResult(!playerWon, _npcMove, _npcCollapse);
 
         // すべての場合で勝利数をカウントするように変更
         if (UpdateWinsAndCheckBattleEnd(playerWon))
@@ -508,26 +504,8 @@ public class BattlePresenter: IStartable
         }
         else
         {
-            // NPCカードの進化処理（InstanceIdを保持）
-            var selectedEnemyCard = _enemy.SelectedCard.CurrentValue;
-            if (selectedEnemyCard != null)
-            {
-                // 即時進化チェック
-                var npcCardAfterEvolution = _gameProgressService.EnemyStats.CheckCardEvolution(selectedEnemyCard.Data);
-                // 進化結果をアナウンス
-                if (npcCardAfterEvolution != selectedEnemyCard.Data)
-                {
-                    // カードを進化後のデータで置換（InstanceIdは保持）
-                    _enemy.ReplaceCard(selectedEnemyCard, npcCardAfterEvolution);
-                    
-                    // 人格ログ: NPCカード進化イベント記録
-                    _personalityLogService.LogCardEvolution("enemy", selectedEnemyCard.Data, npcCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"対戦相手の {selectedEnemyCard.Data.CardName} が {npcCardAfterEvolution.CardName} に変化");
-                }
-                
-                // カードをプレイ（崩壊しない）
-                _enemy.PlaySelectedCard(false);
-            }
+            // カードをプレイ（崩壊しない）
+            _enemy.PlaySelectedCard(false);
         }
         
         // カード使用後の処理完了を待つ
