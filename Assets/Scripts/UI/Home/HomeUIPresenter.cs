@@ -17,6 +17,7 @@ public class HomeUIPresenter : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button titleButton;
+    [SerializeField] private Button deckButton;
     [SerializeField] private Button libraryButton;
     [SerializeField] private Button storyButton;
     [SerializeField] private Button personButton;
@@ -52,6 +53,7 @@ public class HomeUIPresenter : MonoBehaviour
         settingsButton.OnClickAsObservable().Subscribe(_ => _settingsPresenter.ShowSettings()).AddTo(this);
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
+        deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
         libraryButton.OnClickAsObservable().Subscribe(_ => ShowCardLibrary()).AddTo(this);
         
         // ホームBGMを再生
