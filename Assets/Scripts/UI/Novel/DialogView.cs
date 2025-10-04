@@ -21,6 +21,7 @@ public class DialogView : MonoBehaviour
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
     [SerializeField] private Image backgroundImage;
+    [SerializeField] private AudioClip dialogSe;
     
     [Header("操作ボタン")]
     [SerializeField] private Button autoButton;
@@ -44,11 +45,12 @@ public class DialogView : MonoBehaviour
     private bool _isWaitingForNext;
     private bool _isAutoMode;
     private CancellationTokenSource _waitCancellationTokenSource;
+    private CancellationTokenSource _dialogSeCancellationTokenSource;
     private DialogData _currentDialogData;
-    
+
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
-    
+
     private string _currentImageName;
     private float _additionalWaitTime;
     
@@ -144,13 +146,22 @@ public class DialogView : MonoBehaviour
         // 文字送りアニメーションを開始
         _isTyping = true;
         _isWaitingForNext = false;
-        
+
         // 文字速度を決定
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
-        
+
+        _dialogSeCancellationTokenSource = new CancellationTokenSource();
+        PlayDialogSeLoop(0.08f, _dialogSeCancellationTokenSource.Token).Forget();
+
         await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
+
+        // dialogSeループを停止
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = null;
+
         await UniTask.Yield();
-        
+
         // アニメーション完了後の状態をリセット
         _isTyping = false;
         _isWaitingForNext = true;
@@ -361,6 +372,24 @@ public class DialogView : MonoBehaviour
     }
     
     /// <summary>
+    /// ダイアログSEをループ再生する
+    /// </summary>
+    /// <param name="interval">再生間隔（秒）</param>
+    /// <param name="cancellationToken">キャンセルトークン</param>
+    private async UniTaskVoid PlayDialogSeLoop(float interval, CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                SeManager.Instance.PlaySe(dialogSe, volume:0.3f, pitch: UnityEngine.Random.Range(0.95f, 1.05f));
+                await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: cancellationToken);
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    /// <summary>
     /// インジケーターを最後の文字の横に配置
     /// </summary>
     private void PositionIndicatorAtLastCharacter()
@@ -422,10 +451,13 @@ public class DialogView : MonoBehaviour
     private void OnDestroy()
     {
         CancelActiveMotions();
-        
+
         _waitCancellationTokenSource?.Cancel();
         _waitCancellationTokenSource?.Dispose();
-        
+
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+
         // R3のSubjectを解放
         _onDialogCompleted.Dispose();
         _onUserClickDetected.Dispose();
