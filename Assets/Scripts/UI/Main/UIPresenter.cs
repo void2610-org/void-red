@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
@@ -86,7 +87,7 @@ public class UIPresenter : IStartable, System.IDisposable
     
     public async UniTask ShowScores(float playerScore, float enemyScore) => await _scoreView.ShowScores(playerScore, enemyScore);
     public async UniTask ShowWinLoseResult(string result, bool isPlayerWin) => await _resultView.ShowWinLoseResult(result, isPlayerWin);
-    public async UniTask ShowAndWaitBattleResult(bool playerWon, int playerWins, int enemyWins) => await _battleResultView.ShowAndWaitBattleResult(playerWon, playerWins, enemyWins);
+    public async UniTask ShowAndWaitBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes) => await _battleResultView.ShowAndWaitBattleResult(playerWon, playerWins, enemyWins, wonThemes);
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
     public async UniTask StartTutorial() => await _tutorialPresenter.StartTutorial();

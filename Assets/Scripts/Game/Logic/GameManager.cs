@@ -30,11 +30,14 @@ public class GameManager: IStartable, IDisposable
     private int _playerWins;
     private int _enemyWins;
     private const int WINS_TO_VICTORY = 3;
-    
+
+    // 勝利したテーマの記録
+    private readonly List<ThemeData> _wonThemes = new();
+
     // 崩壊判定用メンバー変数
     private bool _playerCollapse;
     private bool _npcCollapse;
-    
+
     // 現在の敵データ
     private EnemyData _currentEnemyData;
 
@@ -492,6 +495,12 @@ public class GameManager: IStartable, IDisposable
         await _uiPresenter.ShowWinLoseResult(result, playerWon);
         await UniTask.Delay(500);
         await _uiPresenter.HideBlackOverlay();
+
+        // プレイヤー勝利時は現在のテーマを記録
+        if (playerWon && currentTheme != null)
+        {
+            _wonThemes.Add(currentTheme);
+        }
         
         // 勝敗確定後のナレーション（プレイヤーの勝敗に基づく）
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
@@ -670,8 +679,8 @@ public class GameManager: IStartable, IDisposable
         // バトル結果を判定
         var playerWon = _playerWins >= WINS_TO_VICTORY;
 
-        // バトル結果画面を表示
-        await _uiPresenter.ShowAndWaitBattleResult(playerWon, _playerWins, _enemyWins);
+        // バトル結果画面を表示（勝利したテーマリストを渡す）
+        await _uiPresenter.ShowAndWaitBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
         
         // 人格ログ: チャプター完了
         _personalityLogService.CompleteChapter();
@@ -712,6 +721,7 @@ public class GameManager: IStartable, IDisposable
     {
         _playerWins = 0;
         _enemyWins = 0;
+        _wonThemes.Clear();
     }
     
     /// <summary>
