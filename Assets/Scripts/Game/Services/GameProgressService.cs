@@ -30,6 +30,9 @@ public class GameProgressService
     // 閲覧済みカード
     private readonly HashSet<string> _viewedCardIds = new();
     
+    // ノベル選択結果
+    private readonly List<NovelChoiceResult> _novelChoiceResults = new();
+    
     private readonly SaveDataManager _saveDataManager;
     private readonly CardPoolService _cardPoolService;
     
@@ -76,6 +79,10 @@ public class GameProgressService
             _viewedCardIds.Add(id);
         }
         
+        // ノベル選択結果をメモリにロード
+        _novelChoiceResults.Clear();
+        _novelChoiceResults.AddRange(loadedData.GetAllChoiceResults());
+        
         // 新規データかどうかを判定（Step0かつ結果が0件の場合）
         var isNewData = _currentStep == 0 && _results.Count == 0;
         var dataType = isNewData ? "新規データ" : "既存データ";
@@ -113,6 +120,9 @@ public class GameProgressService
         
         // 人格ログをリセット
         _personalityLogData = new PersonalityLogData();
+        
+        // ノベル選択結果をリセット
+        _novelChoiceResults.Clear();
         
         // リセット後に即座にセーブファイルに反映
         SaveAndPersist();
@@ -201,6 +211,22 @@ public class GameProgressService
     }
     
     /// <summary>
+    /// ノベル選択結果を記録してセーブ
+    /// </summary>
+    /// <param name="scenarioId">シナリオID</param>
+    /// <param name="choiceIndex">選択肢番号</param>
+    /// <param name="selectedOptionIndex">選択された選択肢のインデックス</param>
+    public void RecordNovelChoiceAndSave(string scenarioId, int choiceIndex, int selectedOptionIndex)
+    {
+        var choiceResult = new NovelChoiceResult(scenarioId, choiceIndex, selectedOptionIndex);
+        _novelChoiceResults.Add(choiceResult);
+        
+        Debug.Log($"[GameProgressService] 選択結果を記録: {choiceResult}");
+        
+        SaveAndPersist();
+    }
+    
+    /// <summary>
     /// ゲーム進行状態をセーブ（全サービス統合）
     /// </summary>
     private void SaveAndPersist()
@@ -235,6 +261,12 @@ public class GameProgressService
         foreach (var cardId in _viewedCardIds)
         {
             saveData.RecordCardView(cardId);
+        }
+        
+        // ノベル選択結果をセーブデータに追加
+        foreach (var choiceResult in _novelChoiceResults)
+        {
+            saveData.AddNovelChoiceResult(choiceResult);
         }
         
         return saveData;
@@ -340,6 +372,25 @@ public class GameProgressService
     public HashSet<string> GetViewedCardIds()
     {
         return new HashSet<string>(_viewedCardIds);
+    }
+    
+    /// <summary>
+    /// 特定のシナリオの選択結果を取得
+    /// </summary>
+    /// <param name="scenarioId">シナリオID</param>
+    /// <returns>該当する選択結果のリスト</returns>
+    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
+    {
+        return _novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
+    }
+    
+    /// <summary>
+    /// 全ての選択結果を取得
+    /// </summary>
+    /// <returns>全選択結果のリスト</returns>
+    public List<NovelChoiceResult> GetAllNovelChoiceResults()
+    {
+        return new List<NovelChoiceResult>(_novelChoiceResults);
     }
     
     /// <summary>
