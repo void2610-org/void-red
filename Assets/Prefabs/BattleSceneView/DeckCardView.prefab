@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4779874160718359984, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+      propertyPath: m_Transition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779874160718359984, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+      propertyPath: m_TargetGraphic
+      value: 
+      objectReference: {fileID: 31008625205435812}
     - target: {fileID: 6875814594121904464, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

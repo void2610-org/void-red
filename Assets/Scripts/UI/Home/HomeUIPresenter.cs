@@ -24,6 +24,7 @@ public class HomeUIPresenter : MonoBehaviour
     [SerializeField] private Button dreamButton;
     [SerializeField] private DeckView deckView;
     [SerializeField] private CardLibraryView cardLibraryView;
+    [SerializeField] private CardDetailView cardDetailView;
     [SerializeField] private TextMeshProUGUI speakingText;
     
     private GameProgressService _gameProgressService;
@@ -48,17 +49,22 @@ public class HomeUIPresenter : MonoBehaviour
         // 未実装のボタンを無効化
         personButton.interactable = false;
         dreamButton.interactable = false;
-        
+
         // ボタンイベントの設定
         settingsButton.OnClickAsObservable().Subscribe(_ => _settingsPresenter.ShowSettings()).AddTo(this);
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
         deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
         libraryButton.OnClickAsObservable().Subscribe(_ => ShowCardLibrary()).AddTo(this);
-        
+
+        // DeckViewのカードクリックイベントを購読
+        deckView.OnCardClicked
+            .Subscribe(cardData => cardDetailView.ShowCardDetail(cardData))
+            .AddTo(this);
+
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
-        
+
         InitSpeaking().Forget();
     }
 
