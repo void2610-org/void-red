@@ -53,11 +53,13 @@ public abstract class BaseCardView : MonoBehaviour
                 break;
 
             case CardDisplayState.Collapsed:
-                // 崩壊表示：グレーアウト
+                // 崩壊表示：グレーアウト, UIEffectを有効化
                 CardImage.color = cardData.CardImage ? new Color(0.5f, 0.5f, 0.5f, 0.7f) : Color.clear;
                 CardBanner.color = new Color(0.5f, 0.5f, 0.5f, 0.7f);
                 CardFrame.color = new Color(0.5f, 0.5f, 0.5f, 0.7f);
                 CardNameText.color = cardData.IsTextColorBlack ? new Color(0.2f, 0.2f, 0.2f, 1f) : new Color(0.7f, 0.7f, 0.7f, 1f);
+                BackUIEffect.transitionColor = GetCardData().Color * 1.5f;
+                BackUIEffect.transitionRate = 0.95f;
                 break;
 
             case CardDisplayState.Backside:
