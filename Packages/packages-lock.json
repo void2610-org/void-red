@@ -50,13 +50,6 @@
       "dependencies": {},
       "hash": "f789083c31250c83082da9b29be0c976152d699b"
     },
-    "com.marijnzwemmer.unity-toolbar-extender": {
-      "version": "https://github.com/marijnz/unity-toolbar-extender.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "dbd76ed996483d219c39d240f785b1790aa039ed"
-    },
     "com.rlabrecque.steamworks.net": {
       "version": "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2025.162.1",
       "depth": 0,
@@ -450,6 +443,13 @@
         "com.unity.inputsystem": "1.5.0"
       },
       "hash": "2a6575ec7c077bf6748609c7ba0dbe72549b50fa"
+    },
+    "com.yujiap.unity-toolbar-extension": {
+      "version": "https://github.com/Yusuke57/UnityToolbarExtension.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "4a8cec6d056e7673ce19d892d2bee1129ad33044"
     },
     "jp.hadashikick.vcontainer": {
       "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer",
