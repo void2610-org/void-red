@@ -59,12 +59,12 @@ public class HomeUIPresenter : MonoBehaviour
 
         // DeckViewのカードクリックイベントを購読
         deckView.OnCardClicked
-            .Subscribe(cardData => cardDetailView.ShowCardDetail(cardData))
+            .Subscribe(cardData => cardDetailView.ShowCardDetail(cardData, false))
             .AddTo(this);
 
         // CardLibraryViewのカードクリックイベントを購読
         cardLibraryView.OnCardClicked
-            .Subscribe(cardData => cardDetailView.ShowCardDetail(cardData))
+            .Subscribe(cardData => cardDetailView.ShowCardDetail(cardData, false))
             .AddTo(this);
 
         // ホームBGMを再生
