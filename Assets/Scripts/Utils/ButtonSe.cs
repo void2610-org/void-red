@@ -19,6 +19,7 @@ namespace Void2610.UnityTemplate
         
         [Header("ピッチランダム化")]
         [SerializeField] private bool randomizePitch = true;
+        [SerializeField] private bool isOnlyRandomizeOnHover = false; // ホバー音のみランダム化
         [SerializeField] private float minPitch = 0.9f;
         [SerializeField] private float maxPitch = 1.1f;
         
@@ -43,12 +44,12 @@ namespace Void2610.UnityTemplate
         {
             // ボタンが無効またはクールダウン中の場合は再生しない
             if ((_button && !_button.interactable) || 
-                Time.time - _lastHoverTime < hoverCooldown ||
+                Time.unscaledTime - _lastHoverTime < hoverCooldown ||
                 !hoverSe) 
                 return;
             
-            _lastHoverTime = Time.time;
-            PlaySound(hoverSe, hoverVolume);
+            _lastHoverTime = Time.unscaledTime;
+            PlaySound(hoverSe, hoverVolume, randomizePitch);
         }
         
         /// <summary>
@@ -59,18 +60,18 @@ namespace Void2610.UnityTemplate
             if ((_button && !_button.interactable) || clickSe == null) 
                 return;
             
-            PlaySound(clickSe, clickVolume);
+            PlaySound(clickSe, clickVolume, randomizePitch && isOnlyRandomizeOnHover);
         }
         
         /// <summary>
         /// 効果音を再生する汎用メソッド（SeManager統合版）
         /// </summary>
-        private void PlaySound(AudioClip clip, float volume)
+        private void PlaySound(AudioClip clip, float volume, bool isRandomPitch)
         {
             if (!clip) return;
             
             // ピッチの計算
-            var pitch = randomizePitch ? Random.Range(minPitch, maxPitch) : 1.0f;
+            var pitch = isRandomPitch ? Random.Range(minPitch, maxPitch) : 1.0f;
             
             // SeManagerを使用して再生
             SeManager.Instance.PlaySe(clip, volume, pitch, important: isImportantButton);
@@ -91,7 +92,7 @@ namespace Void2610.UnityTemplate
         /// </summary>
         public void OnSelect(BaseEventData eventData)
         {
-            PlayHoverSound();
+            // PlayHoverSound();
         }
         
         /// <summary>

@@ -1,64 +1,119 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Coffee.UIEffects;
+using R3;
+
+/// <summary>
+/// カードの表示状態
+/// </summary>
+public enum CardDisplayState
+{
+    Normal,    // 通常状態
+    Veiled,    // 隠されている状態
+    Collapsed, // 崩壊状態
+    Backside   // 裏面状態
+}
 
 /// <summary>
 /// デッキ表示専用の簡易カードViewクラス
 /// CardViewのサブセットで表示のみを担当
 /// </summary>
-public class DeckCardView : MonoBehaviour
+public class DeckCardView : BaseCardView
 {
     [Header("UIコンポーネント")]
+    [SerializeField] private Button cardButton;
     [SerializeField] private Image cardImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image cardTextBanner;
     [SerializeField] private Image cardFrame;
-    
+    [SerializeField] private UIEffect backUIEffect;
+    [SerializeField] private UIEffect edgeUIEffect;
+
     [Header("色設定")]
     [SerializeField] private Color activeColor = Color.white;
     [SerializeField] private Color collapsedColor = new(0.5f, 0.5f, 0.5f, 0.7f);
-    [SerializeField] private Color unviewedColor = new(0.2f, 0.2f, 0.2f, 0.9f);
-    
+    [SerializeField] private Color veiledColor = new(0.2f, 0.2f, 0.2f, 0.9f);
+
     public CardModel CardModel { get; private set; }
+    public Observable<CardData> OnCardClicked => _onCardClicked;
+
+    // BaseCardView 抽象プロパティの実装
+    protected override Image CardImage => cardImage;
+    protected override TextMeshProUGUI CardNameText => cardNameText;
+    protected override Image CardBanner => cardTextBanner;
+    protected override Image CardFrame => cardFrame;
+    protected override UIEffect BackUIEffect => backUIEffect;
+    protected override UIEffect EdgeUIEffect => edgeUIEffect;
+    protected override CardData GetCardData() => CardModel?.Data;
+
+    private readonly Subject<CardData> _onCardClicked = new();
 
     /// <summary>
     /// カードモデルを設定して表示を更新
     /// </summary>
     /// <param name="cardModel">表示するカードモデル</param>
-    /// <param name="isVeiled">カードが隠されているか</param>
-    public void Initialize(CardModel cardModel, bool isVeiled = false)
+    /// <param name="displayState">カードの表示状態</param>
+    public void Initialize(CardModel cardModel, CardDisplayState displayState = CardDisplayState.Normal)
     {
         CardModel = cardModel;
-        UpdateDisplay(isVeiled || CardModel.IsCollapsed);
+        UpdateDisplay(displayState);
     }
-    
+
     /// <summary>
     /// 表示を更新
     /// </summary>
-    private void UpdateDisplay(bool isVeiled)
+    private void UpdateDisplay(CardDisplayState displayState)
     {
-        if (!CardModel?.Data) return;
-        
-        // カード画像と名前を設定
-        cardImage.sprite = CardModel.Data.CardImage;
-        cardImage.color = CardModel.Data.CardImage ? Color.white : Color.clear;
-        cardNameText.text = CardModel.Data.CardName;
-        cardNameText.color = CardModel.Data.IsTextColorBlack ? Color.black : Color.white;
-        
-        // バナーとフレームの色をカードの色に設定
-        cardTextBanner.color = CardModel.Data.Color;
-        cardFrame.color = CardModel.Data.Color;
+        // 基底クラスの共通表示ロジックを呼び出し
+        UpdateCardDisplay(displayState);
 
-        // 未閲覧カード：黒く暗い表示
-        if (isVeiled)
+        // DeckCardView固有の backgroundImage の色設定
+        switch (displayState)
         {
-            backgroundImage.color = unviewedColor;
-            cardImage.color = CardModel.Data.CardImage ? new Color(0.2f, 0.2f, 0.2f, 1f) : Color.clear;
-            cardTextBanner.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-            cardNameText.color = Color.black;
-            cardFrame.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-            cardNameText.text = "???";
+            case CardDisplayState.Normal:
+                backgroundImage.color = activeColor;
+                break;
+
+            case CardDisplayState.Veiled:
+                backgroundImage.color = veiledColor;
+                break;
+
+            case CardDisplayState.Collapsed:
+                backgroundImage.color = collapsedColor;
+                break;
+
+            case CardDisplayState.Backside:
+                backgroundImage.color = Color.clear;
+                break;
         }
+    }
+
+    private void Awake()
+    {
+        // カードボタンのクリックイベントを購読
+        if (cardButton)
+        {
+            cardButton.OnClickAsObservable()
+                .Subscribe(_ => OnCardButtonClicked())
+                .AddTo(this);
+        }
+    }
+
+    /// <summary>
+    /// カードボタンがクリックされた時の処理
+    /// </summary>
+    private void OnCardButtonClicked()
+    {
+        if (CardModel?.Data)
+        {
+            _onCardClicked.OnNext(CardModel.Data);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        _onCardClicked?.Dispose();
     }
 }

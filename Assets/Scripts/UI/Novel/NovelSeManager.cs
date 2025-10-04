@@ -46,9 +46,11 @@ public class NovelSeManager : MonoBehaviour
     /// <returns>再生時間（秒）</returns>
     public float PlaySe(string seName, float volume = 1.0f, float pitch = -1.0f)
     {
+        if (!_seAudioSource) return 0f;
+
         var data = soundData.FirstOrDefault(t => t.name == seName);
-        
-        if (data == null) 
+
+        if (data == null)
         {
             Debug.LogWarning($"SE '{seName}' が見つかりません。");
             return 0f;
@@ -56,7 +58,7 @@ public class NovelSeManager : MonoBehaviour
 
         _seAudioSource.clip = data.audioClip;
         _seAudioSource.volume = data.volume * volume;
-        
+
         // ピッチがマイナスの場合はランダム化
         _seAudioSource.pitch = pitch < 0.0f ? Random.Range(0.8f, 1.2f) : pitch;
         _seAudioSource.Play();
@@ -78,7 +80,7 @@ public class NovelSeManager : MonoBehaviour
     
     public void StopSe()
     {
-        if (_seAudioSource.isPlaying)
+        if (_seAudioSource && _seAudioSource.isPlaying)
             _seAudioSource.Stop();
     }
 

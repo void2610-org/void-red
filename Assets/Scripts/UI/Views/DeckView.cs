@@ -28,10 +28,13 @@ public class DeckView : MonoBehaviour
     [SerializeField] private Button showActiveButton; 
     [SerializeField] private Button showCollapsedButton;
     
+    public Observable<CardData> OnCardClicked => _onCardClicked;
+
     private readonly List<DeckCardView> _cardViews = new();
     private readonly CompositeDisposable _disposables = new();
     private DeckDisplayMode _currentMode = DeckDisplayMode.All;
-    
+    private readonly Subject<CardData> _onCardClicked = new();
+
     // CardModelリストを保持
     private List<CardModel> _cardModels;
     
@@ -111,7 +114,13 @@ public class DeckView : MonoBehaviour
     private void CreateCardView(CardModel cardModel)
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
-        cardView.Initialize(cardModel);
+        cardView.Initialize(cardModel, cardModel.IsCollapsed ? CardDisplayState.Collapsed : CardDisplayState.Normal);
+
+        // カードクリックイベントを購読
+        cardView.OnCardClicked
+            .Subscribe(cardData => _onCardClicked.OnNext(cardData))
+            .AddTo(_disposables);
+
         _cardViews.Add(cardView);
     }
     
@@ -179,5 +188,6 @@ public class DeckView : MonoBehaviour
     private void OnDestroy()
     {
         _disposables?.Dispose();
+        _onCardClicked?.Dispose();
     }
 }
