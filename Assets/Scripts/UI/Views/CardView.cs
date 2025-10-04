@@ -11,7 +11,7 @@ using Void2610.UnityTemplate;
 /// カードの表示と基本的なロジックを担当するViewクラス
 /// 元のCard.csをベースに選択機能とアニメーション機能を追加した簡略化されたMVPパターン
 /// </summary>
-public class CardView : MonoBehaviour
+public class CardView : BaseCardView
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
@@ -22,15 +22,22 @@ public class CardView : MonoBehaviour
     [SerializeField] private Button cardButton;
     [SerializeField] private UIEffect backUIEffect;
     [SerializeField] private UIEffect edgeUIEffect;
-    
+
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked => _onClicked;
-    
+
+    // BaseCardView 抽象プロパティの実装
+    protected override Image CardImage => cardImage;
+    protected override TextMeshProUGUI CardNameText => cardNameText;
+    protected override Image CardBanner => cardNameBanner;
+    protected override Image CardFrame => cardFrame;
+    protected override CardData GetCardData() => CardData;
+
     private readonly Subject<CardView> _onClicked = new();
     private Vector2 _originalPosition;
     private RectTransform _rectTransform;
-    private bool _isBackside = false;
-    
+    private CardDisplayState _displayState = CardDisplayState.Normal;
+
     // Tween管理用
     private MotionHandle _backTransitionTween;
     private MotionHandle _edgeColorTween;
@@ -40,12 +47,9 @@ public class CardView : MonoBehaviour
 
     public void SetToBackside(Sprite cardBackSprite)
     {
-        _isBackside = true;
+        _displayState = CardDisplayState.Backside;
         cardBackImage.sprite = cardBackSprite;
-        cardFrame.color = Color.clear;
-        cardNameBanner.color = Color.clear;
-        cardImage.color = Color.clear;
-        cardNameText.text = string.Empty;
+        UpdateCardDisplay(_displayState);
     }
 
     /// <summary>
@@ -194,7 +198,7 @@ public class CardView : MonoBehaviour
     /// <param name="themeMatchRate">テーマ合致率（0.0～1.0）</param>
     public void UpdateCollapseVisual(float collapseChance, float themeMatchRate)
     {
-        if (!CardData || _isBackside) return;
+        if (!CardData || _displayState == CardDisplayState.Backside) return;
         
         // 既存のTweenをキャンセル
         if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
@@ -218,7 +222,7 @@ public class CardView : MonoBehaviour
     /// </summary>
     public void ResetCollapseVisual()
     {
-        if (!CardData || _isBackside) return;
+        if (!CardData || _displayState == CardDisplayState.Backside) return;
         
         // 既存のTweenをキャンセル
         if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
@@ -240,22 +244,15 @@ public class CardView : MonoBehaviour
     private void UpdateDisplay()
     {
         if (!CardData) return;
-        if (_isBackside) return;
-        
-        // カード名を設定
-        cardNameText.text = CardData.CardName;
-        cardNameText.color = CardData.IsTextColorBlack ? Color.black : Color.white;
-        
-        // カード画像を設定
-        if (CardData.CardImage)
-            cardImage.sprite = CardData.CardImage;
-        else
-            cardImage.color = Color.clear;
-        
-        // バナーとフレームの色をCardDataの色に設定
-        cardNameBanner.color = CardData.Color;
-        cardFrame.color = CardData.Color;
-        backUIEffect.transitionColor = CardData.Color * 1.5f;
+
+        // 基底クラスの共通表示ロジックを呼び出し
+        UpdateCardDisplay(_displayState);
+
+        // CardView固有の処理：backUIEffect の色設定
+        if (_displayState != CardDisplayState.Backside)
+        {
+            backUIEffect.transitionColor = CardData.Color * 1.5f;
+        }
     }
     
     /// <summary>
