@@ -10,14 +10,15 @@ public enum CardDisplayState
 {
     Normal,    // 通常状態
     Veiled,    // 隠されている状態
-    Collapsed  // 崩壊状態
+    Collapsed, // 崩壊状態
+    Backside   // 裏面状態
 }
 
 /// <summary>
 /// デッキ表示専用の簡易カードViewクラス
 /// CardViewのサブセットで表示のみを担当
 /// </summary>
-public class DeckCardView : MonoBehaviour
+public class DeckCardView : BaseCardView
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
@@ -33,6 +34,13 @@ public class DeckCardView : MonoBehaviour
     [SerializeField] private Color veiledColor = new(0.2f, 0.2f, 0.2f, 0.9f);
 
     public CardModel CardModel { get; private set; }
+
+    // BaseCardView 抽象プロパティの実装
+    protected override Image CardImage => cardImage;
+    protected override TextMeshProUGUI CardNameText => cardNameText;
+    protected override Image CardBanner => cardTextBanner;
+    protected override Image CardFrame => cardFrame;
+    protected override CardData GetCardData() => CardModel?.Data;
 
     /// <summary>
     /// カードモデルを設定して表示を更新
@@ -50,40 +58,26 @@ public class DeckCardView : MonoBehaviour
     /// </summary>
     private void UpdateDisplay(CardDisplayState displayState)
     {
-        if (!CardModel?.Data) return;
+        // 基底クラスの共通表示ロジックを呼び出し
+        UpdateCardDisplay(displayState);
 
-        // カード画像と名前を設定
-        cardImage.sprite = CardModel.Data.CardImage;
-        cardNameText.text = CardModel.Data.CardName;
-
+        // DeckCardView固有の backgroundImage の色設定
         switch (displayState)
         {
             case CardDisplayState.Normal:
-                // 通常表示
                 backgroundImage.color = activeColor;
-                cardImage.color = CardModel.Data.CardImage ? Color.white : Color.clear;
-                cardTextBanner.color = CardModel.Data.Color;
-                cardFrame.color = CardModel.Data.Color;
-                cardNameText.color = CardModel.Data.IsTextColorBlack ? Color.black : Color.white;
                 break;
 
             case CardDisplayState.Veiled:
-                // 隠されている表示：黒く暗い表示
                 backgroundImage.color = veiledColor;
-                cardImage.color = CardModel.Data.CardImage ? new Color(0.2f, 0.2f, 0.2f, 1f) : Color.clear;
-                cardTextBanner.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-                cardFrame.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-                cardNameText.color = Color.black;
-                cardNameText.text = "???";
                 break;
 
             case CardDisplayState.Collapsed:
-                // 崩壊表示：グレーアウト
                 backgroundImage.color = collapsedColor;
-                cardImage.color = CardModel.Data.CardImage ? new Color(0.5f, 0.5f, 0.5f, 0.7f) : Color.clear;
-                cardTextBanner.color = new Color(0.5f, 0.5f, 0.5f, 0.7f);
-                cardFrame.color = new Color(0.5f, 0.5f, 0.5f, 0.7f);
-                cardNameText.color = CardModel.Data.IsTextColorBlack ? new Color(0.2f, 0.2f, 0.2f, 1f) : new Color(0.7f, 0.7f, 0.7f, 1f);
+                break;
+
+            case CardDisplayState.Backside:
+                backgroundImage.color = Color.clear;
                 break;
         }
     }
