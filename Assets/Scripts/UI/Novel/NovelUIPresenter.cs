@@ -27,9 +27,9 @@ public class NovelUIPresenter : IStartable
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
-    private bool _isShowingItemGetEffect;
     private bool _isShowingChoiceEffect;
     private int _choiceCounter;
+    private string _currentScenarioId;
     private readonly CompositeDisposable _disposables = new();
     
     public NovelUIPresenter(bool useLocalExcel)
@@ -81,11 +81,11 @@ public class NovelUIPresenter : IStartable
         var seSetting = _settingsManager.GetSetting<SliderSetting>("SE音量");
         _novelSeManager.SeVolume = seSetting.CurrentValue;
 
-        var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
-        Debug.Log($"[NovelUIPresenter] シナリオ開始: {scenarioId}");
+        _currentScenarioId = _gameProgressService.GetCurrentNode().NodeId;
+        Debug.Log($"[NovelUIPresenter] シナリオ開始: {_currentScenarioId}");
 
         // Excel/スプレッドシートからシナリオを読み込み
-        await StartScenario(scenarioId);
+        await StartScenario(_currentScenarioId);
     }
     
     /// <summary>
@@ -236,8 +236,7 @@ public class NovelUIPresenter : IStartable
         var selectedIndex = await _choiceView.ShowChoice(choiceData);
         
         // 選択結果をGameProgressServiceに記録
-        var scenarioId = _gameProgressService.GetCurrentNode().NodeId;
-        _gameProgressService.RecordNovelChoiceAndSave(scenarioId, _choiceCounter, selectedIndex);
+        _gameProgressService.RecordNovelChoiceAndSave(_currentScenarioId, _choiceCounter, selectedIndex);
         
         // 選択肢番号をインクリメント
         _choiceCounter++;
