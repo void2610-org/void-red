@@ -27,7 +27,6 @@ public class NovelUIPresenter : IStartable
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
-    private bool _isShowingChoiceEffect;
     private int _choiceCounter;
     private string _currentScenarioId;
     private readonly CompositeDisposable _disposables = new();
@@ -228,8 +227,6 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
-        _isShowingChoiceEffect = true;
-        
         _dialogView.SetInteractable(false);
         
         // 選択肢を表示して結果を取得
@@ -245,8 +242,6 @@ public class NovelUIPresenter : IStartable
         Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
         
         _dialogView.SetInteractable(true);
-        
-        _isShowingChoiceEffect = false;
     }
     
     /// <summary>
