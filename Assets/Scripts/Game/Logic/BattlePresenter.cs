@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using VContainer.Unity;
 using UnityEngine;
 
-public class GameManager: IStartable, IDisposable
+public class BattlePresenter: IStartable, IDisposable
 {
     private readonly CardPoolService _cardPoolService;
     private readonly UIPresenter _uiPresenter;
@@ -41,7 +41,7 @@ public class GameManager: IStartable, IDisposable
     /// <summary>
     /// コンストラクタ（依存性注入）
     /// </summary>
-    public GameManager(
+    public BattlePresenter(
         CardPoolService cardPoolService,
         UIPresenter uiPresenter,
         Player player,
