@@ -195,10 +195,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverSe: {fileID: 8300000, guid: 0523a9b80961b4235947ab2c1b4e918f, type: 3}
-  hoverVolume: 0.15
+  hoverVolume: 0.1
   clickSe: {fileID: 8300000, guid: 3201935c4382f4b48b1361533e6f0015, type: 3}
   clickVolume: 0.5
   randomizePitch: 0
+  isOnlyRandomizeOnHover: 0
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1

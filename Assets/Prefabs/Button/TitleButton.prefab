@@ -136,11 +136,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoverSe: {fileID: 0}
-  hoverVolume: 1
+  hoverSe: {fileID: 8300000, guid: 0523a9b80961b4235947ab2c1b4e918f, type: 3}
+  hoverVolume: 0.1
   clickSe: {fileID: 8300000, guid: 8da87a6ab6429438a849c7dc8a3006bc, type: 3}
   clickVolume: 1
-  randomizePitch: 1
+  randomizePitch: 0
+  isOnlyRandomizeOnHover: 0
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
@@ -158,10 +159,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   glowImage: {fileID: 5415802268992503101}
-  fadeInDuration: 0.3
-  fadeOutDuration: 0.15
-  fadeInEase: 8
-  fadeOutEase: 8
 --- !u!1 &4537349981176782011
 GameObject:
   m_ObjectHideFlags: 0
