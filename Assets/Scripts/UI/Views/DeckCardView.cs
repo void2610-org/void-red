@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Coffee.UIEffects;
+using R3;
 
 /// <summary>
 /// カードの表示状態
@@ -36,6 +37,7 @@ public class DeckCardView : BaseCardView
     [SerializeField] private Color veiledColor = new(0.2f, 0.2f, 0.2f, 0.9f);
 
     public CardModel CardModel { get; private set; }
+    public Observable<CardData> OnCardClicked => _onCardClicked;
 
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
@@ -45,6 +47,8 @@ public class DeckCardView : BaseCardView
     protected override UIEffect BackUIEffect => backUIEffect;
     protected override UIEffect EdgeUIEffect => edgeUIEffect;
     protected override CardData GetCardData() => CardModel?.Data;
+
+    private readonly Subject<CardData> _onCardClicked = new();
 
     /// <summary>
     /// カードモデルを設定して表示を更新
@@ -84,5 +88,32 @@ public class DeckCardView : BaseCardView
                 backgroundImage.color = Color.clear;
                 break;
         }
+    }
+
+    private void Awake()
+    {
+        // カードボタンのクリックイベントを購読
+        if (cardButton)
+        {
+            cardButton.OnClickAsObservable()
+                .Subscribe(_ => OnCardButtonClicked())
+                .AddTo(this);
+        }
+    }
+
+    /// <summary>
+    /// カードボタンがクリックされた時の処理
+    /// </summary>
+    private void OnCardButtonClicked()
+    {
+        if (CardModel?.Data)
+        {
+            _onCardClicked.OnNext(CardModel.Data);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        _onCardClicked?.Dispose();
     }
 }
