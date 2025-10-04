@@ -111,7 +111,7 @@ public class DeckView : MonoBehaviour
     private void CreateCardView(CardModel cardModel)
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
-        cardView.Initialize(cardModel);
+        cardView.Initialize(cardModel, cardModel.IsCollapsed ? CardDisplayState.Collapsed : CardDisplayState.Normal);
         _cardViews.Add(cardView);
     }
     
