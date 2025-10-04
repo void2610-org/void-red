@@ -44,11 +44,15 @@ public class GameSaveData
     [Header("カード閲覧履歴")]
     [SerializeField] private List<string> viewedCardIds = new();
     
+    [Header("ノベル選択結果")]
+    [SerializeField] private List<NovelChoiceResult> novelChoiceResults = new();
+    
     // プロパティ
     public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
     public EvolutionStatsData EvolutionStats => evolutionStats;
     public PersonalityLogData PersonalityLog => personalityLog;
+    public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
     
     /// <summary>
     /// デッキ情報を更新
@@ -139,10 +143,38 @@ public class GameSaveData
     }
     
     /// <summary>
+    /// ノベル選択結果を追加
+    /// </summary>
+    /// <param name="choiceResult">追加する選択結果</param>
+    public void AddNovelChoiceResult(NovelChoiceResult choiceResult)
+    {
+        novelChoiceResults.Add(choiceResult);
+    }
+    
+    /// <summary>
+    /// 特定のシナリオIDの選択結果を取得
+    /// </summary>
+    /// <param name="scenarioId">シナリオID</param>
+    /// <returns>該当する選択結果のリスト</returns>
+    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
+    {
+        return novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
+    }
+    
+    /// <summary>
+    /// 全ての選択結果を取得
+    /// </summary>
+    /// <returns>全選択結果のリスト</returns>
+    public List<NovelChoiceResult> GetAllChoiceResults()
+    {
+        return new List<NovelChoiceResult>(novelChoiceResults);
+    }
+    
+    /// <summary>
     /// デバッグ用情報文字列
     /// </summary>
     public string GetDebugInfo()
     {
-        return $"Step: {currentStep}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}";
+        return $"Step: {currentStep}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}";
     }
 }
