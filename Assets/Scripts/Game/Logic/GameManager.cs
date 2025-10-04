@@ -7,8 +7,6 @@ using UnityEngine;
 
 public class GameManager: IStartable, IDisposable
 {
-    public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
-    
     private readonly CardPoolService _cardPoolService;
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
@@ -23,7 +21,6 @@ public class GameManager: IStartable, IDisposable
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
-    private bool _isProcessing;
     private bool _isDisposed;
     
     // バトル勝利数管理
@@ -86,8 +83,6 @@ public class GameManager: IStartable, IDisposable
         await _cardNarrationService.InitializeAsync();
         await UniTask.Delay(500);
         
-        // バトル勝利数をリセット
-        ResetBattleWins();
         // 敵の統計をリセット
         _gameProgressService.ResetEnemyStats();
         
@@ -166,11 +161,10 @@ public class GameManager: IStartable, IDisposable
     {
         if (_isDisposed) return;
         
-        if (!TrySetReactiveProperty(_currentState, newState)) return;
+        _currentState.Value = newState;
         switch (newState)
         {
             case GameState.ThemeAnnouncement:
-                _isProcessing = false; // フラグリセット
                 _playerCollapse = false; // 崩壊フラグリセット
                 _npcCollapse = false; // 崩壊フラグリセット
                 // 敵をデフォルト立ち絵に戻す
@@ -178,24 +172,22 @@ public class GameManager: IStartable, IDisposable
                 HandleThemeAnnouncement();
                 break;
             case GameState.PlayerCardSelection:
-                _isProcessing = false; // フラグリセット
-                HandlePlayerCardSelection();
+                HandlePlayerCardSelection().Forget();
                 break;
             case GameState.EnemyCardSelection:
-                _isProcessing = false; // フラグリセット
-                HandleEnemyCardSelection();
+                HandleEnemyCardSelection().Forget();
                 break;
             case GameState.Evaluation:
-                HandleEvaluation();
+                HandleEvaluation().Forget();
                 break;
             case GameState.ResultDisplay:
-                HandleResultDisplay();
+                HandleResultDisplay().Forget();
                 break;
             case GameState.BattleEnd:
-                HandleBattleEnd();
+                HandleBattleEnd().Forget();
                 break;
             case GameState.GameOver:
-                HandleGameOver();
+                HandleGameOver().Forget();
                 break;
         }
     }
@@ -225,7 +217,7 @@ public class GameManager: IStartable, IDisposable
             newTheme = _currentEnemyData.MinorThemes[randomIndex];
         }
 
-        if (!TrySetReactiveProperty(_currentTheme, newTheme)) return;
+        _currentTheme.Value = newTheme;
 
         _uiPresenter.SetTheme(_currentTheme.Value);
 
@@ -263,16 +255,7 @@ public class GameManager: IStartable, IDisposable
     /// <summary>
     /// プレイヤーカード選択フェーズ
     /// </summary>
-    private void HandlePlayerCardSelection()
-    {
-        // プレイヤーの操作を待つ（カード選択とプレイボタン）
-        WaitForPlayerActionAsync().Forget();
-    }
-    
-    /// <summary>
-    /// プレイヤーのアクションを待つ
-    /// </summary>
-    private async UniTask WaitForPlayerActionAsync()
+    private async UniTask HandlePlayerCardSelection()
     {
         // カード選択を待つ
         while (true)
@@ -329,15 +312,7 @@ public class GameManager: IStartable, IDisposable
     /// <summary>
     /// 敵カード選択フェーズ
     /// </summary>
-    private void HandleEnemyCardSelection()
-    {
-        NpcThinkAndSelectAsync().Forget();
-    }
-    
-    /// <summary>
-    /// NPCの思考と選択
-    /// </summary>
-    private async UniTask NpcThinkAndSelectAsync()
+    private async UniTask HandleEnemyCardSelection()
     {
         // 思考時間を待つ（NPCが考えているように見せる）
         await UniTask.Delay(1000);
@@ -376,25 +351,14 @@ public class GameManager: IStartable, IDisposable
     /// <summary>
     /// 評価フェーズ
     /// </summary>
-    private void HandleEvaluation()
+    private async UniTask HandleEvaluation()
     {
-        if (_isProcessing) return; // 既に処理中の場合はスキップ
-        EvaluationAsync(_playerMove, _npcMove).Forget();
-    }
-    
-    /// <summary>
-    /// 評価処理
-    /// </summary>
-    private async UniTask EvaluationAsync(PlayerMove playerMove, PlayerMove npcMove)
-    {
-        _isProcessing = true; // 処理開始フラグ
-        
         // スコアを計算（テーマ倍率 × 精神ベット）
         var currentTheme = _currentTheme.CurrentValue;
         if (!currentTheme) return;
         
-        var playerScore = ScoreCalculator.CalculateScore(playerMove, currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(npcMove, currentTheme);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, currentTheme);
         
         // 評価結果をスコア専用Viewで同時表示
         await _uiPresenter.ShowScores(playerScore, npcScore);
@@ -425,26 +389,14 @@ public class GameManager: IStartable, IDisposable
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
-        _isProcessing = false; // フラグリセット
         ChangeState(GameState.ResultDisplay);
     }
     
     /// <summary>
     /// 勝敗表示フェーズ
     /// </summary>
-    private void HandleResultDisplay()
+    private async UniTask HandleResultDisplay()
     {
-        if (_isProcessing) return; // 既に処理中の場合はスキップ
-        ResultDisplayAsync().Forget();
-    }
-    
-    /// <summary>
-    /// 結果表示処理
-    /// </summary>
-    private async UniTask ResultDisplayAsync()
-    {
-        _isProcessing = true;
-        
         var currentTheme = _currentTheme.CurrentValue;
         
         var playerScore = ScoreCalculator.CalculateScore(_playerMove, currentTheme);
@@ -522,7 +474,6 @@ public class GameManager: IStartable, IDisposable
         if (UpdateWinsAndCheckBattleEnd(playerWon))
         {
             // 3勝に達した場合、カード処理をスキップしてバトル終了へ
-            _isProcessing = false;
             ChangeState(GameState.BattleEnd);
             return;
         }
@@ -619,8 +570,6 @@ public class GameManager: IStartable, IDisposable
         // 人格ログ: ターン終了
         _personalityLogService.EndTurn();
         
-        _isProcessing = false;
-        
         // ゲームオーバー条件をチェック
         ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement);
     }
@@ -663,19 +612,8 @@ public class GameManager: IStartable, IDisposable
     /// <summary>
     /// バトル終了フェーズ
     /// </summary>
-    private void HandleBattleEnd()
+    private async UniTask HandleBattleEnd()
     {
-        if (_isProcessing) return;
-        HandleBattleEndAsync().Forget();
-    }
-    
-    /// <summary>
-    /// バトル終了処理
-    /// </summary>
-    private async UniTask HandleBattleEndAsync()
-    {
-        _isProcessing = true;
-
         // バトル結果を判定
         var playerWon = _playerWins >= WINS_TO_VICTORY;
 
@@ -710,36 +648,13 @@ public class GameManager: IStartable, IDisposable
             var nextScene = _gameProgressService.GetNextSceneType();
             await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
         }
-        
-        _isProcessing = false;
-    }
-    
-    /// <summary>
-    /// バトル勝利数をリセット
-    /// </summary>
-    private void ResetBattleWins()
-    {
-        _playerWins = 0;
-        _enemyWins = 0;
-        _wonThemes.Clear();
     }
     
     /// <summary>
     /// ゲームオーバーフェーズ
     /// </summary>
-    private void HandleGameOver()
+    private async UniTask HandleGameOver()
     {
-        if (_isProcessing) return;
-        HandleGameOverAsync().Forget();
-    }
-    
-    /// <summary>
-    /// ゲームオーバー処理
-    /// </summary>
-    private async UniTask HandleGameOverAsync()
-    {
-        _isProcessing = true;
-        
         // ゲームオーバーの理由を判定
         var gameOverReason = "";
         if (_player.MentalPower.CurrentValue <= 0)
@@ -749,33 +664,6 @@ public class GameManager: IStartable, IDisposable
         
         // ゲームオーバー画面を表示
         await _uiPresenter.ShowGameOverScreen(gameOverReason);
-    }
-    
-    /// <summary>
-    /// 遅延してステート変更
-    /// </summary>
-    private async UniTask DelayedStateChangeAsync(GameState newState, float delay)
-    {
-        await UniTask.Delay((int)(delay * 1000));
-        ChangeState(newState);
-    }
-    
-    /// <summary>
-    /// ReactivePropertyに安全に値を設定
-    /// </summary>
-    private bool TrySetReactiveProperty<T>(ReactiveProperty<T> reactiveProperty, T value)
-    {
-        if (_isDisposed || reactiveProperty == null) return false;
-        
-        try
-        {
-            reactiveProperty.Value = value;
-            return true;
-        }
-        catch (ObjectDisposedException)
-        {
-            return false;
-        }
     }
     
     /// <summary>
