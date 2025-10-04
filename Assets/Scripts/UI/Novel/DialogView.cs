@@ -88,13 +88,15 @@ public class DialogView : MonoBehaviour
     /// </summary>
     public async UniTask FadeIn()
     {
+        if (!canvasGroup) return;
+
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
-        
+
         CancelActiveMotions();
-        
+
         _fadeMotion = canvasGroup.FadeIn(fadeInDuration, Ease.OutCubic).AddTo(this);
-        
+
         await _fadeMotion.ToUniTask();
     }
     
@@ -103,13 +105,15 @@ public class DialogView : MonoBehaviour
     /// </summary>
     public async UniTask FadeOut()
     {
+        if (!canvasGroup) return;
+
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
-        
+
         CancelActiveMotions();
-        
+
         _fadeMotion = canvasGroup.FadeOut(fadeOutDuration, Ease.InCubic).AddTo(this);
-        
+
         await _fadeMotion.ToUniTask();
     }
     
@@ -326,6 +330,7 @@ public class DialogView : MonoBehaviour
     /// </summary>
     private void OnClick()
     {
+        if (!canvasGroup) return;
         if (canvasGroup.alpha == 0f || !canvasGroup.interactable) return;
         if (_isTyping) return;
         if (!_isWaitingForNext) return;
@@ -429,6 +434,7 @@ public class DialogView : MonoBehaviour
     /// <param name="interactable">操作可能かどうか</param>
     public void SetInteractable(bool interactable)
     {
+        if (!canvasGroup) return;
         canvasGroup.interactable = interactable;
     }
     
