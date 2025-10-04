@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class BattlePresenter: IStartable
 {
+    private const int WINS_TO_VICTORY = 3;
+    
     private readonly CardPoolService _cardPoolService;
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
@@ -17,24 +19,17 @@ public class BattlePresenter: IStartable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
     private readonly DiscordService _discordService;
+    
+    private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
     
-    // バトル勝利数管理
     private int _playerWins;
     private int _enemyWins;
-    private const int WINS_TO_VICTORY = 3;
-
-    // 勝利したテーマの記録
-    private readonly List<ThemeData> _wonThemes = new();
-
-    // 崩壊判定用メンバー変数
     private bool _playerCollapse;
     private bool _npcCollapse;
-
-    // 現在の敵データ
-    private EnemyData _currentEnemyData;
+    private readonly List<ThemeData> _wonThemes = new();
 
     /// <summary>
     /// コンストラクタ（依存性注入）
