@@ -31,6 +31,8 @@ public class CardView : BaseCardView
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardBanner => cardNameBanner;
     protected override Image CardFrame => cardFrame;
+    protected override UIEffect BackUIEffect => backUIEffect;
+    protected override UIEffect EdgeUIEffect => edgeUIEffect;
     protected override CardData GetCardData() => CardData;
 
     private readonly Subject<CardView> _onClicked = new();
