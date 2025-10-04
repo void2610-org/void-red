@@ -263,6 +263,7 @@ GameObject:
   m_Component:
   - component: {fileID: 81076095}
   - component: {fileID: 81076094}
+  - component: {fileID: 81076096}
   m_Layer: 0
   m_Name: DebugLogDisplay
   m_TagString: Untagged
@@ -305,6 +306,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &81076096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81076093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4909fdb0bf824fe78a89ee7afdd226fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetObject: {fileID: 0}
 --- !u!224 &508480000 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8503395000404048060, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
@@ -991,23 +1005,6 @@ MonoBehaviour:
   autoInjectGameObjects: []
   novelSeManager: {fileID: 1113668051}
   useLocalExcel: 0
---- !u!1 &1290794004 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
-  m_PrefabInstance: {fileID: 1899330456664192952}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1290794007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1290794004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08ff77b3328e243858a317c63345a977, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1721305999
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1120,30 +1117,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
-    - target: {fileID: 4293295509419723206, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
-      propertyPath: dialogSe
-      value: 
-      objectReference: {fileID: 8300000, guid: 72547479258c2447297409140b8191c0, type: 3}
-    - target: {fileID: 4422162762152353045, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
-      propertyPath: m_Alpha
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4422162762152353045, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
-      propertyPath: m_Interactable
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4422162762152353045, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
-      propertyPath: m_BlocksRaycasts
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Name
       value: DialogView
       objectReference: {fileID: 0}
-    - target: {fileID: 6404542667110867973, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -4126157499417677361, guid: 821d81242acae4bd488aa3d2521265c9, type: 3}
     - target: {fileID: 8503395000404048060, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1227,10 +1204,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1290794007}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
 --- !u!1001 &4252798666017759329
 PrefabInstance:

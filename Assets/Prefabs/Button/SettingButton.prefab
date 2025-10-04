@@ -167,11 +167,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoverSe: {fileID: 0}
-  hoverVolume: 1
-  clickSe: {fileID: 8300000, guid: 8da87a6ab6429438a849c7dc8a3006bc, type: 3}
-  clickVolume: 1
-  randomizePitch: 1
+  hoverSe: {fileID: 8300000, guid: 0523a9b80961b4235947ab2c1b4e918f, type: 3}
+  hoverVolume: 0.15
+  clickSe: {fileID: 8300000, guid: 3201935c4382f4b48b1361533e6f0015, type: 3}
+  clickVolume: 0.5
+  randomizePitch: 0
   minPitch: 0.9
   maxPitch: 1.1
   hoverCooldown: 0.1
