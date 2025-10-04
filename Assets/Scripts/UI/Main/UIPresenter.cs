@@ -98,7 +98,7 @@ public class UIPresenter : IStartable, System.IDisposable
         var selectedCard = _player.SelectedCard.CurrentValue;
         if (selectedCard?.Data != null)
         {
-            _cardDetailView.ShowCardDetail(selectedCard.Data);
+            _cardDetailView.ShowCardDetail(selectedCard.Data, true);
         }
     }
     

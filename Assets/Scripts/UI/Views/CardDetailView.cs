@@ -27,15 +27,14 @@ public class CardDetailView : MonoBehaviour
     /// カード詳細を表示
     /// </summary>
     /// <param name="cardData">表示するカードデータ</param>
-    public void ShowCardDetail(CardData cardData)
+    public void ShowCardDetail(CardData cardData, bool isPlayable)
     {
-        if (cardData == null) return;
-        
         // カード詳細情報を設定
         UpdateCardDisplay(cardData);
         
         // パネルを表示
         detailPanel.SetActive(true);
+        playButton.gameObject.SetActive(isPlayable);
     }
     
     /// <summary>
