@@ -67,7 +67,7 @@ public class CardLibraryView : MonoBehaviour
         // カードViewを生成
         foreach (var cardData in sortedCards)
         {
-            CreateCardView(cardData, !viewedCardIds.Contains(cardData.CardId));
+            CreateCardView(cardData, viewedCardIds.Contains(cardData.CardId));
         }
         
         // 統計情報を更新
@@ -82,12 +82,12 @@ public class CardLibraryView : MonoBehaviour
     /// カードViewを生成
     /// </summary>
     /// <param name="cardData">カードデータ</param>
-    /// <param name="isUnviewed">未閲覧かどうか</param>
-    private void CreateCardView(CardData cardData, bool isUnviewed = false)
+    /// <param name="isRevealed">閲覧済みかどうか</param>
+    private void CreateCardView(CardData cardData, bool isRevealed)
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
         var cardModel = new CardModel(cardData);
-        cardView.Initialize(cardModel, isUnviewed ? CardDisplayState.Veiled : CardDisplayState.Normal);
+        cardView.Initialize(cardModel, isRevealed ? CardDisplayState.Normal : CardDisplayState.Veiled);
 
         // カードクリックイベントを購読
         cardView.OnCardClicked
