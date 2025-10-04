@@ -84,7 +84,7 @@ public class CardLibraryView : MonoBehaviour
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
         var cardModel = new CardModel(cardData);
-        cardView.Initialize(cardModel, isUnviewed);
+        cardView.Initialize(cardModel, isUnviewed ? CardDisplayState.Normal : CardDisplayState.Veiled);
         
         _cardViews.Add(cardView);
     }

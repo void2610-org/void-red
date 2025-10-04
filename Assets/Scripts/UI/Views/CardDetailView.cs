@@ -54,7 +54,7 @@ public class CardDetailView : MonoBehaviour
     {
         // 新しいカードViewを作成
         var cardModel = new CardModel(cardData);
-        cardView.Initialize(cardModel, false);
+        cardView.Initialize(cardModel);
         
         // 詳細情報を更新
         attributeText.text = $"属性: {cardData.Attribute.ToJapaneseName()}";
