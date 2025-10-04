@@ -220,7 +220,6 @@ public class GameProgressService
         _novelChoiceResults.Add(choiceResult);
         
         Debug.Log($"[GameProgressService] 選択結果を記録: {choiceResult}");
-        
         SaveAndPersist();
     }
     
@@ -233,7 +232,6 @@ public class GameProgressService
         
         // 実際にファイルに保存
         _saveDataManager.SaveGameData(saveData);
-        
         // データセーブイベントを発火
         _onDataSaved.OnNext(Unit.Default);
     }
@@ -347,9 +345,7 @@ public class GameProgressService
     public void RecordCardViews(List<CardData> cardDataList)
     {
         foreach (var cardData in cardDataList)
-        {
             RecordCardView(cardData);
-        }
     }
 
     /// <summary>
@@ -359,7 +355,6 @@ public class GameProgressService
     public void RecordCardView(CardData cardData)
     {
         if (!cardData || string.IsNullOrEmpty(cardData.CardId)) return;
-        
         _viewedCardIds.Add(cardData.CardId);
     }
     
@@ -450,20 +445,5 @@ public class GameProgressService
     public PersonalityLogData GetPersonalityLogData()
     {
         return _personalityLogData;
-    }
-    
-    /// <summary>
-    /// GameSaveDataからゲーム進行状態を復元
-    /// </summary>
-    public void LoadState(GameSaveData saveData)
-    {
-        _currentStep = saveData.CurrentStep;
-        _results.Clear();
-        
-        var loadedResults = saveData.GetResults();
-        foreach (var result in loadedResults)
-        {
-            _results[result.Key] = result.Value;
-        }
     }
 }
