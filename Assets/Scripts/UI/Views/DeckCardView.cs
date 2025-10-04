@@ -21,6 +21,7 @@ public enum CardDisplayState
 public class DeckCardView : BaseCardView
 {
     [Header("UIコンポーネント")]
+    [SerializeField] private Button cardButton;
     [SerializeField] private Image cardImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Image backgroundImage;
