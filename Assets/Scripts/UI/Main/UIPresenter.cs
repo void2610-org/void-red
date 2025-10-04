@@ -37,6 +37,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly BlackOverlayView _blackOverlayView;
     private readonly CardDetailButtonView _cardDetailButtonView;
     private readonly CardDetailView _cardDetailView;
+    private readonly BattleResultView _battleResultView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
@@ -85,7 +86,7 @@ public class UIPresenter : IStartable, System.IDisposable
     
     public async UniTask ShowScores(float playerScore, float enemyScore) => await _scoreView.ShowScores(playerScore, enemyScore);
     public async UniTask ShowWinLoseResult(string result, bool isPlayerWin) => await _resultView.ShowWinLoseResult(result, isPlayerWin);
-    
+    public async UniTask ShowAndWaitBattleResult(bool playerWon, int playerWins, int enemyWins) => await _battleResultView.ShowAndWaitBattleResult(playerWon, playerWins, enemyWins);
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
     public async UniTask StartTutorial() => await _tutorialPresenter.StartTutorial();
@@ -147,6 +148,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
+        _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
         _tutorialPresenter = new TutorialPresenter(tutorialData);
         _sceneTransitionManager = sceneTransitionManager;
         
