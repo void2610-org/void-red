@@ -43,11 +43,11 @@ namespace Void2610.UnityTemplate
         {
             // ボタンが無効またはクールダウン中の場合は再生しない
             if ((_button && !_button.interactable) || 
-                Time.time - _lastHoverTime < hoverCooldown ||
+                Time.unscaledTime - _lastHoverTime < hoverCooldown ||
                 !hoverSe) 
                 return;
             
-            _lastHoverTime = Time.time;
+            _lastHoverTime = Time.unscaledTime;
             PlaySound(hoverSe, hoverVolume);
         }
         
@@ -91,7 +91,7 @@ namespace Void2610.UnityTemplate
         /// </summary>
         public void OnSelect(BaseEventData eventData)
         {
-            PlayHoverSound();
+            // PlayHoverSound();
         }
         
         /// <summary>
