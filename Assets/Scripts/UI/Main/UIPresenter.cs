@@ -87,10 +87,11 @@ public class UIPresenter : IStartable, System.IDisposable
     
     public async UniTask ShowScores(float playerScore, float enemyScore) => await _scoreView.ShowScores(playerScore, enemyScore);
     public async UniTask ShowWinLoseResult(string result, bool isPlayerWin) => await _resultView.ShowWinLoseResult(result, isPlayerWin);
-    public async UniTask ShowAndWaitBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes) => await _battleResultView.ShowAndWaitBattleResult(playerWon, playerWins, enemyWins, wonThemes);
+    public void ShowBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes) => _battleResultView.ShowBattleResult(playerWon, playerWins, enemyWins, wonThemes);
+    public async UniTask WaitForBattleResultClose() => await _battleResultView.WaitForUntilClose();
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
-    public async UniTask StartTutorial() => await _tutorialPresenter.StartTutorial();
+    public async UniTask StartTutorial(string tutorialId) => await _tutorialPresenter.StartTutorial(tutorialId);
     
     /// <summary>
     /// 選択されたカードの詳細を表示
@@ -115,30 +116,30 @@ public class UIPresenter : IStartable, System.IDisposable
             _cardDetailButtonView?.Hide();
     }
     
-    public UIPresenter(Player player, Enemy enemy, TutorialData tutorialData, SceneTransitionManager sceneTransitionManager)
+    public UIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager)
     {
         _player = player;
         _enemy = enemy;
-        
+
         // 初期化
         _themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
         _announcementView = UnityEngine.Object.FindFirstObjectByType<AnnouncementView>();
-        
+
         // 複数のNarrationViewを取得して、プレイヤー用と敵用を区別
         var narrationViews = UnityEngine.Object.FindObjectsByType<NarrationView>(UnityEngine.FindObjectsSortMode.None);
         if (narrationViews.Length != 2) throw new System.Exception("Expected exactly two NarrationViews in the scene.");
         _narrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
         _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
-        
+
         _playButtonView = UnityEngine.Object.FindFirstObjectByType<PlayButtonView>();
         _playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
-        
+
         var mentalPowerViews = UnityEngine.Object.FindObjectsByType<MentalPowerView>(UnityEngine.FindObjectsSortMode.None);
         // Y座標が低い方をプレイヤー、高い方を敵とする
         _playerMentalPowerView = mentalPowerViews[0].transform.position.y < mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
         _enemyMentalPowerView = mentalPowerViews[0].transform.position.y > mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
-        
+
         _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
         _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
         _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
@@ -150,7 +151,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
-        _tutorialPresenter = new TutorialPresenter(tutorialData);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData);
         _sceneTransitionManager = sceneTransitionManager;
         
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
