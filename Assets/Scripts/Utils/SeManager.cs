@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -88,9 +90,9 @@ namespace Void2610.UnityTemplate
 
             audioSource.clip = data.audioClip;
             audioSource.volume = data.volume * volume;
-            
+
             // ピッチがマイナスの場合はランダム化
-            audioSource.pitch = pitch < 0.0f ? Random.Range(0.8f, 1.2f) : pitch;
+            audioSource.pitch = pitch < 0.0f ? UnityEngine.Random.Range(0.8f, 1.2f) : pitch;
             audioSource.Play();
         }
 
@@ -158,6 +160,28 @@ namespace Void2610.UnityTemplate
         public int GetPlayingSeCount()
         {
             return _seAudioSourceList.Count(audioSource => audioSource.isPlaying);
+        }
+
+        /// <summary>
+        /// 名前を指定してSEをループ再生する（CancellationTokenでキャンセル可能）
+        /// </summary>
+        /// <param name="seName">SE名</param>
+        /// <param name="interval">再生間隔（秒）</param>
+        /// <param name="volume">音量倍率</param>
+        /// <param name="pitchMin">ピッチの最小値</param>
+        /// <param name="pitchMax">ピッチの最大値</param>
+        /// <param name="cancellationToken">キャンセルトークン</param>
+        public async UniTaskVoid PlaySeLoop(string seName, float interval = 0.08f, float volume = 1.0f, float pitchMin = 0.95f, float pitchMax = 1.05f, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    PlaySe(seName, volume, UnityEngine.Random.Range(pitchMin, pitchMax));
+                    await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: cancellationToken);
+                }
+            }
+            catch (OperationCanceledException) { }
         }
 
         /// <summary>

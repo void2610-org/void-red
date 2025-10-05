@@ -154,9 +154,8 @@ public class BattlePresenter: IStartable
             case GameState.ThemeAnnouncement:
                 _playerCollapse = false; // 崩壊フラグリセット
                 _npcCollapse = false; // 崩壊フラグリセット
-                // 敵をデフォルト立ち絵に戻す
                 _uiPresenter.ResetEnemyToDefault().Forget();
-                HandleThemeAnnouncement();
+                HandleThemeAnnouncement().Forget();
                 break;
             case GameState.PlayerCardSelection:
                 HandlePlayerCardSelection().Forget();
@@ -182,7 +181,7 @@ public class BattlePresenter: IStartable
     /// <summary>
     /// お題発表フェーズ
     /// </summary>
-    private void HandleThemeAnnouncement()
+    private async UniTask HandleThemeAnnouncement()
     {
         // 人格ログ: ターン開始
         _personalityLogService.StartTurn();
@@ -196,7 +195,7 @@ public class BattlePresenter: IStartable
             newTheme = _currentEnemyData.MajorTheme;
         }
         // 小テーマが設定されている場合はランダムに選択
-        else if (_currentEnemyData?.MinorThemes != null && _currentEnemyData.MinorThemes.Count > 0)
+        else if (_currentEnemyData?.MinorThemes is { Count: > 0 })
         {
             var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
             newTheme = _currentEnemyData.MinorThemes[randomIndex];
@@ -207,7 +206,9 @@ public class BattlePresenter: IStartable
         _uiPresenter.SetTheme(_currentTheme);
 
         // 会話シーケンスを表示してからカード選択へ
-        ShowThemeDialoguesAsync().Forget();
+        // await ShowThemeDialoguesAsync();
+        
+        ChangeState(GameState.PlayerCardSelection);
     }
 
     /// <summary>
@@ -234,7 +235,6 @@ public class BattlePresenter: IStartable
         }
 
         await UniTask.Delay(300);
-        ChangeState(GameState.PlayerCardSelection);
     }
     
     /// <summary>

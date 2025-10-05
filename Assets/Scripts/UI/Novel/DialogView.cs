@@ -21,7 +21,6 @@ public class DialogView : MonoBehaviour
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
     [SerializeField] private Image backgroundImage;
-    [SerializeField] private AudioClip dialogSe;
     
     [Header("操作ボタン")]
     [SerializeField] private Button autoButton;
@@ -151,12 +150,11 @@ public class DialogView : MonoBehaviour
         _isTyping = true;
         _isWaitingForNext = false;
 
-        // 文字速度を決定
+
+        _dialogSeCancellationTokenSource = new CancellationTokenSource(); 
+        SeManager.Instance.PlaySeLoop("Dialog2", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
+
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
-
-        _dialogSeCancellationTokenSource = new CancellationTokenSource();
-        PlayDialogSeLoop(0.08f, _dialogSeCancellationTokenSource.Token).Forget();
-
         await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
 
         // dialogSeループを停止
@@ -376,24 +374,6 @@ public class DialogView : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// ダイアログSEをループ再生する
-    /// </summary>
-    /// <param name="interval">再生間隔（秒）</param>
-    /// <param name="cancellationToken">キャンセルトークン</param>
-    private async UniTaskVoid PlayDialogSeLoop(float interval, CancellationToken cancellationToken)
-    {
-        try
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                SeManager.Instance.PlaySe(dialogSe, volume:0.3f, pitch: UnityEngine.Random.Range(0.95f, 1.05f));
-                await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: cancellationToken);
-            }
-        }
-        catch (OperationCanceledException) { }
-    }
-
     /// <summary>
     /// インジケーターを最後の文字の横に配置
     /// </summary>
