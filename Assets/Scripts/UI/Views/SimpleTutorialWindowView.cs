@@ -18,6 +18,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
     
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentNarrationCts;
+    private CancellationTokenSource _dialogSeCancellationTokenSource;
 
     /// <summary>
     /// ナレーションを表示
@@ -52,9 +53,18 @@ public class SimpleTutorialWindowView : MonoBehaviour
             // backgroundImageとテキストのフェードインを同時実行
             backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
             await tutorialText.FadeIn(FADE_DURATION, Ease.OutQuart);
-            
+
+            // ダイアログSEループを開始
+            _dialogSeCancellationTokenSource = new CancellationTokenSource();
+            SeManager.Instance.PlaySeLoop("Dialog", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
+
             // 1文字ずつ表示するアニメーション
             await tutorialText.TypewriterAnimation(message, cancellationToken: cancellationToken);
+
+            // dialogSeループを停止
+            _dialogSeCancellationTokenSource?.Cancel();
+            _dialogSeCancellationTokenSource?.Dispose();
+            _dialogSeCancellationTokenSource = null;
             
             // autoAdvanceフラグに基づいた待機処理
             if (autoAdvance)
@@ -119,5 +129,9 @@ public class SimpleTutorialWindowView : MonoBehaviour
         // ナレーションのキャンセレーショントークンをクリーンアップ
         _currentNarrationCts?.Cancel();
         _currentNarrationCts?.Dispose();
+
+        // ダイアログSEのキャンセレーショントークンをクリーンアップ
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
     }
 }
