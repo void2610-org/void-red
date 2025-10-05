@@ -93,9 +93,7 @@ public class NarrationView : MonoBehaviour
         
         try
         {
-            // backgroundImageとテキストのフェードアウトを同時実行
-            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-            await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
+            await _canvasGroup.FadeOut(FADE_DURATION).ToUniTask(cancellationToken);
         }
         catch (System.OperationCanceledException) { }
         finally
