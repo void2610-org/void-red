@@ -561,11 +561,12 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask HandleBattleEnd()
     {
-        // バトル結果を判定
+        await UniTask.Delay(500);
+        
         var playerWon = _playerWins >= WINS_TO_VICTORY;
 
-        // バトル結果画面を表示（勝利したテーマリストを渡す）
         _uiPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
+        
         // 敵がアルヴならチュートリアルを表示
         if (_currentEnemyData.EnemyId == "E001")
             await _uiPresenter.StartTutorial("BattleResult");
@@ -574,16 +575,15 @@ public class BattlePresenter: IStartable
         
         // 人格ログ: チャプター完了
         _personalityLogService.CompleteChapter();
-        
         // 人格ログデータをGameProgressServiceに更新（セーブのため）
         _gameProgressService.UpdatePersonalityLogData(_personalityLogService.GetPersonalityLogData());
-
         // プレイヤーのデッキ変更をセーブ（バトル終了時のみ）
         _player.SaveDeckChanges();
         
+        // 現在のノード情報を一旦キャッシュ
         var currentNode = _gameProgressService.GetCurrentNode();
         
-        // 現在のバトル結果を記録
+        // 現在のバトル結果を記録(ここでノード進行する)
         _gameProgressService.RecordBattleResultAndSave(playerWon);
         Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
         
