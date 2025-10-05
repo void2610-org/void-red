@@ -69,7 +69,7 @@ MonoBehaviour:
     volume: 1
   - name: Dialog
     audioClip: {fileID: 8300000, guid: 13a7612a17581481faca59bf4f12ad56, type: 3}
-    volume: 0.3
+    volume: 0.2
   - name: Dialog2
     audioClip: {fileID: 8300000, guid: 72547479258c2447297409140b8191c0, type: 3}
-    volume: 0.3
+    volume: 0.2
