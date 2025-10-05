@@ -13,6 +13,7 @@ public class RootLifetimeScope : LifetimeScope
     [SerializeField] private SeManager seManager;
     [SerializeField] private AllEnemyData allEnemyData;
     [SerializeField] private AllCardData allCardData;
+    [SerializeField] private AllTutorialData allTutorialData;
     [SerializeField] private ConfirmationDialogView confirmationDialogView;
     
     protected override void Configure(IContainerBuilder builder)
@@ -20,6 +21,7 @@ public class RootLifetimeScope : LifetimeScope
         // データの登録と初期化
         builder.RegisterInstance(allEnemyData);
         builder.RegisterInstance(allCardData);
+        builder.RegisterInstance(allTutorialData);
         RegisterAllData();
         
         // カードプールサービス（GameProgressServiceが依存）

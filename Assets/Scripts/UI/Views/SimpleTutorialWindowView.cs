@@ -8,13 +8,10 @@ using System.Threading;
 using System.Collections.Generic;
 using Void2610.UnityTemplate;
 
-/// <summary>
-/// ナレーション表示を担当するViewクラス
-/// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class NarrationView : MonoBehaviour
+public class SimpleTutorialWindowView : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI narrationText;
+    [SerializeField] private TextMeshProUGUI tutorialText;
     [SerializeField] private Image backgroundImage;
     
     private const float FADE_DURATION = 0.3f;
@@ -25,7 +22,7 @@ public class NarrationView : MonoBehaviour
     /// <summary>
     /// ナレーションを表示
     /// </summary>
-    public async UniTask DisplayNarration(string message, float duration = 2f, bool autoAdvance = true)
+    public async UniTask DisplayText(string message, float duration = 2f, bool autoAdvance = true)
     {
         // 現在実行中のナレーションをキャンセル
         _currentNarrationCts?.Cancel();
@@ -46,18 +43,18 @@ public class NarrationView : MonoBehaviour
         try
         {
             // メッセージを空で初期化（後で1文字ずつ表示）
-            narrationText.text = "";
+            tutorialText.text = "";
             
             // 初期状態を設定
-            narrationText.gameObject.SetActive(true);
-            narrationText.SetAlpha(0f);
+            tutorialText.gameObject.SetActive(true);
+            tutorialText.SetAlpha(0f);
             
             // backgroundImageとテキストのフェードインを同時実行
             backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
-            await narrationText.FadeIn(FADE_DURATION, Ease.OutQuart);
+            await tutorialText.FadeIn(FADE_DURATION, Ease.OutQuart);
             
             // 1文字ずつ表示するアニメーション
-            await narrationText.TypewriterAnimation(message, cancellationToken: cancellationToken);
+            await tutorialText.TypewriterAnimation(message, cancellationToken: cancellationToken);
             
             // autoAdvanceフラグに基づいた待機処理
             if (autoAdvance)
@@ -67,7 +64,7 @@ public class NarrationView : MonoBehaviour
                 
                 // backgroundImageとテキストのフェードアウトを同時実行
                 backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-                await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
+                await tutorialText.FadeOut(FADE_DURATION, Ease.InQuart);
             }
         }
         catch (System.OperationCanceledException) { }
@@ -93,14 +90,16 @@ public class NarrationView : MonoBehaviour
         
         try
         {
-            await _canvasGroup.FadeOut(FADE_DURATION).ToUniTask(cancellationToken);
+            // backgroundImageとテキストのフェードアウトを同時実行
+            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+            await tutorialText.FadeOut(FADE_DURATION, Ease.InQuart);
         }
         catch (System.OperationCanceledException) { }
         finally
         {
             _canvasGroup.alpha = 0f;
             backgroundImage.SetAlpha(0f);
-            narrationText.gameObject.SetActive(false);
+            tutorialText.gameObject.SetActive(false);
         }
     }
     
@@ -109,12 +108,11 @@ public class NarrationView : MonoBehaviour
         // 初期状態の設定
         _canvasGroup = GetComponent<CanvasGroup>();
         _canvasGroup.alpha = 0f;  // CanvasGroup全体を透明に初期化
-        narrationText.gameObject.SetActive(false);
+        tutorialText.gameObject.SetActive(false);
         
         // backgroundImageの初期状態を透明に設定
         backgroundImage.SetAlpha(0f);
     }
-    
     
     private void OnDestroy()
     {

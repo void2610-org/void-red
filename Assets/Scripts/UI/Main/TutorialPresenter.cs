@@ -4,31 +4,36 @@ using UnityEngine;
 
 /// <summary>
 /// チュートリアル機能の制御を担当するPresenterクラス
-/// TutorialDataの管理とTutorialViewへの指示を行う
+/// AllTutorialDataの管理とTutorialViewへの指示を行う
 /// </summary>
 public class TutorialPresenter
 {
-    private readonly TutorialData _tutorialData;
+    private readonly AllTutorialData _allTutorialData;
     private readonly TutorialView _tutorialView;
-    
-    public TutorialPresenter(TutorialData tutorialData)
+
+    public TutorialPresenter(AllTutorialData allTutorialData)
     {
-        _tutorialData = tutorialData;
+        _allTutorialData = allTutorialData;
+        _allTutorialData.RegisterAllTutorials();
         _tutorialView = UnityEngine.Object.FindFirstObjectByType<TutorialView>();
     }
-    
+
     /// <summary>
-    /// チュートリアルを開始
+    /// 指定されたIDのチュートリアルを開始
     /// </summary>
-    public async UniTask StartTutorial()
+    /// <param name="tutorialId">チュートリアルID</param>
+    public async UniTask StartTutorial(string tutorialId)
     {
+        var tutorialData = _allTutorialData.GetTutorialById(tutorialId);
+        var isBattleTutorial = tutorialId == "Battle";
+
         // すべてのステップを順番に表示
-        for (var i = 0; i < _tutorialData.StepCount; i++)
+        for (var i = 0; i < tutorialData.StepCount; i++)
         {
-            var step = _tutorialData.GetStep(i);
-            await _tutorialView.ShowStepAndWaitForClick(step);
+            var step = tutorialData.GetStep(i);
+            await _tutorialView.ShowStepAndWaitForClick(step, isBattleTutorial);
         }
-        
+
         await _tutorialView.Hide();
         await UniTask.Delay(500);
     }
