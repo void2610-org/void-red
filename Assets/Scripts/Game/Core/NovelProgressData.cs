@@ -9,26 +9,27 @@ public class NovelProgressData
     /// <summary>
     /// ノベル選択結果のリスト
     /// </summary>
-    public List<NovelChoiceResult> ChoiceResults { get; set; }
+    private readonly List<NovelChoiceResult> _choiceResults;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     public NovelProgressData()
     {
-        ChoiceResults = new List<NovelChoiceResult>();
+        _choiceResults = new List<NovelChoiceResult>();
     }
 
     /// <summary>
     /// 選択結果を記録
     /// </summary>
-    /// <param name="scenarioId">シナリオID</param>
-    /// <param name="choiceIndex">選択肢番号</param>
-    /// <param name="selectedOptionIndex">選択された選択肢のインデックス</param>
-    public void RecordChoice(string scenarioId, int choiceIndex, int selectedOptionIndex)
+    public void RecordChoice(NovelChoiceResult choiceResult)
     {
-        var choiceResult = new NovelChoiceResult(scenarioId, choiceIndex, selectedOptionIndex);
-        ChoiceResults.Add(choiceResult);
+        _choiceResults.Add(choiceResult);
+    }
+    
+    public List<NovelChoiceResult> GetAllChoiceResults()
+    {
+        return new List<NovelChoiceResult>(_choiceResults);
     }
 
     /// <summary>
@@ -38,7 +39,7 @@ public class NovelProgressData
     /// <returns>該当する選択結果のリスト</returns>
     public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
     {
-        return ChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
+        return _choiceResults.FindAll(result => result.ScenarioId == scenarioId);
     }
 
     /// <summary>
@@ -46,6 +47,12 @@ public class NovelProgressData
     /// </summary>
     public void Reset()
     {
-        ChoiceResults.Clear();
+        _choiceResults.Clear();
+    }
+
+    public void LoadFrom(List<NovelChoiceResult> getAllChoiceResults)
+    {
+        _choiceResults.Clear();
+        _choiceResults.AddRange(getAllChoiceResults);
     }
 }

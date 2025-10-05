@@ -17,10 +17,10 @@ public class StoryProgressData
     public StoryNode CurrentNode { get; set; }
 
     /// <summary>
-    /// バトル/ノベル結果を保存する辞書
-    /// キー: ステップ番号 or 識別子、値: 結果（"win"/"lose" など）
+    /// バトル結果を保存する辞書
+    /// キー: ノードID、値: 勝利(true)/敗北(false)
     /// </summary>
-    public Dictionary<string, string> Results { get; set; }
+    public Dictionary<string, bool> BattleResults { get; set; }
 
     /// <summary>
     /// コンストラクタ
@@ -29,27 +29,27 @@ public class StoryProgressData
     {
         CurrentStep = 0;
         CurrentNode = null;
-        Results = new Dictionary<string, string>();
+        BattleResults = new Dictionary<string, bool>();
     }
 
     /// <summary>
     /// 結果を記録
     /// </summary>
-    /// <param name="key">結果のキー</param>
-    /// <param name="value">結果の値</param>
-    public void RecordResult(string key, string value)
+    /// <param name="nodeId"></param>
+    /// <param name="isPlayerWon"></param>
+    public void RecordBattleResult(string nodeId, bool isPlayerWon)
     {
-        Results[key] = value;
+        BattleResults[nodeId] = isPlayerWon;
     }
 
     /// <summary>
     /// 結果を取得
     /// </summary>
-    /// <param name="key">結果のキー</param>
+    /// <param name="nodeId">結果のキー</param>
     /// <returns>結果の値（存在しない場合は空文字列）</returns>
-    public string GetResult(string key)
+    public bool GetBattleResult(string nodeId)
     {
-        return Results.GetValueOrDefault(key, "");
+        return BattleResults.GetValueOrDefault(nodeId, false);
     }
 
     /// <summary>
@@ -67,6 +67,6 @@ public class StoryProgressData
     {
         CurrentStep = 0;
         CurrentNode = null;
-        Results.Clear();
+        BattleResults.Clear();
     }
 }

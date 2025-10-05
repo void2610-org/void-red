@@ -33,7 +33,7 @@ public class GameSaveData
     [Header("ゲーム進行データ")]
     [SerializeField] private int currentStep = 0;
     [SerializeField] private List<string> resultKeys = new();
-    [SerializeField] private List<string> resultValues = new();
+    [SerializeField] private List<bool> resultValues = new();
     
     [Header("統計・進化データ")]
     [SerializeField] private EvolutionStatsData evolutionStats = new();
@@ -66,7 +66,7 @@ public class GameSaveData
     /// <summary>
     /// ゲーム進行情報を更新
     /// </summary>
-    public void UpdateGameProgress(int step, Dictionary<string, string> results)
+    public void UpdateGameProgress(int step, Dictionary<string, bool> results)
     {
         currentStep = step;
         
@@ -99,14 +99,12 @@ public class GameSaveData
     /// <summary>
     /// 結果辞書を取得
     /// </summary>
-    public Dictionary<string, string> GetResults()
+    public Dictionary<string, bool> GetBattleResults()
     {
-        var results = new Dictionary<string, string>();
+        var results = new Dictionary<string, bool>();
         
-        for (int i = 0; i < Mathf.Min(resultKeys.Count, resultValues.Count); i++)
-        {
+        for (var i = 0; i < Mathf.Min(resultKeys.Count, resultValues.Count); i++)
             results[resultKeys[i]] = resultValues[i];
-        }
         
         return results;
     }
