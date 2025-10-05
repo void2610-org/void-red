@@ -7,7 +7,6 @@ public class BattleLifetimeScope : LifetimeScope
     [SerializeField] private AllThemeData allThemeData;
     [SerializeField] private HandView playerHandView;
     [SerializeField] private HandView enemyHandView;
-    [SerializeField] private TutorialData tutorialData;
     
     private Player _player;
     private Enemy _enemy;
@@ -33,12 +32,7 @@ public class BattleLifetimeScope : LifetimeScope
         
         // 人格ログサービス（バトルシーン専用）
         builder.Register<PersonalityLogService>(Lifetime.Singleton);
-        
-        
-        // === チュートリアルデータの登録 ===
-        
-        builder.RegisterInstance(tutorialData);
-        
+
         // === エントリーポイントとPresenterの登録 ===
         
         builder.RegisterEntryPoint<UIPresenter>().AsSelf();

@@ -29,8 +29,17 @@ public class TutorialStep
 [CreateAssetMenu(fileName = "TutorialData", menuName = "VoidRed/Tutorial Data")]
 public class TutorialData : ScriptableObject
 {
+    [Header("識別情報")]
+    [SerializeField] private string tutorialId;
+
+    [Header("チュートリアルステップ")]
     [SerializeField] private List<TutorialStep> steps = new();
-    
+
+    /// <summary>
+    /// チュートリアルID（一意の識別子）
+    /// </summary>
+    public string TutorialId => tutorialId;
+
     /// <summary>
     /// チュートリアルステップのリスト
     /// </summary>

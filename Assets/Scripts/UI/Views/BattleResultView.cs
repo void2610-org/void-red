@@ -26,7 +26,7 @@ public class BattleResultView : MonoBehaviour
     /// <param name="playerWins">プレイヤーの勝利数</param>
     /// <param name="enemyWins">敵の勝利数</param>
     /// <param name="wonThemes">勝利したテーマのリスト</param>
-    public async UniTask ShowAndWaitBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes)
+    public void ShowBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes)
     {
         // テキストを設定
         resultText.text = playerWon ? "勝利！" : "敗北...";
@@ -44,7 +44,10 @@ public class BattleResultView : MonoBehaviour
         }
 
         panel.gameObject.SetActive(true);
+    }
 
+    public async UniTask WaitForUntilClose()
+    {
         await homeButton.OnClickAsync();
     }
 

@@ -137,8 +137,8 @@ public class BattlePresenter: IStartable
         await _enemy.DrawCardsWithDelay(3, 300);
         
         // 敵がアルヴならチュートリアルを表示
-        if (_currentEnemyData.EnemyId == "E001") 
-            await _uiPresenter.StartTutorial();
+        if (_currentEnemyData.EnemyId == "E001")
+            await _uiPresenter.StartTutorial("Battle");
         
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement);
@@ -565,7 +565,12 @@ public class BattlePresenter: IStartable
         var playerWon = _playerWins >= WINS_TO_VICTORY;
 
         // バトル結果画面を表示（勝利したテーマリストを渡す）
-        await _uiPresenter.ShowAndWaitBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
+        _uiPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
+        // 敵がアルヴならチュートリアルを表示
+        if (_currentEnemyData.EnemyId == "E001")
+            await _uiPresenter.StartTutorial("BattleResult");
+        
+        await _uiPresenter.WaitForBattleResultClose();
         
         // 人格ログ: チャプター完了
         _personalityLogService.CompleteChapter();
