@@ -233,7 +233,8 @@ public class NovelUIPresenter : IStartable
         var selectedIndex = await _choiceView.ShowChoice(choiceData);
         
         // 選択結果をGameProgressServiceに記録
-        _gameProgressService.RecordNovelChoiceAndSave(_currentScenarioId, _choiceCounter, selectedIndex);
+        var novelRes = new NovelChoiceResult(_currentScenarioId, _choiceCounter, selectedIndex);
+        _gameProgressService.RecordNovelChoiceAndSave(novelRes);
         
         // 選択肢番号をインクリメント
         _choiceCounter++;

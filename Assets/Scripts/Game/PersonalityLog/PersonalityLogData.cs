@@ -14,6 +14,18 @@ namespace Game.PersonalityLog
         
         private ChapterLog _currentChapter;
         
+        public PersonalityLogData()
+        {
+            chapters = new List<ChapterLog>();
+            _currentChapter = null;
+        }
+        
+        public void LoadFrom(PersonalityLogData other)
+        {
+            chapters = new List<ChapterLog>(other.chapters);
+            _currentChapter = other._currentChapter;
+        }
+        
         /// <summary>
         /// 新しいチャプターを開始
         /// </summary>
@@ -30,6 +42,15 @@ namespace Game.PersonalityLog
         public ChapterLog GetCurrentChapter()
         {
             return _currentChapter;
+        }
+
+        /// <summary>
+        /// リセット
+        /// </summary>
+        public void Reset()
+        {
+            chapters.Clear();
+            _currentChapter = null;
         }
     }
 }
