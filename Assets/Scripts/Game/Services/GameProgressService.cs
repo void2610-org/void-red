@@ -100,8 +100,8 @@ public class GameProgressService
     /// </summary>
     public void RecordBattleResultAndSave(bool isPlayerWin)
     {
-        var result = isPlayerWin ? "win" : "lose";
-        _repository.StoryProgress.RecordResult(_repository.StoryProgress.CurrentStep.ToString(), result);
+        var nodeId = _repository.StoryProgress.CurrentNode.NodeId;
+        _repository.StoryProgress.RecordBattleResult(nodeId, isPlayerWin);
         _repository.StoryProgress.AdvanceStep();
         _repository.StoryProgress.CurrentNode = GetNextNode();
         _repository.SaveAll();
@@ -112,8 +112,6 @@ public class GameProgressService
     /// </summary>
     public void RecordNovelResultAndSave(Dictionary<string, string> choices)
     {
-        foreach (var choice in choices)
-            _repository.StoryProgress.RecordResult(choice.Key, choice.Value);
         _repository.StoryProgress.AdvanceStep();
         _repository.StoryProgress.CurrentNode = GetNextNode();
         _repository.SaveAll();
@@ -122,10 +120,10 @@ public class GameProgressService
     /// <summary>
     /// ノベル選択結果を記録してセーブ
     /// </summary>
-    public void RecordNovelChoiceAndSave(string scenarioId, int choiceIndex, int selectedOptionIndex)
+    public void RecordNovelChoiceAndSave(NovelChoiceResult choiceResult)
     {
-        _repository.NovelProgress.RecordChoice(scenarioId, choiceIndex, selectedOptionIndex);
-        Debug.Log($"[GameProgressService] 選択結果を記録: {scenarioId} - Choice{choiceIndex}: {selectedOptionIndex}");
+        _repository.NovelProgress.RecordChoice(choiceResult);
+        Debug.Log($"[GameProgressService] 選択結果を記録: {choiceResult.ScenarioId} - Choice{choiceResult.ChoiceIndex}: {choiceResult.SelectedOptionIndex}");
         _repository.SaveAll();
     }
 
@@ -198,14 +196,6 @@ public class GameProgressService
     public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
     {
         return _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-    }
-
-    /// <summary>
-    /// 全ての選択結果を取得
-    /// </summary>
-    public List<NovelChoiceResult> GetAllNovelChoiceResults()
-    {
-        return new List<NovelChoiceResult>(_repository.NovelProgress.ChoiceResults);
     }
 
     /// <summary>

@@ -52,11 +52,11 @@ public class GameStateRepository
 
         // ストーリー進行データのロード
         StoryProgress.CurrentStep = loadedData.CurrentStep;
-        StoryProgress.Results.Clear();
-        var loadedResults = loadedData.GetResults();
+        StoryProgress.BattleResults.Clear();
+        var loadedResults = loadedData.GetBattleResults();
         foreach (var result in loadedResults)
         {
-            StoryProgress.Results[result.Key] = result.Value;
+            StoryProgress.BattleResults[result.Key] = result.Value;
         }
 
         // プレイヤー進行データのロード
@@ -72,14 +72,13 @@ public class GameStateRepository
         }
 
         // ノベル進行データのロード
-        NovelProgress.ChoiceResults.Clear();
-        NovelProgress.ChoiceResults.AddRange(loadedData.GetAllChoiceResults());
+        NovelProgress.LoadFrom(loadedData.GetAllChoiceResults());
 
         // 人格ログのロード
         PersonalityLogData.LoadFrom(loadedData.PersonalityLog);
 
         // 新規データかどうかを判定
-        var isNewData = StoryProgress.CurrentStep == 0 && StoryProgress.Results.Count == 0;
+        var isNewData = StoryProgress.CurrentStep == 0 && StoryProgress.BattleResults.Count == 0;
         var dataType = isNewData ? "新規データ" : "既存データ";
 
         Debug.Log($"[GameStateRepository] {dataType}自動ロード: Step {StoryProgress.CurrentStep}");
@@ -93,7 +92,7 @@ public class GameStateRepository
         var saveData = new GameSaveData();
 
         // ストーリー進行データを設定
-        saveData.UpdateGameProgress(StoryProgress.CurrentStep, StoryProgress.Results);
+        saveData.UpdateGameProgress(StoryProgress.CurrentStep, StoryProgress.BattleResults);
 
         // プレイヤー進行データを設定
         saveData.UpdateDeck(PlayerProgress.Deck);
@@ -106,7 +105,7 @@ public class GameStateRepository
         }
 
         // ノベル選択結果をセーブデータに追加
-        foreach (var choiceResult in NovelProgress.ChoiceResults)
+        foreach (var choiceResult in NovelProgress.GetAllChoiceResults())
         {
             saveData.AddNovelChoiceResult(choiceResult);
         }
@@ -123,7 +122,7 @@ public class GameStateRepository
     public bool HasSaveData()
     {
         return _saveDataManager.SaveFileExists() &&
-               (StoryProgress.CurrentStep > 0 || StoryProgress.Results.Count > 0);
+               (StoryProgress.CurrentStep > 0 || StoryProgress.BattleResults.Count > 0);
     }
 
     /// <summary>
