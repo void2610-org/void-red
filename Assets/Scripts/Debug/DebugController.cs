@@ -7,19 +7,11 @@ using VContainer;
 /// </summary>
 public class DebugController : MonoBehaviour
 {
-    [Header("実行速度")]
-    [SerializeField] private bool enableFastMode = false;
-    [SerializeField, Range(0.1f, 10f)] private float timeScale = 2f;
-    
     [Header("セーブデータ")]
     [SerializeField] private bool showSaveInfo = false;
-    [SerializeField] private bool startWithFreshData = false; // 毎回新しいセーブデータで始める
     
     [Header("Steam連携")]
     [SerializeField] private bool resetSteamStats = false; // Steamの実績・統計情報をリセットする
-    
-    private readonly ReactiveProperty<bool> _fastModeProperty = new();
-    private readonly ReactiveProperty<float> _timeScaleProperty = new();
     
     private GameProgressService _gameProgressService;
     private SaveDataManager _saveDataManager;
@@ -42,21 +34,6 @@ public class DebugController : MonoBehaviour
             return;
         }
         
-        // 初期値設定
-        _fastModeProperty.Value = enableFastMode;
-        _timeScaleProperty.Value = timeScale;
-        
-        // 値の変更を監視してタイムスケールを適用
-        _fastModeProperty.CombineLatest(_timeScaleProperty, (fastMode, scale) => fastMode ? scale : 1f)
-            .Subscribe(scale => Time.timeScale = scale)
-            .AddTo(this);
-        
-        if (startWithFreshData)
-        {
-            var success = _saveDataManager.DeleteSaveFile();
-            if (success) Debug.Log("[Debug] セーブファイル削除完了");
-        }
-        
         #if !UNITY_WEBGL || UNITY_EDITOR
         if (resetSteamStats)
         {
@@ -65,16 +42,6 @@ public class DebugController : MonoBehaviour
             else Debug.LogWarning("[Debug] Steamの実績・統計情報のリセットに失敗しました");
         }
         #endif
-    }
-    
-    private void OnValidate()
-    {
-        // インスペクターでの変更を反映
-        if (Application.isPlaying)
-        {
-            _fastModeProperty.Value = enableFastMode;
-            _timeScaleProperty.Value = timeScale;
-        }
     }
     
     private void OnGUI()
