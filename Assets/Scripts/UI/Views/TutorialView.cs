@@ -14,6 +14,7 @@ using Void2610.UnityTemplate;
 public class TutorialView : MonoBehaviour
 {
     [SerializeField] private RectTransform maskArea;
+    [SerializeField] private SimpleTutorialWindowView simpleTutorialWindow;
     [SerializeField] private NarrationView playerNarrationView;
     [SerializeField] private NarrationView enemyNarrationView;
     
@@ -30,7 +31,7 @@ public class TutorialView : MonoBehaviour
     /// <summary>
     /// チュートリアルステップを表示してクリック待機
     /// </summary>
-    public async UniTask ShowStepAndWaitForClick(TutorialStep step)
+    public async UniTask ShowStepAndWaitForClick(TutorialStep step, bool isBattleTutorial)
     {
         if (step == null) return;
         
@@ -68,16 +69,28 @@ public class TutorialView : MonoBehaviour
         _currentMaskSize = step.MaskSize;
         
         // メッセージテキストの更新
-        var narrationView = step.IsPlayerDialog ? playerNarrationView : enemyNarrationView;
-        var disableView = step.IsPlayerDialog ? enemyNarrationView : playerNarrationView;
-        disableView.HideNarration().Forget();
-        await narrationView.DisplayNarration(step.Message, autoAdvance: false);
+        await UpdateMessageText(step.Message, step.IsPlayerDialog, isBattleTutorial);
         
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));
         
         // クリック待機
         await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0));
+    }
+    
+    private async UniTask UpdateMessageText(string message, bool isPlayerDialog, bool isBattleTutorial)
+    {
+        if (!isBattleTutorial)
+        {
+            // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
+            await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
+            return;
+        }
+        
+        var narrationView = isPlayerDialog ? playerNarrationView : enemyNarrationView;
+        var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
+        disableView.HideNarration().Forget();
+        await narrationView.DisplayNarration(message, autoAdvance: false);
     }
     
     /// <summary>
