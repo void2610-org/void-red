@@ -25,12 +25,13 @@ public class TutorialPresenter
     public async UniTask StartTutorial(string tutorialId)
     {
         var tutorialData = _allTutorialData.GetTutorialById(tutorialId);
+        var isBattleTutorial = tutorialId == "Battle";
 
         // すべてのステップを順番に表示
         for (var i = 0; i < tutorialData.StepCount; i++)
         {
             var step = tutorialData.GetStep(i);
-            await _tutorialView.ShowStepAndWaitForClick(step);
+            await _tutorialView.ShowStepAndWaitForClick(step, isBattleTutorial);
         }
 
         await _tutorialView.Hide();
