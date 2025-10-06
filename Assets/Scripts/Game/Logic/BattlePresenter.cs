@@ -418,9 +418,9 @@ public class BattlePresenter: IStartable
                 result = playerWon ? "あなたの勝利\n（引き分け→ランダム決着）" : "相手の勝利\n（引き分け→ランダム決着）";
             }
         }
-        
-        // 結果を表示
-        await _uiPresenter.ShowWinLoseResult(result, playerWon);
+
+        // 結果を表示（スコアと内訳付き）
+        await _uiPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _npcMove, _currentTheme);
         await UniTask.Delay(500);
         await _uiPresenter.HideBlackOverlay();
 
@@ -613,7 +613,7 @@ public class BattlePresenter: IStartable
             gameOverReason = "精神力が0になりました";
         else if (_player.IsAllCardsCollapsed)
             gameOverReason = "すべてのカードが崩壊しました";
-        
+
         // ゲームオーバー画面を表示
         await _uiPresenter.ShowGameOverScreen(gameOverReason);
     }

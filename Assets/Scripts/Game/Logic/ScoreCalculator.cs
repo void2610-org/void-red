@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -25,6 +26,34 @@ public static class ScoreCalculator
     }
 
     /// <summary>
+    /// キーワード一致数を取得
+    /// </summary>
+    /// <param name="card">カードデータ</param>
+    /// <param name="theme">テーマデータ</param>
+    /// <returns>一致したキーワード数</returns>
+    public static int GetKeywordMatchCount(CardData card, ThemeData theme)
+    {
+        if (card.Keywords == null || theme.Keywords == null)
+            return 0;
+
+        return card.Keywords.Intersect(theme.Keywords).Count();
+    }
+
+    /// <summary>
+    /// 一致したキーワードのリストを取得
+    /// </summary>
+    /// <param name="card">カードデータ</param>
+    /// <param name="theme">テーマデータ</param>
+    /// <returns>一致したキーワードのリスト</returns>
+    public static List<KeywordType> GetMatchedKeywords(CardData card, ThemeData theme)
+    {
+        if (card.Keywords == null || theme.Keywords == null)
+            return new List<KeywordType>();
+
+        return card.Keywords.Intersect(theme.Keywords).ToList();
+    }
+
+    /// <summary>
     /// キーワード一致によるボーナス倍率を取得
     /// </summary>
     /// <param name="card">カードデータ</param>
@@ -32,11 +61,7 @@ public static class ScoreCalculator
     /// <returns>キーワードボーナス倍率</returns>
     private static float GetKeywordMatchBonus(CardData card, ThemeData theme)
     {
-        if (card.Keywords == null || theme.Keywords == null)
-            return 1.0f;
-
-        // カードとテーマで一致するキーワード数をカウント
-        var matchCount = card.Keywords.Intersect(theme.Keywords).Count();
+        var matchCount = GetKeywordMatchCount(card, theme);
 
         return matchCount switch
         {
