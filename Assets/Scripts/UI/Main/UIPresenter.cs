@@ -34,7 +34,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly PersonalityLogView _personalityLogView;
     private readonly PersonalityLogButtonView _personalityLogButtonView;
     private readonly ScoreView _scoreView;
-    private readonly ResultView _resultView;
+    private readonly ScoreResultView _scoreResultView;
     private readonly BlackOverlayView _blackOverlayView;
     private readonly CardDetailButtonView _cardDetailButtonView;
     private readonly CardDetailView _cardDetailView;
@@ -86,7 +86,7 @@ public class UIPresenter : IStartable, System.IDisposable
     }
     
     public async UniTask ShowScores(float playerScore, float enemyScore) => await _scoreView.ShowScores(playerScore, enemyScore);
-    public async UniTask ShowWinLoseResult(string result, bool isPlayerWin) => await _resultView.ShowWinLoseResult(result, isPlayerWin);
+    public async UniTask ShowWinLoseResult(string result, bool isPlayerWin) => await _scoreResultView.ShowWinLoseResult(result, isPlayerWin);
     public void ShowBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes) => _battleResultView.ShowBattleResult(playerWon, playerWins, enemyWins, wonThemes);
     public async UniTask WaitForBattleResultClose() => await _battleResultView.WaitForUntilClose();
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
@@ -146,7 +146,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
         _personalityLogButtonView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogButtonView>();
         _scoreView = UnityEngine.Object.FindFirstObjectByType<ScoreView>();
-        _resultView = UnityEngine.Object.FindFirstObjectByType<ResultView>();
+        _scoreResultView = UnityEngine.Object.FindFirstObjectByType<ScoreResultView>();
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();

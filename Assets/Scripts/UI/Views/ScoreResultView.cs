@@ -10,7 +10,7 @@ using Void2610.UnityTemplate;
 /// ゲーム結果表示を担当するViewクラス（勝敗・ドロー・進化・共鳴等）
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class ResultView : MonoBehaviour
+public class ScoreResultView : MonoBehaviour
 {
     [Header("結果表示要素")]
     [SerializeField] private Image gavelImage;
@@ -23,20 +23,6 @@ public class ResultView : MonoBehaviour
     
     private CanvasGroup _canvasGroup;
     private CanvasGroup _textBackgroundCanvasGroup;
-    
-    private void Awake()
-    {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _textBackgroundCanvasGroup = textBackgroundImage.GetComponent<CanvasGroup>();
-        
-        // 初期状態は非表示
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-        
-        gavelImage.color = new Color(1f, 1f, 1f, 0f);
-        _textBackgroundCanvasGroup.alpha = 0f;
-    }
     
     /// <summary>
     /// 勝敗結果を専用スタイルで表示
@@ -62,6 +48,20 @@ public class ResultView : MonoBehaviour
         await _canvasGroup.FadeOut(0.3f);
         
         // 結果表示後の状態をリセット
+        _textBackgroundCanvasGroup.alpha = 0f;
+    }
+    
+    private void Awake()
+    {
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _textBackgroundCanvasGroup = textBackgroundImage.GetComponent<CanvasGroup>();
+        
+        // 初期状態は非表示
+        _canvasGroup.alpha = 0f;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
+        
+        gavelImage.color = new Color(1f, 1f, 1f, 0f);
         _textBackgroundCanvasGroup.alpha = 0f;
     }
 }
