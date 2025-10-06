@@ -58,6 +58,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fced74ee5834b48d09d48d58a5ec3acd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatSpeed: 0.3
+  floatRange: 20
 --- !u!114 &5048973015377771057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,8 +89,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4286611584
+  m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
