@@ -86,7 +86,7 @@ public class UIPresenter : IStartable, System.IDisposable
     }
     
     public async UniTask ShowScores(float playerScore, float enemyScore) => await _scoreView.ShowScores(playerScore, enemyScore);
-    public async UniTask ShowWinLoseResult(string result, bool isPlayerWin) => await _scoreResultView.ShowWinLoseResult(result, isPlayerWin);
+    public async UniTask ShowWinLoseResult(string result, bool isPlayerWin, float playerScore, float enemyScore, PlayerMove playerMove, PlayerMove enemyMove, ThemeData theme) => await _scoreResultView.ShowWinLoseResult(result, isPlayerWin, playerScore, enemyScore, playerMove, enemyMove, theme);
     public void ShowBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes) => _battleResultView.ShowBattleResult(playerWon, playerWins, enemyWins, wonThemes);
     public async UniTask WaitForBattleResultClose() => await _battleResultView.WaitForUntilClose();
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
