@@ -36,7 +36,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         foreach (var keyword in themeData.Keywords)
         {
             var keywordView = Instantiate(keywordTextPrefab, keywordContainer);
-            var pos = Random.insideUnitCircle * 300f; // ランダムな位置に配置
+            var pos = Random.insideUnitCircle * 250f; // ランダムな位置に配置
             keywordView.transform.localPosition = new Vector3(pos.x, pos.y, 0);
             keywordView.SetKeyword(keyword);
             _keywordViews.Add(keywordView);

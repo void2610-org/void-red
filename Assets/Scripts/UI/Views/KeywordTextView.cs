@@ -61,6 +61,8 @@ public class KeywordTextView : MonoBehaviour
         _keywordText = GetComponent<TextMeshProUGUI>();
         _rectTransform = GetComponent<RectTransform>();
         _fadeMotion = _keywordText.FadeOut(0f);
+
+        _keywordText.color = Color.white * 2f;
     }
 
     private void OnDestroy()
