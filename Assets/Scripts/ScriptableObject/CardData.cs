@@ -18,6 +18,7 @@ public class CardData : ScriptableObject
     [SerializeField] private int collapseThreshold = 3;
     [SerializeField] private Color color = Color.white;
     [SerializeField] private bool isTextColorBlack = false;
+    [SerializeField] private List<KeywordType> keywords = new();
     
     [Header("進化システム")]
     [SerializeField] private List<EvolutionConditionGroup> evolutionConditionGroups = new List<EvolutionConditionGroup>();
@@ -38,6 +39,7 @@ public class CardData : ScriptableObject
     public int CollapseThreshold => collapseThreshold;
     public Color Color => color;
     public bool IsTextColorBlack => isTextColorBlack;
+    public List<KeywordType> Keywords => keywords;
     
     public List<EvolutionConditionGroup> EvolutionConditionGroups => evolutionConditionGroups;
     public CardData EvolutionTarget => evolutionTarget;
