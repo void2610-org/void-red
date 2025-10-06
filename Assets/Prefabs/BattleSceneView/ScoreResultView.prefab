@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 2548623946977372426}
   - component: {fileID: 8304011970078901003}
   m_Layer: 5
-  m_Name: ResultView
+  m_Name: ScoreResultView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
