@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -14,10 +13,14 @@ public class KeywordTextView : MonoBehaviour
     [Header("設定")]
     [SerializeField] private float floatSpeed = 1f;
     [SerializeField] private float floatRange = 10f;
+    [SerializeField] private float hdrIntensity = 2f;
+
+    private static readonly int _faceColorProperty = Shader.PropertyToID("_FaceColor");
 
     private TextMeshProUGUI _keywordText;
     private RectTransform _rectTransform;
     private MotionHandle _fadeMotion;
+    private Material _materialInstance;
     private Vector2 _initialPosition;
     private float _randomSeedX;
     private float _randomSeedY;
@@ -62,11 +65,15 @@ public class KeywordTextView : MonoBehaviour
         _rectTransform = GetComponent<RectTransform>();
         _fadeMotion = _keywordText.FadeOut(0f);
 
-        _keywordText.color = Color.white * 2f;
+        // マテリアルインスタンスを作成してHDRカラーを設定
+        _materialInstance = new Material(_keywordText.fontSharedMaterial);
+        _keywordText.fontMaterial = _materialInstance;
+        _materialInstance.SetColor(_faceColorProperty, Color.white * hdrIntensity);
     }
 
     private void OnDestroy()
     {
         if (_fadeMotion.IsActive()) _fadeMotion.Cancel();
+        if (_materialInstance) Destroy(_materialInstance);
     }
 }

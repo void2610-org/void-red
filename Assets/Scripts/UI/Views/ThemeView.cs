@@ -37,7 +37,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         foreach (var keyword in themeData.Keywords)
         {
             var keywordView = Instantiate(keywordTextPrefab, keywordContainer);
-            var pos = GetFarthestPosition(250f, 30);
+            var pos = GetFarthestPosition(220f, 30);
             keywordView.transform.localPosition = new Vector3(pos.x, pos.y, 0);
             keywordView.SetKeyword(keyword);
             _keywordViews.Add(keywordView);
