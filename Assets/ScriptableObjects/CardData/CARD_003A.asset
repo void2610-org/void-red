@@ -19,6 +19,8 @@ MonoBehaviour:
   scoreMultiplier: 1
   collapseThreshold: 3
   color: {r: 0, g: 0.07855177, b: 1, a: 1}
+  isTextColorBlack: 0
+  keywords: 010000000200000003000000
   evolutionConditionGroups:
   - conditions:
     - rid: 8005200165294309478

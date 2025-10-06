@@ -20,6 +20,7 @@ MonoBehaviour:
   collapseThreshold: 3
   color: {r: 0.35, g: 0.35, b: 0.35, a: 1}
   isTextColorBlack: 0
+  keywords: 010000000200000003000000
   evolutionConditionGroups:
   - conditions:
     - rid: 8005200165294309474
