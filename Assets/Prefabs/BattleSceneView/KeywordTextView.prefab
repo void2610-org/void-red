@@ -60,6 +60,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floatSpeed: 0.3
   floatRange: 20
+  hdrIntensity: 1.3
 --- !u!114 &5048973015377771057
 MonoBehaviour:
   m_ObjectHideFlags: 0
