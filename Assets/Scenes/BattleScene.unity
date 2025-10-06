@@ -7437,7 +7437,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3131571153025553854, guid: 866dfba3b13ee49e6bcc9fe79bcd9784, type: 3}
       propertyPath: m_Name
-      value: ResultView
+      value: ScoreResultView
       objectReference: {fileID: 0}
     - target: {fileID: 8642605178873583448, guid: 866dfba3b13ee49e6bcc9fe79bcd9784, type: 3}
       propertyPath: m_Pivot.x
