@@ -334,9 +334,9 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask HandleEvaluation()
     {
-        // スコアを計算（テーマ倍率 × 精神ベット）
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _currentTheme);
+        // スコアを計算（テーマ倍率 × 精神ベット × PlayStyle相性）
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _npcMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _playerMove, _currentTheme);
         
         // 評価結果をスコア専用Viewで同時表示
         await _uiPresenter.ShowScores(playerScore, npcScore);
@@ -375,8 +375,8 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask HandleResultDisplay()
     {
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _currentTheme);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _npcMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _playerMove, _currentTheme);
 
         // 崩壊結果を考慮した勝敗決定
         string result;
