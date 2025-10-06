@@ -25,12 +25,14 @@ public class ThemeData : ScriptableObject
     [Header("テーマ情報")]
     [SerializeField] private string title;
     [SerializeField] private SerializableDictionary<CardAttribute, float> attributeMultipliers = new SerializableDictionary<CardAttribute, float>();
+    [SerializeField] private List<KeywordType> keywords = new();
 
     [Header("会話")]
     [SerializeField] private List<ThemeDialogue> dialogues = new();
 
     public string Title => title;
     public SerializableDictionary<CardAttribute, float> AttributeMultipliers => attributeMultipliers;
+    public List<KeywordType> Keywords => keywords;
     public List<ThemeDialogue> Dialogues => dialogues;
 
     /// <summary>
