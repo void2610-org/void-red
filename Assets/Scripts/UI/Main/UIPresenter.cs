@@ -53,7 +53,7 @@ public class UIPresenter : IStartable, System.IDisposable
     public void SetTheme(ThemeData theme)
     {
         _currentTheme = theme;
-        _themeView.DisplayTheme(theme.Title);
+        _themeView.DisplayThemeWithKeywords(theme);
     }
     
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
