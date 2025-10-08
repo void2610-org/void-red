@@ -68,7 +68,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         
         if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
 
-        _lensFlareMotionHandle = LMotion.Create(0f, 1f, 0.5f)
+        _lensFlareMotionHandle = LMotion.Create(0f, 1f, 0.3f)
             .WithEase(Ease.OutCubic)
             .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
             .AddTo(this);
@@ -84,7 +84,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         
         if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
         
-        _lensFlareMotionHandle = LMotion.Create(1f, 0f, 0.5f)
+        _lensFlareMotionHandle = LMotion.Create(1f, 0f, 0.3f)
             .WithEase(Ease.OutCubic)
             .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
             .AddTo(this);
