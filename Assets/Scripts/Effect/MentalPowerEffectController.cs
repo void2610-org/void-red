@@ -37,13 +37,14 @@ public class MentalPowerEffectController : IStartable, IDisposable
     private void OnMentalPowerChanged(int mentalPower)
     {
         // 精神力割合を計算（0.0～1.0）
-        var ratio = mentalPower / (float)GameConstants.MAX_MENTAL_POWER;
+        var ratio = (mentalPower + 10) / (float)GameConstants.MAX_MENTAL_POWER;
+        ratio = Math.Clamp(ratio, 0f, 1f);
         var inverseRatio = 1f - ratio; // 精神力が低いほど大きい値
 
         // エフェクト強度を設定
         _volumeController.SetFilmGrainIntensity(inverseRatio);
         _volumeController.SetChromaticAberrationIntensity(inverseRatio);
-        _volumeController.SetVignetteIntensity(inverseRatio * 0.5f); // ビネットは控えめに
+        _volumeController.SetVignetteIntensity(inverseRatio); // ビネットは控えめに
 
         // めまいエフェクトの制御
         if (ratio <= DIZZY_EFFECT_THRESHOLD && !_isDizzyEffectActive)
