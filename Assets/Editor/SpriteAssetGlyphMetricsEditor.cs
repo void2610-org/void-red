@@ -189,7 +189,7 @@ public class SpriteAssetSelectiveEditor : EditorWindow
                 character.unicode = newID;
 
             // SpriteCharacter の Scale を上書き
-            if (overrideScale)
+            if (overrideCaracterScale)
                 character.scale = newCaracterScale;
         }
 
