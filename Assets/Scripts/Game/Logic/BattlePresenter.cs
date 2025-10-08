@@ -456,9 +456,6 @@ public class BattlePresenter: IStartable
             // 崩壊処理前にカード情報を取得
             var playerCollapseCard = _player.SelectedCard.CurrentValue;
             
-            // 実際の崩壊処理を実行
-            await _player.CollapseSelectedCard();
-            
             if (playerCollapseCard != null)
                 _personalityLogService.LogCardCollapse("player", playerCollapseCard.Data);
         }
