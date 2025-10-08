@@ -9,6 +9,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
 {
     [SerializeField] private Vector2 filmGrainIntensityRange = new Vector2(0f, 1f);
     [SerializeField] private Vector2 chromaticAberrationIntensityRange = new Vector2(0f, 1f);
+    [SerializeField] private Vector2 vignetteIntensityRange = new Vector2(0f, 1f);
     [SerializeField] private float defaultDepthOfFieldFocusDistance = 50f;
     [SerializeField] private float dizzyEffectDuration = 2f;
     [SerializeField] private float dizzyMinDistance = 1f;
@@ -18,6 +19,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     private FilmGrain _filmGrain;
     private ChromaticAberration _chromaticAberration;
     private DepthOfField _depthOfField;
+    private Vignette _vignette;
     private MotionHandle _dizzyMotionHandle;
     
     public void SetFilmGrainIntensity(float intensity)
@@ -28,6 +30,11 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     public void SetChromaticAberrationIntensity(float intensity)
     {
         _chromaticAberration.intensity.value = Mathf.Clamp(intensity, chromaticAberrationIntensityRange.x, chromaticAberrationIntensityRange.y);
+    }
+    
+    public void SetVignetteIntensity(float intensity)
+    {
+        _vignette.intensity.value = Mathf.Clamp(intensity, vignetteIntensityRange.x, vignetteIntensityRange.y);
     }
 
     /// <summary>
@@ -65,6 +72,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
         
         _volume.profile.TryGet(out _filmGrain);
         _volume.profile.TryGet(out _chromaticAberration);
+        _volume.profile.TryGet(out _vignette);
         _volume.profile.TryGet(out _depthOfField);
     }
 }

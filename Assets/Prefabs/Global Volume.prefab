@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   filmGrainIntensityRange: {x: 0, y: 0.125}
   chromaticAberrationIntensityRange: {x: 0.005, y: 1}
+  vignetteIntensityRange: {x: 0, y: 0.4}
   defaultDepthOfFieldFocusDistance: 50
   dizzyEffectDuration: 1.5
   dizzyMinDistance: 50
