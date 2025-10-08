@@ -27,16 +27,21 @@ public class BattleLifetimeScope : LifetimeScope
         builder.RegisterInstance(_enemy).AsSelf();
         
         // === データとサービスの登録 ===
-        
+
         builder.Register<CardNarrationService>(Lifetime.Singleton);
-        
+
         // 人格ログサービス（バトルシーン専用）
         builder.Register<PersonalityLogService>(Lifetime.Singleton);
 
+        // === エフェクトコントローラーの登録 ===
+
+        builder.RegisterComponentInHierarchy<VolumeController>();
+
         // === エントリーポイントとPresenterの登録 ===
-        
+
         builder.RegisterEntryPoint<UIPresenter>().AsSelf();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
         builder.RegisterEntryPoint<BattlePresenter>();
+        builder.RegisterEntryPoint<MentalPowerEffectController>();
     }
 }

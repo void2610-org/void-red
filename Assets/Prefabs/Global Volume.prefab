@@ -48,6 +48,7 @@ MonoBehaviour:
   filmGrainIntensityRange: {x: 0, y: 0.125}
   chromaticAberrationIntensityRange: {x: 0.005, y: 1}
   vignetteIntensityRange: {x: 0, y: 0.4}
+  screenSpaceLensFlareIntensityRange: {x: 0, y: 3}
   defaultDepthOfFieldFocusDistance: 50
   dizzyEffectDuration: 1.5
   dizzyMinDistance: 50

@@ -10,6 +10,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     [SerializeField] private Vector2 filmGrainIntensityRange = new Vector2(0f, 1f);
     [SerializeField] private Vector2 chromaticAberrationIntensityRange = new Vector2(0f, 1f);
     [SerializeField] private Vector2 vignetteIntensityRange = new Vector2(0f, 1f);
+    [SerializeField] private Vector2 screenSpaceLensFlareIntensityRange = new Vector2(0f, 1f);
     [SerializeField] private float defaultDepthOfFieldFocusDistance = 50f;
     [SerializeField] private float dizzyEffectDuration = 2f;
     [SerializeField] private float dizzyMinDistance = 1f;
@@ -20,21 +21,27 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     private ChromaticAberration _chromaticAberration;
     private DepthOfField _depthOfField;
     private Vignette _vignette;
+    private ScreenSpaceLensFlare _screenSpaceLensFlare;
     private MotionHandle _dizzyMotionHandle;
     
     public void SetFilmGrainIntensity(float intensity)
     {
-        _filmGrain.intensity.value = Mathf.Clamp(intensity, filmGrainIntensityRange.x, filmGrainIntensityRange.y);
+        _filmGrain.intensity.value = Mathf.Lerp(filmGrainIntensityRange.x, filmGrainIntensityRange.y, intensity);
     }
     
     public void SetChromaticAberrationIntensity(float intensity)
     {
-        _chromaticAberration.intensity.value = Mathf.Clamp(intensity, chromaticAberrationIntensityRange.x, chromaticAberrationIntensityRange.y);
+        _chromaticAberration.intensity.value = Mathf.Lerp(chromaticAberrationIntensityRange.x, chromaticAberrationIntensityRange.y, intensity);
     }
     
     public void SetVignetteIntensity(float intensity)
     {
-        _vignette.intensity.value = Mathf.Clamp(intensity, vignetteIntensityRange.x, vignetteIntensityRange.y);
+        _vignette.intensity.value = Mathf.Lerp(vignetteIntensityRange.x, vignetteIntensityRange.y, intensity);
+    }
+    
+    public void SetScreenSpaceLensFlareIntensity(float intensity)
+    {
+        _screenSpaceLensFlare.intensity.value = Mathf.Lerp(screenSpaceLensFlareIntensityRange.x, screenSpaceLensFlareIntensityRange.y, intensity);
     }
 
     /// <summary>
@@ -73,6 +80,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
         _volume.profile.TryGet(out _filmGrain);
         _volume.profile.TryGet(out _chromaticAberration);
         _volume.profile.TryGet(out _vignette);
+        _volume.profile.TryGet(out _screenSpaceLensFlare);
         _volume.profile.TryGet(out _depthOfField);
     }
 }
