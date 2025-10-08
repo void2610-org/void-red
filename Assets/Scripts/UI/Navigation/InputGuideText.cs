@@ -69,11 +69,8 @@ public class InputGuideText : MonoBehaviour
     {
         var action = inputGuideData.actionReference.action;
         // 現在のスキーマに合致するバインディングを探す
-        foreach (var spriteName in from binding in action.bindings where IsBindingForCurrentScheme(binding) select GetSpriteNameFromBinding(binding))
-        {
-            // スプライトタグとして出力（例: <sprite name="keyboard-shift">）
-            _text.SetText($"{inputGuideData.actionName} <sprite name=\"{spriteName}\">");
-        }
+        
+        // TODO: Addressablesでスプライトを管理する
     }
     
     private void OnEnable()
@@ -101,21 +98,28 @@ public class InputGuideText : MonoBehaviour
     }
 
     /// <summary>
-    /// binding.path から、スプライト命名規則に沿った名前を生成する。
-    /// 例: binding.path が "<Keyboard>/shift" の場合 "keyboard-shift" を返す。
+    /// binding.pathからAddressablesキーを生成する。
+    /// InputSystemのバインディングパスを小文字化してスプライトパスに変換する。
+    ///
+    /// 例:
+    /// - "<Keyboard>/space" → "keyboard/space"
+    /// - "<Keyboard>/upArrow" → "keyboard/uparrow"
+    /// - "<Mouse>/leftButton" → "mouse/leftbutton"
+    /// - "<Gamepad>/buttonSouth" → "gamepad/buttonsouth"
+    /// - "<Gamepad>/leftStick/up" → "gamepad/leftstick/up"
     /// </summary>
     private string GetSpriteNameFromBinding(InputBinding binding)
     {
         if (string.IsNullOrEmpty(binding.path)) return "";
-        
-        // 例: "<Keyboard>/shift" から "Keyboard" を抽出
+
+        // デバイス名を抽出: "<Keyboard>" → "Keyboard"
         var start = binding.path.IndexOf('<') + 1;
         var end = binding.path.IndexOf('>');
         if (start < 0 || end < 0 || end <= start) return "";
-        
+
         var device = binding.path.Substring(start, end - start);
 
-        // '/' 以降のコントロール名を抽出（例: "shift"）
+        // コントロール名を抽出: "/shift" → "shift", "/leftStick/up" → "leftstick/up"
         var slashIndex = binding.path.IndexOf('/');
         var control = "";
         if (slashIndex >= 0 && slashIndex < binding.path.Length - 1)
@@ -123,9 +127,9 @@ public class InputGuideText : MonoBehaviour
              control = binding.path[(slashIndex + 1)..];
         }
 
-        // スプライト命名は小文字に変換して、"device-control" の形式にする
-        // 必要に応じて、特殊な名称の変換もここで実施可能
-        return $"{device}-{control}".ToLower();
+        // Addressablesキーとして使用するため、小文字に統一
+        // これにより、InputSystemの命名規則（camelCase）がファイル名（lowercase）と一致する
+        return $"{device}/{control}".ToLower();
     }
 
     /// <summary>
