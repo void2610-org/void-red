@@ -91,4 +91,36 @@ public static class PlayStyleExtensions
             _ => 1.0f
         };
     }
+
+    /// <summary>
+    /// 相手のPlayStyleに対して有利かどうかを判定
+    /// じゃんけんの三すくみ関係: Hesitation→Conviction→Impulse→Hesitation
+    /// </summary>
+    public static bool IsStrongAgainst(this PlayStyle playStyle, PlayStyle opponent)
+    {
+        return playStyle switch
+        {
+            PlayStyle.Hesitation => opponent == PlayStyle.Conviction,  // 迷い は 確信 に勝つ
+            PlayStyle.Conviction => opponent == PlayStyle.Impulse,      // 確信 は 衝動 に勝つ
+            PlayStyle.Impulse => opponent == PlayStyle.Hesitation,      // 衝動 は 迷い に勝つ
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// 相手のPlayStyleとの相性によるスコア倍率を取得
+    /// </summary>
+    /// <param name="playStyle">自分のPlayStyle</param>
+    /// <param name="opponent">相手のPlayStyle</param>
+    /// <returns>有利: 1.2倍, 不利: 0.9倍, 同じ/引き分け: 1.0倍</returns>
+    public static float GetAdvantageMultiplier(this PlayStyle playStyle, PlayStyle opponent)
+    {
+        if (playStyle == opponent)
+            return 1.0f;  // 同じPlayStyle: ボーナスなし
+
+        if (playStyle.IsStrongAgainst(opponent))
+            return 1.2f;  // 有利: +20%ボーナス
+
+        return 0.9f;  // 不利: -10%ペナルティ
+    }
 }
