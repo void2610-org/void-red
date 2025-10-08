@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1144052185887447738}
-  - component: {fileID: 3178916904866382925}
   - component: {fileID: 5470536369724715556}
+  - component: {fileID: 3178916904866382925}
   m_Layer: 0
   m_Name: Global Volume
   m_TagString: Untagged
@@ -33,6 +33,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5470536369724715556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 387095545125703357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40a2ac749caa4a9191f61393cab09659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  filmGrainIntensityRange: {x: 0, y: 0.125}
+  chromaticAberrationIntensityRange: {x: 0.005, y: 1}
+  defaultDepthOfFieldFocusDistance: 50
+  dizzyEffectDuration: 1.5
+  dizzyMinDistance: 50
+  dizzyMaxDistance: 125
 --- !u!114 &3178916904866382925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,17 +68,3 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 337b856d5389149d08fa5522a4aef5fb, type: 2}
---- !u!114 &5470536369724715556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 387095545125703357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40a2ac749caa4a9191f61393cab09659, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  filmGrainIntensityRange: {x: 0, y: 0.125}
-  chromaticAberrationIntensityRange: {x: 0.005, y: 1}
