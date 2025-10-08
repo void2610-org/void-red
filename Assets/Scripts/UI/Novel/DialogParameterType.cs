@@ -43,7 +43,7 @@ public enum DialogParameterType
     Choice,
     
     /// <summary>
-    /// カード獲得演出（パラメータなし - 選択結果に基づいてカードを決定）
+    /// カード獲得演出（パラメータなし - 列が存在すれば発火。選択結果に基づいてカードを決定）
     /// </summary>
     GetCard
 }
