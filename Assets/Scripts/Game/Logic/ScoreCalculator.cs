@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -25,6 +26,34 @@ public static class ScoreCalculator
     }
 
     /// <summary>
+    /// キーワード一致数を取得
+    /// </summary>
+    /// <param name="card">カードデータ</param>
+    /// <param name="theme">テーマデータ</param>
+    /// <returns>一致したキーワード数</returns>
+    public static int GetKeywordMatchCount(CardData card, ThemeData theme)
+    {
+        if (card.Keywords == null || theme.Keywords == null)
+            return 0;
+
+        return card.Keywords.Intersect(theme.Keywords).Count();
+    }
+
+    /// <summary>
+    /// 一致したキーワードのリストを取得
+    /// </summary>
+    /// <param name="card">カードデータ</param>
+    /// <param name="theme">テーマデータ</param>
+    /// <returns>一致したキーワードのリスト</returns>
+    public static List<KeywordType> GetMatchedKeywords(CardData card, ThemeData theme)
+    {
+        if (card.Keywords == null || theme.Keywords == null)
+            return new List<KeywordType>();
+
+        return card.Keywords.Intersect(theme.Keywords).ToList();
+    }
+
+    /// <summary>
     /// キーワード一致によるボーナス倍率を取得
     /// </summary>
     /// <param name="card">カードデータ</param>
@@ -32,11 +61,7 @@ public static class ScoreCalculator
     /// <returns>キーワードボーナス倍率</returns>
     private static float GetKeywordMatchBonus(CardData card, ThemeData theme)
     {
-        if (card.Keywords == null || theme.Keywords == null)
-            return 1.0f;
-
-        // カードとテーマで一致するキーワード数をカウント
-        var matchCount = card.Keywords.Intersect(theme.Keywords).Count();
+        var matchCount = GetKeywordMatchCount(card, theme);
 
         return matchCount switch
         {
@@ -49,28 +74,33 @@ public static class ScoreCalculator
     }
 
     /// <summary>
-    /// プレイヤーの手のスコアを計算
+    /// プレイヤーの手のスコアを計算（PlayStyle相性を考慮）
     /// </summary>
-    /// <param name="move">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
+    /// <param name="playerMove">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
+    /// <param name="opponentMove">相手の手（PlayStyle相性判定用）</param>
     /// <param name="theme">テーマデータ</param>
-    /// <returns>計算されたスコア</returns>
-    public static float CalculateScore(PlayerMove move, ThemeData theme)
+    /// <returns>PlayStyle相性を考慮した計算スコア</returns>
+    public static float CalculateScore(PlayerMove playerMove, PlayerMove opponentMove, ThemeData theme)
     {
-        if (move == null || !theme) return 0f;
-
         // テーマから該当属性の倍率を取得
-        var attributeMultiplier = theme.GetMultiplier(move.SelectedCard.Attribute);
+        var attributeMultiplier = theme.GetMultiplier(playerMove.SelectedCard.Attribute);
 
         // プレイスタイルによるスコア倍率を取得
-        var playStyleMultiplier = move.PlayStyle.GetScoreMultiplier();
+        var playStyleMultiplier = playerMove.PlayStyle.GetScoreMultiplier();
 
         // ベット額によるスコア補正倍率を取得
-        var betScoreMultiplier = GetBetScoreMultiplier(move.MentalBet);
+        var betScoreMultiplier = GetBetScoreMultiplier(playerMove.MentalBet);
 
         // キーワード一致によるボーナス倍率を取得
-        var keywordBonus = GetKeywordMatchBonus(move.SelectedCard, theme);
+        var keywordBonus = GetKeywordMatchBonus(playerMove.SelectedCard, theme);
 
         // スコア = 属性倍率 × 精神ベット × カード固有の倍率 × プレイスタイル倍率 × ベット補正倍率 × キーワードボーナス
-        return attributeMultiplier * move.MentalBet * move.SelectedCard.ScoreMultiplier * playStyleMultiplier * betScoreMultiplier * keywordBonus;
+        var baseScore = attributeMultiplier * playerMove.MentalBet * playerMove.SelectedCard.ScoreMultiplier * playStyleMultiplier * betScoreMultiplier * keywordBonus;
+
+        // PlayStyle相性倍率を取得（有利: 1.2倍, 不利: 0.9倍, 同じ: 1.0倍）
+        var advantageMultiplier = playerMove.PlayStyle.GetAdvantageMultiplier(opponentMove.PlayStyle);
+
+        // 相性倍率を適用して最終スコアを返す
+        return baseScore * advantageMultiplier;
     }
 }

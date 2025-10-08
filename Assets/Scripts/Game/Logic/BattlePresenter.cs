@@ -334,9 +334,9 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask HandleEvaluation()
     {
-        // スコアを計算（テーマ倍率 × 精神ベット）
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _currentTheme);
+        // スコアを計算（テーマ倍率 × 精神ベット × PlayStyle相性）
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _npcMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _playerMove, _currentTheme);
         
         // 評価結果をスコア専用Viewで同時表示
         await _uiPresenter.ShowScores(playerScore, npcScore);
@@ -375,8 +375,8 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask HandleResultDisplay()
     {
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _currentTheme);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _npcMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _playerMove, _currentTheme);
 
         // 崩壊結果を考慮した勝敗決定
         string result;
@@ -418,9 +418,9 @@ public class BattlePresenter: IStartable
                 result = playerWon ? "あなたの勝利\n（引き分け→ランダム決着）" : "相手の勝利\n（引き分け→ランダム決着）";
             }
         }
-        
-        // 結果を表示
-        await _uiPresenter.ShowWinLoseResult(result, playerWon);
+
+        // 結果を表示（スコアと内訳付き）
+        await _uiPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _npcMove, _currentTheme);
         await UniTask.Delay(500);
         await _uiPresenter.HideBlackOverlay();
 
@@ -613,7 +613,7 @@ public class BattlePresenter: IStartable
             gameOverReason = "精神力が0になりました";
         else if (_player.IsAllCardsCollapsed)
             gameOverReason = "すべてのカードが崩壊しました";
-        
+
         // ゲームオーバー画面を表示
         await _uiPresenter.ShowGameOverScreen(gameOverReason);
     }
