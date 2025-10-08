@@ -11,7 +11,7 @@ namespace proTools.proFolder
         public static Dictionary<string, Color> folderColors = new Dictionary<string, Color>();
         public static Dictionary<string, int> folderMarkers = new Dictionary<string, int>();
 
-        private static string GetDataPath() => "Assets/proTools/proFolder/folderData.json";
+        private static string GetDataPath() => "Assets/proTools/proFolder/proFolderData.json";
         private static MarkerLibrary markerLibrary;
 
         private static void LoadMarkerLibrary()

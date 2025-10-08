@@ -16,6 +16,10 @@ MonoBehaviour:
   - icon: {fileID: 2800000, guid: bff1c1a8ddc794442bff5e822c51596c, type: 3}
     groupName: Base
     fileExtensions: []
+  - icon: {fileID: 2800000, guid: 015a355e01127b649a6cae37b7e94c3c, type: 3}
+    groupName: Base
+    fileExtensions:
+    - .unity
   - icon: {fileID: 2800000, guid: 32d2d65e13528a04bb795113114fd47c, type: 3}
     groupName: Base
     fileExtensions:

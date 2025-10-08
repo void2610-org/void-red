@@ -8,183 +8,308 @@ namespace proTools.proFolder
 {
     public class proFolderEditor : EditorWindow
     {
-        private static proFolderEditor Instance;
+        #region Constants
+        private const string MARKER_LIBRARY_PATH = "Assets/proTools/proFolder/SO/MarkerLibrary.asset";
+        private const int ICON_SIZE = 32;
+        private const int MAX_COLUMNS = 11;
+        private const int ROW_HEIGHT = 34;
+        private const int BASE_HEIGHT = 46;
+        private const int WINDOW_WIDTH = 388;
+        private const int SPACING_SMALL = 8;
+        private const int SPACING_LARGE = 16;
+        #endregion
 
-        private static List<Color> colors;
-        private static Texture2D[] colorIcons;
+        #region Static Fields
+        private static proFolderEditor _instance;
+        private static List<Color> _colors;
+        private static Texture2D[] _colorIcons;
+        private static MarkerLibrary _markerLibrary;
+        #endregion
 
-        private static MarkerLibrary markerLibrary;
-
+        #region Events
         public static System.Action<Color> OnColorSelected;
         public static System.Action<int> OnMarkSelected;
+        #endregion
 
+        #region Public Methods
         public static void Open(Vector2 position)
         {
-            if (Instance != null)
+            CloseExistingInstance();
+            InitializeData();
+
+            Vector2 windowSize = CalculateWindowSize();
+            CreateAndShowWindow(position, windowSize);
+        }
+        #endregion
+
+        #region Window Management
+        private static void CloseExistingInstance()
+        {
+            if (_instance != null)
             {
-                Instance.Close();
-                Instance = null;
+                _instance.Close();
+                _instance = null;
             }
+        }
 
-            colors = proFolderEditorWindow.colorPresets;
-            GenerateColorIcons();
-            LoadMarkerLibrary();
+        private static void CreateAndShowWindow(Vector2 position, Vector2 size)
+        {
+            _instance = CreateInstance<proFolderEditor>();
+            _instance.position = new Rect(position.x, position.y, size.x, size.y);
+            _instance.ShowPopup();
+        }
 
-            int columns = 11;
-            int rowHeight = 34;
-            int baseHeight = 46;
+        private static Vector2 CalculateWindowSize()
+        {
+            int colorRowCount = Mathf.CeilToInt((_colors.Count + 1) / (float)MAX_COLUMNS);
+            int markerRowCount = CalculateMarkerRowCount();
+            int totalHeight = (colorRowCount + markerRowCount) * ROW_HEIGHT + BASE_HEIGHT;
 
-            int colorRowCount = Mathf.CeilToInt((colors.Count + 1) / (float)columns);
+            return new Vector2(WINDOW_WIDTH, totalHeight);
+        }
 
-            var groups = markerLibrary.entries.GroupBy(entry => entry.groupName);
+        private static int CalculateMarkerRowCount()
+        {
+            if (_markerLibrary == null) return 0;
 
+            var groups = _markerLibrary.entries.GroupBy(entry => entry.groupName);
             int totalMarkerRows = 0;
+
             foreach (var group in groups)
             {
                 int groupIconCount = group.Count();
-                int iconRows = Mathf.CeilToInt(groupIconCount / (float)columns);
+                int iconRows = Mathf.CeilToInt(groupIconCount / (float)MAX_COLUMNS);
                 totalMarkerRows += iconRows;
             }
 
-            int totalHeight = (colorRowCount + totalMarkerRows) * rowHeight + baseHeight;
+            return totalMarkerRows;
+        }
+        #endregion
 
-            Instance = CreateInstance<proFolderEditor>();
-            Instance.position = new Rect(position.x, position.y, 388, totalHeight);
-            Instance.ShowPopup();
+        #region Data Initialization
+        private static void InitializeData()
+        {
+            LoadColors();
+            GenerateColorIcons();
+            LoadMarkerLibrary();
         }
 
+        private static void LoadColors()
+        {
+            _colors = proFolderSettings.ColorPresetList;
+        }
+
+        private static void LoadMarkerLibrary()
+        {
+            if (_markerLibrary == null)
+            {
+                _markerLibrary = AssetDatabase.LoadAssetAtPath<MarkerLibrary>(MARKER_LIBRARY_PATH);
+                if (_markerLibrary == null)
+                {
+                    Debug.LogWarning($"proFolder: MarkerLibrary not found at {MARKER_LIBRARY_PATH}");
+                }
+            }
+        }
+        #endregion
+
+        #region Color Icon Generation
+        private static void GenerateColorIcons()
+        {
+            DisposeColorIcons();
+
+            if (_colors == null || _colors.Count == 0) return;
+
+            _colorIcons = new Texture2D[_colors.Count];
+
+            for (int i = 0; i < _colors.Count; i++)
+            {
+                _colorIcons[i] = CreateColorTexture(_colors[i]);
+            }
+        }
+
+        private static Texture2D CreateColorTexture(Color color)
+        {
+            var texture = new Texture2D(ICON_SIZE, ICON_SIZE, TextureFormat.ARGB32, false)
+            {
+                wrapMode = TextureWrapMode.Clamp
+            };
+
+            Color[] pixels = new Color[ICON_SIZE * ICON_SIZE];
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = color;
+            }
+
+            texture.SetPixels(pixels);
+            texture.Apply();
+            return texture;
+        }
+
+        private static void DisposeColorIcons()
+        {
+            if (_colorIcons == null) return;
+
+            foreach (var icon in _colorIcons)
+            {
+                if (icon != null)
+                {
+                    DestroyImmediate(icon);
+                }
+            }
+            _colorIcons = null;
+        }
+        #endregion
+
+        #region Unity Callbacks
         private void OnDisable()
         {
-            Instance = null;
+            _instance = null;
         }
 
         private void OnLostFocus()
         {
-            this.Close();
-            Instance = null;
+            CloseWindow();
         }
 
         private void OnApplicationFocus(bool hasFocus)
         {
             if (!hasFocus)
             {
-                this.Close();
-                Instance = null;
+                CloseWindow();
             }
+        }
+
+        private void CloseWindow()
+        {
+            Close();
+            _instance = null;
         }
 
         private void OnGUI()
         {
-            GUILayout.Label("proFolder", EditorStyles.boldLabel);
-            GUILayout.Space(8);
+            DrawHeader();
             DrawColorGrid();
-            GUILayout.Space(16);
-            DrawMarkGrid();
+            DrawSpacer();
+            DrawMarkerGrid();
+        }
+        #endregion
+
+        #region GUI Drawing
+        private void DrawHeader()
+        {
+            GUILayout.Label("proFolder", EditorStyles.boldLabel);
+            GUILayout.Space(SPACING_SMALL);
+        }
+
+        private void DrawSpacer()
+        {
+            GUILayout.Space(SPACING_LARGE);
         }
 
         private void DrawColorGrid()
         {
-            int iconSize = 32;
-            int maxColumns = 11;
+            if (_colorIcons == null || _markerLibrary == null) return;
 
-            int count = colorIcons.Length + 1;
+            int totalItems = _colorIcons.Length + 1;
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < totalItems; i++)
             {
-                if (i % maxColumns == 0)
+                if (i % MAX_COLUMNS == 0)
                 {
                     GUILayout.BeginHorizontal();
                 }
 
-                if (i == 0)
-                {
-                    if (GUILayout.Button(markerLibrary.entries[0].icon, GUILayout.Width(32), GUILayout.Height(32)))
-                    {
-                        OnColorSelected?.Invoke(Color.clear);
-                        Close();
-                    }
-                }
-                else
-                {
-                    int colorIndex = i - 1;
-                    if (GUILayout.Button(colorIcons[colorIndex], GUILayout.Width(iconSize), GUILayout.Height(iconSize)))
-                    {
-                        OnColorSelected?.Invoke(colors[colorIndex]);
-                        Close();
-                    }
-                }
+                DrawColorButton(i);
 
-                if ((i % maxColumns) == (maxColumns - 1) || i == count - 1)
+                if ((i % MAX_COLUMNS) == (MAX_COLUMNS - 1) || i == totalItems - 1)
                 {
                     GUILayout.EndHorizontal();
                 }
             }
         }
 
-        private void DrawMarkGrid()
+        private void DrawColorButton(int index)
         {
-            int iconSize = 32;
-            int maxColumns = 11;
+            if (index == 0)
+            {
+                // Clear button
+                if (_markerLibrary?.entries != null && _markerLibrary.entries.Count > 0)
+                {
+                    var clearIcon = _markerLibrary.entries[0].icon;
+                    if (clearIcon != null && GUILayout.Button(clearIcon, GUILayout.Width(ICON_SIZE), GUILayout.Height(ICON_SIZE)))
+                    {
+                        OnColorSelected?.Invoke(Color.clear);
+                        CloseWindow();
+                    }
+                }
+            }
+            else
+            {
+                // Color button
+                int colorIndex = index - 1;
+                if (colorIndex < _colorIcons.Length && _colorIcons[colorIndex] != null)
+                {
+                    if (GUILayout.Button(_colorIcons[colorIndex], GUILayout.Width(ICON_SIZE), GUILayout.Height(ICON_SIZE)))
+                    {
+                        OnColorSelected?.Invoke(_colors[colorIndex]);
+                        CloseWindow();
+                    }
+                }
+            }
+        }
 
-            var groups = markerLibrary.entries
+        private void DrawMarkerGrid()
+        {
+            if (_markerLibrary?.entries == null) return;
+
+            var groups = _markerLibrary.entries
                 .Select((entry, index) => new { entry, index })
                 .GroupBy(x => x.entry.groupName);
 
             foreach (var group in groups)
             {
-                int col = 0;
-                GUILayout.BeginHorizontal();
-                foreach (var item in group)
-                {
-                    if (col >= maxColumns)
-                    {
-                        GUILayout.EndHorizontal();
-                        GUILayout.BeginHorizontal();
-                        col = 0;
-                    }
+                DrawMarkerGroup(group);
+            }
+        }
 
-                    if (GUILayout.Button(item.entry.icon, GUILayout.Width(iconSize), GUILayout.Height(iconSize)))
+        private void DrawMarkerGroup(IGrouping<string, dynamic> group)
+        {
+            int columnCount = 0;
+            GUILayout.BeginHorizontal();
+
+            foreach (var item in group)
+            {
+                if (columnCount >= MAX_COLUMNS)
+                {
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    columnCount = 0;
+                }
+
+                if (item.entry.icon != null)
+                {
+                    if (GUILayout.Button(item.entry.icon, GUILayout.Width(ICON_SIZE), GUILayout.Height(ICON_SIZE)))
                     {
                         OnMarkSelected?.Invoke(item.index);
-                        Close();
-                    }
-
-                    col++;
-                }
-                GUILayout.EndHorizontal();
-            }
-        }
-
-        private static void GenerateColorIcons()
-        {
-            int size = 32;
-            colorIcons = new Texture2D[colors.Count];
-
-            for (int i = 0; i < colors.Count; i++)
-            {
-                var tex = new Texture2D(size, size, TextureFormat.ARGB32, false);
-                tex.wrapMode = TextureWrapMode.Clamp;
-
-                Color color = colors[i];
-                for (int y = 0; y < size; y++)
-                {
-                    for (int x = 0; x < size; x++)
-                    {
-                        tex.SetPixel(x, y, color);
+                        CloseWindow();
                     }
                 }
 
-                tex.Apply();
-                colorIcons[i] = tex;
+                columnCount++;
             }
-        }
 
-        private static void LoadMarkerLibrary()
+            GUILayout.EndHorizontal();
+        }
+        #endregion
+
+        #region Cleanup
+        private void OnDestroy()
         {
-            if (markerLibrary == null)
+            if (_instance == this)
             {
-                markerLibrary = AssetDatabase.LoadAssetAtPath<MarkerLibrary>("Assets/proTools/proFolder/SO/MarkerLibrary.asset");
+                DisposeColorIcons();
             }
         }
+        #endregion
     }
 }
