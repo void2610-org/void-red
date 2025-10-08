@@ -107,7 +107,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.AutoAdvance => float.TryParse(valueString, out var autoValue) ? autoValue : -1f,
             DialogParameterType.GetItem => ItemGetData.FromCommaSeparatedString(valueString),
             DialogParameterType.Choice => ChoiceData.FromCommaSeparatedString(valueString),
-            DialogParameterType.GetCard => !string.IsNullOrEmpty(valueString),
+            DialogParameterType.GetCard => true,
             _ => valueString
         };
     }
