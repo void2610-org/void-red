@@ -21,6 +21,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private readonly List<KeywordTextView> _keywordViews = new();
     private readonly List<Vector2> _keywordPositions = new();
     
+    private ThemeData _themeData;
     private MotionHandle _lensFlareMotionHandle;
 
     /// <summary>
@@ -29,6 +30,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// <param name="themeData">テーマデータ</param>
     public void DisplayThemeWithKeywords(ThemeData themeData)
     {
+        _themeData = themeData;
         // テーマタイトルを表示
         themeText.TypewriterAnimation(themeData.Title, skipOnClick:false).Forget();
 
@@ -63,6 +65,8 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!_themeData) return;
+        
         foreach (var view in _keywordViews)
             view.FadeIn();
         
@@ -79,6 +83,8 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!_themeData) return;
+        
         foreach (var view in _keywordViews)
             view.FadeOut();
         
