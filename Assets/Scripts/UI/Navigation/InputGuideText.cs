@@ -65,6 +65,17 @@ public class InputGuideText : MonoBehaviour
         };
     }
     
+    private void UpdateText()
+    {
+        var action = inputGuideData.actionReference.action;
+        // 現在のスキーマに合致するバインディングを探す
+        foreach (var spriteName in from binding in action.bindings where IsBindingForCurrentScheme(binding) select GetSpriteNameFromBinding(binding))
+        {
+            // スプライトタグとして出力（例: <sprite name="keyboard-shift">）
+            _text.SetText($"{inputGuideData.actionName} <sprite name=\"{spriteName}\">");
+        }
+    }
+    
     private void OnEnable()
     {
         UpdateText();
@@ -84,15 +95,9 @@ public class InputGuideText : MonoBehaviour
         InputSystem.onEvent -= OnEvent;
     }
     
-    private void UpdateText()
+    private void Awake()
     {
-        var action = inputGuideData.actionReference.action;
-        // 現在のスキーマに合致するバインディングを探す
-        foreach (var spriteName in from binding in action.bindings where IsBindingForCurrentScheme(binding) select GetSpriteNameFromBinding(binding))
-        {
-            // スプライトタグとして出力（例: <sprite name="keyboard-shift">）
-            _text.SetText($"{inputGuideData.actionName} <sprite name=\"{spriteName}\">");
-        }
+        _text = GetComponent<TextMeshProUGUI>();
     }
 
     /// <summary>
