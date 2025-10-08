@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+using System.Reflection;
 
 /// <summary>
 /// ノベルシーンでの選択結果に基づいてカードを選択するサービス
@@ -8,6 +8,33 @@ using UnityEngine;
 /// </summary>
 public static class NovelCardSelectionService
 {
+    private static readonly Dictionary<string, MethodInfo> _scenarioMethods = new();
+    
+    /// <summary>
+    /// 静的コンストラクタ ScenarioCardSelectionAttributeが付与されたメソッドを収集
+    /// </summary>
+    static NovelCardSelectionService()
+    {
+        InitializeScenarioMethods();
+    }
+    
+    /// <summary>
+    /// アトリビュートが付与されたメソッドを収集してキャッシュ
+    /// </summary>
+    private static void InitializeScenarioMethods()
+    {
+        var methods = typeof(NovelCardSelectionService).GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
+        
+        foreach (var method in methods)
+        {
+            var attribute = method.GetCustomAttribute<ScenarioCardSelectionAttribute>();
+            if (attribute != null)
+            {
+                _scenarioMethods[attribute.ScenarioId] = method;
+            }
+        }
+    }
+    
     /// <summary>
     /// シナリオIDと選択結果に基づいてカードIDを決定
     /// </summary>
@@ -16,12 +43,14 @@ public static class NovelCardSelectionService
     /// <returns>獲得するカードのID、選択できない場合はnull</returns>
     public static string SelectCardByChoices(string scenarioId, List<NovelChoiceResult> choiceResults)
     {
-        return scenarioId switch
+        // キャッシュされたメソッドを検索
+        if (_scenarioMethods.TryGetValue(scenarioId, out var method))
         {
-            "prologue1" => SelectCardForPrologue1(choiceResults),
-            // 他のシナリオのカード選択ロジックは今後ここに追加
-            _ => null
-        };
+            // リフレクションでメソッドを呼び出し
+            return (string)method.Invoke(null, new object[] { choiceResults });
+        }
+        
+        return null;
     }
     
     /// <summary>
@@ -30,6 +59,7 @@ public static class NovelCardSelectionService
     /// </summary>
     /// <param name="choiceResults">選択結果リスト</param>
     /// <returns>選択されたカードID</returns>
+    [ScenarioCardSelection("prologue1")]
     private static string SelectCardForPrologue1(List<NovelChoiceResult> choiceResults)
     {
         // 選択結果が存在しない場合
@@ -38,16 +68,21 @@ public static class NovelCardSelectionService
             return null;
         }
         
-        // 最初の選択肢（choiceIndex = 0）の結果を取得（最後に追加されたものを取得）
-        var choiceIndex0Results = choiceResults.Where(result => result.ChoiceIndex == 0).ToList();
+        // 最初の選択肢（choiceIndex = 0）の結果を最後から検索
+        NovelChoiceResult firstChoice = null;
+        for (int i = choiceResults.Count - 1; i >= 0; i--)
+        {
+            if (choiceResults[i].ChoiceIndex == 0)
+            {
+                firstChoice = choiceResults[i];
+                break;
+            }
+        }
         
-        if (choiceIndex0Results.Count == 0)
+        if (firstChoice == null)
         {
             return null;
         }
-        
-        // 複数ある場合は最後のものを取得
-        var firstChoice = choiceIndex0Results.Last();
         
         // 選択された選択肢のインデックスに基づいてカードIDを決定
         return firstChoice.SelectedOptionIndex switch
