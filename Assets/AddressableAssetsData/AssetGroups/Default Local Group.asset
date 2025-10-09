@@ -20,8 +20,43 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a4d225f374f34d92ad66b5f91f0fac0
+    m_Address: Assets/Sprites/Input/keyboard/space.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a603675306744af093b8a5c59cb98d2
+    m_Address: Assets/Sprites/Input/keyboard/x.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0f04f2ed6f09d4213a05a7b814860a64
     m_Address: Assets/Sprites/Character/Alv/1-5.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 147db1c1f077d4a829cde01c84a79258
+    m_Address: Assets/Sprites/Input/keyboard/m.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16a018da26e3241f29f65b3362341b5d
+    m_Address: Assets/Sprites/Input/keyboard/g.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16a245143ec724554a8eb36a399e2ec7
+    m_Address: Assets/Sprites/Input/keyboard/v.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 190def50c5da6443f9078d0f384c0a3a
+    m_Address: Assets/Sprites/Input/mouse/vscroll.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20b7494852361489cb004c4292ccd874
+    m_Address: Assets/Sprites/Input/mouse/scrollleft.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -30,8 +65,88 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 261c3d12628ae40fe88056f9697d5275
+    m_Address: Assets/Sprites/Input/gamepad/dpad.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2a70d861cc344489b998ed488d1d9a51
+    m_Address: Assets/Sprites/Input/keyboard/escape.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 319882228aac24a0ca56683db2243fca
+    m_Address: Assets/Sprites/Input/mouse/scrollup.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31b44eb18a9ce4a41a81c54a726b66ab
+    m_Address: Assets/Sprites/Input/keyboard/rightctrl.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38e75bf4533af4d708a841e00a5a70c6
+    m_Address: Assets/Sprites/Input/keyboard/leftarrow.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3fa2d505ad595416cbbb79d2f1418898
+    m_Address: Assets/Sprites/Input/keyboard/leftalt.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 412de83ff24f348f68b1ca97bf0e3e7d
     m_Address: Assets/Sprites/Character/Alv/1-4.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 41e0b67a1badf4a5680d138465ede248
+    m_Address: Assets/Sprites/Input/keyboard/downarrow.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4284028c68db54e02b16d457400b22fc
+    m_Address: Assets/Sprites/Input/keyboard/seven.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4652c4c8b851b433b8548cbcd6036eca
+    m_Address: Assets/Sprites/Input/keyboard/delete.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 48dd05c54d2f9412fae8b41e3f8bf2af
+    m_Address: Assets/Sprites/Input/gamepad/lefttrigger.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4993c0d1f9ec4451abf040af6c306b26
+    m_Address: Assets/Sprites/Input/keyboard/l.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4dc054b4953fc4fef8f5adc235309982
+    m_Address: Assets/Sprites/Input/keyboard/alt.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4e35304faba52448fa290eea2f6713c1
+    m_Address: Assets/Sprites/Input/keyboard/return.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 528a1e199af524953a728e6fe5f39c0b
+    m_Address: Assets/Sprites/Input/keyboard/six.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 564b4268a14dc418d9984811deef9c03
+    m_Address: Assets/Sprites/Input/keyboard/one.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 56b0c51bda439468e90c23370e30e337
+    m_Address: Assets/Sprites/Input/keyboard/j.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -40,8 +155,33 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c924ef377b34447eaaef7a196013709
+    m_Address: Assets/Sprites/Input/mouse/rightbutton.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5cc508a20954849d990a6d6215fe001f
     m_Address: Assets/Sprites/Background/LobbyDark.jpg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5dfde9127453344cd853b9199b052bce
+    m_Address: Assets/Sprites/Input/keyboard/i.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ee7a0def52044d0991e91137ed01dc4
+    m_Address: Assets/Sprites/Input/keyboard/z.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 601545886aee746569f17c4dbbd017bd
+    m_Address: Assets/Sprites/Input/keyboard/n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65298c4f5aa174631b50084933aaf59f
+    m_Address: Assets/Sprites/Input/keyboard/r.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -50,8 +190,53 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6bd1336a0e59d4e98ac64c04b7799c87
+    m_Address: Assets/Sprites/Input/keyboard/rightshift.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6f4cccfa1630e48c1a35d6104db1e8d4
+    m_Address: Assets/Sprites/Input/keyboard/four.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72afa3f050a0f4a128a9175b3f02bee4
+    m_Address: Assets/Sprites/Input/keyboard/leftshift.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 76f4c2fe610e341b2945cf51294ac9d2
+    m_Address: Assets/Sprites/Input/mouse/hscroll.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7710a68fc2a3f485e8abdf5c95fbc7db
+    m_Address: Assets/Sprites/Input/gamepad/buttonsouth.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7737af78a4df84e9084c26a3b969b8b1
     m_Address: Assets/Sprites/Background/Lobby.jpg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78b380ff3184a4822875d71f8070534a
+    m_Address: Assets/Sprites/Input/mouse/scrolldown.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78f434cf59f604ee39efbe4540ec6795
+    m_Address: Assets/Sprites/Input/keyboard/k.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ca7622bb89f142d79d5deb26b72786d
+    m_Address: Assets/Sprites/Input/keyboard/two.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 811fcd3e19cef4a5ba28df96bce44c08
+    m_Address: Assets/Sprites/Input/keyboard/t.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -60,8 +245,63 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8308d973d7df747bbbf442022f4aa964
+    m_Address: Assets/Sprites/Input/mouse/scrollright.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8793a2a4f6eaf4c16b720b9ef40d34b6
+    m_Address: Assets/Sprites/Input/gamepad/righttrigger.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 885811b86b3bc4c8d886050945d5c84f
+    m_Address: Assets/Sprites/Input/keyboard/a.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8b74e4e3816da41e985b1eb323426ce5
+    m_Address: Assets/Sprites/Input/keyboard/rightarrow.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8db85ac5f430a4e2f9d21da034619661
+    m_Address: Assets/Sprites/Input/keyboard/h.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ae5a5333c0e147eb834a7c0f3e224b7
+    m_Address: Assets/Sprites/Input/gamepad/buttoneast.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d3db562b1e08465e914e33175c13612
+    m_Address: Assets/Sprites/Input/keyboard/nine.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9f53c6cf7e0ba48c5a1684a9818b0157
     m_Address: Assets/Sprites/Character/Alv/2-3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a0653047ddcb5487d907028c6ae82568
+    m_Address: Assets/Sprites/Input/gamepad/buttonwest.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a759819433883446b9d82cc6b8481794
+    m_Address: Assets/Sprites/Input/keyboard/q.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac830104adb0245a28205ae4f92f231e
+    m_Address: Assets/Sprites/Input/keyboard/zero.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad938596aca784f048b47f512ad58eca
+    m_Address: Assets/Sprites/Input/keyboard/enter.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -70,8 +310,78 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b92dfd407e702475ea16e832de851460
+    m_Address: Assets/Sprites/Input/keyboard/o.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bda5007a10fa54988a432de9b171b87b
+    m_Address: Assets/Sprites/Input/keyboard/p.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c0f1638c2065946f6a9e5a16984e4a2d
     m_Address: Assets/Sprites/Item/Card.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c614f34ec560d4f13b19c4a2973c978f
+    m_Address: Assets/Sprites/Input/keyboard/y.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c7a345a58dcfb4ec1830dc6f6783a28f
+    m_Address: Assets/Sprites/Input/keyboard/u.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cadc241d9dc744129beb629f4d8a0f64
+    m_Address: Assets/Sprites/Input/mouse/leftbutton.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ccafd5a330c4746e5a6e2dba0d433222
+    m_Address: Assets/Sprites/Input/keyboard/s.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d033fced8edb941aa9ea792f8b667976
+    m_Address: Assets/Sprites/Input/keyboard/d.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3b7904f0cc7540ae9580be7823c91a6
+    m_Address: Assets/Sprites/Input/gamepad/rightshoulder.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3bbf3c5cb8b049409205cbdc29cd209
+    m_Address: Assets/Sprites/Input/gamepad/buttonnorth.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d5db8cbc3aa4f46698afdb5610c7509c
+    m_Address: Assets/Sprites/Input/keyboard/f.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d656d018279444b4fac337388b8551f0
+    m_Address: Assets/Sprites/Input/mouse/middlebutton.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6694cdc1d04e4fa09b7f3e8309e5572
+    m_Address: Assets/Sprites/Input/keyboard/eight.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d9246c43651324af790d9630035af361
+    m_Address: Assets/Sprites/Input/keyboard/ctrl.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d9aad8963a5514af0ae59b9b37b9c1cc
+    m_Address: Assets/Sprites/Input/keyboard/five.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -80,8 +390,68 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e0fcf1025ea6642d2b1d8cb31e1c27f9
+    m_Address: Assets/Sprites/Input/keyboard/b.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e26f53d05abb5428ea799874f86cb3e3
+    m_Address: Assets/Sprites/Input/keyboard/tab.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e55aa82b701ec498bacae2d02fd3be3c
+    m_Address: Assets/Sprites/Input/keyboard/uparrow.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e68ebd9d44f2540e5b10007e15146cc6
     m_Address: Assets/Sprites/Character/Alv/1-3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e70032c75499f43bfbfefdbbe11ba42e
+    m_Address: Assets/Sprites/Input/keyboard/leftctrl.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e89801ab26b7b40e59793c28ea5f7050
+    m_Address: Assets/Sprites/Input/keyboard/c.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e993501e6f46c49b3b572b131a120712
+    m_Address: Assets/Sprites/Input/keyboard/w.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea2bbea9729bd4a73a4a570cb46d6c61
+    m_Address: Assets/Sprites/Input/keyboard/three.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eb29ce9557bee48edbdb21cba7e89bc4
+    m_Address: Assets/Sprites/Input/keyboard/shift.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef9d1812a095847a0b266524f1aea8b1
+    m_Address: Assets/Sprites/Input/keyboard/rightalt.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8bf4cfafb1a6451db01a3546d7e50bc
+    m_Address: Assets/Sprites/Input/keyboard/e.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8fbaf16474c74b22bf22d9f72923d6a
+    m_Address: Assets/Sprites/Input/gamepad/leftshoulder.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fa6b5c7a99d5546cea064b3451dfac8e
+    m_Address: Assets/Sprites/Input/keyboard/backspace.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

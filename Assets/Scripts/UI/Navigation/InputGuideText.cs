@@ -1,11 +1,14 @@
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.UI;
 
-[RequireComponent(typeof(TextMeshProUGUI))]
 public class InputGuideText : MonoBehaviour
 {
     public enum InputSchemeType
@@ -22,12 +25,14 @@ public class InputGuideText : MonoBehaviour
     }
 
     [SerializeField] private InputGuideData inputGuideData;
-    
+    [SerializeField] private Image spriteImage; 
+    [SerializeField] private TextMeshProUGUI text;
+
     public event Action<InputSchemeType> OnSchemeChanged;
-    
+
     private Action<InputSchemeType> _onSchemeChanged;
     private InputSchemeType _scheme = InputSchemeType.KeyboardAndMouse;
-    private TextMeshProUGUI _text;
+    private AsyncOperationHandle<Sprite> _spriteHandle;
 
     private InputSchemeType Scheme
     {
@@ -65,12 +70,47 @@ public class InputGuideText : MonoBehaviour
         };
     }
     
-    private void UpdateText()
+    private async void UpdateText()
     {
+        // 前回ロードしたスプライトを解放
+        if (_spriteHandle.IsValid())
+            Addressables.Release(_spriteHandle);
+
         var action = inputGuideData.actionReference.action;
+        text.text = inputGuideData.actionName;
+
         // 現在のスキーマに合致するバインディングを探す
-        
-        // TODO: Addressablesでスプライトを管理する
+        var binding = action.bindings.FirstOrDefault(IsBindingForCurrentScheme);
+        if (string.IsNullOrEmpty(binding.path))
+        {
+            // バインディングが見つからない場合は非表示
+            spriteImage.enabled = false;
+            text.text = "";
+            return;
+        }
+
+        // バインディングからAddressablesキーを生成
+        var addressableKey = "Assets/Sprites/Input/" + GetSpriteNameFromBinding(binding) + ".png";
+        if (string.IsNullOrEmpty(addressableKey))
+        {
+            spriteImage.enabled = false;
+            return;
+        }
+
+        // Addressablesからスプライトをロード
+        try
+        {
+            _spriteHandle = Addressables.LoadAssetAsync<Sprite>(addressableKey);
+            var sprite = await _spriteHandle.ToUniTask();
+
+            spriteImage.sprite = sprite;
+            spriteImage.enabled = true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Failed to load sprite: {addressableKey}. Error: {e.Message}");
+            spriteImage.enabled = false;
+        }
     }
     
     private void OnEnable()
@@ -88,15 +128,16 @@ public class InputGuideText : MonoBehaviour
             OnSchemeChanged -= _onSchemeChanged;
             _onSchemeChanged = null;
         }
-        
+
         InputSystem.onEvent -= OnEvent;
+
+        // Addressablesハンドルを解放
+        if (_spriteHandle.IsValid())
+        {
+            Addressables.Release(_spriteHandle);
+        }
     }
     
-    private void Awake()
-    {
-        _text = GetComponent<TextMeshProUGUI>();
-    }
-
     /// <summary>
     /// binding.pathからAddressablesキーを生成する。
     /// InputSystemのバインディングパスを小文字化してスプライトパスに変換する。
