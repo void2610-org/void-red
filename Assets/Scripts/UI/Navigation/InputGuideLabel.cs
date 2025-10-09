@@ -131,6 +131,7 @@ public class InputGuideLabel : MonoBehaviour
     private void Awake()
     {
         _image = GetComponent<Image>();
+        _image.enabled = false;
     }
     
     /// <summary>
