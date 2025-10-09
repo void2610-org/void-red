@@ -645,6 +645,169 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Battle"",
+            ""id"": ""e445b594-6384-4873-ac60-b2b18c48860d"",
+            ""actions"": [
+                {
+                    ""name"": ""OpenPersonalityLog"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e11da15-4d21-4362-9772-1a9f9a45af8d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FocusOnTheme"",
+                    ""type"": ""Button"",
+                    ""id"": ""b357e10f-24b3-4878-a0f8-0716da4fab22"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangePlayStyle"",
+                    ""type"": ""Button"",
+                    ""id"": ""28e47d77-c6d8-42ac-a817-e5b4fe7f88a5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MinusMentalBet"",
+                    ""type"": ""Button"",
+                    ""id"": ""772a4cad-e366-411c-a39a-6519051b5a5d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PlusMentalBet"",
+                    ""type"": ""Button"",
+                    ""id"": ""b238c7d5-5ef0-417b-a079-4f91cfd3fb87"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""9c1a5704-469c-4a74-bd14-2eaabcded99b"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenPersonalityLog"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""713607d8-2e14-4279-80f8-24597be69e8b"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenPersonalityLog"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d7c002e4-54d6-4a07-8541-3cd9e37adc77"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FocusOnTheme"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7d84e54c-e65d-42f5-8e5a-98378a350f17"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FocusOnTheme"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""87bbd39c-7ce0-45fe-9369-770255ee89e3"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangePlayStyle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bd3078f6-b04b-4e13-aee5-e1f8e3744ce1"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangePlayStyle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""68ec74e1-88d5-4798-98dc-00cf551460b5"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlusMentalBet"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4d495344-0759-4356-9807-c7e4c52501df"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlusMentalBet"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""82e1ac8f-ef0d-49dc-9965-c0c458e837eb"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MinusMentalBet"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a6ff84ce-dd87-45bd-af52-35d4704e3530"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MinusMentalBet"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -723,11 +886,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_Pause = m_UI.FindAction("Pause", throwIfNotFound: true);
+        // Battle
+        m_Battle = asset.FindActionMap("Battle", throwIfNotFound: true);
+        m_Battle_OpenPersonalityLog = m_Battle.FindAction("OpenPersonalityLog", throwIfNotFound: true);
+        m_Battle_FocusOnTheme = m_Battle.FindAction("FocusOnTheme", throwIfNotFound: true);
+        m_Battle_ChangePlayStyle = m_Battle.FindAction("ChangePlayStyle", throwIfNotFound: true);
+        m_Battle_MinusMentalBet = m_Battle.FindAction("MinusMentalBet", throwIfNotFound: true);
+        m_Battle_PlusMentalBet = m_Battle.FindAction("PlusMentalBet", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
     {
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Battle.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Battle.Disable() has not been called.");
     }
 
     /// <summary>
@@ -1005,6 +1176,146 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="UIActions" /> instance referencing this action map.
     /// </summary>
     public UIActions @UI => new UIActions(this);
+
+    // Battle
+    private readonly InputActionMap m_Battle;
+    private List<IBattleActions> m_BattleActionsCallbackInterfaces = new List<IBattleActions>();
+    private readonly InputAction m_Battle_OpenPersonalityLog;
+    private readonly InputAction m_Battle_FocusOnTheme;
+    private readonly InputAction m_Battle_ChangePlayStyle;
+    private readonly InputAction m_Battle_MinusMentalBet;
+    private readonly InputAction m_Battle_PlusMentalBet;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Battle".
+    /// </summary>
+    public struct BattleActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public BattleActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Battle/OpenPersonalityLog".
+        /// </summary>
+        public InputAction @OpenPersonalityLog => m_Wrapper.m_Battle_OpenPersonalityLog;
+        /// <summary>
+        /// Provides access to the underlying input action "Battle/FocusOnTheme".
+        /// </summary>
+        public InputAction @FocusOnTheme => m_Wrapper.m_Battle_FocusOnTheme;
+        /// <summary>
+        /// Provides access to the underlying input action "Battle/ChangePlayStyle".
+        /// </summary>
+        public InputAction @ChangePlayStyle => m_Wrapper.m_Battle_ChangePlayStyle;
+        /// <summary>
+        /// Provides access to the underlying input action "Battle/MinusMentalBet".
+        /// </summary>
+        public InputAction @MinusMentalBet => m_Wrapper.m_Battle_MinusMentalBet;
+        /// <summary>
+        /// Provides access to the underlying input action "Battle/PlusMentalBet".
+        /// </summary>
+        public InputAction @PlusMentalBet => m_Wrapper.m_Battle_PlusMentalBet;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Battle; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="BattleActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(BattleActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="BattleActions" />
+        public void AddCallbacks(IBattleActions instance)
+        {
+            if (instance == null || m_Wrapper.m_BattleActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_BattleActionsCallbackInterfaces.Add(instance);
+            @OpenPersonalityLog.started += instance.OnOpenPersonalityLog;
+            @OpenPersonalityLog.performed += instance.OnOpenPersonalityLog;
+            @OpenPersonalityLog.canceled += instance.OnOpenPersonalityLog;
+            @FocusOnTheme.started += instance.OnFocusOnTheme;
+            @FocusOnTheme.performed += instance.OnFocusOnTheme;
+            @FocusOnTheme.canceled += instance.OnFocusOnTheme;
+            @ChangePlayStyle.started += instance.OnChangePlayStyle;
+            @ChangePlayStyle.performed += instance.OnChangePlayStyle;
+            @ChangePlayStyle.canceled += instance.OnChangePlayStyle;
+            @MinusMentalBet.started += instance.OnMinusMentalBet;
+            @MinusMentalBet.performed += instance.OnMinusMentalBet;
+            @MinusMentalBet.canceled += instance.OnMinusMentalBet;
+            @PlusMentalBet.started += instance.OnPlusMentalBet;
+            @PlusMentalBet.performed += instance.OnPlusMentalBet;
+            @PlusMentalBet.canceled += instance.OnPlusMentalBet;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="BattleActions" />
+        private void UnregisterCallbacks(IBattleActions instance)
+        {
+            @OpenPersonalityLog.started -= instance.OnOpenPersonalityLog;
+            @OpenPersonalityLog.performed -= instance.OnOpenPersonalityLog;
+            @OpenPersonalityLog.canceled -= instance.OnOpenPersonalityLog;
+            @FocusOnTheme.started -= instance.OnFocusOnTheme;
+            @FocusOnTheme.performed -= instance.OnFocusOnTheme;
+            @FocusOnTheme.canceled -= instance.OnFocusOnTheme;
+            @ChangePlayStyle.started -= instance.OnChangePlayStyle;
+            @ChangePlayStyle.performed -= instance.OnChangePlayStyle;
+            @ChangePlayStyle.canceled -= instance.OnChangePlayStyle;
+            @MinusMentalBet.started -= instance.OnMinusMentalBet;
+            @MinusMentalBet.performed -= instance.OnMinusMentalBet;
+            @MinusMentalBet.canceled -= instance.OnMinusMentalBet;
+            @PlusMentalBet.started -= instance.OnPlusMentalBet;
+            @PlusMentalBet.performed -= instance.OnPlusMentalBet;
+            @PlusMentalBet.canceled -= instance.OnPlusMentalBet;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="BattleActions.UnregisterCallbacks(IBattleActions)" />.
+        /// </summary>
+        /// <seealso cref="BattleActions.UnregisterCallbacks(IBattleActions)" />
+        public void RemoveCallbacks(IBattleActions instance)
+        {
+            if (m_Wrapper.m_BattleActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="BattleActions.AddCallbacks(IBattleActions)" />
+        /// <seealso cref="BattleActions.RemoveCallbacks(IBattleActions)" />
+        /// <seealso cref="BattleActions.UnregisterCallbacks(IBattleActions)" />
+        public void SetCallbacks(IBattleActions instance)
+        {
+            foreach (var item in m_Wrapper.m_BattleActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_BattleActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="BattleActions" /> instance referencing this action map.
+    /// </summary>
+    public BattleActions @Battle => new BattleActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -1154,5 +1465,48 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPause(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Battle" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="BattleActions.AddCallbacks(IBattleActions)" />
+    /// <seealso cref="BattleActions.RemoveCallbacks(IBattleActions)" />
+    public interface IBattleActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "OpenPersonalityLog" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnOpenPersonalityLog(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FocusOnTheme" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFocusOnTheme(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ChangePlayStyle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnChangePlayStyle(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MinusMentalBet" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMinusMentalBet(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PlusMentalBet" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPlusMentalBet(InputAction.CallbackContext context);
     }
 }
