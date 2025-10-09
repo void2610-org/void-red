@@ -9,7 +9,8 @@ using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
-public class InputGuideText : MonoBehaviour
+[RequireComponent(typeof(Image))]
+public class InputGuideLabel : MonoBehaviour
 {
     public enum InputSchemeType
     {
@@ -17,16 +18,9 @@ public class InputGuideText : MonoBehaviour
         Gamepad
     }
 
-    [Serializable]
-    public class InputGuideData
-    {
-        public string actionName;
-        public InputActionReference actionReference;
-    }
-
-    [SerializeField] private InputGuideData inputGuideData;
-    [SerializeField] private Image spriteImage; 
-    [SerializeField] private TextMeshProUGUI text;
+    [SerializeField] private InputActionReference inputActionReference;
+    
+    private Image _image; 
 
     public event Action<InputSchemeType> OnSchemeChanged;
 
@@ -76,16 +70,12 @@ public class InputGuideText : MonoBehaviour
         if (_spriteHandle.IsValid())
             Addressables.Release(_spriteHandle);
 
-        var action = inputGuideData.actionReference.action;
-        text.text = inputGuideData.actionName;
-
         // 現在のスキーマに合致するバインディングを探す
-        var binding = action.bindings.FirstOrDefault(IsBindingForCurrentScheme);
+        var binding = inputActionReference.action.bindings.FirstOrDefault(IsBindingForCurrentScheme);
         if (string.IsNullOrEmpty(binding.path))
         {
             // バインディングが見つからない場合は非表示
-            spriteImage.enabled = false;
-            text.text = "";
+            _image.enabled = false;
             return;
         }
 
@@ -93,7 +83,7 @@ public class InputGuideText : MonoBehaviour
         var addressableKey = "Assets/Sprites/Input/" + GetSpriteNameFromBinding(binding) + ".png";
         if (string.IsNullOrEmpty(addressableKey))
         {
-            spriteImage.enabled = false;
+            _image.enabled = false;
             return;
         }
 
@@ -103,13 +93,13 @@ public class InputGuideText : MonoBehaviour
             _spriteHandle = Addressables.LoadAssetAsync<Sprite>(addressableKey);
             var sprite = await _spriteHandle.ToUniTask();
 
-            spriteImage.sprite = sprite;
-            spriteImage.enabled = true;
+            _image.sprite = sprite;
+            _image.enabled = true;
         }
         catch (Exception e)
         {
             Debug.LogWarning($"Failed to load sprite: {addressableKey}. Error: {e.Message}");
-            spriteImage.enabled = false;
+            _image.enabled = false;
         }
     }
     
@@ -136,6 +126,11 @@ public class InputGuideText : MonoBehaviour
         {
             Addressables.Release(_spriteHandle);
         }
+    }
+    
+    private void Awake()
+    {
+        _image = GetComponent<Image>();
     }
     
     /// <summary>

@@ -344,7 +344,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2432446654732621487, guid: 4016e3b99bf14419a8514436073a022c, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2432446654732621487, guid: 4016e3b99bf14419a8514436073a022c, type: 3}
       propertyPath: m_SizeDelta.y
@@ -380,11 +380,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2432446654732621487, guid: 4016e3b99bf14419a8514436073a022c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 2432446654732621487, guid: 4016e3b99bf14419a8514436073a022c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -50
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 2432446654732621487, guid: 4016e3b99bf14419a8514436073a022c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -404,7 +404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7579280335539003653, guid: 4016e3b99bf14419a8514436073a022c, type: 3}
       propertyPath: m_Name
-      value: InputGuideText
+      value: InputGuideLabel
       objectReference: {fileID: 0}
     - target: {fileID: 7949456129641412522, guid: 4016e3b99bf14419a8514436073a022c, type: 3}
       propertyPath: inputGuideData.actionName
