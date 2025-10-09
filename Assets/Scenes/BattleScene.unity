@@ -5360,6 +5360,7 @@ RectTransform:
   - {fileID: 1124826946}
   - {fileID: 359829453}
   - {fileID: 397660102}
+  - {fileID: 731645807}
   - {fileID: 1749416359}
   - {fileID: 1780088944661058621}
   - {fileID: 3381169792331492097}
@@ -5367,7 +5368,6 @@ RectTransform:
   - {fileID: 1196038111}
   - {fileID: 293733585}
   - {fileID: 922065028}
-  - {fileID: 731645807}
   - {fileID: 8910911758015889554}
   - {fileID: 2796001278686421515}
   - {fileID: 1414258586}
@@ -7543,15 +7543,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1144052185887447738, guid: f5e6fe0c12dd74e2a9d6ef02a485e5f8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5054041
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1144052185887447738, guid: f5e6fe0c12dd74e2a9d6ef02a485e5f8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.30409145
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1144052185887447738, guid: f5e6fe0c12dd74e2a9d6ef02a485e5f8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1712.4575
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1144052185887447738, guid: f5e6fe0c12dd74e2a9d6ef02a485e5f8, type: 3}
       propertyPath: m_LocalRotation.w
