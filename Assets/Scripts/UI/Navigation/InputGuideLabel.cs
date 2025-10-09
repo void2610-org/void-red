@@ -66,16 +66,17 @@ public class InputGuideLabel : MonoBehaviour
     
     private async void UpdateText()
     {
-        // 前回ロードしたスプライトを解放
-        if (_spriteHandle.IsValid())
-            Addressables.Release(_spriteHandle);
-
         // 現在のスキーマに合致するバインディングを探す
         var binding = inputActionReference.action.bindings.FirstOrDefault(IsBindingForCurrentScheme);
         if (string.IsNullOrEmpty(binding.path))
         {
             // バインディングが見つからない場合は非表示
             _image.enabled = false;
+            
+            // 前回ロードしたスプライトを解放
+            if (_spriteHandle.IsValid())
+                Addressables.Release(_spriteHandle);
+            
             return;
         }
 
@@ -84,22 +85,38 @@ public class InputGuideLabel : MonoBehaviour
         if (string.IsNullOrEmpty(addressableKey))
         {
             _image.enabled = false;
+            
+            // 前回ロードしたスプライトを解放
+            if (_spriteHandle.IsValid())
+                Addressables.Release(_spriteHandle);
+            
             return;
         }
 
         // Addressablesからスプライトをロード
         try
         {
+            var oldHandle = _spriteHandle; // 古いハンドルを保存
+            
             _spriteHandle = Addressables.LoadAssetAsync<Sprite>(addressableKey);
             var sprite = await _spriteHandle.ToUniTask();
 
+            // 新しいスプライトを設定してから古いハンドルを解放
             _image.sprite = sprite;
             _image.enabled = true;
+            
+            // 古いハンドルを解放（新しいスプライト設定後）
+            if (oldHandle.IsValid())
+                Addressables.Release(oldHandle);
         }
         catch (Exception e)
         {
             Debug.LogWarning($"Failed to load sprite: {addressableKey}. Error: {e.Message}");
             _image.enabled = false;
+            
+            // エラー時も古いハンドルを解放
+            if (_spriteHandle.IsValid())
+                Addressables.Release(_spriteHandle);
         }
     }
     
