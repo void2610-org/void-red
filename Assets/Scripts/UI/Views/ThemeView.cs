@@ -20,6 +20,9 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     private readonly List<KeywordTextView> _keywordViews = new();
     private readonly List<Vector2> _keywordPositions = new();
+    
+    private ThemeData _themeData;
+    private MotionHandle _lensFlareMotionHandle;
 
     /// <summary>
     /// テーマとキーワードを表示
@@ -27,6 +30,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// <param name="themeData">テーマデータ</param>
     public void DisplayThemeWithKeywords(ThemeData themeData)
     {
+        _themeData = themeData;
         // テーマタイトルを表示
         themeText.TypewriterAnimation(themeData.Title, skipOnClick:false).Forget();
 
@@ -61,8 +65,17 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!_themeData) return;
+        
         foreach (var view in _keywordViews)
             view.FadeIn();
+        
+        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
+
+        _lensFlareMotionHandle = LMotion.Create(0f, 1f, 0.3f)
+            .WithEase(Ease.OutCubic)
+            .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
+            .AddTo(this);
     }
 
     /// <summary>
@@ -70,8 +83,17 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!_themeData) return;
+        
         foreach (var view in _keywordViews)
             view.FadeOut();
+        
+        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
+        
+        _lensFlareMotionHandle = LMotion.Create(1f, 0f, 0.3f)
+            .WithEase(Ease.OutCubic)
+            .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
+            .AddTo(this);
     }
     
     /// <summary>
@@ -110,5 +132,6 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private void OnDestroy()
     {
         ClearKeywords();
+        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
     }
 }
