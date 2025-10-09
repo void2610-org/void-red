@@ -75,6 +75,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2d3737371b2d641d2ae16d06e4128a6f
+    m_Address: Assets/Sprites/Input/gamepad/back.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 319882228aac24a0ca56683db2243fca
     m_Address: Assets/Sprites/Input/mouse/scrollup.png
     m_ReadOnly: 0
@@ -202,6 +207,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 72afa3f050a0f4a128a9175b3f02bee4
     m_Address: Assets/Sprites/Input/keyboard/leftshift.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 732e6868f26364863ac78073c29aebd6
+    m_Address: Assets/Sprites/Input/gamepad/start.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

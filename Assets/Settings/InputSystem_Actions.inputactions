@@ -97,7 +97,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "OpenSetting",
+                    "name": "Pause",
                     "type": "Button",
                     "id": "9f2f5099-2cf3-4008-b1bf-8d1b183c4af3",
                     "expectedControlType": "",
@@ -543,7 +543,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OpenSetting",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6afa1894-1b19-4f1a-8873-691afc0aee2d",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
