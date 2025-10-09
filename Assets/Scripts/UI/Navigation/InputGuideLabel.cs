@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
@@ -64,7 +63,7 @@ public class InputGuideLabel : MonoBehaviour
         };
     }
     
-    private async void UpdateText()
+    private async UniTask UpdateText()
     {
         // 現在のスキーマに合致するバインディングを探す
         var binding = inputActionReference.action.bindings.FirstOrDefault(IsBindingForCurrentScheme);
@@ -122,8 +121,8 @@ public class InputGuideLabel : MonoBehaviour
     
     private void OnEnable()
     {
-        UpdateText();
-        OnSchemeChanged += _onSchemeChanged = _ => UpdateText();
+        UpdateText().Forget();
+        OnSchemeChanged += _onSchemeChanged = _ => UpdateText().Forget();
         
         InputSystem.onEvent += OnEvent;
     }
@@ -154,13 +153,6 @@ public class InputGuideLabel : MonoBehaviour
     /// <summary>
     /// binding.pathからAddressablesキーを生成する。
     /// InputSystemのバインディングパスを小文字化してスプライトパスに変換する。
-    ///
-    /// 例:
-    /// - "<Keyboard>/space" → "keyboard/space"
-    /// - "<Keyboard>/upArrow" → "keyboard/uparrow"
-    /// - "<Mouse>/leftButton" → "mouse/leftbutton"
-    /// - "<Gamepad>/buttonSouth" → "gamepad/buttonsouth"
-    /// - "<Gamepad>/leftStick/up" → "gamepad/leftstick/up"
     /// </summary>
     private string GetSpriteNameFromBinding(InputBinding binding)
     {
