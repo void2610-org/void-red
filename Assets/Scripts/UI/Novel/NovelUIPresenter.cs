@@ -143,6 +143,12 @@ public class NovelUIPresenter : IStartable
                 await ShowChoiceEffect(currentDialog);
             }
             
+            // カード獲得演出がある場合は実行
+            if (currentDialog.HasGetCard)
+            {
+                await ShowCardGetEffect();
+            }
+            
             _currentDialogIndex++;
         }
         
@@ -175,7 +181,7 @@ public class NovelUIPresenter : IStartable
         if (dialogData.HasSe)
         {
             // SEのクリップ長を取得（オートモード時のため）
-            seWaitTime = _novelSeManager.PlaySe(dialogData.SeClipName, volume: 0.5f);
+            seWaitTime = _novelSeManager.PlaySe(dialogData.SeClipName);
         }
         
         // ダイアログを表示（完了まで待機）
@@ -243,6 +249,94 @@ public class NovelUIPresenter : IStartable
         Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
         
         _dialogView.SetInteractable(true);
+    }
+    
+    /// <summary>
+    /// カード獲得演出を実行
+    /// 選択結果に基づいてカードを決定し、アイテム取得演出を流用して表示
+    /// </summary>
+    private async UniTask ShowCardGetEffect()
+    {
+        // 現在のシナリオの選択結果を取得
+        var choiceResults = _gameProgressService.GetChoiceResultsByScenario(_currentScenarioId);
+        
+        // 選択結果に基づいてカードIDを決定
+        var selectedCardId = NovelCardSelectionService.SelectCardByChoices(_currentScenarioId, choiceResults);
+        
+        if (string.IsNullOrEmpty(selectedCardId))
+        {
+            // カードが選択されなかった場合は演出をスキップ
+            return;
+        }
+        
+        // カード情報を取得
+        var cardName = GetCardDisplayName(selectedCardId);
+        var cardDescription = GetCardDisplayDescription(selectedCardId);
+        var cardImageName = GetCardImageName(selectedCardId);
+        
+        // ItemGetDataとして演出データを作成
+        var cardGetData = new ItemGetData(cardImageName, cardName, cardDescription);
+        
+        _dialogView.SetInteractable(false);
+        
+        // カード画像を読み込み
+        Sprite cardSprite = null;
+        if (!string.IsNullOrEmpty(cardImageName))
+        {
+            // カード画像を読み込み（アイテム画像と同じフォルダから読み込み）
+            cardSprite = await _addressableImageLoader.LoadItemImageAsync(cardImageName);
+        }
+        
+        // アイテム取得演出を流用してカード獲得演出を実行
+        _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
+        await _itemGetEffectView.ShowItemGetEffect(cardGetData, cardSprite);
+        
+        _dialogView.SetInteractable(true);
+    }
+    
+    /// <summary>
+    /// カードIDから表示用の名前を取得（仮実装）
+    /// </summary>
+    /// <param name="cardId">カードID</param>
+    /// <returns>カードの表示名</returns>
+    private string GetCardDisplayName(string cardId)
+    {
+        return cardId switch
+        {
+            "card_aggressive_001" => "【攻撃】鋭い一撃",
+            "card_defensive_001" => "【防御】堅実な守り",
+            _ => "未知のカード"
+        };
+    }
+    
+    /// <summary>
+    /// カードIDから表示用の説明を取得（仮実装）
+    /// </summary>
+    /// <param name="cardId">カードID</param>
+    /// <returns>カードの説明文</returns>
+    private string GetCardDisplayDescription(string cardId)
+    {
+        return cardId switch
+        {
+            "card_aggressive_001" => "積極的な選択から生まれた攻撃カード",
+            "card_defensive_001" => "慎重な選択から生まれた防御カード",
+            _ => "あなたの選択が生み出したカード"
+        };
+    }
+    
+    /// <summary>
+    /// カードIDから画像名を取得（仮実装）
+    /// </summary>
+    /// <param name="cardId">カードID</param>
+    /// <returns>画像ファイル名</returns>
+    private string GetCardImageName(string cardId)
+    {
+        return cardId switch
+        {
+            "card_aggressive_001" => "Card",
+            "card_defensive_001" => "Card",
+            _ => "Card"
+        };
     }
     
     /// <summary>
