@@ -28,6 +28,7 @@ public class InputActionsProvider : IDisposable
     {
         // InputSystem_Actionsのインスタンスを作成
         _inputActions = new InputSystem_Actions();
+        _inputActions.UI.Enable();
     }
 
     public void Dispose()

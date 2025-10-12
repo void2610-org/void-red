@@ -37,7 +37,6 @@ public class SettingsPresenter : IStartable, IDisposable
 
         // Pauseアクションの購読
         _inputActionsProvider.UI.Pause.performed += OnPauseActionPerformed;
-        _inputActionsProvider.UI.Enable();
 
         // 設定ボタンのイベント設定
         if (_settingButtonView != null)
@@ -165,8 +164,6 @@ public class SettingsPresenter : IStartable, IDisposable
     
     public void Dispose()
     {
-        // Pauseアクションの購読解除
-        _inputActionsProvider.UI.Pause.performed -= OnPauseActionPerformed;
         _disposables?.Dispose();
     }
 }
