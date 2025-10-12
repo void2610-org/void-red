@@ -23,7 +23,8 @@ public class SceneTransitionManager : IDisposable
     private Image _fadeImage;
     private MotionHandle _currentFadeHandle;
     
-    private DiscordService _discordService;
+    private readonly DiscordService _discordService;
+    private readonly InputActionsProvider _inputActionsProvider;
     
     /// <summary>
     /// 現在フェード中かどうか
@@ -33,9 +34,10 @@ public class SceneTransitionManager : IDisposable
     /// <summary>
     /// コンストラクタでフェード用のUIを初期化
     /// </summary>
-    public SceneTransitionManager(DiscordService discordService)
+    public SceneTransitionManager(DiscordService discordService, InputActionsProvider inputActionsProvider)
     {
         _discordService = discordService;
+        _inputActionsProvider = inputActionsProvider;
         InitializeFadeCanvas();
     }
     
@@ -103,6 +105,18 @@ public class SceneTransitionManager : IDisposable
             // シーンの有効化完了を待つ
             await UniTask.WaitUntil(() => asyncOperation.isDone);
             await UniTask.Delay(100, DelayType.UnscaledDeltaTime);
+            
+            // InputSystemのActionsを有効化
+            if (targetScene == SceneType.Battle)
+            {
+                _inputActionsProvider.Battle.Enable();
+                _inputActionsProvider.Novel.Disable();
+            }
+            else
+            {
+                _inputActionsProvider.Novel.Enable();
+                _inputActionsProvider.Battle.Disable();
+            }
             
             // Discord Rich Presence更新
             _discordService.SetSceneState(targetScene);

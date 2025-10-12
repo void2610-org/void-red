@@ -30,14 +30,13 @@ public class PausePresenter : IStartable, System.IDisposable
 
         // Pauseアクションの購読
         _inputActionsProvider.UI.Pause.performed += OnPauseActionPerformed;
-        _inputActionsProvider.UI.Enable();
 
         // ポーズボタンのイベント設定
         _pauseButtonView.OnButtonClicked.Subscribe(
             _ => _pauseView.Show())
             .AddTo(_disposables);
 
-        // リジュームボタンのイベント設定
+        // 再開ボタンのイベント設定
         _pauseView.OnResumeButtonClicked.Subscribe(
             _ => _pauseView.Hide())
             .AddTo(_disposables);
@@ -67,8 +66,6 @@ public class PausePresenter : IStartable, System.IDisposable
 
     public void Dispose()
     {
-        // Pauseアクションの購読解除
-        _inputActionsProvider.UI.Pause.performed -= OnPauseActionPerformed;
         _disposables.Dispose();
     }
 }
