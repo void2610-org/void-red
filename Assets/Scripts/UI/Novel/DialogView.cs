@@ -326,7 +326,7 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// クリック時の処理
     /// </summary>
-    private void OnClick()
+    public void OnClick()
     {
         if (!canvasGroup) return;
         if (canvasGroup.alpha == 0f || !canvasGroup.interactable) return;

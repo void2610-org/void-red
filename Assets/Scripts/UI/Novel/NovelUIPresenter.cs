@@ -80,6 +80,10 @@ public class NovelUIPresenter : IStartable
             .Subscribe(_ => SkipAllDialogs().Forget())
             .AddTo(_disposables);
 
+        _inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
+            .Subscribe(_ => _dialogView.OnClick())
+            .AddTo(_disposables);
+
         // Viewイベントを購読
         _dialogView.OnDialogCompleted
             .Subscribe(_ => OnDialogCompleted().Forget())
