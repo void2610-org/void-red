@@ -294,6 +294,9 @@ public class NovelUIPresenter : IStartable
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
         await _itemGetEffectView.ShowItemGetEffect(cardGetData, cardSprite);
         
+        // カードをプレイヤーのデッキに追加してセーブ
+        _gameProgressService.AddCardToDeckAndSave(cardData);
+        
         _dialogView.SetInteractable(true);
     }
     
