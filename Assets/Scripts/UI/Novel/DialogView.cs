@@ -55,11 +55,9 @@ public class DialogView : MonoBehaviour
     
     // イベント
     private readonly Subject<Unit> _onDialogCompleted = new();
-    private readonly Subject<Unit> _onUserClickDetected = new();
     private readonly Subject<Unit> _onSkipRequested = new();
     
     public Observable<Unit> OnDialogCompleted => _onDialogCompleted;
-    public Observable<Unit> OnUserClickDetected => _onUserClickDetected;
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
     
     private void Awake()
@@ -274,11 +272,7 @@ public class DialogView : MonoBehaviour
                 await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: _waitCancellationTokenSource.Token);
                 
                 // タイムアウト後もまだ待機中の場合は自動で進む
-                if (_isWaitingForNext)
-                {
-                    _isWaitingForNext = false;
-                    _onUserClickDetected.OnNext(Unit.Default);
-                }
+                if (_isWaitingForNext) _isWaitingForNext = false;
             }
             catch (OperationCanceledException)
             {
@@ -314,11 +308,7 @@ public class DialogView : MonoBehaviour
             var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
             await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: this.GetCancellationTokenOnDestroy());
             
-            if (_isWaitingForNext && _isAutoMode)
-            {
-                _isWaitingForNext = false;
-                _onUserClickDetected.OnNext(Unit.Default);
-            }
+            if (_isWaitingForNext && _isAutoMode) _isWaitingForNext = false;
         }
         catch (OperationCanceledException) { }
     }
@@ -344,7 +334,6 @@ public class DialogView : MonoBehaviour
         
         // 通常モードのクリックで次へ進む
         _isWaitingForNext = false;
-        _onUserClickDetected.OnNext(Unit.Default);
     }
     
     /// <summary>
@@ -446,7 +435,6 @@ public class DialogView : MonoBehaviour
 
         // R3のSubjectを解放
         _onDialogCompleted.Dispose();
-        _onUserClickDetected.Dispose();
         _onSkipRequested.Dispose();
     }
 }
