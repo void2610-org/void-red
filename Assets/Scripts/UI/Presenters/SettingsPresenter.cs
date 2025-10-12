@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using R3;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using VContainer.Unity;
 using Object = UnityEngine.Object;
 
@@ -36,7 +35,9 @@ public class SettingsPresenter : IStartable, IDisposable
         _settingButtonView = Object.FindFirstObjectByType<SettingButtonView>();
 
         // Pauseアクションの購読
-        _inputActionsProvider.UI.Pause.performed += OnPauseActionPerformed;
+        _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
+            .Subscribe(_ => ToggleSettings())
+            .AddTo(_disposables);
 
         // 設定ボタンのイベント設定
         if (_settingButtonView != null)
@@ -49,11 +50,6 @@ public class SettingsPresenter : IStartable, IDisposable
         SubscribeToViewEvents();
         RefreshSettingsView();
         HideSettings(); // 初期状態では非表示にする
-    }
-
-    private void OnPauseActionPerformed(InputAction.CallbackContext context)
-    {
-        ToggleSettings();
     }
 
     private void ToggleSettings()
