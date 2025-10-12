@@ -415,7 +415,6 @@ namespace Void2610.UnityTemplate
             {
                 // キャンセル時は完全なテキストを表示
                 if (text) text.text = message;
-                throw;
             }
             
             // 最終的に完全なテキストを表示（念のため）

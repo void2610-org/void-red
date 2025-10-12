@@ -43,6 +43,7 @@ public class DialogView : MonoBehaviour
     private bool _isTyping;
     private bool _isWaitingForNext;
     private bool _isAutoMode;
+    private CancellationTokenSource _typingCancellationTokenSource;
     private CancellationTokenSource _waitCancellationTokenSource;
     private CancellationTokenSource _dialogSeCancellationTokenSource;
     private DialogData _currentDialogData;
@@ -154,8 +155,11 @@ public class DialogView : MonoBehaviour
         _dialogSeCancellationTokenSource = new CancellationTokenSource();
         SeManager.Instance.PlaySeLoop("Dialog2", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
 
+        _typingCancellationTokenSource?.Cancel();
+        _typingCancellationTokenSource?.Dispose();
+        _typingCancellationTokenSource = new CancellationTokenSource();
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
-        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
+        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, _typingCancellationTokenSource.Token);
 
         // dialogSeループを停止
         _dialogSeCancellationTokenSource?.Cancel();
@@ -322,7 +326,18 @@ public class DialogView : MonoBehaviour
     {
         if (!canvasGroup) return;
         if (canvasGroup.alpha == 0f || !canvasGroup.interactable) return;
-        if (_isTyping) return;
+        if (_isTyping)
+        {
+            // 文字送り中のクリックで即座に全文表示
+            _typingCancellationTokenSource?.Cancel();
+
+            _isTyping = false;
+            _isWaitingForNext = true;
+            ShowNextIndicator();
+
+            return;
+        }
+        
         if (!_isWaitingForNext) return;
         
         // オートモード中のクリックはオートモードを解除
