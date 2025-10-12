@@ -79,11 +79,16 @@ public class SettingsView : MonoBehaviour
     /// 設定画面を表示
     /// </summary>
     public void ShowSettings() => settingsPanel.SetActive(true);
-    
+
     /// <summary>
     /// 設定画面を非表示
     /// </summary>
     public void HideSettings() => settingsPanel.SetActive(false);
+
+    /// <summary>
+    /// 設定画面の表示状態
+    /// </summary>
+    public bool IsShowing => settingsPanel.activeSelf;
     
     private void Start()
     {
