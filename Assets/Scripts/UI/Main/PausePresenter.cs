@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using VContainer.Unity;
 
 /// <summary>
@@ -29,7 +28,9 @@ public class PausePresenter : IStartable, System.IDisposable
         _pauseButtonView = Object.FindFirstObjectByType<PauseButtonView>();
 
         // Pauseアクションの購読
-        _inputActionsProvider.UI.Pause.performed += OnPauseActionPerformed;
+        _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
+            .Subscribe(_ => TogglePause())
+            .AddTo(_disposables);
 
         // ポーズボタンのイベント設定
         _pauseButtonView.OnButtonClicked.Subscribe(
@@ -45,11 +46,6 @@ public class PausePresenter : IStartable, System.IDisposable
         _pauseView.OnTitleButtonClicked.Subscribe(
             _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget()
         ).AddTo(_disposables);
-    }
-
-    private void OnPauseActionPerformed(InputAction.CallbackContext context)
-    {
-        TogglePause();
     }
 
     private void TogglePause()

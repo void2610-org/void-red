@@ -194,18 +194,18 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// オートモードの切り替え
     /// </summary>
-    private void ToggleAutoMode()
+    public void ToggleAutoMode()
     {
         _isAutoMode = !_isAutoMode;
         UpdateAutoButtonColor();
-        
+
         // オートモードONで現在待機中の場合、自動進行を開始
         if (_isAutoMode && _isWaitingForNext)
         {
             _waitCancellationTokenSource?.Cancel();
             _waitCancellationTokenSource?.Dispose();
             _waitCancellationTokenSource = null;
-            
+
             // 新しい自動進行タスクを開始
             StartAutoProgress().Forget();
         }

@@ -106,17 +106,8 @@ public class SceneTransitionManager : IDisposable
             await UniTask.WaitUntil(() => asyncOperation.isDone);
             await UniTask.Delay(100, DelayType.UnscaledDeltaTime);
             
-            // InputSystemのActionsを有効化
-            if (targetScene == SceneType.Battle)
-            {
-                _inputActionsProvider.Battle.Enable();
-                _inputActionsProvider.Novel.Disable();
-            }
-            else
-            {
-                _inputActionsProvider.Novel.Enable();
-                _inputActionsProvider.Battle.Disable();
-            }
+            // InputSystemを更新
+            _inputActionsProvider.OnSceneChanged(targetScene);
             
             // Discord Rich Presence更新
             _discordService.SetSceneState(targetScene);

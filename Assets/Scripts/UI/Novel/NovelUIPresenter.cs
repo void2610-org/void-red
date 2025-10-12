@@ -19,11 +19,12 @@ public class NovelUIPresenter : IStartable
     private AddressableImageLoader _addressableImageLoader;
     private ConfirmationDialogService _confirmationDialogService;
     private SettingsManager _settingsManager;
+    private InputActionsProvider _inputActionsProvider;
     private DialogView _dialogView;
     private ItemGetEffectView _itemGetEffectView;
     private ChoiceView _choiceView;
     private NovelSeManager _novelSeManager;
-    
+
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
@@ -44,16 +45,18 @@ public class NovelUIPresenter : IStartable
     [Inject]
     public void Construct(
         NovelSeManager novelSeManager,
-        GameProgressService gameProgressService, 
-        SceneTransitionManager sceneTransitionManager, 
+        GameProgressService gameProgressService,
+        SceneTransitionManager sceneTransitionManager,
         ConfirmationDialogService confirmationDialogService,
-        SettingsManager settingsManager)
+        SettingsManager settingsManager,
+        InputActionsProvider inputActionsProvider)
     {
         _novelSeManager = novelSeManager;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
         _settingsManager = settingsManager;
+        _inputActionsProvider = inputActionsProvider;
         _addressableImageLoader = new AddressableImageLoader();
     }
     
@@ -67,7 +70,16 @@ public class NovelUIPresenter : IStartable
         _dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
         _itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
         _choiceView = UnityEngine.Object.FindAnyObjectByType<ChoiceView>();
-        
+
+        // InputSystemアクションの購読
+        _inputActionsProvider.Novel.Auto.OnPerformedAsObservable()
+            .Subscribe(_ => _dialogView.ToggleAutoMode())
+            .AddTo(_disposables);
+
+        _inputActionsProvider.Novel.Skip.OnPerformedAsObservable()
+            .Subscribe(_ => SkipAllDialogs().Forget())
+            .AddTo(_disposables);
+
         // Viewイベントを購読
         _dialogView.OnDialogCompleted
             .Subscribe(_ => OnDialogCompleted().Forget())
@@ -75,7 +87,7 @@ public class NovelUIPresenter : IStartable
         _dialogView.OnSkipRequested
             .Subscribe(_ => SkipAllDialogs().Forget())
             .AddTo(_disposables);
-        
+
         // SE音量設定を適用
         var seSetting = _settingsManager.GetSetting<SliderSetting>("SE音量");
         _novelSeManager.SeVolume = seSetting.CurrentValue;
@@ -349,9 +361,9 @@ public class NovelUIPresenter : IStartable
             "スキップ",
             "キャンセル"
         );
-        
+
         if (!confirmed) return;
-        
+
         // ダイアログループを強制終了してダイアログ完了を表示
         _currentDialogIndex = _currentDialogList.Count;
         await _dialogView.ShowDialogComplete();

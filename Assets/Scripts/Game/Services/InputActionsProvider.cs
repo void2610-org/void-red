@@ -7,7 +7,7 @@ using VContainer.Unity;
 /// </summary>
 public class InputActionsProvider : IDisposable
 {
-    private readonly InputSystem_Actions _inputActions;
+    private InputSystem_Actions _inputActions;
 
     /// <summary>
     /// Battle アクションマップへのアクセス
@@ -29,6 +29,30 @@ public class InputActionsProvider : IDisposable
         // InputSystem_Actionsのインスタンスを作成
         _inputActions = new InputSystem_Actions();
         _inputActions.UI.Enable();
+    }
+
+    /// <summary>
+    /// シーン遷移時に呼び出され、アクションマップを適切に切り替える
+    /// </summary>
+    public void OnSceneChanged(SceneType targetScene)
+    {
+        // 全てのアクションマップを無効化
+        _inputActions.Battle.Disable();
+        _inputActions.Novel.Disable();
+
+        // UIは常に有効
+        _inputActions.UI.Enable();
+
+        // 遷移先シーンに応じてアクションマップを有効化
+        switch (targetScene)
+        {
+            case SceneType.Battle:
+                _inputActions.Battle.Enable();
+                break;
+            case SceneType.Novel:
+                _inputActions.Novel.Enable();
+                break;
+        }
     }
 
     public void Dispose()
