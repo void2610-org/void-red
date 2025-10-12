@@ -107,7 +107,7 @@ public class SceneTransitionManager : IDisposable
             await UniTask.Delay(100, DelayType.UnscaledDeltaTime);
             
             // InputSystemを更新
-            _inputActionsProvider.OnSceneChanged(targetScene);
+            _inputActionsProvider.EnableActionMapsForScene(targetScene);
             
             // Discord Rich Presence更新
             _discordService.SetSceneState(targetScene);
