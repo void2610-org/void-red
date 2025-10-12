@@ -148,8 +148,10 @@ public class DialogView : MonoBehaviour
         _isTyping = true;
         _isWaitingForNext = false;
 
-
-        _dialogSeCancellationTokenSource = new CancellationTokenSource(); 
+        // 既存のSEループをキャンセル
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = new CancellationTokenSource();
         SeManager.Instance.PlaySeLoop("Dialog2", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
 
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
