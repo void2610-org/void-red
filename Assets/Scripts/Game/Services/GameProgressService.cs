@@ -239,4 +239,23 @@ public class GameProgressService
     {
         return _repository.PersonalityLogData;
     }
+
+    /// <summary>
+    /// 新しいカードをプレイヤーのデッキに追加してセーブ
+    /// </summary>
+    /// <param name="cardData">追加するカードデータ</param>
+    public void AddCardToDeckAndSave(CardData cardData)
+    {
+        // 新しいインスタンスIDを生成
+        var instanceId = System.Guid.NewGuid().ToString();
+        
+        // SavedCardとしてデッキに追加
+        var savedCard = new SavedCard(cardData.CardId, instanceId, false);
+        _repository.PlayerProgress.Deck.Add(savedCard);
+        
+        Debug.Log($"[GameProgressService] カードをデッキに追加: {cardData.CardName} (ID: {cardData.CardId})");
+        
+        // セーブデータを更新
+        _repository.SaveAll();
+    }
 }
