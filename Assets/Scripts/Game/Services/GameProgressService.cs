@@ -249,8 +249,11 @@ public class GameProgressService
         // 新しいインスタンスIDを生成
         var instanceId = System.Guid.NewGuid().ToString();
         
+        // 新規獲得カードは崩壊していない状態で追加
+        const bool isCollapsed = false;
+        
         // SavedCardとしてデッキに追加
-        var savedCard = new SavedCard(cardData.CardId, instanceId, false);
+        var savedCard = new SavedCard(cardData.CardId, instanceId, isCollapsed);
         _repository.PlayerProgress.Deck.Add(savedCard);
         
         Debug.Log($"[GameProgressService] カードをデッキに追加: {cardData.CardName} (ID: {cardData.CardId})");
