@@ -19,6 +19,7 @@ public class NovelUIPresenter : IStartable
     private AddressableImageLoader _addressableImageLoader;
     private ConfirmationDialogService _confirmationDialogService;
     private SettingsManager _settingsManager;
+    private CardPoolService _cardPoolService;
     private DialogView _dialogView;
     private ItemGetEffectView _itemGetEffectView;
     private ChoiceView _choiceView;
@@ -47,13 +48,15 @@ public class NovelUIPresenter : IStartable
         GameProgressService gameProgressService, 
         SceneTransitionManager sceneTransitionManager, 
         ConfirmationDialogService confirmationDialogService,
-        SettingsManager settingsManager)
+        SettingsManager settingsManager,
+        CardPoolService cardPoolService)
     {
         _novelSeManager = novelSeManager;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
         _settingsManager = settingsManager;
+        _cardPoolService = cardPoolService;
         _addressableImageLoader = new AddressableImageLoader();
     }
     
@@ -269,23 +272,23 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
-        // カード情報を取得
-        var cardName = GetCardDisplayName(selectedCardId);
-        var cardDescription = GetCardDisplayDescription(selectedCardId);
-        var cardImageName = GetCardImageName(selectedCardId);
+        // CardPoolServiceから実際のCardDataを取得
+        var cardData = _cardPoolService.GetCardById(selectedCardId);
+        if (cardData == null)
+        {
+            Debug.LogWarning($"[NovelUIPresenter] カードID '{selectedCardId}' が見つかりません");
+            return;
+        }
         
-        // ItemGetDataとして演出データを作成
-        var cardGetData = new ItemGetData(cardImageName, cardName, cardDescription);
+        // 実際のCardDataから情報を取得
+        var cardName = cardData.CardName;
+        var cardDescription = GetCardDescription(cardData);
+        var cardSprite = cardData.CardImage; // 直接Spriteを使用
+        
+        // ItemGetDataとして演出データを作成（画像名は空文字列で、Spriteを直接使用）
+        var cardGetData = new ItemGetData("", cardName, cardDescription);
         
         _dialogView.SetInteractable(false);
-        
-        // カード画像を読み込み
-        Sprite cardSprite = null;
-        if (!string.IsNullOrEmpty(cardImageName))
-        {
-            // カード画像を読み込み（アイテム画像と同じフォルダから読み込み）
-            cardSprite = await _addressableImageLoader.LoadItemImageAsync(cardImageName);
-        }
         
         // アイテム取得演出を流用してカード獲得演出を実行
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
@@ -295,50 +298,19 @@ public class NovelUIPresenter : IStartable
     }
     
     /// <summary>
-    /// カードIDから表示用の名前を取得（仮実装）
+    /// CardDataから表示用の説明を生成
     /// </summary>
-    /// <param name="cardId">カードID</param>
-    /// <returns>カードの表示名</returns>
-    private string GetCardDisplayName(string cardId)
-    {
-        return cardId switch
-        {
-            "card_aggressive_001" => "【攻撃】鋭い一撃",
-            "card_defensive_001" => "【防御】堅実な守り",
-            _ => "未知のカード"
-        };
-    }
-    
-    /// <summary>
-    /// カードIDから表示用の説明を取得（仮実装）
-    /// </summary>
-    /// <param name="cardId">カードID</param>
+    /// <param name="cardData">カードデータ</param>
     /// <returns>カードの説明文</returns>
-    private string GetCardDisplayDescription(string cardId)
+    private string GetCardDescription(CardData cardData)
     {
-        return cardId switch
-        {
-            "card_aggressive_001" => "積極的な選択から生まれた攻撃カード",
-            "card_defensive_001" => "慎重な選択から生まれた防御カード",
-            _ => "あなたの選択が生み出したカード"
-        };
+        // カードのタイプや効果に基づいて説明文を生成
+        var keywords = cardData.Keywords != null && cardData.Keywords.Count > 0 
+            ? string.Join(", ", cardData.Keywords) 
+            : "なし";
+        
+        return $"属性: {cardData.Attribute}\nキーワード: {keywords}";
     }
-    
-    /// <summary>
-    /// カードIDから画像名を取得（仮実装）
-    /// </summary>
-    /// <param name="cardId">カードID</param>
-    /// <returns>画像ファイル名</returns>
-    private string GetCardImageName(string cardId)
-    {
-        return cardId switch
-        {
-            "card_aggressive_001" => "Card",
-            "card_defensive_001" => "Card",
-            _ => "Card"
-        };
-    }
-    
     /// <summary>
     /// 全ダイアログをスキップして即座に完了
     /// </summary>
