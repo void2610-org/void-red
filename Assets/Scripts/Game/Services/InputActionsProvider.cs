@@ -28,13 +28,16 @@ public class InputActionsProvider : IDisposable
     {
         // InputSystem_Actionsのインスタンスを作成
         _inputActions = new InputSystem_Actions();
-        _inputActions.UI.Enable();
+
+        // 現在のシーンに応じてアクションマップを有効化（デバッグで直接シーンを開いた場合に対応）
+        var currentScene = SceneUtility.GetCurrentSceneType();
+        EnableActionMapsForScene(currentScene);
     }
 
     /// <summary>
-    /// シーン遷移時に呼び出され、アクションマップを適切に切り替える
+    /// 指定されたシーンに応じてアクションマップを有効化
     /// </summary>
-    public void OnSceneChanged(SceneType targetScene)
+    public void EnableActionMapsForScene(SceneType sceneType)
     {
         // 全てのアクションマップを無効化
         _inputActions.Battle.Disable();
@@ -43,8 +46,8 @@ public class InputActionsProvider : IDisposable
         // UIは常に有効
         _inputActions.UI.Enable();
 
-        // 遷移先シーンに応じてアクションマップを有効化
-        switch (targetScene)
+        // シーンに応じてアクションマップを有効化
+        switch (sceneType)
         {
             case SceneType.Battle:
                 _inputActions.Battle.Enable();
