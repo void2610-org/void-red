@@ -23,33 +23,36 @@ public class RootLifetimeScope : LifetimeScope
         builder.RegisterInstance(allCardData);
         builder.RegisterInstance(allTutorialData);
         RegisterAllData();
-        
+
         // カードプールサービス（GameProgressServiceが依存）
         builder.Register<CardPoolService>(Lifetime.Singleton);
-        
+
         // セーブデータ管理
         builder.Register<SaveDataManager>(Lifetime.Singleton);
-        
+
         // シーン遷移管理（クロスフェード機能付き）
         builder.Register<SceneTransitionManager>(Lifetime.Singleton);
-        
+
         // ゲーム進行管理（全機能統合）
         builder.Register<GameProgressService>(Lifetime.Singleton);
-        
+
+        // InputSystem管理
+        builder.Register<InputActionsProvider>(Lifetime.Singleton);
+
         // UIナビゲーション管理
         builder.RegisterEntryPoint<MouseHoverUISelector>();
         builder.RegisterEntryPoint<SafeNavigationManager>();
-        
+
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
         builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
             .WithParameter(confirmationDialogView);
-        
+
         // Steam統合サービス
         builder.RegisterEntryPoint<SteamService>().AsSelf();
         // Discord統合サービス
         builder.Register<DiscordService>(Lifetime.Singleton);
-        
+
         // サウンドマネージャーの初期化
         InitializeSoundManagers();
     }
