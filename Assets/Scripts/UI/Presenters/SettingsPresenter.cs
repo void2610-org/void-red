@@ -12,23 +12,56 @@ using Object = UnityEngine.Object;
 public class SettingsPresenter : IStartable, IDisposable
 {
     private SettingsView _settingsView;
+    private SettingButtonView _settingButtonView;
     private readonly SettingsManager _settingsManager;
     private readonly ConfirmationDialogService _confirmationDialogService;
+    private readonly InputActionsProvider _inputActionsProvider;
     private readonly CompositeDisposable _disposables = new();
-    
-    public SettingsPresenter(SettingsManager settingsManager, ConfirmationDialogService confirmationDialogService)
+
+    public SettingsPresenter(
+        SettingsManager settingsManager,
+        ConfirmationDialogService confirmationDialogService,
+        InputActionsProvider inputActionsProvider)
     {
         _settingsManager = settingsManager;
         _confirmationDialogService = confirmationDialogService;
+        _inputActionsProvider = inputActionsProvider;
     }
-    
+
     public void Start()
     {
+        // ビューの取得
         _settingsView = Object.FindFirstObjectByType<SettingsView>();
-        
+        _settingButtonView = Object.FindFirstObjectByType<SettingButtonView>();
+
+        // Pauseアクションの購読
+        _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
+            .Subscribe(_ => ToggleSettings())
+            .AddTo(_disposables);
+
+        // 設定ボタンのイベント設定
+        if (_settingButtonView != null)
+        {
+            _settingButtonView.OnButtonClicked.Subscribe(
+                _ => ShowSettings())
+                .AddTo(_disposables);
+        }
+
         SubscribeToViewEvents();
         RefreshSettingsView();
         HideSettings(); // 初期状態では非表示にする
+    }
+
+    private void ToggleSettings()
+    {
+        if (_settingsView.IsShowing)
+        {
+            HideSettings();
+        }
+        else
+        {
+            ShowSettings();
+        }
     }
     
     /// <summary>

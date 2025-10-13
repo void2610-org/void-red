@@ -43,6 +43,7 @@ public class DialogView : MonoBehaviour
     private bool _isTyping;
     private bool _isWaitingForNext;
     private bool _isAutoMode;
+    private CancellationTokenSource _typingCancellationTokenSource;
     private CancellationTokenSource _waitCancellationTokenSource;
     private CancellationTokenSource _dialogSeCancellationTokenSource;
     private DialogData _currentDialogData;
@@ -55,11 +56,9 @@ public class DialogView : MonoBehaviour
     
     // イベント
     private readonly Subject<Unit> _onDialogCompleted = new();
-    private readonly Subject<Unit> _onUserClickDetected = new();
     private readonly Subject<Unit> _onSkipRequested = new();
     
     public Observable<Unit> OnDialogCompleted => _onDialogCompleted;
-    public Observable<Unit> OnUserClickDetected => _onUserClickDetected;
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
     
     private void Awake()
@@ -150,12 +149,17 @@ public class DialogView : MonoBehaviour
         _isTyping = true;
         _isWaitingForNext = false;
 
-
-        _dialogSeCancellationTokenSource = new CancellationTokenSource(); 
+        // 既存のSEループをキャンセル
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = new CancellationTokenSource();
         SeManager.Instance.PlaySeLoop("Dialog2", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
 
+        _typingCancellationTokenSource?.Cancel();
+        _typingCancellationTokenSource?.Dispose();
+        _typingCancellationTokenSource = new CancellationTokenSource();
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
-        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, this.GetCancellationTokenOnDestroy());
+        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, _typingCancellationTokenSource.Token);
 
         // dialogSeループを停止
         _dialogSeCancellationTokenSource?.Cancel();
@@ -194,18 +198,18 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// オートモードの切り替え
     /// </summary>
-    private void ToggleAutoMode()
+    public void ToggleAutoMode()
     {
         _isAutoMode = !_isAutoMode;
         UpdateAutoButtonColor();
-        
+
         // オートモードONで現在待機中の場合、自動進行を開始
         if (_isAutoMode && _isWaitingForNext)
         {
             _waitCancellationTokenSource?.Cancel();
             _waitCancellationTokenSource?.Dispose();
             _waitCancellationTokenSource = null;
-            
+
             // 新しい自動進行タスクを開始
             StartAutoProgress().Forget();
         }
@@ -274,11 +278,7 @@ public class DialogView : MonoBehaviour
                 await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: _waitCancellationTokenSource.Token);
                 
                 // タイムアウト後もまだ待機中の場合は自動で進む
-                if (_isWaitingForNext)
-                {
-                    _isWaitingForNext = false;
-                    _onUserClickDetected.OnNext(Unit.Default);
-                }
+                if (_isWaitingForNext) _isWaitingForNext = false;
             }
             catch (OperationCanceledException)
             {
@@ -314,11 +314,7 @@ public class DialogView : MonoBehaviour
             var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
             await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: this.GetCancellationTokenOnDestroy());
             
-            if (_isWaitingForNext && _isAutoMode)
-            {
-                _isWaitingForNext = false;
-                _onUserClickDetected.OnNext(Unit.Default);
-            }
+            if (_isWaitingForNext && _isAutoMode) _isWaitingForNext = false;
         }
         catch (OperationCanceledException) { }
     }
@@ -326,11 +322,22 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// クリック時の処理
     /// </summary>
-    private void OnClick()
+    public void OnClick()
     {
         if (!canvasGroup) return;
         if (canvasGroup.alpha == 0f || !canvasGroup.interactable) return;
-        if (_isTyping) return;
+        if (_isTyping)
+        {
+            // 文字送り中のクリックで即座に全文表示
+            _typingCancellationTokenSource?.Cancel();
+
+            _isTyping = false;
+            _isWaitingForNext = true;
+            ShowNextIndicator();
+
+            return;
+        }
+        
         if (!_isWaitingForNext) return;
         
         // オートモード中のクリックはオートモードを解除
@@ -344,7 +351,6 @@ public class DialogView : MonoBehaviour
         
         // 通常モードのクリックで次へ進む
         _isWaitingForNext = false;
-        _onUserClickDetected.OnNext(Unit.Default);
     }
     
     /// <summary>
@@ -446,7 +452,6 @@ public class DialogView : MonoBehaviour
 
         // R3のSubjectを解放
         _onDialogCompleted.Dispose();
-        _onUserClickDetected.Dispose();
         _onSkipRequested.Dispose();
     }
 }
