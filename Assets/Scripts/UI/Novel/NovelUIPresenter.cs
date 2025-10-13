@@ -34,6 +34,9 @@ public class NovelUIPresenter : IStartable
     private string _currentScenarioId;
     private readonly CompositeDisposable _disposables = new();
     
+    // シナリオ完了時にまとめてセーブするカードリスト
+    private readonly List<CardData> _acquiredCards = new();
+    
     public NovelUIPresenter(bool useLocalExcel)
     {
         // ビルドでは必ずローカルExcelを使用
@@ -313,8 +316,8 @@ public class NovelUIPresenter : IStartable
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
         await ShowCardGetEffectWithDeckCardView(cardGetData, cardModel);
         
-        // カードをプレイヤーのデッキに追加してセーブ
-        _gameProgressService.AddCardToDeckAndSave(cardData);
+        // カードをシナリオ完了時のセーブ用に一時保存
+        _acquiredCards.Add(cardData);
         
         _dialogView.SetInteractable(true);
     }
@@ -428,6 +431,19 @@ public class NovelUIPresenter : IStartable
         
         // 現在のノードを結果記録前に取得
         var currentNode = _gameProgressService.GetCurrentNode();
+        
+        // 獲得したカードをまとめてデッキに追加（セーブは最後に1回のみ）
+        if (_acquiredCards.Count > 0)
+        {
+            foreach (var cardData in _acquiredCards)
+            {
+                // 個別にカード追加（既存メソッド使用）
+                _gameProgressService.AddCardToDeckAndSave(cardData);
+            }
+            
+            Debug.Log($"[NovelUIPresenter] シナリオ完了時に{_acquiredCards.Count}枚のカードをデッキに追加完了");
+            _acquiredCards.Clear();
+        }
         
         // ダイアログ結果を記録
         var choices = new Dictionary<string, string>
