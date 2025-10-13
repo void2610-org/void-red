@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 using VContainer;
@@ -272,7 +273,7 @@ public class NovelUIPresenter : IStartable
     
     /// <summary>
     /// カード獲得演出を実行
-    /// 選択結果に基づいてカードを決定し、アイテム取得演出を流用して表示
+    /// 選択結果に基づいてカードを決定し、DeckCardViewを使用してカード表示
     /// </summary>
     private async UniTask ShowCardGetEffect()
     {
@@ -296,19 +297,21 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
-        // 実際のCardDataから情報を取得
-        var cardName = cardData.CardName;
-        var cardDescription = GetCardDescription(cardData);
-        var cardSprite = cardData.CardImage; // 直接Spriteを使用
+        // CardModelを作成（新規獲得カードは崩壊していない状態）
+        var instanceId = System.Guid.NewGuid().ToString();
+        var cardModel = new CardModel(cardData, instanceId, false);
         
-        // ItemGetDataとして演出データを作成（画像名は空文字列で、Spriteを直接使用）
-        var cardGetData = new ItemGetData("", cardName, cardDescription);
+        // カード詳細な説明を生成
+        var cardDescription = GetCardDescription(cardData);
+        
+        // ItemGetDataとしてカード獲得演出データを作成
+        var cardGetData = new ItemGetData("", cardData.CardName, cardDescription);
         
         _dialogView.SetInteractable(false);
         
-        // アイテム取得演出を流用してカード獲得演出を実行
+        // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
-        await _itemGetEffectView.ShowItemGetEffect(cardGetData, cardSprite);
+        await ShowCardGetEffectWithDeckCardView(cardGetData, cardModel);
         
         // カードをプレイヤーのデッキに追加してセーブ
         _gameProgressService.AddCardToDeckAndSave(cardData);
@@ -325,10 +328,21 @@ public class NovelUIPresenter : IStartable
     {
         // カードのタイプや効果に基づいて説明文を生成
         var keywords = cardData.Keywords != null && cardData.Keywords.Count > 0 
-            ? string.Join(", ", cardData.Keywords) 
+            ? string.Join(", ", cardData.Keywords.Select(k => k.GetJapaneseName())) 
             : "なし";
         
-        return $"属性: {cardData.Attribute}\nキーワード: {keywords}";
+        return $"属性: {cardData.Attribute.ToJapaneseName()}\nキーワード: {keywords}";
+    }
+
+    /// <summary>
+    /// DeckCardViewを使用したカード獲得演出を実行
+    /// </summary>
+    /// <param name="cardGetData">カード獲得データ</param>
+    /// <param name="cardModel">表示するカードモデル</param>
+    private async UniTask ShowCardGetEffectWithDeckCardView(ItemGetData cardGetData, CardModel cardModel)
+    {
+        // ItemGetEffectViewの新しいカード専用メソッドを使用
+        await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
     }
     /// <summary>
     /// 全ダイアログをスキップして即座に完了
