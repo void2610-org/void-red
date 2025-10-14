@@ -294,6 +294,7 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
+        var cardModel =  new CardModel(cardData);
         // カード詳細な説明を生成
         var cardDescription = cardData.GetCardDescription();
 
@@ -304,10 +305,10 @@ public class NovelUIPresenter : IStartable
         
         // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
-        await _itemGetEffectView.ShowCardGetEffect(cardGetData, new CardModel(cardData));
+        await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
 
         // カードをデッキに追加（セーブはシナリオ完了時にまとめて実行）
-        _gameProgressService.AddCardToDeck(cardData);
+        _gameProgressService.AddCardToDeck(cardModel);
 
         _dialogView.SetInteractable(true);
     }

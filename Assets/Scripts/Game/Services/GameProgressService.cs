@@ -243,19 +243,9 @@ public class GameProgressService
     /// <summary>
     /// 新しいカードをプレイヤーのデッキに追加
     /// </summary>
-    /// <param name="cardData">追加するカードデータ</param>
-    public void AddCardToDeck(CardData cardData)
+    public void AddCardToDeck(CardModel cardModel)
     {
-        // 新しいインスタンスIDを生成
-        var instanceId = System.Guid.NewGuid().ToString();
-
-        // 新規獲得カードは崩壊していない状態で追加
-        const bool isCollapsed = false;
-
-        // SavedCardとしてデッキに追加
-        var savedCard = new SavedCard(cardData.CardId, instanceId, isCollapsed);
-        _repository.PlayerProgress.Deck.Add(savedCard);
-
-        Debug.Log($"[GameProgressService] カードをデッキに追加: {cardData.CardName} (ID: {cardData.CardId})");
+        _repository.PlayerProgress.Deck.Add(new SavedCard(cardModel));
+        Debug.Log($"[GameProgressService] カードをデッキに追加: {cardModel.Data.CardName}");
     }
 }
