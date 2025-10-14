@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using TMPro;
 using VContainer;
 using Cysharp.Threading.Tasks;
 using R3;
@@ -303,10 +300,10 @@ public class NovelUIPresenter : IStartable
         // CardModelを作成（新規獲得カードは崩壊していない状態）
         var instanceId = System.Guid.NewGuid().ToString();
         var cardModel = new CardModel(cardData, instanceId, false);
-        
+
         // カード詳細な説明を生成
-        var cardDescription = GetCardDescription(cardData);
-        
+        var cardDescription = cardData.GetCardDescription();
+
         // ItemGetDataとしてカード獲得演出データを作成
         var cardGetData = new ItemGetData("", cardData.CardName, cardDescription);
         
@@ -314,39 +311,14 @@ public class NovelUIPresenter : IStartable
         
         // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
-        await ShowCardGetEffectWithDeckCardView(cardGetData, cardModel);
+        await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
         
         // カードをシナリオ完了時のセーブ用に一時保存
         _acquiredCards.Add(cardData);
         
         _dialogView.SetInteractable(true);
     }
-    
-    /// <summary>
-    /// CardDataから表示用の説明を生成
-    /// </summary>
-    /// <param name="cardData">カードデータ</param>
-    /// <returns>カードの説明文</returns>
-    private string GetCardDescription(CardData cardData)
-    {
-        // カードのタイプや効果に基づいて説明文を生成
-        var keywords = cardData.Keywords != null && cardData.Keywords.Count > 0 
-            ? string.Join(", ", cardData.Keywords.Select(k => k.GetJapaneseName())) 
-            : "なし";
-        
-        return $"属性: {cardData.Attribute.ToJapaneseName()}\nキーワード: {keywords}";
-    }
 
-    /// <summary>
-    /// DeckCardViewを使用したカード獲得演出を実行
-    /// </summary>
-    /// <param name="cardGetData">カード獲得データ</param>
-    /// <param name="cardModel">表示するカードモデル</param>
-    private async UniTask ShowCardGetEffectWithDeckCardView(ItemGetData cardGetData, CardModel cardModel)
-    {
-        // ItemGetEffectViewの新しいカード専用メソッドを使用
-        await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
-    }
     /// <summary>
     /// 全ダイアログをスキップして即座に完了
     /// </summary>

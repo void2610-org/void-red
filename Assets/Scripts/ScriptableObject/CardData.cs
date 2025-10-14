@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -57,4 +58,18 @@ public class CardData : ScriptableObject
     /// 劣化可能かどうかを判定
     /// </summary>
     public bool CanDegrade => degradationTarget && degradationConditionGroups.Count > 0;
+
+    /// <summary>
+    /// カード情報から表示用の説明文を生成
+    /// </summary>
+    /// <returns>カードの説明文</returns>
+    public string GetCardDescription()
+    {
+        // カードのタイプや効果に基づいて説明文を生成
+        var keywords = Keywords != null && Keywords.Count > 0
+            ? string.Join(", ", Keywords.Select(k => k.GetJapaneseName()))
+            : "なし";
+
+        return $"属性: {Attribute.ToJapaneseName()}\nキーワード: {keywords}";
+    }
 }
