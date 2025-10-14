@@ -239,4 +239,13 @@ public class GameProgressService
     {
         return _repository.PersonalityLogData;
     }
+
+    /// <summary>
+    /// 新しいカードをプレイヤーのデッキに追加
+    /// </summary>
+    public void AddCardToDeck(CardModel cardModel)
+    {
+        _repository.PlayerProgress.Deck.Add(new SavedCard(cardModel));
+        Debug.Log($"[GameProgressService] カードをデッキに追加: {cardModel.Data.CardName}");
+    }
 }

@@ -19,6 +19,13 @@ public class SavedCard
         this.instanceId = instanceId;
         this.isCollapsed = isCollapsed;
     }
+    
+    public SavedCard(CardModel cardModel)
+    {
+        cardId = cardModel.Data.CardId;
+        instanceId = cardModel.InstanceId;
+        isCollapsed = cardModel.IsCollapsed;
+    }
 }
 
 /// <summary>
