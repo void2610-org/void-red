@@ -44,11 +44,8 @@ public class ItemGetEffectView : MonoBehaviour
         itemImage.transform.localScale = itemImageStartScale;
 
         // DeckCardViewの初期設定
-        if (deckCardView != null)
-        {
-            deckCardView.transform.localScale = itemImageStartScale;
-            deckCardView.gameObject.SetActive(false);
-        }
+        deckCardView.transform.localScale = itemImageStartScale;
+        deckCardView.gameObject.SetActive(false);
 
         itemNameText.text = "";
         itemDescriptionText.text = "";
@@ -125,10 +122,7 @@ public class ItemGetEffectView : MonoBehaviour
         itemImage.transform.localScale = itemImageStartScale;
         
         // カード表示を非表示
-        if (deckCardView != null)
-        {
-            deckCardView.gameObject.SetActive(false);
-        }
+        deckCardView.gameObject.SetActive(false);
         
         // アイテム画像を表示
         itemImage.gameObject.SetActive(true);
@@ -144,12 +138,9 @@ public class ItemGetEffectView : MonoBehaviour
         itemDescriptionText.text = itemGetData.ItemDescription;
         
         // DeckCardViewでカードを表示
-        if (deckCardView != null)
-        {
-            deckCardView.gameObject.SetActive(true);
-            deckCardView.Initialize(cardModel, CardDisplayState.Normal);
-            deckCardView.transform.localScale = itemImageStartScale;
-        }
+        deckCardView.gameObject.SetActive(true);
+        deckCardView.Initialize(cardModel);
+        deckCardView.transform.localScale = itemImageStartScale;
         
         // 通常のアイテム画像を非表示
         itemImage.gameObject.SetActive(false);
@@ -191,10 +182,7 @@ public class ItemGetEffectView : MonoBehaviour
         itemImageBackground.ColorTo(Color.white, 1f, Ease.OutCubic).ToUniTask().Forget();
         
         // DeckCardViewのスケールアニメーション
-        if (deckCardView != null)
-        {
-            await deckCardView.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
-        }
+        await deckCardView.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
         
         // クリック可能にする
         effectPanelCanvasGroup.interactable = true;
