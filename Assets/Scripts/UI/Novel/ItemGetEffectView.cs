@@ -17,6 +17,7 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private Image backgroundOverlay;
     [SerializeField] private Image itemImageBackground;
     [SerializeField] private Image itemImage;
+    [SerializeField] private DeckCardView deckCardView; // カード表示用
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
     [SerializeField] private Button clickAreaButton;
@@ -42,6 +43,10 @@ public class ItemGetEffectView : MonoBehaviour
         itemImageBackground.color = Color.clear;
         itemImage.transform.localScale = itemImageStartScale;
 
+        // DeckCardViewの初期設定
+        deckCardView.transform.localScale = itemImageStartScale;
+        deckCardView.gameObject.SetActive(false);
+
         itemNameText.text = "";
         itemDescriptionText.text = "";
         
@@ -62,7 +67,7 @@ public class ItemGetEffectView : MonoBehaviour
         // フェードインアニメーション
         await effectPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
         
-        // UI要素を設定
+        // UI要素を設定（通常のアイテム表示）
         SetupUIElements(itemGetData, itemSprite);
         
         // 演出を開始
@@ -75,9 +80,33 @@ public class ItemGetEffectView : MonoBehaviour
         particle.Stop();
         particle.Clear();
     }
+
+    /// <summary>
+    /// カード取得演出を表示（DeckCardView使用）
+    /// </summary>
+    /// <param name="itemGetData">カード取得データ</param>
+    /// <param name="cardModel">表示するカードモデル</param>
+    public async UniTask ShowCardGetEffect(ItemGetData itemGetData, CardModel cardModel)
+    {
+        // フェードインアニメーション
+        await effectPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+        
+        // UI要素を設定（カード表示）
+        SetupUIElementsForCard(itemGetData, cardModel);
+        
+        // 演出を開始
+        await PlayShowAnimationForCard();
+        // ユーザーの入力待ち
+        await WaitForUserInput();
+        // 演出を終了
+        await PlayHideAnimation();
+        
+        particle.Stop();
+        particle.Clear();
+    }
     
     /// <summary>
-    /// UI要素を設定
+    /// UI要素を設定（通常アイテム用）
     /// </summary>
     private void SetupUIElements(ItemGetData itemGetData, Sprite itemSprite)
     {
@@ -91,10 +120,34 @@ public class ItemGetEffectView : MonoBehaviour
         itemImage.sprite = itemSprite;
         itemImage.color = itemSprite != null ? Color.white : Color.clear;
         itemImage.transform.localScale = itemImageStartScale;
+        
+        // カード表示を非表示
+        deckCardView.gameObject.SetActive(false);
+        
+        // アイテム画像を表示
+        itemImage.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// UI要素を設定（カード用）
+    /// </summary>
+    private void SetupUIElementsForCard(ItemGetData itemGetData, CardModel cardModel)
+    {
+        // カード名と説明を設定
+        itemNameText.text = itemGetData.ItemName;
+        itemDescriptionText.text = itemGetData.ItemDescription;
+        
+        // DeckCardViewでカードを表示
+        deckCardView.gameObject.SetActive(true);
+        deckCardView.Initialize(cardModel);
+        deckCardView.transform.localScale = itemImageStartScale;
+        
+        // 通常のアイテム画像を非表示
+        itemImage.gameObject.SetActive(false);
     }
     
     /// <summary>
-    /// 表示アニメーションを再生
+    /// 表示アニメーションを再生（通常アイテム用）
     /// </summary>
     private async UniTask PlayShowAnimation()
     {
@@ -109,6 +162,27 @@ public class ItemGetEffectView : MonoBehaviour
         
         // アイテム画像のスケールアニメーション
         await itemImage.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
+        
+        // クリック可能にする
+        effectPanelCanvasGroup.interactable = true;
+    }
+
+    /// <summary>
+    /// 表示アニメーションを再生（カード用）
+    /// </summary>
+    private async UniTask PlayShowAnimationForCard()
+    {
+        effectPanelCanvasGroup.interactable = false;
+        effectPanelCanvasGroup.blocksRaycasts = true;
+        
+        await UniTask.Delay(350);
+        particle.Play();
+        await UniTask.Delay(150);
+        itemImageBackground.color = Color.clear;
+        itemImageBackground.ColorTo(Color.white, 1f, Ease.OutCubic).ToUniTask().Forget();
+        
+        // DeckCardViewのスケールアニメーション
+        await deckCardView.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
         
         // クリック可能にする
         effectPanelCanvasGroup.interactable = true;

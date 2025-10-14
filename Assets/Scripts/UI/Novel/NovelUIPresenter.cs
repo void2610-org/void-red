@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using VContainer;
 using Cysharp.Threading.Tasks;
 using R3;
@@ -19,6 +17,7 @@ public class NovelUIPresenter : IStartable
     private AddressableImageLoader _addressableImageLoader;
     private ConfirmationDialogService _confirmationDialogService;
     private SettingsManager _settingsManager;
+    private CardPoolService _cardPoolService;
     private InputActionsProvider _inputActionsProvider;
     private DialogView _dialogView;
     private ItemGetEffectView _itemGetEffectView;
@@ -49,6 +48,7 @@ public class NovelUIPresenter : IStartable
         SceneTransitionManager sceneTransitionManager,
         ConfirmationDialogService confirmationDialogService,
         SettingsManager settingsManager,
+        CardPoolService cardPoolService,
         InputActionsProvider inputActionsProvider)
     {
         _novelSeManager = novelSeManager;
@@ -56,6 +56,7 @@ public class NovelUIPresenter : IStartable
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
         _settingsManager = settingsManager;
+        _cardPoolService = cardPoolService;
         _inputActionsProvider = inputActionsProvider;
         _addressableImageLoader = new AddressableImageLoader();
     }
@@ -269,7 +270,7 @@ public class NovelUIPresenter : IStartable
     
     /// <summary>
     /// カード獲得演出を実行
-    /// 選択結果に基づいてカードを決定し、アイテム取得演出を流用して表示
+    /// 選択結果に基づいてカードを決定し、DeckCardViewを使用してカード表示
     /// </summary>
     private async UniTask ShowCardGetEffect()
     {
@@ -285,76 +286,33 @@ public class NovelUIPresenter : IStartable
             return;
         }
         
-        // カード情報を取得
-        var cardName = GetCardDisplayName(selectedCardId);
-        var cardDescription = GetCardDisplayDescription(selectedCardId);
-        var cardImageName = GetCardImageName(selectedCardId);
+        // CardPoolServiceから実際のCardDataを取得
+        var cardData = _cardPoolService.GetCardById(selectedCardId);
+        if (cardData == null)
+        {
+            Debug.LogWarning($"[NovelUIPresenter] カードID '{selectedCardId}' が見つかりません");
+            return;
+        }
         
-        // ItemGetDataとして演出データを作成
-        var cardGetData = new ItemGetData(cardImageName, cardName, cardDescription);
+        var cardModel =  new CardModel(cardData);
+        // カード詳細な説明を生成
+        var cardDescription = cardData.GetCardDescription();
+
+        // ItemGetDataとしてカード獲得演出データを作成
+        var cardGetData = new ItemGetData("", cardData.CardName, cardDescription);
         
         _dialogView.SetInteractable(false);
         
-        // カード画像を読み込み
-        Sprite cardSprite = null;
-        if (!string.IsNullOrEmpty(cardImageName))
-        {
-            // カード画像を読み込み（アイテム画像と同じフォルダから読み込み）
-            cardSprite = await _addressableImageLoader.LoadItemImageAsync(cardImageName);
-        }
-        
-        // アイテム取得演出を流用してカード獲得演出を実行
+        // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
-        await _itemGetEffectView.ShowItemGetEffect(cardGetData, cardSprite);
-        
+        await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
+
+        // カードをデッキに追加（セーブはシナリオ完了時にまとめて実行）
+        _gameProgressService.AddCardToDeck(cardModel);
+
         _dialogView.SetInteractable(true);
     }
-    
-    /// <summary>
-    /// カードIDから表示用の名前を取得（仮実装）
-    /// </summary>
-    /// <param name="cardId">カードID</param>
-    /// <returns>カードの表示名</returns>
-    private string GetCardDisplayName(string cardId)
-    {
-        return cardId switch
-        {
-            "card_aggressive_001" => "【攻撃】鋭い一撃",
-            "card_defensive_001" => "【防御】堅実な守り",
-            _ => "未知のカード"
-        };
-    }
-    
-    /// <summary>
-    /// カードIDから表示用の説明を取得（仮実装）
-    /// </summary>
-    /// <param name="cardId">カードID</param>
-    /// <returns>カードの説明文</returns>
-    private string GetCardDisplayDescription(string cardId)
-    {
-        return cardId switch
-        {
-            "card_aggressive_001" => "積極的な選択から生まれた攻撃カード",
-            "card_defensive_001" => "慎重な選択から生まれた防御カード",
-            _ => "あなたの選択が生み出したカード"
-        };
-    }
-    
-    /// <summary>
-    /// カードIDから画像名を取得（仮実装）
-    /// </summary>
-    /// <param name="cardId">カードID</param>
-    /// <returns>画像ファイル名</returns>
-    private string GetCardImageName(string cardId)
-    {
-        return cardId switch
-        {
-            "card_aggressive_001" => "Card",
-            "card_defensive_001" => "Card",
-            _ => "Card"
-        };
-    }
-    
+
     /// <summary>
     /// 全ダイアログをスキップして即座に完了
     /// </summary>
@@ -439,14 +397,14 @@ public class NovelUIPresenter : IStartable
         
         // 現在のノードを結果記録前に取得
         var currentNode = _gameProgressService.GetCurrentNode();
-        
-        // ダイアログ結果を記録
+
+        // ダイアログ結果を記録（内部でセーブ実行）
         var choices = new Dictionary<string, string>
         {
             { "dialog_completed", "true" },
             { "scenario_id", currentNode.NodeId }
         };
-        
+
         _gameProgressService.RecordNovelResultAndSave(choices);
         
         // 記録前に取得したノードの設定を確認

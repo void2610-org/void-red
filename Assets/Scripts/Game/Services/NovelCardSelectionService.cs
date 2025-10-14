@@ -87,8 +87,8 @@ public static class NovelCardSelectionService
         // 選択された選択肢のインデックスに基づいてカードIDを決定
         return firstChoice.SelectedOptionIndex switch
         {
-            0 => "card_aggressive_001", // 最初の選択肢を選んだ場合
-            1 => "card_defensive_001",  // 二番目の選択肢を選んだ場合
+            0 => "CARD_001A", // 最初の選択肢を選んだ場合
+            1 => "CARD_002A",  // 二番目の選択肢を選んだ場合
             _ => null // 想定外の選択肢インデックス
         };
     }
