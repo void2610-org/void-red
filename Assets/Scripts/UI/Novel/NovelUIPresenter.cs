@@ -4,6 +4,7 @@ using VContainer;
 using Cysharp.Threading.Tasks;
 using R3;
 using VContainer.Unity;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// ノベルシーンのUI管理を担当するプレゼンター
@@ -64,6 +65,7 @@ public class NovelUIPresenter : IStartable
     public void Start()
     {
         Initialize().Forget();
+        BgmManager.Instance.PlayRandomBGM(BgmType.Novel);
     }
     
     private async UniTaskVoid Initialize()
