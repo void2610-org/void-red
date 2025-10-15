@@ -214,7 +214,7 @@ public class CardView : BaseCardView
     /// <summary>
     /// スコアに応じてUIEffectsを更新
     /// </summary>
-    /// <param name="score">テーマ合致率（0.0～1.0）</param>
+    /// <param name="score">スコア</param>
     public void UpdateScoreVisual(float score)
     {
         if (!CardData || _displayState == CardDisplayState.Backside) return;
