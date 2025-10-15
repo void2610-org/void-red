@@ -303,7 +303,7 @@ public class HandView : MonoBehaviour
     /// </summary>
     /// <param name="index">カードのインデックス</param>
     /// <param name="collapseChance">崩壊確率（0.0～1.0）</param>
-    /// <param name="score">テーマ合致率（0.0～1.0）</param>
+    /// <param name="score">スコア</param>
     public void UpdateCardVisual(int index, float collapseChance, float score)
     {
         if (index < 0 || index >= _cardViews.Count) return;

@@ -191,7 +191,7 @@ public class UIPresenter : IStartable, System.IDisposable
     /// <summary>
     /// 選択されたカードの崩壊ビジュアルを更新
     /// </summary>
-    private void UpdateCardCollapseVisual(CardModel cardModel, int selectedIndex, float score)
+    private void UpdateCardVisual(CardModel cardModel, int selectedIndex, float score)
     {
         if (_currentTheme == null) return;
         
@@ -253,7 +253,7 @@ public class UIPresenter : IStartable, System.IDisposable
                     // PlayerMoveを作成してスコアを計算
                     var move = new PlayerMove(card.Data, _selectedPlayStyle, _mentalBetValue);
                     var score = ScoreCalculator.CalculateScoreWithoutEnemy(move, _currentTheme);
-                    UpdateCardCollapseVisual(card, index, score);
+                    UpdateCardVisual(card, index, score);
                 }
             }).AddTo(_disposables);
     }
