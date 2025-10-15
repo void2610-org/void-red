@@ -9,7 +9,7 @@ using VContainer.Unity;
 /// ノベルシーンのUI管理を担当するプレゼンター
 /// ダイアログの進行制御とViewの管理を行う
 /// </summary>
-public class NovelUIPresenter : IStartable
+public class NovelUIPresenter : IStartable, System.IDisposable
 {
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
@@ -419,11 +419,11 @@ public class NovelUIPresenter : IStartable
         }
     }
     
-    private void OnDestroy()
+    public void Dispose()
     {
         // 購読を一括解除
         _disposables?.Dispose();
-        
+
         // 画像のメモリを解放
         _addressableImageLoader?.UnloadAllImages();
     }
