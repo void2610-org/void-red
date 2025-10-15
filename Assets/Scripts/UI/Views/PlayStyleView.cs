@@ -42,7 +42,7 @@ public class PlayStyleView : MonoBehaviour
     /// <summary>
     /// 車輪を回転させて次のプレイスタイルを選択
     /// </summary>
-    private void RotateWheel()
+    public void RotateWheel()
     {
         if (_isRotating) return;
 
