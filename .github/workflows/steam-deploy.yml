@@ -12,6 +12,8 @@ jobs:
   build-windows:
     name: Build Windows 🪟
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.buildVersion }}
     steps:
       - name: Free up disk space 🧹
         run: |
@@ -37,6 +39,16 @@ jobs:
             Library-Windows-${{ runner.os }}-
             Library-${{ runner.os }}-
 
+      - name: Generate version string 🔢
+        id: version
+        run: |
+          BASE_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          DATE_JST=$(TZ=Asia/Tokyo date '+%Y/%m/%d %H:%M:%S')
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          FULL_VERSION="Ver. ${BASE_VERSION} ${DATE_JST} ${SHORT_SHA}"
+          echo "buildVersion=${FULL_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Generated version: ${FULL_VERSION}"
+
       - name: Build Windows project 🏗️
         uses: game-ci/unity-builder@v4
         env:
@@ -49,6 +61,8 @@ jobs:
           allowDirtyBuild: true
           buildsPath:     builds
           buildName:      void-red
+          versioning:     Custom
+          version:        ${{ steps.version.outputs.buildVersion }}
 
       - name: Upload Windows build artifact 📤
         uses: actions/upload-artifact@v4
@@ -77,6 +91,16 @@ jobs:
             Library-Mac-${{ runner.os }}-
             Library-${{ runner.os }}-
 
+      - name: Generate version string 🔢
+        id: version
+        run: |
+          BASE_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          DATE_JST=$(TZ=Asia/Tokyo date '+%Y/%m/%d %H:%M:%S')
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          FULL_VERSION="Ver. ${BASE_VERSION} ${DATE_JST} ${SHORT_SHA}"
+          echo "buildVersion=${FULL_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Generated version: ${FULL_VERSION}"
+
       - name: Build Mac project 🏗️
         uses: game-ci/unity-builder@v4
         env:
@@ -89,6 +113,8 @@ jobs:
           allowDirtyBuild: true
           buildsPath:     builds
           buildName:      void-red
+          versioning:     Custom
+          version:        ${{ steps.version.outputs.buildVersion }}
 
       - name: Upload Mac build artifact 📤
         uses: actions/upload-artifact@v4
