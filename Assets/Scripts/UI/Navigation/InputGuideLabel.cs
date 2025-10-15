@@ -110,6 +110,8 @@ public class InputGuideLabel : MonoBehaviour
         }
         catch (Exception e)
         {
+            if (!this) return;
+            
             Debug.LogWarning($"Failed to load sprite: {addressableKey}. Error: {e.Message}");
             _image.enabled = false;
             
