@@ -38,7 +38,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly CardDetailButtonView _cardDetailButtonView;
     private readonly CardDetailView _cardDetailView;
     private readonly BattleResultView _battleResultView;
-    private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
+    private PlayStyle _selectedPlayStyle = PlayStyle.Impulse;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
     private readonly Player _player;

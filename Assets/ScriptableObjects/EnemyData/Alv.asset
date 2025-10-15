@@ -35,11 +35,11 @@ MonoBehaviour:
   playstyleWeights:
     serializedList:
     - key: 0
-      value: 1
+      value: 0.1
     - key: 1
       value: 0.1
     - key: 2
-      value: 0.1
+      value: 1
   initialDeck:
   - {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
   - {fileID: 11400000, guid: 16f56a4b6822e49e4917ff50562bcb0c, type: 2}
