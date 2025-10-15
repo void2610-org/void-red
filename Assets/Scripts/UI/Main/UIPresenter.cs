@@ -94,14 +94,36 @@ public class UIPresenter : IStartable, System.IDisposable
     public async UniTask StartTutorial(string tutorialId) => await _tutorialPresenter.StartTutorial(tutorialId);
     
     /// <summary>
-    /// 選択されたカードの詳細を表示
+    /// 選択されたカードの詳細を表示（InputSystem用の公開メソッド）
     /// </summary>
-    private void ShowCardDetail()
+    public void ShowSelectedCardDetail()
     {
         var selectedCard = _player.SelectedCard.CurrentValue;
         if (selectedCard?.Data != null)
         {
             _cardDetailView.ShowCardDetail(selectedCard.Data, true);
+        }
+    }
+
+    /// <summary>
+    /// 精神ベットを増やす（InputSystem用の公開メソッド）
+    /// </summary>
+    public void IncrementMentalBet() => OnMentalBetChanged(1);
+
+    /// <summary>
+    /// 精神ベットを減らす（InputSystem用の公開メソッド）
+    /// </summary>
+    public void DecrementMentalBet() => OnMentalBetChanged(-1);
+
+    /// <summary>
+    /// カードをプレイ（InputSystem用の公開メソッド）
+    /// カードが選択されており、プレイボタンが表示されている場合のみ実行
+    /// </summary>
+    public void TryPlayCard()
+    {
+        if (_player.SelectedCard.CurrentValue != null && _playButtonView.gameObject.activeSelf)
+        {
+            _playButtonView.SimulateClick();
         }
     }
     
@@ -259,44 +281,6 @@ public class UIPresenter : IStartable, System.IDisposable
             }).AddTo(_disposables);
     }
 
-    private void SetupInputActions()
-    {
-        // InputSystemアクションの購読
-        _inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
-            .Subscribe(_ => _personalityLogView.ShowLog())
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
-            .Subscribe(_ => _themeView.ToggleKeywords())
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Battle.ChangePlayStyle.OnPerformedAsObservable()
-            .Subscribe(_ => _playStyleView.RotateWheel())
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Battle.MinusMentalBet.OnPerformedAsObservable()
-            .Subscribe(_ => OnMentalBetChanged(-1))
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Battle.PlusMentalBet.OnPerformedAsObservable()
-            .Subscribe(_ => OnMentalBetChanged(1))
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
-            .Subscribe(_ => ShowCardDetail())
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
-            .Subscribe(_ =>
-            {
-                // カードが選択されている場合のみプレイボタンをクリック
-                if (_player.SelectedCard.CurrentValue != null && _playButtonView.gameObject.activeSelf)
-                {
-                    _playButtonView.SimulateClick();
-                }
-            })
-            .AddTo(_disposables);
-    }
     
     private void SetUpButtonEvents()
     {
@@ -310,7 +294,7 @@ public class UIPresenter : IStartable, System.IDisposable
                 _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget())
             .AddTo(_disposables);
         _cardDetailButtonView?.DetailButtonClicked.Subscribe(
-                _ => ShowCardDetail())
+                _ => ShowSelectedCardDetail())
             .AddTo(_disposables);
     }
     
@@ -323,8 +307,9 @@ public class UIPresenter : IStartable, System.IDisposable
         SetupViewEvents();
         // ボタンのイベント設定
         SetUpButtonEvents();
-        // InputSystemアクションの設定
-        SetupInputActions();
+
+        // キーバインドを設定
+        BattleKeyBindings.Setup(_inputActionsProvider, this, _disposables);
 
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);

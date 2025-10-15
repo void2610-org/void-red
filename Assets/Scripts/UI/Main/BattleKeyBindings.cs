@@ -1,0 +1,57 @@
+using R3;
+
+/// <summary>
+/// バトルシーンのキーバインド設定
+/// InputSystemアクションを購読してViewやUIPresenterに処理を委譲
+/// </summary>
+public static class BattleKeyBindings
+{
+    /// <summary>
+    /// キーバインドを設定（UIPresenterから呼び出される）
+    /// </summary>
+    public static void Setup(
+        InputActionsProvider inputActionsProvider,
+        UIPresenter uiPresenter,
+        CompositeDisposable disposables)
+    {
+        // ViewをシーンからFind
+        var personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
+        var themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
+        var playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
+
+        // 人格ログを開く
+        inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
+            .Subscribe(_ => personalityLogView.ShowLog())
+            .AddTo(disposables);
+
+        // テーマのキーワードをトグル表示
+        inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
+            .Subscribe(_ => themeView.ToggleKeywords())
+            .AddTo(disposables);
+
+        // プレイスタイルを切り替え
+        inputActionsProvider.Battle.ChangePlayStyle.OnPerformedAsObservable()
+            .Subscribe(_ => playStyleView.RotateWheel())
+            .AddTo(disposables);
+
+        // 精神ベットを減らす
+        inputActionsProvider.Battle.MinusMentalBet.OnPerformedAsObservable()
+            .Subscribe(_ => uiPresenter.DecrementMentalBet())
+            .AddTo(disposables);
+
+        // 精神ベットを増やす
+        inputActionsProvider.Battle.PlusMentalBet.OnPerformedAsObservable()
+            .Subscribe(_ => uiPresenter.IncrementMentalBet())
+            .AddTo(disposables);
+
+        // カード詳細を表示
+        inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
+            .Subscribe(_ => uiPresenter.ShowSelectedCardDetail())
+            .AddTo(disposables);
+
+        // カードをプレイ
+        inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
+            .Subscribe(_ => uiPresenter.TryPlayCard())
+            .AddTo(disposables);
+    }
+}
