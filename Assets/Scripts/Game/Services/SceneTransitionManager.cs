@@ -93,6 +93,7 @@ public class SceneTransitionManager : IDisposable
         
         try
         {
+            BgmManager.Instance.Stop().Forget();
             await FadeIn(fadeDuration);
             
             // シーンをロード
