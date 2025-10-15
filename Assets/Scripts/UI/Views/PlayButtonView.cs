@@ -12,6 +12,11 @@ public class PlayButtonView : MonoBehaviour
     public Observable<Unit> PlayButtonClicked => playButton.OnClickAsObservable();
     public void Show() => playButton.gameObject.SetActive(true);
     public void Hide() => playButton.gameObject.SetActive(false);
+
+    /// <summary>
+    /// ボタンクリックをシミュレート（InputSystemアクション用）
+    /// </summary>
+    public void SimulateClick() => playButton.onClick.Invoke();
     
     private void Awake()
     {
