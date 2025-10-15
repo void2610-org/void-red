@@ -32,6 +32,14 @@ MonoBehaviour:
       value: {fileID: 21300000, guid: dbd9d78e045314a78af872aff7db913d, type: 3}
   maxMentalPower: 10
   initialMentalPower: 10
+  playstyleWeights:
+    serializedList:
+    - key: 0
+      value: 1
+    - key: 1
+      value: 0.1
+    - key: 2
+      value: 0.1
   initialDeck:
   - {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
   - {fileID: 11400000, guid: 16f56a4b6822e49e4917ff50562bcb0c, type: 2}
