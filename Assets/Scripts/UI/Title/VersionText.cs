@@ -9,6 +9,6 @@ public class VersionText : MonoBehaviour
     private void Awake()
     {
         _text = GetComponent<TextMeshProUGUI>();
-        _text.text = $"ver. {Application.version} (alpha)";
+        _text.text = $"{Application.version} (alpha)";
     }
 }
