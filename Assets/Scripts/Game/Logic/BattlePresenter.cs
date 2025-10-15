@@ -114,6 +114,7 @@ public class BattlePresenter: IStartable
         }
         
         // 敵を初期化して表示
+        _enemy.SetEnemyData(_currentEnemyData);
         _uiPresenter.InitializeEnemy(_currentEnemyData);
         await _uiPresenter.ShowEnemy();
         
@@ -295,14 +296,13 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask HandleEnemyCardSelection()
     {
-        // 思考時間を待つ（NPCが考えているように見せる）
         await UniTask.Delay(1000);
         
         // AIでカードを選択
         var npcCard = _enemy.GetRandomCardFromHand();
         _enemy.SelectCard(npcCard);
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
-        var npcPlayStyle = (PlayStyle)UnityEngine.Random.Range(0, 3);
+        var npcPlayStyle = _enemy.DecidePlayStyle();
         var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, _enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
         
         // NPCの精神力を消費
