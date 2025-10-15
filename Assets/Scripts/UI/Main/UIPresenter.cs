@@ -13,6 +13,7 @@ public class UIPresenter : IStartable, System.IDisposable
 {
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
+    [Inject] private readonly InputActionsProvider _inputActionsProvider;
     
     public Observable<Unit> PlayButtonClicked => Observable.Merge(
         _playButtonView.PlayButtonClicked,
@@ -220,27 +221,27 @@ public class UIPresenter : IStartable, System.IDisposable
         // プレイヤーの精神力変化を監視
         _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
         // 敵の精神力変化を監視
-        _enemy.MentalPower.Subscribe(mentalPower => 
+        _enemy.MentalPower.Subscribe(mentalPower =>
             _enemyMentalPowerView.UpdateDisplay(mentalPower, GameConstants.MAX_MENTAL_POWER)
         ).AddTo(_disposables);
         // プレイヤーのカード選択を監視して敵のSpriteを更新
-        _player.SelectedCard.Subscribe(cardModel => 
+        _player.SelectedCard.Subscribe(cardModel =>
         {
             // 手動制御モード中は自動更新をスキップ
             if (_isEnemySpriteManualMode) return;
             if (cardModel != null && cardModel.Data) _enemyView.UpdateSpriteForAttribute(cardModel.Data.Attribute).Forget();
             else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
-        
+
         // プレイヤーのカード選択を監視して詳細ボタンの表示制御
         _player.SelectedCard.Subscribe(_ => UpdateDetailButtonVisibility()).AddTo(_disposables);
-        
+
         // 崩壊ビジュアル更新に関する全てのイベントを統合
         var cardSelectionChange = _player.SelectedCard.Select(_ => Unit.Default);
         var cardIndexChange = _player.SelectedIndex.Select(_ => Unit.Default);
         var playStyleChange = _playStyleView.PlayStyleSelected.Select(_ => Unit.Default);
         var mentalBetChange = _mentalBetView.MentalBetChanged.Select(_ => Unit.Default);
-        
+
         // 全ての変更イベントをマージして崩壊ビジュアルを更新
         Observable.Merge(cardSelectionChange, cardIndexChange, playStyleChange, mentalBetChange)
             .Subscribe(_ =>
@@ -256,6 +257,45 @@ public class UIPresenter : IStartable, System.IDisposable
                     UpdateCardVisual(card, index, score);
                 }
             }).AddTo(_disposables);
+    }
+
+    private void SetupInputActions()
+    {
+        // InputSystemアクションの購読
+        _inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
+            .Subscribe(_ => _personalityLogView.ShowLog())
+            .AddTo(_disposables);
+
+        _inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
+            .Subscribe(_ => _themeView.ToggleKeywords())
+            .AddTo(_disposables);
+
+        _inputActionsProvider.Battle.ChangePlayStyle.OnPerformedAsObservable()
+            .Subscribe(_ => _playStyleView.RotateWheel())
+            .AddTo(_disposables);
+
+        _inputActionsProvider.Battle.MinusMentalBet.OnPerformedAsObservable()
+            .Subscribe(_ => OnMentalBetChanged(-1))
+            .AddTo(_disposables);
+
+        _inputActionsProvider.Battle.PlusMentalBet.OnPerformedAsObservable()
+            .Subscribe(_ => OnMentalBetChanged(1))
+            .AddTo(_disposables);
+
+        _inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
+            .Subscribe(_ => ShowCardDetail())
+            .AddTo(_disposables);
+
+        _inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
+            .Subscribe(_ =>
+            {
+                // カードが選択されている場合のみプレイボタンをクリック
+                if (_player.SelectedCard.CurrentValue != null && _playButtonView.gameObject.activeSelf)
+                {
+                    _playButtonView.SimulateClick();
+                }
+            })
+            .AddTo(_disposables);
     }
     
     private void SetUpButtonEvents()
@@ -278,16 +318,18 @@ public class UIPresenter : IStartable, System.IDisposable
     {
         // PersonalityLogViewを初期化
         _personalityLogView.Initialize(_gameProgressService);
-        
+
         // Viewイベントの設定
         SetupViewEvents();
         // ボタンのイベント設定
         SetUpButtonEvents();
-        
+        // InputSystemアクションの設定
+        SetupInputActions();
+
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
         UpdateMentalBetDisplay();
-        
+
         // 詳細ボタンの初期状態を設定
         UpdateDetailButtonVisibility();
     }
