@@ -73,14 +73,7 @@ public static class ScoreCalculator
         };
     }
 
-    /// <summary>
-    /// プレイヤーの手のスコアを計算（PlayStyle相性を考慮）
-    /// </summary>
-    /// <param name="playerMove">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
-    /// <param name="opponentMove">相手の手（PlayStyle相性判定用）</param>
-    /// <param name="theme">テーマデータ</param>
-    /// <returns>PlayStyle相性を考慮した計算スコア</returns>
-    public static float CalculateScore(PlayerMove playerMove, PlayerMove opponentMove, ThemeData theme)
+    public static float CalculateScoreWithoutEnemy(PlayerMove playerMove, ThemeData theme)
     {
         // テーマから該当属性の倍率を取得
         var attributeMultiplier = theme.GetMultiplier(playerMove.SelectedCard.Attribute);
@@ -95,8 +88,19 @@ public static class ScoreCalculator
         var keywordBonus = GetKeywordMatchBonus(playerMove.SelectedCard, theme);
 
         // スコア = 属性倍率 × 精神ベット × カード固有の倍率 × プレイスタイル倍率 × ベット補正倍率 × キーワードボーナス
-        var baseScore = attributeMultiplier * playerMove.MentalBet * playerMove.SelectedCard.ScoreMultiplier * playStyleMultiplier * betScoreMultiplier * keywordBonus;
+        return attributeMultiplier * playerMove.MentalBet * playerMove.SelectedCard.ScoreMultiplier * playStyleMultiplier * betScoreMultiplier * keywordBonus;
+    }
 
+    /// <summary>
+    /// プレイヤーの手のスコアを計算（PlayStyle相性を考慮）
+    /// </summary>
+    /// <param name="playerMove">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
+    /// <param name="opponentMove">相手の手（PlayStyle相性判定用）</param>
+    /// <param name="theme">テーマデータ</param>
+    /// <returns>PlayStyle相性を考慮した計算スコア</returns>
+    public static float CalculateScore(PlayerMove playerMove, PlayerMove opponentMove, ThemeData theme)
+    {
+        var baseScore = CalculateScoreWithoutEnemy(playerMove, theme);
         // PlayStyle相性倍率を取得（有利: 1.2倍, 不利: 0.9倍, 同じ: 1.0倍）
         var advantageMultiplier = playerMove.PlayStyle.GetAdvantageMultiplier(opponentMove.PlayStyle);
 

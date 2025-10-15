@@ -191,7 +191,7 @@ public class UIPresenter : IStartable, System.IDisposable
     /// <summary>
     /// 選択されたカードの崩壊ビジュアルを更新
     /// </summary>
-    private void UpdateCardCollapseVisual(CardModel cardModel, int selectedIndex, float normalizedScore)
+    private void UpdateCardCollapseVisual(CardModel cardModel, int selectedIndex, float score)
     {
         if (_currentTheme == null) return;
         
@@ -200,7 +200,7 @@ public class UIPresenter : IStartable, System.IDisposable
         var collapseChance = CollapseJudge.CalculateCollapseChance(move);
         
         // HandViewのメソッドを使用して色を更新
-        _playerHandView.UpdateCardVisual(selectedIndex, collapseChance, normalizedScore);
+        _playerHandView.UpdateCardVisual(selectedIndex, collapseChance, score);
     }
     
     /// <summary>
@@ -243,14 +243,17 @@ public class UIPresenter : IStartable, System.IDisposable
         
         // 全ての変更イベントをマージして崩壊ビジュアルを更新
         Observable.Merge(cardSelectionChange, cardIndexChange, playStyleChange, mentalBetChange)
-            .Subscribe(_ => 
+            .Subscribe(_ =>
             {
                 ResetAllCardCollapseVisuals();
                 var card = _player.SelectedCard.CurrentValue;
                 var index = _player.SelectedIndex.CurrentValue;
-                if (card != null && index >= 0)
+                if (card != null && index >= 0 && _currentTheme != null)
                 {
-                    UpdateCardCollapseVisual(card, index);
+                    // PlayerMoveを作成してスコアを計算
+                    var move = new PlayerMove(card.Data, _selectedPlayStyle, _mentalBetValue);
+                    var score = ScoreCalculator.CalculateScoreWithoutEnemy(move, _currentTheme);
+                    UpdateCardCollapseVisual(card, index, score);
                 }
             }).AddTo(_disposables);
     }
