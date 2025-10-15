@@ -37,9 +37,9 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     {
         _colorMotion.TryCancel();
         _scaleMotion.TryCancel();
-        
-        _colorMotion = target.ColorTo(selectedColor, DURATION, EASE);
-        _scaleMotion = target.rectTransform.ScaleTo(Vector3.one * _defaultScale * selectedScale, DURATION, EASE);
+
+        _colorMotion = target.ColorTo(selectedColor, DURATION, EASE, ignoreTimeScale: true);
+        _scaleMotion = target.rectTransform.ScaleTo(Vector3.one * _defaultScale * selectedScale, DURATION, EASE, ignoreTimeScale: true);
     }
     
     /// <summary>
@@ -49,9 +49,9 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     {
         _colorMotion.TryCancel();
         _scaleMotion.TryCancel();
-        
-        _colorMotion = target.ColorTo(unselectedColor, DURATION, EASE);
-        _scaleMotion  = target.rectTransform.ScaleTo(Vector3.one * _defaultScale, DURATION, EASE);
+
+        _colorMotion = target.ColorTo(unselectedColor, DURATION, EASE, ignoreTimeScale: true);
+        _scaleMotion = target.rectTransform.ScaleTo(Vector3.one * _defaultScale, DURATION, EASE, ignoreTimeScale: true);
     }
     
     private void OnDestroy()

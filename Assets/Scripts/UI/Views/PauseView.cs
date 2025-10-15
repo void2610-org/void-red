@@ -26,6 +26,7 @@ public class PauseView : MonoBehaviour
     {
         Time.timeScale = 0;
         panel.SetActive(true);
+        SafeNavigationManager.SetSelectedGameObjectSafe(resumeButton.gameObject);
     }
 
     public void Hide()

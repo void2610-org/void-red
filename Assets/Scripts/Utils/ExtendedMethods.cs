@@ -313,10 +313,11 @@ namespace Void2610.UnityTemplate
         /// <summary>
         /// TransformをLitMotionで指定スケールに変更
         /// </summary>
-        public static MotionHandle ScaleTo(this Transform transform, Vector3 targetScale, float duration, Ease ease = Ease.Linear)
+        public static MotionHandle ScaleTo(this Transform transform, Vector3 targetScale, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
         {
             return LMotion.Create(transform.localScale, targetScale, duration)
                 .WithEase(ease)
+                .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
                 .BindToLocalScale(transform)
                 .AddTo(transform.gameObject);
         }
