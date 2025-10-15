@@ -222,7 +222,7 @@ public class CardView : BaseCardView
         _edgeColorTween.TryCancel();
         
         // EdgeUIEffectのColorをTween
-        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, score * 0.5f, 0.3f)
+        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, score * 1.2f, 0.3f)
             .WithEase(Ease.OutCubic)
             .Bind(v => edgeUIEffect.edgeColor = Color.white * v);
     }
