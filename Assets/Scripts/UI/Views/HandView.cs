@@ -318,7 +318,7 @@ public class HandView : MonoBehaviour
     public void ResetAllCardVisuals()
     {
         foreach (var cardView in _cardViews) 
-            cardView.ResetCollapseVisual();
+            cardView.ResetVisual();
     }
     
     /// <summary>
