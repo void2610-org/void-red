@@ -194,17 +194,14 @@ public class CardView : BaseCardView
     }
     
     /// <summary>
-    /// 崩壊確率とテーマ合致度に基づいて崩壊エフェクトのTransitionRateを更新
+    /// 崩壊確率に基づいてUIEffectsを更新
     /// </summary>
     /// <param name="collapseChance">崩壊確率（0.0～1.0）</param>
-    /// <param name="themeMatchRate">テーマ合致率（0.0～1.0）</param>
-    public void UpdateCollapseVisual(float collapseChance, float themeMatchRate)
+    public void UpdateCollapseVisual(float collapseChance)
     {
         if (!CardData || _displayState == CardDisplayState.Backside) return;
         
-        // 既存のTweenをキャンセル
-        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
-        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
+        _backTransitionTween.TryCancel();
         
         // BackUIEffectのTransitionRateをTween
         var targetCollapseChance = Mathf.Clamp01(collapseChance * 1.75f);
@@ -212,23 +209,33 @@ public class CardView : BaseCardView
         _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, targetCollapseChance, 0.3f)
             .WithEase(Ease.OutCubic)
             .Bind(value => backUIEffect.transitionRate = value);
+    }
+    
+    /// <summary>
+    /// スコアに応じてUIEffectsを更新
+    /// </summary>
+    /// <param name="score">スコア</param>
+    public void UpdateScoreVisual(float score)
+    {
+        if (!CardData || _displayState == CardDisplayState.Backside) return;
+
+        _edgeColorTween.TryCancel();
         
         // EdgeUIEffectのColorをTween
-        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, themeMatchRate * 5f, 0.3f)
+        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, score * 1.2f, 0.3f)
             .WithEase(Ease.OutCubic)
             .Bind(v => edgeUIEffect.edgeColor = Color.white * v);
     }
     
     /// <summary>
-    /// 崩壊エフェクトをリセット（選択解除時用）
+    /// UIEffectsをリセット（選択解除時用）
     /// </summary>
-    public void ResetCollapseVisual()
+    public void ResetVisual()
     {
         if (!CardData || _displayState == CardDisplayState.Backside) return;
         
-        // 既存のTweenをキャンセル
-        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
-        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
+        _backTransitionTween.TryCancel();
+        _edgeColorTween.TryCancel();
         
         // リセット値へのTween
         _backTransitionTween = LMotion.Create(backUIEffect.transitionRate, 1f, 0.2f)
