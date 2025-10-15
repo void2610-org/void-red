@@ -172,6 +172,7 @@ MonoBehaviour:
   target: {fileID: 8686837477837500151}
   selectedColor: {r: 1, g: 1, b: 1, a: 1}
   unselectedColor: {r: 0.7, g: 0.7, b: 0.7, a: 0.69803923}
+  selectedScale: 1.1
 --- !u!1 &4537349981176782011
 GameObject:
   m_ObjectHideFlags: 0
