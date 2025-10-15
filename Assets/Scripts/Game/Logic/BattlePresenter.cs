@@ -23,7 +23,7 @@ public class BattlePresenter: IStartable
     private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
     private PlayerMove _playerMove;
-    private PlayerMove _npcMove;
+    private PlayerMove _enemyMove;
     
     private int _playerWins;
     private int _enemyWins;
@@ -307,13 +307,13 @@ public class BattlePresenter: IStartable
         
         // NPCの精神力を消費
         _enemy.ConsumeMentalPower(npcMentalBet);
-        _npcMove = new PlayerMove(npcCard.Data, npcPlayStyle, npcMentalBet);
+        _enemyMove = new PlayerMove(npcCard.Data, npcPlayStyle, npcMentalBet);
         
         // 敵のカードも閲覧済みとして記録
         _gameProgressService.RecordCardView(npcCard.Data);
         
         // 人格ログ: 敵ムーブ記録
-        _personalityLogService.LogEnemyMove(_npcMove, _enemy.MentalPower.CurrentValue);
+        _personalityLogService.LogEnemyMove(_enemyMove, _enemy.MentalPower.CurrentValue);
         
         // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
         var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
@@ -335,15 +335,15 @@ public class BattlePresenter: IStartable
     private async UniTask HandleEvaluation()
     {
         // スコアを計算（テーマ倍率 × 精神ベット × PlayStyle相性）
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _npcMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _playerMove, _currentTheme);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _enemyMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_enemyMove, _playerMove, _currentTheme);
         
         // 評価結果をスコア専用Viewで同時表示
         await _uiPresenter.ShowScores(playerScore, npcScore);
         
         // カード崩壊判定
         _playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
-        _npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);
+        _npcCollapse = CollapseJudge.ShouldCollapse(_enemyMove);
 
         // 崩壊結果を表示
         if (_playerCollapse || _npcCollapse)
@@ -375,8 +375,8 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask HandleResultDisplay()
     {
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _npcMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_npcMove, _playerMove, _currentTheme);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _enemyMove, _currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_enemyMove, _playerMove, _currentTheme);
 
         // 崩壊結果を考慮した勝敗決定
         string result;
@@ -420,7 +420,7 @@ public class BattlePresenter: IStartable
         }
 
         // 結果を表示（スコアと内訳付き）
-        await _uiPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _npcMove, _currentTheme);
+        await _uiPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _enemyMove, _currentTheme);
         await UniTask.Delay(500);
         await _uiPresenter.HideBlackOverlay();
 
