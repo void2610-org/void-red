@@ -303,17 +303,19 @@ public class HandView : MonoBehaviour
     /// </summary>
     /// <param name="index">カードのインデックス</param>
     /// <param name="collapseChance">崩壊確率（0.0～1.0）</param>
-    /// <param name="themeMatchRate">テーマ合致率（0.0～1.0）</param>
-    public void UpdateCardCollapseVisual(int index, float collapseChance, float themeMatchRate)
+    /// <param name="score">テーマ合致率（0.0～1.0）</param>
+    public void UpdateCardVisual(int index, float collapseChance, float score)
     {
         if (index < 0 || index >= _cardViews.Count) return;
-        _cardViews[index].UpdateCollapseVisual(collapseChance, themeMatchRate);
+        
+        _cardViews[index].UpdateCollapseVisual(collapseChance);
+        _cardViews[index].UpdateScoreVisual(score);
     }
     
     /// <summary>
     /// 全カードの崩壊ビジュアルをリセット
     /// </summary>
-    public void ResetAllCardCollapseVisuals()
+    public void ResetAllCardVisuals()
     {
         foreach (var cardView in _cardViews) 
             cardView.ResetCollapseVisual();
