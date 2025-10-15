@@ -228,9 +228,9 @@ public class CardView : BaseCardView
     }
     
     /// <summary>
-    /// 崩壊エフェクトをリセット（選択解除時用）
+    /// UIEffectsをリセット（選択解除時用）
     /// </summary>
-    public void ResetCollapseVisual()
+    public void ResetVisual()
     {
         if (!CardData || _displayState == CardDisplayState.Backside) return;
         
