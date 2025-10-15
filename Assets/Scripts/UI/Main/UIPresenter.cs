@@ -29,7 +29,6 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly MentalPowerView _playerMentalPowerView;
     private readonly MentalPowerView _enemyMentalPowerView;
     private readonly GameOverView _gameOverView;
-    private readonly ConfirmationDialogView _confirmationDialogView;
     private EnemyView _enemyView;
     private readonly PersonalityLogView _personalityLogView;
     private readonly PersonalityLogButtonView _personalityLogButtonView;
@@ -141,7 +140,6 @@ public class UIPresenter : IStartable, System.IDisposable
         _enemyMentalPowerView = mentalPowerViews[0].transform.position.y > mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
 
         _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
-        _confirmationDialogView = UnityEngine.Object.FindFirstObjectByType<ConfirmationDialogView>();
         _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
         _personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
         _personalityLogButtonView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogButtonView>();
@@ -193,7 +191,7 @@ public class UIPresenter : IStartable, System.IDisposable
     /// <summary>
     /// 選択されたカードの崩壊ビジュアルを更新
     /// </summary>
-    private void UpdateCardCollapseVisual(CardModel cardModel, int selectedIndex)
+    private void UpdateCardCollapseVisual(CardModel cardModel, int selectedIndex, float normalizedScore)
     {
         if (_currentTheme == null) return;
         
@@ -201,12 +199,8 @@ public class UIPresenter : IStartable, System.IDisposable
         var move = new PlayerMove(cardModel.Data, _selectedPlayStyle, _mentalBetValue);
         var collapseChance = CollapseJudge.CalculateCollapseChance(move);
         
-        // テーマ合致度を計算（属性倍率を利用）
-        var themeMatchRate = _currentTheme.GetMultiplier(cardModel.Data.Attribute);
-        // 1.0〜2.0の範囲を0.0〜1.0に正規化（1.0未満は0、2.0で1.0）
-        themeMatchRate = Mathf.Clamp01((themeMatchRate - 1.0f));
         // HandViewのメソッドを使用して色を更新
-        _playerHandView.UpdateCardCollapseVisual(selectedIndex, collapseChance, themeMatchRate);
+        _playerHandView.UpdateCardVisual(selectedIndex, collapseChance, normalizedScore);
     }
     
     /// <summary>
@@ -214,7 +208,7 @@ public class UIPresenter : IStartable, System.IDisposable
     /// </summary>
     private void ResetAllCardCollapseVisuals()
     {
-        _playerHandView.ResetAllCardCollapseVisuals();
+        _playerHandView.ResetAllCardVisuals();
     }
     
     private void SetupViewEvents()
@@ -239,10 +233,7 @@ public class UIPresenter : IStartable, System.IDisposable
         }).AddTo(_disposables);
         
         // プレイヤーのカード選択を監視して詳細ボタンの表示制御
-        _player.SelectedCard.Subscribe(cardModel =>
-        {
-            UpdateDetailButtonVisibility();
-        }).AddTo(_disposables);
+        _player.SelectedCard.Subscribe(_ => UpdateDetailButtonVisibility()).AddTo(_disposables);
         
         // 崩壊ビジュアル更新に関する全てのイベントを統合
         var cardSelectionChange = _player.SelectedCard.Select(_ => Unit.Default);
