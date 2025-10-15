@@ -19,7 +19,6 @@ namespace Void2610.UnityTemplate
             public BgmType bgmType = BgmType.Battle;
         }
 
-        [SerializeField] private bool playOnStart = true;
         [SerializeField] private AudioMixerGroup bgmMixerGroup;
         [SerializeField] private List<SoundData> bgmList = new List<SoundData>();
 
@@ -104,7 +103,7 @@ namespace Void2610.UnityTemplate
             PlayBGMInternal(data).Forget();
         }
 
-        public void PlayRandomBGM(BgmType bgmType = BgmType.Battle)
+        public void PlayRandomBGM(BgmType bgmType)
         {
             if (bgmList.Count == 0) return;
             if (_currentBGM != null && _currentBGM.bgmType == bgmType) return;
@@ -164,12 +163,6 @@ namespace Void2610.UnityTemplate
             _currentBGM = null;
             bgmMixerGroup.audioMixer.SetFloat("BgmVolume", Mathf.Log10(_bgmVolume) * 20);
             _audioSource.volume = 0;
-            
-            if (playOnStart)
-            {
-                _isPlaying = true;
-                PlayRandomBGM();
-            }
         }
 
         private void Update()
@@ -193,7 +186,7 @@ namespace Void2610.UnityTemplate
                 .BindToVolume(_audioSource)
                 .ToUniTask();
             
-            PlayRandomBGM();
+            PlayRandomBGM(_currentBGM.bgmType);
         }
     }
 }
