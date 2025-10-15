@@ -43,31 +43,34 @@ public class ConfirmationDialogView : MonoBehaviour
             this.GetCancellationTokenOnDestroy(),
             Application.exitCancellationToken
         ).Token;
-        
+
         try
         {
             // ダイアログの結果を管理するCompletionSourceを作成
             _dialogResult = new UniTaskCompletionSource<bool>();
-            
+
             // メッセージとボタンテキストを設定
             messageText.text = message;
             confirmButtonText.text = confirmText;
             cancelButtonText.text = cancelText;
-            
+
             // ダイアログを表示
             dialogPanel.SetActive(true);
-            
+
             // ボタンのインタラクションを有効化
             confirmButton.interactable = true;
             cancelButton.interactable = true;
-            
+
+            // ボタンを選択
+            SafeNavigationManager.SetSelectedGameObjectSafe(cancelButton.gameObject);
+
             // ユーザーの選択を待つ
             var result = await _dialogResult.Task;
-            
+
             await UniTask.Yield(cancellationToken);
             // ダイアログを非表示
             HideDialog();
-            
+
             return result;
         }
         catch (System.OperationCanceledException)
@@ -75,6 +78,10 @@ public class ConfirmationDialogView : MonoBehaviour
             // キャンセルされた場合のクリーンアップ
             HideDialog();
             return false;
+        }
+        finally
+        {
+           SafeNavigationManager.SelectRootForceSelectable(); 
         }
     }
     

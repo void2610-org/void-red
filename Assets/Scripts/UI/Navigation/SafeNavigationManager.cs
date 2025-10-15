@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VContainer.Unity;
@@ -18,6 +19,20 @@ public class SafeNavigationManager : ITickable
         _allowProgrammaticChange = true;
         if (!_eventSystem) _eventSystem = EventSystem.current;
         _eventSystem.SetSelectedGameObject(go);
+    }
+
+    public static void SelectRootForceSelectable()
+    {
+        var canvas = Object.FindAnyObjectByType<Canvas>();
+        var selectable = canvas.transform.GetComponentsInChildren<ForceSelectable>().FirstOrDefault();
+        if (selectable != null)
+        {
+            SetSelectedGameObjectSafe(selectable.gameObject);
+        }
+        else
+        {
+            Debug.LogError("ルートのForceSelectableが見つかりません");
+        }
     }
     
     /// <summary>
