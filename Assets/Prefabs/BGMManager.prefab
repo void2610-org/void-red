@@ -44,10 +44,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71f27f356df5a461d8140fbae957a904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playOnStart: 0
   bgmMixerGroup: {fileID: 4012142502108132091, guid: b2ecbb207e05140658f87e606166d8f5, type: 2}
   bgmList:
   - name: Title
     audioClip: {fileID: 8300000, guid: e3f47cea037ff4104a0e81704210474c, type: 3}
-    volume: 0.1
+    volume: 0.15
     bgmType: 0
+  - name: Scenario
+    audioClip: {fileID: 8300000, guid: 405fecb88521b497ca9edabbdc3ec0cd, type: 3}
+    volume: 0.3
+    bgmType: 2
+  - name: Battle
+    audioClip: {fileID: 8300000, guid: 5c51d0e3a6eaf448eb6b7494181295c3, type: 3}
+    volume: 0.3
+    bgmType: 3

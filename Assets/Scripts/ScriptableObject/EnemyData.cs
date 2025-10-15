@@ -22,6 +22,8 @@ public class EnemyData : ScriptableObject
     [Header("ステータス")]
     [SerializeField] private int maxMentalPower = 10;
     [SerializeField] private int initialMentalPower = 10;
+
+    [SerializeField] private SerializableDictionary<PlayStyle, float> playstyleWeights = new ();
     
     [Header("デッキ構成")]
     [SerializeField] private List<CardData> initialDeck = new ();
@@ -40,6 +42,7 @@ public class EnemyData : ScriptableObject
     public Sprite DefaultSprite => defaultSprite;
     public int MaxMentalPower => maxMentalPower;
     public int InitialMentalPower => initialMentalPower;
+    public SerializableDictionary<PlayStyle, float> PlaystyleWeights => playstyleWeights;
     public List<CardData> InitialDeck => initialDeck;
     public CardData ResonanceCard => resonanceCard;
     public ThemeData MajorTheme => majorTheme;
