@@ -4,6 +4,7 @@ public enum BgmType
 {
     Title, // タイトルBGM
     Home,  // ホームBGM
+    Novel, // ノベルBGM
     Battle, // バトルBGM
 }
 

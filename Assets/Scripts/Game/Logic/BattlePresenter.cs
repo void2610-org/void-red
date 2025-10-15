@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using VContainer.Unity;
 using UnityEngine;
+using Void2610.UnityTemplate;
 
 public class BattlePresenter: IStartable
 {
@@ -65,6 +66,7 @@ public class BattlePresenter: IStartable
     public void Start()
     {
         InitializeGame(true).Forget();
+        BgmManager.Instance.PlayRandomBGM(BgmType.Battle);
     }
     
     /// <summary>
