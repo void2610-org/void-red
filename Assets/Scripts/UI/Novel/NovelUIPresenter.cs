@@ -10,7 +10,7 @@ using Void2610.UnityTemplate;
 /// ノベルシーンのUI管理を担当するプレゼンター
 /// ダイアログの進行制御とViewの管理を行う
 /// </summary>
-public class NovelUIPresenter : IStartable
+public class NovelUIPresenter : IStartable, System.IDisposable
 {
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
@@ -74,25 +74,15 @@ public class NovelUIPresenter : IStartable
         _itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
         _choiceView = UnityEngine.Object.FindAnyObjectByType<ChoiceView>();
 
-        // InputSystemアクションの購読
-        _inputActionsProvider.Novel.Auto.OnPerformedAsObservable()
-            .Subscribe(_ => _dialogView.ToggleAutoMode())
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Novel.Skip.OnPerformedAsObservable()
-            .Subscribe(_ => SkipAllDialogs().Forget())
-            .AddTo(_disposables);
-
-        _inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
-            .Subscribe(_ => _dialogView.OnClick())
-            .AddTo(_disposables);
+        // キーバインドを初期化
+        NovelKeyBindings.Setup(_inputActionsProvider, this, _disposables);
 
         // Viewイベントを購読
         _dialogView.OnDialogCompleted
             .Subscribe(_ => OnDialogCompleted().Forget())
             .AddTo(_disposables);
         _dialogView.OnSkipRequested
-            .Subscribe(_ => SkipAllDialogs().Forget())
+            .Subscribe(_ => SkipAllDialogsInternal().Forget())
             .AddTo(_disposables);
 
         // SE音量設定を適用
@@ -316,9 +306,17 @@ public class NovelUIPresenter : IStartable
     }
 
     /// <summary>
-    /// 全ダイアログをスキップして即座に完了
+    /// 全ダイアログをスキップして即座に完了（InputSystem用の公開メソッド）
     /// </summary>
-    private async UniTaskVoid SkipAllDialogs()
+    public void RequestSkipAllDialogs()
+    {
+        SkipAllDialogsInternal().Forget();
+    }
+
+    /// <summary>
+    /// 全ダイアログをスキップして即座に完了（内部実装）
+    /// </summary>
+    private async UniTaskVoid SkipAllDialogsInternal()
     {
         var confirmed = await _confirmationDialogService.ShowDialog(
             "現在のシナリオをスキップしますか？",
@@ -423,11 +421,11 @@ public class NovelUIPresenter : IStartable
         }
     }
     
-    private void OnDestroy()
+    public void Dispose()
     {
         // 購読を一括解除
         _disposables?.Dispose();
-        
+
         // 画像のメモリを解放
         _addressableImageLoader?.UnloadAllImages();
     }
