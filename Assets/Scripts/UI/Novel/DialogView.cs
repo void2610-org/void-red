@@ -162,7 +162,32 @@ public class DialogView : MonoBehaviour
             StartAutoProgress().Forget();
         }
     }
-    
+
+    /// <summary>
+    /// 現在のダイアログを強制的に完了（スキップ用）
+    /// </summary>
+    public void ForceComplete()
+    {
+        // 文字送りアニメーションをキャンセル
+        _typingCancellationTokenSource?.Cancel();
+        _typingCancellationTokenSource?.Dispose();
+        _typingCancellationTokenSource = null;
+
+        // 待機をキャンセル
+        _waitCancellationTokenSource?.Cancel();
+        _waitCancellationTokenSource?.Dispose();
+        _waitCancellationTokenSource = null;
+
+        // SEループを停止
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = null;
+
+        // 状態をリセット
+        _isTyping = false;
+        _isWaitingForNext = false;
+    }
+
     /// <summary>
     /// 話者名を設定する
     /// </summary>

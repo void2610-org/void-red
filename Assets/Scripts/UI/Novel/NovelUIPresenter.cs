@@ -320,9 +320,11 @@ public class NovelUIPresenter : IStartable, System.IDisposable
 
         if (!confirmed) return;
 
-        // ダイアログループを強制終了してダイアログ完了を表示
+        // 現在のダイアログ表示を強制終了
+        _dialogView.ForceComplete();
+
+        // ダイアログループを強制終了
         _currentDialogIndex = _currentDialogList.Count;
-        await OnDialogCompleted();
     }
     
     /// <summary>
