@@ -79,9 +79,6 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         NovelKeyBindings.Setup(_inputActionsProvider, this, _disposables);
 
         // Viewイベントを購読
-        _dialogView.OnDialogCompleted
-            .Subscribe(_ => OnDialogCompleted().Forget())
-            .AddTo(_disposables);
         _dialogView.OnSkipRequested
             .Subscribe(_ => SkipAllDialogsInternal().Forget())
             .AddTo(_disposables);
@@ -95,6 +92,8 @@ public class NovelUIPresenter : IStartable, System.IDisposable
 
         // Excel/スプレッドシートからシナリオを読み込み
         await StartScenario(_currentScenarioId);
+
+        await OnDialogCompleted();
     }
     
     /// <summary>
@@ -158,9 +157,6 @@ public class NovelUIPresenter : IStartable, System.IDisposable
             
             _currentDialogIndex++;
         }
-        
-        // 全てのダイアログが完了
-        _dialogView.ShowDialogComplete();
     }
     
     /// <summary>
@@ -326,7 +322,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
 
         // ダイアログループを強制終了してダイアログ完了を表示
         _currentDialogIndex = _currentDialogList.Count;
-        _dialogView.ShowDialogComplete();
+        await OnDialogCompleted();
     }
     
     /// <summary>
@@ -388,9 +384,16 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     /// <summary>
     /// ダイアログ完了時の処理
     /// </summary>
-    private async UniTaskVoid OnDialogCompleted()
+    private async UniTask OnDialogCompleted()
     {
-        // 少し待ってからシーンを戻る
+        // プロローグ終了後に初期デッキを受け取る
+        if (_currentScenarioId == "prologue1")
+        {
+            var deck = _cardPoolService.GetRandomCards(5);
+            foreach (var card in deck)
+                _gameProgressService.AddCardToDeck(new CardModel(card));
+        }
+        
         await UniTask.Delay(1000);
         
         // 現在のノードを結果記録前に取得

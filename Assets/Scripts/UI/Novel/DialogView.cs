@@ -50,10 +50,8 @@ public class DialogView : MonoBehaviour
     private float _additionalWaitTime;
     
     // イベント
-    private readonly Subject<Unit> _onDialogCompleted = new();
     private readonly Subject<Unit> _onSkipRequested = new();
     
-    public Observable<Unit> OnDialogCompleted => _onDialogCompleted;
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
 
     public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
@@ -143,14 +141,6 @@ public class DialogView : MonoBehaviour
         {
             await WaitForNext();
         }
-    }
-    
-    /// <summary>
-    /// ダイアログ完了を表示
-    /// </summary>
-    public void ShowDialogComplete()
-    {
-        _onDialogCompleted.OnNext(Unit.Default);
     }
     
     /// <summary>
@@ -405,8 +395,6 @@ public class DialogView : MonoBehaviour
         _dialogSeCancellationTokenSource?.Cancel();
         _dialogSeCancellationTokenSource?.Dispose();
 
-        // R3のSubjectを解放
-        _onDialogCompleted.Dispose();
         _onSkipRequested.Dispose();
     }
 }
