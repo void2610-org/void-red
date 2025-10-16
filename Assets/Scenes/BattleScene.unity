@@ -134,6 +134,9 @@ GameObject:
   m_Component:
   - component: {fileID: 359829453}
   - component: {fileID: 359829454}
+  - component: {fileID: 359829457}
+  - component: {fileID: 359829456}
+  - component: {fileID: 359829455}
   m_Layer: 5
   m_Name: PlayerHand
   m_TagString: Untagged
@@ -179,6 +182,56 @@ MonoBehaviour:
   cardBackSprite: {fileID: 0}
   cardSpacing: 100
   cardAngle: 5
+--- !u!114 &359829455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359829452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f19d3d5e7dc40a787fde6ef0f20d06a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &359829456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359829452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &359829457
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359829452}
+  m_CullTransparentMesh: 1
 --- !u!1001 &381149954
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6166,10 +6219,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8161964196290750984, guid: db20cbf4a2e2e44129d940890d2f5a2c, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 2100000, guid: d75aeb61f2e384b81b7ab7acd1b23581, type: 2}
     - target: {fileID: 9223205478302197101, guid: db20cbf4a2e2e44129d940890d2f5a2c, type: 3}
       propertyPath: m_Name
       value: EnemyMentalPowerView

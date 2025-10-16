@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7516731405154190692}
   m_Layer: 5
   m_Name: Block
-  m_TagString: Untagged
+  m_TagString: IgnoreHoverSelection
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -326,7 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -467,7 +467,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.9490196}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -507,6 +507,18 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 1947302341603136683, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
+    - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_Navigation.m_SelectOnLeft
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_Navigation.m_SelectOnRight
+      value: 
+      objectReference: {fileID: 2605023765646184271}
     - target: {fileID: 9037413902010202566, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -655,6 +667,18 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 1947302341603136683, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
+    - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_Navigation.m_SelectOnLeft
+      value: 
+      objectReference: {fileID: 9080199396768719196}
+    - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
+      propertyPath: m_Navigation.m_SelectOnRight
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 9037413902010202566, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

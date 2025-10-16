@@ -65,6 +65,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     public void Start()
     {
         Initialize().Forget();
+        SafeNavigationManager.SelectRootForceSelectable();
         BgmManager.Instance.PlayRandomBGM(BgmType.Novel);
     }
     
@@ -129,9 +130,6 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         _currentDialogIndex = 0;
         _choiceCounter = 0;
         
-        // フェードイン
-        await _dialogView.FadeIn();
-        
         // 全てのダイアログを順番に処理
         while (_currentDialogIndex < _currentDialogList.Count)
         {
@@ -162,7 +160,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         }
         
         // 全てのダイアログが完了
-        await _dialogView.ShowDialogComplete();
+        _dialogView.ShowDialogComplete();
     }
     
     /// <summary>
@@ -328,7 +326,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
 
         // ダイアログループを強制終了してダイアログ完了を表示
         _currentDialogIndex = _currentDialogList.Count;
-        await _dialogView.ShowDialogComplete();
+        _dialogView.ShowDialogComplete();
     }
     
     /// <summary>

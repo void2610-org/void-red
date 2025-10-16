@@ -38,6 +38,7 @@ public class PersonalityLogView : MonoBehaviour
     {
         logPanel.SetActive(true);
         UpdateLogDisplay();
+        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
     }
     
     /// <summary>
