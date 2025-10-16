@@ -62,7 +62,7 @@ public class SafeNavigationManager : ITickable
         if (!currentSelected)
         {
             _previousSelected = null;
-            // UIManager.Instance.ResetSelectedGameObject();
+            SelectRootForceSelectable();
             return;
         }
 
