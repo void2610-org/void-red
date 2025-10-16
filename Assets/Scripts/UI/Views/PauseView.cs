@@ -44,6 +44,6 @@ public class PauseView : MonoBehaviour
         resumeButton.onClick.AddListener(() => _onResumeButtonClicked.OnNext(Unit.Default));
         titleButton.onClick.AddListener(() => _onTitleButtonClicked.OnNext(Unit.Default));
 
-        Hide();
+        panel.SetActive(false);
     }
 }
