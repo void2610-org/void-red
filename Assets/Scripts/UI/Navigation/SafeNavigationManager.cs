@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VContainer.Unity;
@@ -7,6 +8,8 @@ public class SafeNavigationManager : ITickable
     private GameObject _previousSelected;
     private static bool _allowProgrammaticChange = false;
     private static EventSystem _eventSystem;
+    
+    public static GameObject GetCurrentSelected() => _eventSystem.currentSelectedGameObject;
     
     public SafeNavigationManager()
     {
@@ -18,6 +21,21 @@ public class SafeNavigationManager : ITickable
         _allowProgrammaticChange = true;
         if (!_eventSystem) _eventSystem = EventSystem.current;
         _eventSystem.SetSelectedGameObject(go);
+    }
+
+    public static void SelectRootForceSelectable()
+    {
+        if (!_eventSystem) _eventSystem = EventSystem.current;
+        var canvas = Object.FindAnyObjectByType<Canvas>();
+        var selectable = canvas.transform.GetComponentsInChildren<ForceSelectable>().FirstOrDefault();
+        if (selectable != null)
+        {
+            SetSelectedGameObjectSafe(selectable.gameObject);
+        }
+        else
+        {
+            Debug.LogError("ルートのForceSelectableが見つかりません");
+        }
     }
     
     /// <summary>
@@ -45,7 +63,7 @@ public class SafeNavigationManager : ITickable
         if (!currentSelected)
         {
             _previousSelected = null;
-            // UIManager.Instance.ResetSelectedGameObject();
+            SelectRootForceSelectable();
             return;
         }
 

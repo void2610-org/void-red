@@ -30,7 +30,7 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
     /// </summary>
     public void OnSelect(BaseEventData eventData)
     {
-        if (_currentMotion.IsActive()) _currentMotion.Cancel();
+        _currentMotion.TryCancel();
         _currentMotion = glowImage.FadeIn(FADE_DURATION, FADE_EASE);
     }
     
@@ -39,13 +39,12 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
     /// </summary>
     public void OnDeselect(BaseEventData eventData)
     {
-        if (_currentMotion.IsActive()) _currentMotion.Cancel();
+        _currentMotion.TryCancel();
         _currentMotion = glowImage.FadeOut(FADE_DURATION, FADE_EASE);
     }
     
     private void OnDestroy()
     {
-        if (_currentMotion.IsActive())
-            _currentMotion.Cancel();
+        _currentMotion.TryCancel();
     }
 }

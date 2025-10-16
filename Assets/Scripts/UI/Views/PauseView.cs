@@ -26,12 +26,14 @@ public class PauseView : MonoBehaviour
     {
         Time.timeScale = 0;
         panel.SetActive(true);
+        SafeNavigationManager.SetSelectedGameObjectSafe(resumeButton.gameObject);
     }
 
     public void Hide()
     {
         Time.timeScale = 1;
         panel.SetActive(false);
+        SafeNavigationManager.SelectRootForceSelectable();
     }
 
     public bool IsShowing => panel.activeSelf;
