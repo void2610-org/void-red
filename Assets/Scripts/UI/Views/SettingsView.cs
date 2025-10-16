@@ -74,16 +74,24 @@ public class SettingsView : MonoBehaviour
         Enum,
         Button
     }
-    
+
     /// <summary>
     /// 設定画面を表示
     /// </summary>
-    public void ShowSettings() => settingsPanel.SetActive(true);
+    public void ShowSettings()
+    {
+        settingsPanel.SetActive(true);
+        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
+    }
 
     /// <summary>
     /// 設定画面を非表示
     /// </summary>
-    public void HideSettings() => settingsPanel.SetActive(false);
+    public void HideSettings()
+    {
+        settingsPanel.SetActive(false);
+        SafeNavigationManager.SelectRootForceSelectable();
+    }
 
     /// <summary>
     /// 設定画面の表示状態
