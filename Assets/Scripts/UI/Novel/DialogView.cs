@@ -35,10 +35,6 @@ public class DialogView : MonoBehaviour
     [SerializeField] private float defaultCharSpeed = 0.05f; // デフォルトの1文字表示間隔（秒）
     [SerializeField] private float autoNextDelay = 3f; // 自動で次へ進むまでの待機時間（秒）
     
-    [Header("フェード設定")]
-    [SerializeField] private float fadeInDuration = 0.5f;
-    [SerializeField] private float fadeOutDuration = 0.5f;
-    
     private bool _isTyping;
     private bool _isWaitingForNext;
     private bool _isAutoMode;
