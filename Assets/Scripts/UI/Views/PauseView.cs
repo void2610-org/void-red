@@ -33,6 +33,7 @@ public class PauseView : MonoBehaviour
     {
         Time.timeScale = 1;
         panel.SetActive(false);
+        SafeNavigationManager.SelectRootForceSelectable();
     }
 
     public bool IsShowing => panel.activeSelf;

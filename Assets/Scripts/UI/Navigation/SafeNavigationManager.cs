@@ -9,6 +9,8 @@ public class SafeNavigationManager : ITickable
     private static bool _allowProgrammaticChange = false;
     private static EventSystem _eventSystem;
     
+    public static GameObject GetCurrentSelected() => _eventSystem.currentSelectedGameObject;
+    
     public SafeNavigationManager()
     {
         _eventSystem = EventSystem.current;
