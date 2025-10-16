@@ -1,10 +1,10 @@
 using UnityEngine;
-using TMPro;
 using Cysharp.Threading.Tasks;
 using System;
 using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
+using UnityEngine.UI;
+using R3;
 
 /// <summary>
 /// チュートリアル表示を管理するViewクラス
@@ -17,17 +17,23 @@ public class TutorialView : MonoBehaviour
     [SerializeField] private SimpleTutorialWindowView simpleTutorialWindow;
     [SerializeField] private NarrationView playerNarrationView;
     [SerializeField] private NarrationView enemyNarrationView;
-    
+    [SerializeField] private Button clickAreaButton;
+
     private const float FADE_DURATION = 0.3f;
     private const float MASK_TRANSITION_DURATION = 0.5f;
-    
+
     private CanvasGroup _canvasGroup;
     private MotionHandle _currentFadeHandle;
     private MotionHandle _currentMaskPositionHandle;
     private MotionHandle _currentMaskSizeHandle;
-    private bool _isFirstStep = true;
     private Vector2 _currentMaskSize = Vector2.zero;
-    
+
+    private readonly Subject<Unit> _onClickAdvance = new();
+
+    public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
+
+    public void NotifyAdvance() => _onClickAdvance.OnNext(Unit.Default);
+
     /// <summary>
     /// チュートリアルステップを表示してクリック待機
     /// </summary>
@@ -35,18 +41,9 @@ public class TutorialView : MonoBehaviour
     {
         if (step == null) return;
         
-        // 初回のみShow()を呼ぶ
-        if (_isFirstStep)
-        {
-            await Show();
-            _isFirstStep = false;
-        }
-        
         // マスク領域の更新（アニメーション付き）
-        if (_currentMaskPositionHandle.IsActive())
-            _currentMaskPositionHandle.Cancel();
-        if (_currentMaskSizeHandle.IsActive())
-            _currentMaskSizeHandle.Cancel();
+        _currentMaskPositionHandle.TryCancel();
+        _currentMaskSizeHandle.TryCancel();
 
         // 現在のマスクサイズと新しいマスクサイズをチェック
         var isCurrentSizeZero = _currentMaskSize == Vector2.zero;
@@ -73,9 +70,12 @@ public class TutorialView : MonoBehaviour
         
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));
-        
-        // クリック待機
-        await UniTask.WaitUntil(() => Input.GetMouseButtonDown(0));
+
+        // ルートボタンを選択
+        SafeNavigationManager.SelectRootForceSelectable();
+
+        // ボタンクリック待機
+        await _onClickAdvance.FirstAsync();
     }
     
     private async UniTask UpdateMessageText(string message, bool isPlayerDialog, bool isBattleTutorial)
@@ -96,16 +96,16 @@ public class TutorialView : MonoBehaviour
     /// <summary>
     /// チュートリアルビューを表示
     /// </summary>
-    private async UniTask Show()
+    public async UniTask Show()
     {
         // 現在のアニメーションをキャンセル
-        if (_currentFadeHandle.IsActive())
-            _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
         
         // フェードイン
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_DURATION);
         
         await _currentFadeHandle.ToUniTask();
+        SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
     }
     
     /// <summary>
@@ -114,8 +114,7 @@ public class TutorialView : MonoBehaviour
     public async UniTask Hide()
     {
         // 現在のアニメーションをキャンセル
-        if (_currentFadeHandle.IsActive())
-            _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
         
         // NarrationViewも非表示にする
         playerNarrationView.HideNarration().Forget();
@@ -127,30 +126,34 @@ public class TutorialView : MonoBehaviour
         await _currentFadeHandle.ToUniTask();
         
         // 次回のために初期化
-        _isFirstStep = true;
         _currentMaskSize = Vector2.zero;
     }
     
     private void Awake()
     {
         _canvasGroup = this.GetComponent<CanvasGroup>();
-        
+
         // 初期状態は非表示
         _canvasGroup.alpha = 0f;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
         maskArea.anchoredPosition = Vector2.zero;
         maskArea.sizeDelta = Vector2.zero;
+
+        // ボタンイベントを設定
+        clickAreaButton.OnClickAsObservable()
+            .Subscribe(_ => NotifyAdvance())
+            .AddTo(this);
     }
-    
+
     private void OnDestroy()
     {
         // アニメーションのクリーンアップ
-        if (_currentFadeHandle.IsActive())
-            _currentFadeHandle.Cancel();
-        if (_currentMaskPositionHandle.IsActive())
-            _currentMaskPositionHandle.Cancel();
-        if (_currentMaskSizeHandle.IsActive())
-            _currentMaskSizeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
+        _currentMaskPositionHandle.TryCancel();
+        _currentMaskSizeHandle.TryCancel();
+
+        // Subjectのクリーンアップ
+        _onClickAdvance?.Dispose();
     }
 }
