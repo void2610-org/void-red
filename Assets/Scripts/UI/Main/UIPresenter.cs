@@ -49,6 +49,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private ThemeData _currentTheme;
     private readonly HandView _playerHandView;
+    private BattleRootView _battleRootView;
 
     public void SetTheme(ThemeData theme)
     {
@@ -126,7 +127,33 @@ public class UIPresenter : IStartable, System.IDisposable
             _playButtonView.SimulateClick();
         }
     }
-    
+
+    /// <summary>
+    /// 次のカードを選択（InputSystem用の公開メソッド）
+    /// </summary>
+    public void NavigateToNextCard()
+    {
+        var currentIndex = _player.SelectedIndex.CurrentValue;
+        var nextIndex = currentIndex + 1;
+
+        if (nextIndex < _player.HandCount)
+            _player.SelectCardAt(nextIndex);
+    }
+
+    /// <summary>
+    /// 前のカードを選択（InputSystem用の公開メソッド）
+    /// </summary>
+    public void NavigateToPreviousCard()
+    {
+        var currentIndex = _player.SelectedIndex.CurrentValue;
+        var prevIndex = currentIndex - 1;
+
+        if (prevIndex >= 0)
+            _player.SelectCardAt(prevIndex);
+        else if (_player.HandCount > 0)
+            _player.SelectCardAt(0);
+    }
+
     /// <summary>
     /// 詳細ボタンの表示状態を現在の選択状態に基づいて更新
     /// </summary>
@@ -174,10 +201,13 @@ public class UIPresenter : IStartable, System.IDisposable
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
         _tutorialPresenter = new TutorialPresenter(allTutorialData);
         _sceneTransitionManager = sceneTransitionManager;
-        
+
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
         var handViews = Object.FindObjectsByType<HandView>(FindObjectsSortMode.None);
         _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
+
+        // BattleRootViewを取得
+        _battleRootView = UnityEngine.Object.FindFirstObjectByType<BattleRootView>();
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
@@ -309,7 +339,7 @@ public class UIPresenter : IStartable, System.IDisposable
         SetUpButtonEvents();
 
         // キーバインドを設定
-        BattleKeyBindings.Setup(_inputActionsProvider, this, _disposables);
+        BattleKeyBindings.Setup(_inputActionsProvider, this, _battleRootView, _disposables);
 
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
@@ -317,6 +347,9 @@ public class UIPresenter : IStartable, System.IDisposable
 
         // 詳細ボタンの初期状態を設定
         UpdateDetailButtonVisibility();
+
+        // ルートボタンを初期選択
+        SafeNavigationManager.SelectRootForceSelectable();
     }
 
     public void Dispose()
