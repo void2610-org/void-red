@@ -54,7 +54,7 @@ public class HomeUIPresenter : MonoBehaviour
         settingsButton.OnClickAsObservable().Subscribe(_ => _settingsPresenter.ShowSettings()).AddTo(this);
         titleButton.OnClickAsObservable().Subscribe(_ => OnTitleButtonClicked()).AddTo(this);
         storyButton.OnClickAsObservable().Subscribe(_ => StartCurrentNodeAsync().Forget()).AddTo(this);
-        deckButton.OnClickAsObservable().Subscribe(_ => RefreshDeckData()).AddTo(this);
+        deckButton.OnClickAsObservable().Subscribe(_ => ShowDeckData()).AddTo(this);
         libraryButton.OnClickAsObservable().Subscribe(_ => ShowCardLibrary()).AddTo(this);
 
         // DeckViewのカードクリックイベントを購読
@@ -134,11 +134,9 @@ public class HomeUIPresenter : MonoBehaviour
     /// <summary>
     /// デッキデータを更新
     /// </summary>
-    private void RefreshDeckData()
+    private void ShowDeckData()
     {
         var cardModels = _gameProgressService.GetDeckCardModels();
-        var cardDataList = cardModels.Select(cm => cm.Data).ToList();
-        
         deckView.ShowDeck(cardModels);
     }
     
