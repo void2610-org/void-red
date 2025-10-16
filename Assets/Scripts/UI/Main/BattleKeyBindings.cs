@@ -12,6 +12,7 @@ public static class BattleKeyBindings
     public static void Setup(
         InputActionsProvider inputActionsProvider,
         UIPresenter uiPresenter,
+        BattleRootView battleRootView,
         CompositeDisposable disposables)
     {
         // ViewをシーンからFind
@@ -52,6 +53,25 @@ public static class BattleKeyBindings
         // カードをプレイ
         inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
             .Subscribe(_ => uiPresenter.TryPlayCard())
+            .AddTo(disposables);
+
+        // カードナビゲーション（ルート選択時のみ）
+        inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
+            .Where(_ => battleRootView.IsRootSelected)
+            .Subscribe(_ =>
+            {
+                var direction = inputActionsProvider.UI.Navigate.ReadValue<UnityEngine.Vector2>();
+                if (direction.x > 0.5f)
+                {
+                    // 右方向：次のカード
+                    uiPresenter.NavigateToNextCard();
+                }
+                else if (direction.x < -0.5f)
+                {
+                    // 左方向：前のカード
+                    uiPresenter.NavigateToPreviousCard();
+                }
+            })
             .AddTo(disposables);
     }
 }
