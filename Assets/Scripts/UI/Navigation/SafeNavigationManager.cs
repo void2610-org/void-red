@@ -25,6 +25,7 @@ public class SafeNavigationManager : ITickable
 
     public static void SelectRootForceSelectable()
     {
+        if (!_eventSystem) _eventSystem = EventSystem.current;
         var canvas = Object.FindAnyObjectByType<Canvas>();
         var selectable = canvas.transform.GetComponentsInChildren<ForceSelectable>().FirstOrDefault();
         if (selectable != null)
