@@ -57,5 +57,6 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     private void OnDestroy()
     {
         _colorMotion.TryCancel();
+        _scaleMotion.TryCancel();
     }
 }
