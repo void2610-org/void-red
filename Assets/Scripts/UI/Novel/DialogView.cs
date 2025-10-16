@@ -15,7 +15,6 @@ using R3;
 public class DialogView : MonoBehaviour
 {
     [Header("UI要素")]
-    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private TextMeshProUGUI speakerNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
@@ -63,10 +62,6 @@ public class DialogView : MonoBehaviour
     
     private void Awake()
     {
-        // 初期状態を設定
-        canvasGroup.alpha = 0f;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
         dialogText.text = "";
         
         nextIndicator.SetActive(false);
@@ -79,40 +74,6 @@ public class DialogView : MonoBehaviour
         
         // オートボタンの初期色を設定
         UpdateAutoButtonColor();
-    }
-    
-    /// <summary>
-    /// フェードイン
-    /// </summary>
-    public async UniTask FadeIn()
-    {
-        if (!canvasGroup) return;
-
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
-
-        CancelActiveMotions();
-
-        _fadeMotion = canvasGroup.FadeIn(fadeInDuration, Ease.OutCubic).AddTo(this);
-
-        await _fadeMotion.ToUniTask();
-    }
-    
-    /// <summary>
-    /// フェードアウト
-    /// </summary>
-    public async UniTask FadeOut()
-    {
-        if (!canvasGroup) return;
-
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-
-        CancelActiveMotions();
-
-        _fadeMotion = canvasGroup.FadeOut(fadeOutDuration, Ease.InCubic).AddTo(this);
-
-        await _fadeMotion.ToUniTask();
     }
     
     /// <summary>
@@ -189,9 +150,8 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// ダイアログ完了を表示
     /// </summary>
-    public async UniTask ShowDialogComplete()
+    public void ShowDialogComplete()
     {
-        await FadeOut();
         _onDialogCompleted.OnNext(Unit.Default);
     }
     
@@ -324,8 +284,6 @@ public class DialogView : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
-        if (!canvasGroup) return;
-        if (canvasGroup.alpha == 0f || !canvasGroup.interactable) return;
         if (_isTyping)
         {
             // 文字送り中のクリックで即座に全文表示
@@ -420,8 +378,7 @@ public class DialogView : MonoBehaviour
     /// <param name="interactable">操作可能かどうか</param>
     public void SetInteractable(bool interactable)
     {
-        if (!canvasGroup) return;
-        canvasGroup.interactable = interactable;
+        clickAreaButton.interactable = interactable;
     }
     
     /// <summary>
