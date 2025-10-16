@@ -59,6 +59,8 @@ public class DialogView : MonoBehaviour
     
     public Observable<Unit> OnDialogCompleted => _onDialogCompleted;
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
+
+    public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
     
     private void Awake()
     {
