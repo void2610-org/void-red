@@ -165,7 +165,7 @@ public class UIPresenter : IStartable, System.IDisposable
             _cardDetailButtonView?.Hide();
     }
     
-    public UIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager)
+    public UIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
     {
         _player = player;
         _enemy = enemy;
@@ -199,7 +199,7 @@ public class UIPresenter : IStartable, System.IDisposable
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
-        _tutorialPresenter = new TutorialPresenter(allTutorialData);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
         _sceneTransitionManager = sceneTransitionManager;
 
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
