@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Text;
 using Game.PersonalityLog;
 using Cysharp.Threading.Tasks;
+using R3;
 
 /// <summary>
 /// 人格ログを表示するViewコンポーネント
@@ -26,7 +27,7 @@ public class PersonalityLogView : MonoBehaviour
     {
         _scrollContent = scrollRect.content;
         _gameProgressService = gameProgressService;
-        closeButton.onClick.AddListener(HideLog);
+        closeButton.OnClickAsObservable().Subscribe(_ => HideLog()).AddTo(this);
         
         HideLog();
     }
@@ -37,8 +38,8 @@ public class PersonalityLogView : MonoBehaviour
     public void ShowLog()
     {
         logPanel.SetActive(true);
-        UpdateLogDisplay();
         SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
+        UpdateLogDisplay();
     }
     
     /// <summary>
@@ -47,12 +48,13 @@ public class PersonalityLogView : MonoBehaviour
     public void HideLog()
     {
         logPanel.SetActive(false);
+        SafeNavigationManager.SelectRootForceSelectable();
     }
     
     /// <summary>
     /// ログ表示を更新（UniTask版）
     /// </summary>
-    public void UpdateLogDisplay()
+    private void UpdateLogDisplay()
     {
         var logData = _gameProgressService.GetPersonalityLogData();
         var displayText = FormatLogData(logData);

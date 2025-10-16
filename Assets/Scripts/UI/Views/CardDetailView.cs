@@ -36,6 +36,7 @@ public class CardDetailView : MonoBehaviour
         
         // パネルを表示
         detailPanel.SetActive(true);
+        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
         playButton.gameObject.SetActive(isPlayable);
     }
     
@@ -45,6 +46,7 @@ public class CardDetailView : MonoBehaviour
     public void Hide()
     {
         detailPanel.SetActive(false);
+        SafeNavigationManager.SelectRootForceSelectable();
     }
     
     /// <summary>
