@@ -39,6 +39,7 @@ public class CardLibraryView : MonoBehaviour
         _allCardData = allCardData;
         
         libraryPanel.SetActive(true);
+        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
         UpdateLibraryDisplay(viewedCardIds);
     }
     
@@ -48,6 +49,7 @@ public class CardLibraryView : MonoBehaviour
     private void Hide()
     {
         libraryPanel.SetActive(false);
+        SafeNavigationManager.SelectRootForceSelectable();
     }
     
     /// <summary>
