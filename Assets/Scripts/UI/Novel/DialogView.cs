@@ -50,10 +50,8 @@ public class DialogView : MonoBehaviour
     private float _additionalWaitTime;
     
     // イベント
-    private readonly Subject<Unit> _onDialogCompleted = new();
     private readonly Subject<Unit> _onSkipRequested = new();
     
-    public Observable<Unit> OnDialogCompleted => _onDialogCompleted;
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
 
     public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
@@ -146,14 +144,6 @@ public class DialogView : MonoBehaviour
     }
     
     /// <summary>
-    /// ダイアログ完了を表示
-    /// </summary>
-    public void ShowDialogComplete()
-    {
-        _onDialogCompleted.OnNext(Unit.Default);
-    }
-    
-    /// <summary>
     /// オートモードの切り替え
     /// </summary>
     public void ToggleAutoMode()
@@ -172,7 +162,32 @@ public class DialogView : MonoBehaviour
             StartAutoProgress().Forget();
         }
     }
-    
+
+    /// <summary>
+    /// 現在のダイアログを強制的に完了（スキップ用）
+    /// </summary>
+    public void ForceComplete()
+    {
+        // 文字送りアニメーションをキャンセル
+        _typingCancellationTokenSource?.Cancel();
+        _typingCancellationTokenSource?.Dispose();
+        _typingCancellationTokenSource = null;
+
+        // 待機をキャンセル
+        _waitCancellationTokenSource?.Cancel();
+        _waitCancellationTokenSource?.Dispose();
+        _waitCancellationTokenSource = null;
+
+        // SEループを停止
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = null;
+
+        // 状態をリセット
+        _isTyping = false;
+        _isWaitingForNext = false;
+    }
+
     /// <summary>
     /// 話者名を設定する
     /// </summary>
@@ -405,8 +420,6 @@ public class DialogView : MonoBehaviour
         _dialogSeCancellationTokenSource?.Cancel();
         _dialogSeCancellationTokenSource?.Dispose();
 
-        // R3のSubjectを解放
-        _onDialogCompleted.Dispose();
         _onSkipRequested.Dispose();
     }
 }

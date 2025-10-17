@@ -55,6 +55,7 @@ public class DeckView : MonoBehaviour
         _cardModels = cardModels;
         
         deckPanel.SetActive(true);
+        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
         UpdateDeckDisplay();
         UpdateStatistics();
         UpdateButtonStates();
@@ -66,6 +67,7 @@ public class DeckView : MonoBehaviour
     private void HideDeck()
     {
         deckPanel.SetActive(false);
+        SafeNavigationManager.SelectRootForceSelectable();
     }
     
     /// <summary>

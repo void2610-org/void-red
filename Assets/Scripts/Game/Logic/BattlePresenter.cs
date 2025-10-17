@@ -123,13 +123,8 @@ public class BattlePresenter: IStartable
         // 敵情報をアナウンス
         await _uiPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
         
-        // カードデッキを初期化
-        // プレイヤーデッキ: セーブデータから復元を試行、失敗時はランダム生成
-        if (!_player.LoadDeckFromSaveData())
-        {
-            var playerDeck = _cardPoolService.GetRandomCards(5);
-            _player.InitializeDeck(playerDeck);
-        }
+        // セーブデータからデッキを初期化
+        _player.LoadDeckFromSaveData();
         
         // 敵デッキ: 固定デッキを使用
         var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);

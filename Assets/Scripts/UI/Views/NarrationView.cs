@@ -18,10 +18,12 @@ public class NarrationView : MonoBehaviour
     [SerializeField] private Image backgroundImage;
     
     private const float FADE_DURATION = 0.3f;
-    
+
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentNarrationCts;
     private CancellationTokenSource _dialogSeCancellationTokenSource;
+    private CancellationTokenSource _typingCancellationTokenSource;
+    private bool _isTyping;
 
     /// <summary>
     /// ナレーションを表示
@@ -61,8 +63,25 @@ public class NarrationView : MonoBehaviour
             _dialogSeCancellationTokenSource = new CancellationTokenSource();
             SeManager.Instance.PlaySeLoop("Dialog", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
 
+            // 文字送りアニメーションを開始
+            _isTyping = true;
+            _typingCancellationTokenSource?.Cancel();
+            _typingCancellationTokenSource?.Dispose();
+            _typingCancellationTokenSource = new CancellationTokenSource();
+
             // 1文字ずつ表示するアニメーション
-            await narrationText.TypewriterAnimation(message, cancellationToken: cancellationToken);
+            try
+            {
+                await narrationText.TypewriterAnimation(message, cancellationToken: _typingCancellationTokenSource.Token);
+            }
+            catch (System.OperationCanceledException)
+            {
+                // キャンセルされた場合は全文を即座に表示
+                narrationText.text = message;
+            }
+
+            // 文字送り完了
+            _isTyping = false;
 
             // dialogSeループを停止
             _dialogSeCancellationTokenSource?.Cancel();
@@ -83,6 +102,27 @@ public class NarrationView : MonoBehaviour
         catch (System.OperationCanceledException) { }
     }
     
+    /// <summary>
+    /// タイプライターアニメーションをスキップして即座に全文表示
+    /// </summary>
+    public void SkipTyping()
+    {
+        if (!_isTyping) return;
+
+        // タイプライターアニメーションをキャンセル
+        _typingCancellationTokenSource?.Cancel();
+        _typingCancellationTokenSource?.Dispose();
+        _typingCancellationTokenSource = null;
+
+        // SEループを停止
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = null;
+
+        // 状態をリセット
+        _isTyping = false;
+    }
+
     /// <summary>
     /// ナレーションを非表示にする
     /// </summary>
@@ -135,5 +175,9 @@ public class NarrationView : MonoBehaviour
         // ダイアログSEのキャンセレーショントークンをクリーンアップ
         _dialogSeCancellationTokenSource?.Cancel();
         _dialogSeCancellationTokenSource?.Dispose();
+
+        // タイプライターアニメーションのキャンセレーショントークンをクリーンアップ
+        _typingCancellationTokenSource?.Cancel();
+        _typingCancellationTokenSource?.Dispose();
     }
 }
