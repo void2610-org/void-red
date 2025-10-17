@@ -30,6 +30,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     private int _currentDialogIndex;
     private int _choiceCounter;
     private string _currentScenarioId;
+    private bool _isSkipping;
     private readonly CompositeDisposable _disposables = new();
     
     public NovelUIPresenter(bool useLocalExcel)
@@ -128,17 +129,31 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         _currentDialogList = dialogList;
         _currentDialogIndex = 0;
         _choiceCounter = 0;
+        _isSkipping = false;
         
         // 全てのダイアログを順番に処理
         while (_currentDialogIndex < _currentDialogList.Count)
         {
             var currentDialog = _currentDialogList[_currentDialogIndex];
             
-            // ダイアログを表示（完了まで待機）
-            await ShowSingleDialog(currentDialog);
+            // スキップ中で選択肢がある場合はスキップを停止
+            if (_isSkipping && currentDialog.HasChoice)
+            {
+                _isSkipping = false;
+            }
+            
+            // ダイアログを表示（完了まで待機またはスキップ）
+            if (_isSkipping)
+            {
+                // スキップ中はダイアログを表示しない
+            }
+            else
+            {
+                await ShowSingleDialog(currentDialog);
+            }
             
             // アイテム取得演出がある場合は実行
-            if (currentDialog.HasGetItem)
+            if (currentDialog.HasGetItem && !_isSkipping)
             {
                 await ShowItemGetEffect(currentDialog);
             }
@@ -150,7 +165,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
             }
             
             // カード獲得演出がある場合は実行
-            if (currentDialog.HasGetCard)
+            if (currentDialog.HasGetCard && !_isSkipping)
             {
                 await ShowCardGetEffect();
             }
@@ -323,8 +338,8 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         // 現在のダイアログ表示を強制終了
         _dialogView.ForceComplete();
 
-        // ダイアログループを強制終了
-        _currentDialogIndex = _currentDialogList.Count;
+        // スキップを開始
+        _isSkipping = true;
     }
     
     /// <summary>
