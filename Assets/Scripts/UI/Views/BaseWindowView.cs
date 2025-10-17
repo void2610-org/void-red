@@ -49,8 +49,8 @@ public abstract class BaseWindowView : MonoBehaviour
 
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
-        
-        _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION);
+
+        _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
     }
@@ -61,8 +61,8 @@ public abstract class BaseWindowView : MonoBehaviour
 
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
-        
-        _currentFadeHandle = _canvasGroup.FadeOut(FADE_ANIMATION_DURATION);
+
+        _currentFadeHandle = _canvasGroup.FadeOut(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SelectRootForceSelectable();
     }
