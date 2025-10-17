@@ -304,10 +304,11 @@ namespace Void2610.UnityTemplate
         /// <summary>
         /// TransformをLitMotionで指定位置に移動
         /// </summary>
-        public static MotionHandle MoveTo(this Transform transform, Vector3 targetPosition, float duration, Ease ease = Ease.Linear)
+        public static MotionHandle MoveTo(this Transform transform, Vector3 targetPosition, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
         {
             return LMotion.Create(transform.localPosition, targetPosition, duration)
                 .WithEase(ease)
+                .WithScheduler(ignoreTimeScale ? MotionScheduler.UpdateIgnoreTimeScale : MotionScheduler.Update)
                 .BindToLocalPosition(transform)
                 .AddTo(transform.gameObject);
         }
