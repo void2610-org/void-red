@@ -7,14 +7,11 @@ using System.Threading;
 /// <summary>
 /// 確認ダイアログの表示を担当するViewクラス
 /// </summary>
-public class ConfirmationDialogView : MonoBehaviour
+public class ConfirmationDialogView : BaseWindowView
 {
     [Header("UI Components")]
-    [SerializeField] private Image dialogBackground;
-    [SerializeField] private GameObject dialogPanel;
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private Button confirmButton;
-    [SerializeField] private Button cancelButton;
     [SerializeField] private TextMeshProUGUI confirmButtonText;
     [SerializeField] private TextMeshProUGUI cancelButtonText;
     
@@ -54,47 +51,27 @@ public class ConfirmationDialogView : MonoBehaviour
             confirmButtonText.text = confirmText;
             cancelButtonText.text = cancelText;
 
-            // ダイアログを表示
-            dialogPanel.SetActive(true);
-
             // ボタンのインタラクションを有効化
             confirmButton.interactable = true;
-            cancelButton.interactable = true;
 
-            // ボタンを選択
-            SafeNavigationManager.SetSelectedGameObjectSafe(cancelButton.gameObject);
+            // ダイアログを表示
+            Show();
 
             // ユーザーの選択を待つ
             var result = await _dialogResult.Task;
 
             await UniTask.Yield(cancellationToken);
+
             // ダイアログを非表示
-            HideDialog();
+            Hide();
 
             return result;
         }
         catch (System.OperationCanceledException)
         {
-            // キャンセルされた場合のクリーンアップ
-            HideDialog();
+            Hide();
             return false;
         }
-        finally
-        {
-           SafeNavigationManager.SelectRootForceSelectable(); 
-        }
-    }
-    
-    /// <summary>
-    /// ダイアログを非表示にする
-    /// </summary>
-    private void HideDialog()
-    {
-        dialogPanel.SetActive(false);
-        
-        // ボタンのインタラクションを無効化
-        confirmButton.interactable = false;
-        cancelButton.interactable = false;
     }
     
     /// <summary>
@@ -113,26 +90,26 @@ public class ConfirmationDialogView : MonoBehaviour
         _dialogResult?.TrySetResult(false);
     }
     
-    private void Awake()
+    protected override void Awake()
     {
-        // 初期状態の設定 - ダイアログパネルを非表示
-        dialogPanel.SetActive(false);
-        
+        closeButton = GetComponentInChildren<Button>();
+        base.Awake();
+
         // ボタンイベントの設定
         confirmButton.onClick.AddListener(OnConfirmClicked);
-        cancelButton.onClick.AddListener(OnCancelClicked);
-        
+
         // ボタンを無効化
         confirmButton.interactable = false;
-        cancelButton.interactable = false;
     }
-    
-    private void OnDestroy()
+
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
+
         // ダイアログのキャンセレーショントークンをクリーンアップ
         _currentDialogCts?.Cancel();
         _currentDialogCts?.Dispose();
-        
+
         // 未完了のCompletionSourceをキャンセル
         _dialogResult?.TrySetCanceled();
     }

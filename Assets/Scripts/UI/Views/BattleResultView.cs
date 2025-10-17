@@ -11,9 +11,8 @@ using Void2610.UnityTemplate;
 /// <summary>
 /// バトル全体の結果を表示するViewクラス（3勝到達後の最終結果）
 /// </summary>
-public class BattleResultView : MonoBehaviour
+public class BattleResultView : BaseWindowView
 {
-    [SerializeField] private GameObject panel;
     [SerializeField] private TextMeshProUGUI resultText;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI acquiredMemoryText;
@@ -43,7 +42,7 @@ public class BattleResultView : MonoBehaviour
             acquiredMemoryText.text = "なし";
         }
 
-        panel.gameObject.SetActive(true);
+        Show();
     }
 
     public async UniTask WaitForUntilClose()
@@ -51,12 +50,9 @@ public class BattleResultView : MonoBehaviour
         await homeButton.OnClickAsync();
     }
 
-    /// <summary>
-    /// 初期化
-    /// </summary>
-    private void Awake()
+    protected override void Awake()
     {
-        // 初期状態は非表示
-        panel.SetActive(false);
+        closeButton = homeButton;
+        base.Awake();
     }
 }
