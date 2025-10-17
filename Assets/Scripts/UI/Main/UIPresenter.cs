@@ -227,22 +227,42 @@ public class UIPresenter : IStartable, System.IDisposable
     private void UpdateMentalBetDisplay()
     {
         var currentMentalPower = _player.MentalPower.CurrentValue;
-        
+
         // 現在のベット値が精神力を超えている場合や最小値を下回る場合は調整
         if (_mentalBetValue > currentMentalPower)
             _mentalBetValue = currentMentalPower;
         if (_mentalBetValue < GameConstants.MIN_MENTAL_BET)
             _mentalBetValue = GameConstants.MIN_MENTAL_BET;
-        
+
         // MentalBetViewに表示を委譲
         _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, GameConstants.MIN_MENTAL_BET, GameConstants.MAX_MENTAL_BET);
-        
+
         // MentalPowerViewに精神力表示を委譲
         _playerMentalPowerView.UpdateDisplay(currentMentalPower, GameConstants.MAX_MENTAL_POWER);
+
+        // 選択中のカードのビジュアルを更新
+        UpdateSelectedCardVisual();
+    }
+
+    /// <summary>
+    /// 選択中のカードのビジュアルを更新
+    /// </summary>
+    private void UpdateSelectedCardVisual()
+    {
+        ResetAllCardCollapseVisuals();
+        var card = _player.SelectedCard.CurrentValue;
+        var index = _player.SelectedIndex.CurrentValue;
+        if (card != null && index >= 0 && _currentTheme != null)
+        {
+            // PlayerMoveを作成してスコアを計算
+            var move = new PlayerMove(card.Data, _selectedPlayStyle, _mentalBetValue);
+            var score = ScoreCalculator.CalculateScoreWithoutEnemy(move, _currentTheme);
+            UpdateCardVisual(card, index, score);
+        }
     }
     
     /// <summary>
-    /// 選択されたカードの崩壊ビジュアルを更新
+    /// 選択されたカードのUIEffectsを更新
     /// </summary>
     private void UpdateCardVisual(CardModel cardModel, int selectedIndex, float score)
     {
@@ -296,19 +316,8 @@ public class UIPresenter : IStartable, System.IDisposable
 
         // 全ての変更イベントをマージして崩壊ビジュアルを更新
         Observable.Merge(cardSelectionChange, cardIndexChange, playStyleChange, mentalBetChange)
-            .Subscribe(_ =>
-            {
-                ResetAllCardCollapseVisuals();
-                var card = _player.SelectedCard.CurrentValue;
-                var index = _player.SelectedIndex.CurrentValue;
-                if (card != null && index >= 0 && _currentTheme != null)
-                {
-                    // PlayerMoveを作成してスコアを計算
-                    var move = new PlayerMove(card.Data, _selectedPlayStyle, _mentalBetValue);
-                    var score = ScoreCalculator.CalculateScoreWithoutEnemy(move, _currentTheme);
-                    UpdateCardVisual(card, index, score);
-                }
-            }).AddTo(_disposables);
+            .Subscribe(_ => UpdateSelectedCardVisual())
+            .AddTo(_disposables);
     }
 
     
