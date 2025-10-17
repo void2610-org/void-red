@@ -102,9 +102,4 @@ public class CardDetailView : BaseWindowView
         
         evolutionInfoText.text = evolutionInfo.TrimEnd('\n');
     }
-    
-    protected override void Awake()
-    {
-        base.Awake();
-    }
 }

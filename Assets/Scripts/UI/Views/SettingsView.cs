@@ -73,11 +73,6 @@ public class SettingsView : BaseWindowView
         Button
     }
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-    
     /// <summary>
     /// 外部から設定データを注入してUIを更新
     /// </summary>
@@ -254,7 +249,6 @@ public class SettingsView : BaseWindowView
             valueText.text = $"{value:F2}";
         }
     }
-    
     
     /// <summary>
     /// Enum設定のUIを生成

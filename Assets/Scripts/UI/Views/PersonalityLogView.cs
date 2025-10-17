@@ -33,11 +33,6 @@ public class PersonalityLogView : BaseWindowView
         base.Show();
     }
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-
     /// <summary>
     /// ログ表示を更新（UniTask版）
     /// </summary>

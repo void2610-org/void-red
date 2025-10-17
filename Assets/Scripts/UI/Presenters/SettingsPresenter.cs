@@ -49,19 +49,12 @@ public class SettingsPresenter : IStartable, IDisposable
 
         SubscribeToViewEvents();
         RefreshSettingsView();
-        HideSettings(); // 初期状態では非表示にする
     }
 
     private void ToggleSettings()
     {
-        if (_settingsView.IsShowing)
-        {
-            HideSettings();
-        }
-        else
-        {
-            ShowSettings();
-        }
+        if (_settingsView.IsShowing) _settingsView.Hide();
+        else ShowSettings();
     }
     
     /// <summary>
@@ -73,13 +66,6 @@ public class SettingsPresenter : IStartable, IDisposable
         _settingsView.Show();
     }
 
-    /// <summary>
-    /// 設定画面を非表示
-    /// </summary>
-    public void HideSettings()
-    {
-        _settingsView.Hide();
-    }
     
     /// <summary>
     /// ViewのイベントをSettingsManagerに接続

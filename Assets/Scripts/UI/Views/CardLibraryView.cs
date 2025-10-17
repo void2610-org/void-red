@@ -106,11 +106,6 @@ public class CardLibraryView : BaseWindowView
         _cardViews.Clear();
     }
     
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-
     protected override void OnDestroy()
     {
         base.OnDestroy();
