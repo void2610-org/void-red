@@ -9,7 +9,7 @@ public class SafeNavigationManager : ITickable
     private static bool _allowProgrammaticChange = false;
     private static EventSystem _eventSystem;
     
-    public static GameObject GetCurrentSelected() => _eventSystem.currentSelectedGameObject;
+    public static GameObject GetCurrentSelected() => _eventSystem?.currentSelectedGameObject;
     
     public SafeNavigationManager()
     {
@@ -34,7 +34,7 @@ public class SafeNavigationManager : ITickable
         }
         else
         {
-            Debug.LogError("ルートのForceSelectableが見つかりません");
+            Debug.LogWarning("ルートのForceSelectableが見つかりません");
         }
     }
     
