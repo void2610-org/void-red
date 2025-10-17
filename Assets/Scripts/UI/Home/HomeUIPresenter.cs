@@ -137,7 +137,7 @@ public class HomeUIPresenter : MonoBehaviour
     private void ShowDeckData()
     {
         var cardModels = _gameProgressService.GetDeckCardModels();
-        deckView.ShowDeck(cardModels);
+        deckView.Show(cardModels);
     }
     
     /// <summary>

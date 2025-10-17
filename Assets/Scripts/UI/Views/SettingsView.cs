@@ -10,12 +10,10 @@ using Cysharp.Threading.Tasks;
 /// 設定画面のUI表示を担当するViewクラス
 /// 純粋なView - 外部からのデータ注入とイベント通知のみ
 /// </summary>
-public class SettingsView : MonoBehaviour
+public class SettingsView : BaseWindowView
 {
     [Header("UI設定")]
-    [SerializeField] private GameObject settingsPanel;
     [SerializeField] private Transform settingsContainer;
-    [SerializeField] private Button closeButton;
     
     [Header("設定項目プレハブ")]
     [SerializeField] private GameObject settingsContentContainerPrefab;
@@ -75,32 +73,9 @@ public class SettingsView : MonoBehaviour
         Button
     }
 
-    /// <summary>
-    /// 設定画面を表示
-    /// </summary>
-    public void ShowSettings()
+    protected override void Awake()
     {
-        settingsPanel.SetActive(true);
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
-    }
-
-    /// <summary>
-    /// 設定画面を非表示
-    /// </summary>
-    public void HideSettings()
-    {
-        settingsPanel.SetActive(false);
-        SafeNavigationManager.SelectRootForceSelectable();
-    }
-
-    /// <summary>
-    /// 設定画面の表示状態
-    /// </summary>
-    public bool IsShowing => settingsPanel.activeSelf;
-    
-    private void Start()
-    {
-        closeButton.onClick.AddListener(HideSettings);
+        base.Awake();
     }
     
     /// <summary>

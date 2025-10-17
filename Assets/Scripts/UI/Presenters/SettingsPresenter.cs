@@ -69,16 +69,16 @@ public class SettingsPresenter : IStartable, IDisposable
     /// </summary>
     public void ShowSettings()
     {
-        RefreshSettingsView(); // 最新データで更新
-        _settingsView.ShowSettings();
+        RefreshSettingsView();
+        _settingsView.Show();
     }
-    
+
     /// <summary>
     /// 設定画面を非表示
     /// </summary>
     public void HideSettings()
     {
-        _settingsView.HideSettings();
+        _settingsView.Hide();
     }
     
     /// <summary>

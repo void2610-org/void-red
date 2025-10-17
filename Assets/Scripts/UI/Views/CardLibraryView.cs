@@ -9,11 +9,9 @@ using R3;
 /// カード図鑑を表示するViewクラス
 /// ゲーム内の全カードを閲覧できる
 /// </summary>
-public class CardLibraryView : MonoBehaviour
+public class CardLibraryView : BaseWindowView
 {
     [Header("UIコンポーネント")]
-    [SerializeField] private GameObject libraryPanel;
-    [SerializeField] private Button closeButton;
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Transform contentContainer;
     [SerializeField] private DeckCardView cardPrefab;
@@ -22,12 +20,12 @@ public class CardLibraryView : MonoBehaviour
     public Observable<CardData> OnCardClicked => _onCardClicked;
 
     private readonly List<DeckCardView> _cardViews = new();
-    private readonly CompositeDisposable _disposables = new();
     private readonly Subject<CardData> _onCardClicked = new();
 
-    // AllCardDataを保持
+    // AllCardDataと閲覧済みカードIDを保持
     private AllCardData _allCardData;
-    
+    private HashSet<string> _viewedCardIds;
+
     /// <summary>
     /// カード図鑑を表示
     /// </summary>
@@ -37,19 +35,16 @@ public class CardLibraryView : MonoBehaviour
     {
         // データを保持
         _allCardData = allCardData;
-        
-        libraryPanel.SetActive(true);
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
-        UpdateLibraryDisplay(viewedCardIds);
+        _viewedCardIds = viewedCardIds;
+
+        // パネルを表示
+        Show();
     }
-    
-    /// <summary>
-    /// カード図鑑を非表示
-    /// </summary>
-    private void Hide()
+
+    public override void Show()
     {
-        libraryPanel.SetActive(false);
-        SafeNavigationManager.SelectRootForceSelectable();
+        UpdateLibraryDisplay(_viewedCardIds);
+        base.Show();
     }
     
     /// <summary>
@@ -94,7 +89,7 @@ public class CardLibraryView : MonoBehaviour
         // カードクリックイベントを購読
         cardView.OnCardClicked
             .Subscribe(clickedCardData => _onCardClicked.OnNext(clickedCardData))
-            .AddTo(_disposables);
+            .AddTo(Disposables);
 
         _cardViews.Add(cardView);
     }
@@ -111,18 +106,14 @@ public class CardLibraryView : MonoBehaviour
         _cardViews.Clear();
     }
     
-    private void Awake()
+    protected override void Awake()
     {
-        // ボタンイベントの設定
-        closeButton.OnClickAsObservable().Subscribe(_ => Hide()).AddTo(_disposables);
-        
-        // 初期状態では非表示
-        Hide();
+        base.Awake();
     }
-    
-    private void OnDestroy()
+
+    protected override void OnDestroy()
     {
-        _disposables?.Dispose();
+        base.OnDestroy();
         _onCardClicked?.Dispose();
     }
 }

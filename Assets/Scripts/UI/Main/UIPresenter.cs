@@ -323,7 +323,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private void SetUpButtonEvents()
     {
         _personalityLogButtonView?.OnButtonClicked.Subscribe(
-            _ => _personalityLogView.ShowLog())
+            _ => _personalityLogView.Show())
             .AddTo(_disposables);
         _gameOverView.OnRetryClicked.Subscribe(
                 _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle).Forget())
