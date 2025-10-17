@@ -319,7 +319,6 @@ public class UIPresenter : IStartable, System.IDisposable
             .Subscribe(_ => UpdateSelectedCardVisual())
             .AddTo(_disposables);
     }
-
     
     private void SetUpButtonEvents()
     {
