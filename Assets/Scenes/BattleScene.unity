@@ -6672,6 +6672,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8063054174884377505, guid: 626c932d829ce438b8420d45d0b05992, type: 3}
   m_PrefabInstance: {fileID: 1682575734}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1682575737 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3509465709014657228, guid: 626c932d829ce438b8420d45d0b05992, type: 3}
+  m_PrefabInstance: {fileID: 1682575734}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adb90d9179b3949f0938eec5500fd3a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &1749416359 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6556834906226369494, guid: 0d5e64be674f7423ab865f3ba71e6d14, type: 3}
@@ -7349,7 +7360,7 @@ PrefabInstance:
     - target: {fileID: 92328340160874941, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
       propertyPath: enemyNarrationView
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1682575737}
     - target: {fileID: 92328340160874941, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
       propertyPath: playerNarrationView
       value: 

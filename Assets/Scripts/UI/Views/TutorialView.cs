@@ -27,12 +27,22 @@ public class TutorialView : MonoBehaviour
     private MotionHandle _currentMaskPositionHandle;
     private MotionHandle _currentMaskSizeHandle;
     private Vector2 _currentMaskSize = Vector2.zero;
+    private bool _isTyping;
 
     private readonly Subject<Unit> _onClickAdvance = new();
 
     public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
 
-    public void NotifyAdvance() => _onClickAdvance.OnNext(Unit.Default);
+    public void NotifyAdvance()
+    {
+        if (_isTyping)
+        {
+            playerNarrationView.SkipTyping();
+            enemyNarrationView.SkipTyping();
+            return;
+        }
+        _onClickAdvance.OnNext(Unit.Default);
+    }
 
     /// <summary>
     /// チュートリアルステップを表示してクリック待機
@@ -90,7 +100,10 @@ public class TutorialView : MonoBehaviour
         var narrationView = isPlayerDialog ? playerNarrationView : enemyNarrationView;
         var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
         disableView.HideNarration().Forget();
+
+        _isTyping = true;
         await narrationView.DisplayNarration(message, autoAdvance: false);
+        _isTyping = false;
     }
     
     /// <summary>
