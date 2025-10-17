@@ -8,11 +8,9 @@ using System.Linq;
 /// カード詳細情報を表示するモーダルViewクラス
 /// 既存のDeckCardViewを活用してカード表示の一貫性を保つ
 /// </summary>
-public class CardDetailView : MonoBehaviour
+public class CardDetailView : BaseWindowView
 {
     [Header("UIコンポーネント")]
-    [SerializeField] private GameObject detailPanel;
-    [SerializeField] private Button closeButton;
     [SerializeField] private Button playButton;
     [SerializeField] private DeckCardView cardView;
     [SerializeField] private TextMeshProUGUI attributeText;
@@ -22,9 +20,7 @@ public class CardDetailView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI evolutionInfoText;
     
     public Observable<Unit> PlayButtonClicked => playButton.OnClickAsObservable();
-    
-    private readonly CompositeDisposable _disposables = new();
-    
+
     /// <summary>
     /// カード詳細を表示
     /// </summary>
@@ -33,20 +29,10 @@ public class CardDetailView : MonoBehaviour
     {
         // カード詳細情報を設定
         UpdateCardDisplay(cardData);
-        
-        // パネルを表示
-        detailPanel.SetActive(true);
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
         playButton.gameObject.SetActive(isPlayable);
-    }
-    
-    /// <summary>
-    /// カード詳細を非表示
-    /// </summary>
-    public void Hide()
-    {
-        detailPanel.SetActive(false);
-        SafeNavigationManager.SelectRootForceSelectable();
+
+        // パネルを表示
+        Show();
     }
     
     /// <summary>
@@ -117,17 +103,8 @@ public class CardDetailView : MonoBehaviour
         evolutionInfoText.text = evolutionInfo.TrimEnd('\n');
     }
     
-    private void Awake()
+    protected override void Awake()
     {
-        // ボタンイベントの設定
-        closeButton.OnClickAsObservable().Subscribe(_ => Hide()).AddTo(_disposables);
-        
-        // 初期状態では非表示
-        Hide();
-    }
-    
-    private void OnDestroy()
-    {
-        _disposables?.Dispose();
+        base.Awake();
     }
 }
