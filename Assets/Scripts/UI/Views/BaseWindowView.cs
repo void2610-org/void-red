@@ -15,7 +15,7 @@ public abstract class BaseWindowView : MonoBehaviour
     [Header("基本コンポーネント")]
     [SerializeField] protected Button closeButton;
 
-    private const float FADE_ANIMATION_DURATION = 0.3f;
+    private const float FADE_ANIMATION_DURATION = 0.15f;
 
     protected readonly CompositeDisposable Disposables = new();
     
