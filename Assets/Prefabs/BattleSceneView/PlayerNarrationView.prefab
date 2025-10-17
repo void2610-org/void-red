@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 3857931243196412601}
   - component: {fileID: 4747917593038573294}
   m_Layer: 5
-  m_Name: NarrationView
+  m_Name: PlayerNarrationView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -136,7 +136,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5082526181909872633}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
