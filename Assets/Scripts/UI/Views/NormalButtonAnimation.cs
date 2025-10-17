@@ -27,7 +27,9 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     private void Awake()
     {
         _defaultScale = target.transform.localScale.x;
-        OnDeselect(new BaseEventData(EventSystem.current));
+        
+        if (SafeNavigationManager.GetCurrentSelected() != this.gameObject)
+            OnDeselect(new BaseEventData(EventSystem.current));
     }
 
     /// <summary>

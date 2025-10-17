@@ -49,6 +49,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private ThemeData _currentTheme;
     private readonly HandView _playerHandView;
+    private BattleRootView _battleRootView;
 
     public void SetTheme(ThemeData theme)
     {
@@ -126,7 +127,33 @@ public class UIPresenter : IStartable, System.IDisposable
             _playButtonView.SimulateClick();
         }
     }
-    
+
+    /// <summary>
+    /// 次のカードを選択（InputSystem用の公開メソッド）
+    /// </summary>
+    public void NavigateToNextCard()
+    {
+        var currentIndex = _player.SelectedIndex.CurrentValue;
+        var nextIndex = currentIndex + 1;
+
+        if (nextIndex < _player.HandCount)
+            _player.SelectCardAt(nextIndex);
+    }
+
+    /// <summary>
+    /// 前のカードを選択（InputSystem用の公開メソッド）
+    /// </summary>
+    public void NavigateToPreviousCard()
+    {
+        var currentIndex = _player.SelectedIndex.CurrentValue;
+        var prevIndex = currentIndex - 1;
+
+        if (prevIndex >= 0)
+            _player.SelectCardAt(prevIndex);
+        else if (_player.HandCount > 0)
+            _player.SelectCardAt(0);
+    }
+
     /// <summary>
     /// 詳細ボタンの表示状態を現在の選択状態に基づいて更新
     /// </summary>
@@ -138,7 +165,7 @@ public class UIPresenter : IStartable, System.IDisposable
             _cardDetailButtonView?.Hide();
     }
     
-    public UIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager)
+    public UIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
     {
         _player = player;
         _enemy = enemy;
@@ -172,12 +199,15 @@ public class UIPresenter : IStartable, System.IDisposable
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
-        _tutorialPresenter = new TutorialPresenter(allTutorialData);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
         _sceneTransitionManager = sceneTransitionManager;
-        
+
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
         var handViews = Object.FindObjectsByType<HandView>(FindObjectsSortMode.None);
         _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
+
+        // BattleRootViewを取得
+        _battleRootView = UnityEngine.Object.FindFirstObjectByType<BattleRootView>();
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)
@@ -197,22 +227,42 @@ public class UIPresenter : IStartable, System.IDisposable
     private void UpdateMentalBetDisplay()
     {
         var currentMentalPower = _player.MentalPower.CurrentValue;
-        
+
         // 現在のベット値が精神力を超えている場合や最小値を下回る場合は調整
         if (_mentalBetValue > currentMentalPower)
             _mentalBetValue = currentMentalPower;
         if (_mentalBetValue < GameConstants.MIN_MENTAL_BET)
             _mentalBetValue = GameConstants.MIN_MENTAL_BET;
-        
+
         // MentalBetViewに表示を委譲
         _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, GameConstants.MIN_MENTAL_BET, GameConstants.MAX_MENTAL_BET);
-        
+
         // MentalPowerViewに精神力表示を委譲
         _playerMentalPowerView.UpdateDisplay(currentMentalPower, GameConstants.MAX_MENTAL_POWER);
+
+        // 選択中のカードのビジュアルを更新
+        UpdateSelectedCardVisual();
+    }
+
+    /// <summary>
+    /// 選択中のカードのビジュアルを更新
+    /// </summary>
+    private void UpdateSelectedCardVisual()
+    {
+        ResetAllCardCollapseVisuals();
+        var card = _player.SelectedCard.CurrentValue;
+        var index = _player.SelectedIndex.CurrentValue;
+        if (card != null && index >= 0 && _currentTheme != null)
+        {
+            // PlayerMoveを作成してスコアを計算
+            var move = new PlayerMove(card.Data, _selectedPlayStyle, _mentalBetValue);
+            var score = ScoreCalculator.CalculateScoreWithoutEnemy(move, _currentTheme);
+            UpdateCardVisual(card, index, score);
+        }
     }
     
     /// <summary>
-    /// 選択されたカードの崩壊ビジュアルを更新
+    /// 選択されたカードのUIEffectsを更新
     /// </summary>
     private void UpdateCardVisual(CardModel cardModel, int selectedIndex, float score)
     {
@@ -266,21 +316,9 @@ public class UIPresenter : IStartable, System.IDisposable
 
         // 全ての変更イベントをマージして崩壊ビジュアルを更新
         Observable.Merge(cardSelectionChange, cardIndexChange, playStyleChange, mentalBetChange)
-            .Subscribe(_ =>
-            {
-                ResetAllCardCollapseVisuals();
-                var card = _player.SelectedCard.CurrentValue;
-                var index = _player.SelectedIndex.CurrentValue;
-                if (card != null && index >= 0 && _currentTheme != null)
-                {
-                    // PlayerMoveを作成してスコアを計算
-                    var move = new PlayerMove(card.Data, _selectedPlayStyle, _mentalBetValue);
-                    var score = ScoreCalculator.CalculateScoreWithoutEnemy(move, _currentTheme);
-                    UpdateCardVisual(card, index, score);
-                }
-            }).AddTo(_disposables);
+            .Subscribe(_ => UpdateSelectedCardVisual())
+            .AddTo(_disposables);
     }
-
     
     private void SetUpButtonEvents()
     {
@@ -309,7 +347,7 @@ public class UIPresenter : IStartable, System.IDisposable
         SetUpButtonEvents();
 
         // キーバインドを設定
-        BattleKeyBindings.Setup(_inputActionsProvider, this, _disposables);
+        BattleKeyBindings.Setup(_inputActionsProvider, this, _battleRootView, _disposables);
 
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
@@ -317,6 +355,9 @@ public class UIPresenter : IStartable, System.IDisposable
 
         // 詳細ボタンの初期状態を設定
         UpdateDetailButtonVisibility();
+
+        // ルートボタンを初期選択
+        SafeNavigationManager.SelectRootForceSelectable();
     }
 
     public void Dispose()

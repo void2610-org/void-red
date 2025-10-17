@@ -59,7 +59,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -198,7 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -271,18 +271,6 @@ PrefabInstance:
     - target: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
       propertyPath: m_SizeDelta.y
       value: 95
-      objectReference: {fileID: 0}
-    - target: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1283306954786147436, guid: 549e08f5fe0244753986a698450ef753, type: 3}
       propertyPath: m_LocalPosition.x

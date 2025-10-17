@@ -59,7 +59,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -274,7 +274,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hoverSe: {fileID: 0}
   hoverVolume: 1
-  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickSe: {fileID: 8300000, guid: 8da87a6ab6429438a849c7dc8a3006bc, type: 3}
   clickVolume: 0.4
   randomizePitch: 1
   isOnlyRandomizeOnHover: 0
