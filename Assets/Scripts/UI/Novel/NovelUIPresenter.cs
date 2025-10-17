@@ -136,8 +136,8 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         {
             var currentDialog = _currentDialogList[_currentDialogIndex];
             
-            // スキップ中で選択肢がある場合はスキップを停止
-            if (_isSkipping && currentDialog.HasChoice)
+            // スキップ中で選択肢またはカード獲得がある場合はスキップを停止
+            if (_isSkipping && (currentDialog.HasChoice || currentDialog.HasGetCard))
             {
                 _isSkipping = false;
             }
@@ -165,7 +165,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
             }
             
             // カード獲得演出がある場合は実行
-            if (currentDialog.HasGetCard && !_isSkipping)
+            if (currentDialog.HasGetCard)
             {
                 await ShowCardGetEffect();
             }
