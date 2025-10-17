@@ -142,18 +142,14 @@ public class NovelUIPresenter : IStartable, System.IDisposable
                 _isSkipping = false;
             }
             
-            // ダイアログを表示（完了まで待機またはスキップ）
-            if (_isSkipping)
-            {
-                // スキップ中はダイアログを表示しない
-            }
-            else
+            // ダイアログを表示（スキップ中は表示しない）
+            if (!_isSkipping)
             {
                 await ShowSingleDialog(currentDialog);
             }
             
             // アイテム取得演出がある場合は実行
-            if (currentDialog.HasGetItem && !_isSkipping)
+            if (!_isSkipping && currentDialog.HasGetItem)
             {
                 await ShowItemGetEffect(currentDialog);
             }
