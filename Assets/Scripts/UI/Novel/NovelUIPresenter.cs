@@ -332,6 +332,17 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     /// </summary>
     private int FindNextInteractionPoint(int startIndex)
     {
+        // startIndex自体が選択肢/カード獲得かチェック
+        if (startIndex < _currentDialogList.Count)
+        {
+            var currentDialog = _currentDialogList[startIndex];
+            if (currentDialog.HasChoice || currentDialog.HasGetCard)
+            {
+                return startIndex;
+            }
+        }
+        
+        // その先の選択肢/カード獲得を探索
         for (var i = startIndex + 1; i < _currentDialogList.Count; i++)
         {
             var dialog = _currentDialogList[i];
