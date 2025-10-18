@@ -323,8 +323,26 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         // 現在のダイアログ表示を強制終了
         _dialogView.ForceComplete();
 
-        // ダイアログループを強制終了
-        _currentDialogIndex = _currentDialogList.Count;
+        // 選択肢またはカード獲得が見つかるまでインデックスを進める
+        _currentDialogIndex = FindNextInteractionPoint(_currentDialogIndex);
+    }
+    
+    /// <summary>
+    /// 次の選択肢またはカード獲得までのインデックスを探索
+    /// </summary>
+    private int FindNextInteractionPoint(int startIndex)
+    {
+        for (var i = startIndex + 1; i < _currentDialogList.Count; i++)
+        {
+            var dialog = _currentDialogList[i];
+            if (dialog.HasChoice || dialog.HasGetCard)
+            {
+                return i - 1;
+            }
+        }
+        
+        // 見つからない場合はシナリオ完了
+        return _currentDialogList.Count;
     }
     
     /// <summary>
