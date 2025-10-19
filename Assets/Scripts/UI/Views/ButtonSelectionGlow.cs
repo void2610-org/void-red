@@ -31,7 +31,7 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
     public void OnSelect(BaseEventData eventData)
     {
         _currentMotion.TryCancel();
-        _currentMotion = glowImage.FadeIn(FADE_DURATION, FADE_EASE, ignoreTimeScale:true);
+        _currentMotion = glowImage.FadeIn(FADE_DURATION, FADE_EASE, ignoreTimeScale: true);
     }
     
     /// <summary>
