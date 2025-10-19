@@ -70,6 +70,7 @@ public class HomeUIPresenter : MonoBehaviour
         // ホームBGMを再生
         BgmManager.Instance.PlayRandomBGM(BgmType.Home);
 
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
         InitSpeaking().Forget();
     }
 
