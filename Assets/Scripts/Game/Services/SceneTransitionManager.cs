@@ -63,6 +63,7 @@ public class SceneTransitionManager : IDisposable
         
         // フェード用Image作成
         var imageObject = new GameObject("FadeImage");
+        imageObject.tag = "IgnoreHoverSelection";
         imageObject.transform.SetParent(_fadeCanvas.transform, false);
         
         _fadeImage = imageObject.AddComponent<Image>();
