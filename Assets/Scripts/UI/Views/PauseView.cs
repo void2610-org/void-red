@@ -25,6 +25,8 @@ public class PauseView : BaseWindowView
     {
         Time.timeScale = 0;
         base.Show();
+        // 一番前面に移動
+        this.transform.SetAsLastSibling();
     }
 
     public override void Hide()

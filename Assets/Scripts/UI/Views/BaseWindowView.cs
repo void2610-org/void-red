@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
@@ -18,9 +19,12 @@ public abstract class BaseWindowView : MonoBehaviour
     private const float FADE_ANIMATION_DURATION = 0.15f;
 
     protected readonly CompositeDisposable Disposables = new();
-    
+
     private CanvasGroup _canvasGroup;
     private MotionHandle _currentFadeHandle;
+
+    // アクティブなウィンドウをスタックで管理
+    private static readonly Stack<BaseWindowView> _activeWindows = new();
 
     /// <summary>
     /// ウィンドウの表示状態
@@ -50,6 +54,9 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
 
+        // このウィンドウをアクティブなウィンドウスタックに追加
+        _activeWindows.Push(this);
+
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
@@ -62,9 +69,28 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
+        // スタックから自身を削除
+        if (_activeWindows.Count > 0 && _activeWindows.Peek() == this)
+        {
+            _activeWindows.Pop();
+        }
+
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
-        SafeNavigationManager.SelectRootForceSelectable().Forget();
+
+        // スタックに他のウィンドウがあればそのcloseButtonを選択、なければルートを選択
+        if (_activeWindows.Count > 0)
+        {
+            var topWindow = _activeWindows.Peek();
+            if (topWindow && topWindow.closeButton)
+            {
+                SafeNavigationManager.SetSelectedGameObjectSafe(topWindow.closeButton.gameObject);
+            }
+        }
+        else
+        {
+            SafeNavigationManager.SelectRootForceSelectable().Forget();
+        }
     }
 
     protected virtual void Awake()
