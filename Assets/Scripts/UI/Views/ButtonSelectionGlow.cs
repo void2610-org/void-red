@@ -21,8 +21,8 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
     
     private void Awake()
     {
-        // 初期状態では非表示
-        glowImage.SetAlpha(0f);
+        if (SafeNavigationManager.GetCurrentSelected() != this.gameObject)
+            OnDeselect(new BaseEventData(EventSystem.current));
     }
     
     /// <summary>
@@ -31,7 +31,7 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
     public void OnSelect(BaseEventData eventData)
     {
         _currentMotion.TryCancel();
-        _currentMotion = glowImage.FadeIn(FADE_DURATION, FADE_EASE);
+        _currentMotion = glowImage.FadeIn(FADE_DURATION, FADE_EASE, ignoreTimeScale:true);
     }
     
     /// <summary>
@@ -40,7 +40,7 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
     public void OnDeselect(BaseEventData eventData)
     {
         _currentMotion.TryCancel();
-        _currentMotion = glowImage.FadeOut(FADE_DURATION, FADE_EASE);
+        _currentMotion = glowImage.FadeOut(FADE_DURATION, FADE_EASE, ignoreTimeScale: true);
     }
     
     private void OnDestroy()
