@@ -221,7 +221,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8503395000404048060}
   - component: {fileID: 4293295509419723206}
-  - component: {fileID: 4422162762152353045}
+  - component: {fileID: 517564515045573716}
   m_Layer: 0
   m_Name: DialogView
   m_TagString: Untagged
@@ -264,7 +264,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d1f145550aa9d4ab932f7ee7c23fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 4422162762152353045}
   speakerNameText: {fileID: 2467004453087818755}
   dialogText: {fileID: 1666317025185700510}
   nextIndicator: {fileID: 5656026911901862804}
@@ -273,25 +272,23 @@ MonoBehaviour:
   autoButton: {fileID: 1526341870938500661}
   autoButtonText: {fileID: 170024925333391186}
   skipButton: {fileID: 9104940760093943567}
-  clickAreaButton: {fileID: 2661722687809795713}
+  clickAreaButton: {fileID: 1870428648679653052}
   autoButtonNormalColor: {r: 1, g: 1, b: 1, a: 1}
   autoButtonActiveColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   defaultCharSpeed: 0.05
   autoNextDelay: 2.5
-  fadeInDuration: 0.5
-  fadeOutDuration: 0.5
---- !u!225 &4422162762152353045
-CanvasGroup:
+--- !u!114 &517564515045573716
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4673212540328246316}
   m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 0
-  m_BlocksRaycasts: 0
-  m_IgnoreParentGroups: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08ff77b3328e243858a317c63345a977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5656026911901862804
 GameObject:
   m_ObjectHideFlags: 0
@@ -671,7 +668,8 @@ GameObject:
   - component: {fileID: 4779430600760557210}
   - component: {fileID: 8087799617799356848}
   - component: {fileID: 6623523037583543242}
-  - component: {fileID: 2661722687809795713}
+  - component: {fileID: 3651324276167643248}
+  - component: {fileID: 1870428648679653052}
   m_Layer: 5
   m_Name: ClickAreaButton
   m_TagString: Untagged
@@ -736,7 +734,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2661722687809795713
+--- !u!114 &3651324276167643248
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -745,11 +743,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 8994778440531740952}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f19d3d5e7dc40a787fde6ef0f20d06a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1870428648679653052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8994778440531740952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb52b1a925d94b5c87565507a70d245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
