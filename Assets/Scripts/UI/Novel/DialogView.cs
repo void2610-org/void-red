@@ -81,6 +81,8 @@ public class DialogView : MonoBehaviour
     /// <param name="additionalWaitTime">追加の待機時間（SE再生時間など）</param>
     public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null, Sprite backgroundSprite = null, float additionalWaitTime = 0f)
     {
+        if (!this) return;
+        
         // 現在のダイアログデータを保存
         _currentDialogData = dialogData;
         _additionalWaitTime = additionalWaitTime;
@@ -391,6 +393,7 @@ public class DialogView : MonoBehaviour
     /// <param name="interactable">操作可能かどうか</param>
     public void SetInteractable(bool interactable)
     {
+        if (!this) return;
         clickAreaButton.interactable = interactable;
     }
     
