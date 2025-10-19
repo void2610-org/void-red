@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Threading;
+using R3;
 
 /// <summary>
 /// 確認ダイアログの表示を担当するViewクラス
@@ -74,29 +75,17 @@ public class ConfirmationDialogView : BaseWindowView
         }
     }
     
-    /// <summary>
-    /// 確認ボタンがクリックされた時の処理
-    /// </summary>
-    private void OnConfirmClicked()
-    {
-        _dialogResult?.TrySetResult(true);
-    }
-    
-    /// <summary>
-    /// キャンセルボタンがクリックされた時の処理
-    /// </summary>
-    private void OnCancelClicked()
-    {
-        _dialogResult?.TrySetResult(false);
-    }
-    
     protected override void Awake()
     {
-        closeButton = GetComponentInChildren<Button>();
         base.Awake();
 
         // ボタンイベントの設定
-        confirmButton.onClick.AddListener(OnConfirmClicked);
+        confirmButton.OnClickAsObservable()
+            .Subscribe(_ => _dialogResult?.TrySetResult(true))
+            .AddTo(Disposables);
+        closeButton.OnClickAsObservable()
+            .Subscribe(_ => _dialogResult?.TrySetResult(false))
+            .AddTo(Disposables);
 
         // ボタンを無効化
         confirmButton.interactable = false;
