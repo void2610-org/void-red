@@ -64,7 +64,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
-        SafeNavigationManager.SelectRootForceSelectable();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
 
     protected virtual void Awake()

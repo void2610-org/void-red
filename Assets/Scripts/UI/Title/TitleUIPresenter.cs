@@ -56,7 +56,7 @@ public class TitleUIPresenter : MonoBehaviour
         BgmManager.Instance.PlayRandomBGM(BgmType.Title);
         
         _steamService.UnlockAchievement(SteamAchieveType.FIRST_BOOT);
-        SafeNavigationManager.SelectRootForceSelectable();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
 
     /// <summary>

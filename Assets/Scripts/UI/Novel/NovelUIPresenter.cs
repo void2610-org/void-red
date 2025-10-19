@@ -65,7 +65,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     public void Start()
     {
         Initialize().Forget();
-        SafeNavigationManager.SelectRootForceSelectable();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
         BgmManager.Instance.PlayRandomBGM(BgmType.Novel);
     }
     

@@ -68,7 +68,7 @@ public class UIPresenter : IStartable, System.IDisposable
 
     public void InitializeEnemy(EnemyData enemyData)
     {
-        _enemyView　= UnityEngine.Object.FindFirstObjectByType<EnemyView>();
+        _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
     }
 
@@ -357,7 +357,7 @@ public class UIPresenter : IStartable, System.IDisposable
         UpdateDetailButtonVisibility();
 
         // ルートボタンを初期選択
-        SafeNavigationManager.SelectRootForceSelectable();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
 
     public void Dispose()
