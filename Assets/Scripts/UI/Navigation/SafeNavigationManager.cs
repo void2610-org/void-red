@@ -67,6 +67,7 @@ public class SafeNavigationManager : ITickable
     {
         if (!_eventSystem)
         {
+            _eventSystem = EventSystem.current;
             _allowProgrammaticChange = false;
             return;
         }
