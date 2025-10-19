@@ -57,9 +57,13 @@ public class TitleUIPresenter : MonoBehaviour
         
         _steamService.UnlockAchievement(SteamAchieveType.FIRST_BOOT);
         
-        // セーブデータがある場合は「つづきから」、ない場合は「はじめから」を選択
-        var buttonToSelect = _gameProgressService.HasSaveData() ? continueButton : startButton;
-        EventSystem.current.SetSelectedGameObject(buttonToSelect.gameObject);
+        SelectFirstButton().Forget();
+    }
+
+    private async UniTask SelectFirstButton()
+    {
+        await UniTask.Yield();
+        SafeNavigationManager.SelectRootForceSelectable();
     }
 
     /// <summary>
