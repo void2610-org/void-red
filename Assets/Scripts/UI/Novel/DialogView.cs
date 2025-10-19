@@ -393,6 +393,7 @@ public class DialogView : MonoBehaviour
     /// <param name="interactable">操作可能かどうか</param>
     public void SetInteractable(bool interactable)
     {
+        if (!this) return;
         clickAreaButton.interactable = interactable;
     }
     
