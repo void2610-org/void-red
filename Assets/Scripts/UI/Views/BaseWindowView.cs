@@ -25,7 +25,7 @@ public abstract class BaseWindowView : MonoBehaviour
     /// <summary>
     /// ウィンドウの表示状態
     /// </summary>
-    public bool IsShowing => _canvasGroup.alpha > 0;
+    public bool IsShowing => _canvasGroup.interactable;
 
     /// <summary>
     /// ウィンドウを表示

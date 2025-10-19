@@ -280,7 +280,7 @@ namespace Void2610.UnityTemplate
         /// <summary>
         /// CanvasGroupの透明度をLitMotionでフェードインさせる
         /// </summary>
-        public static MotionHandle FadeIn(this CanvasGroup canvasGroup, float duration, Ease ease = Ease.Linear, bool  ignoreTimeScale = false)
+        public static MotionHandle FadeIn(this CanvasGroup canvasGroup, float duration, Ease ease = Ease.Linear, bool ignoreTimeScale = false)
         {
             return LMotion.Create(0f, 1f, duration)
                 .WithEase(ease)
