@@ -9,11 +9,9 @@ using R3;
 /// デッキ内容を表示するViewクラス
 /// カテゴリ別にカードを表示し、統計情報も提供
 /// </summary>
-public class DeckView : MonoBehaviour
+public class DeckView : BaseWindowView
 {
     [Header("UIコンポーネント")]
-    [SerializeField] private GameObject deckPanel;
-    [SerializeField] private Button closeButton;
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Transform contentContainer;
     [SerializeField] private DeckCardView cardPrefab;
@@ -31,7 +29,6 @@ public class DeckView : MonoBehaviour
     public Observable<CardData> OnCardClicked => _onCardClicked;
 
     private readonly List<DeckCardView> _cardViews = new();
-    private readonly CompositeDisposable _disposables = new();
     private DeckDisplayMode _currentMode = DeckDisplayMode.All;
     private readonly Subject<CardData> _onCardClicked = new();
 
@@ -45,29 +42,22 @@ public class DeckView : MonoBehaviour
         Collapsed   // 崩壊カード
     }
     
+    public override void Show()
+    {
+        UpdateDeckDisplay();
+        UpdateStatistics();
+        UpdateButtonStates();
+        base.Show();
+    }
+
     /// <summary>
     /// デッキを表示
     /// </summary>
     /// <param name="cardModels">カードモデルのリスト</param>
-    public void ShowDeck(List<CardModel> cardModels)
+    public void Show(List<CardModel> cardModels)
     {
-        // データを保持
         _cardModels = cardModels;
-        
-        deckPanel.SetActive(true);
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
-        UpdateDeckDisplay();
-        UpdateStatistics();
-        UpdateButtonStates();
-    }
-    
-    /// <summary>
-    /// デッキを非表示
-    /// </summary>
-    private void HideDeck()
-    {
-        deckPanel.SetActive(false);
-        SafeNavigationManager.SelectRootForceSelectable();
+        Show();
     }
     
     /// <summary>
@@ -121,7 +111,7 @@ public class DeckView : MonoBehaviour
         // カードクリックイベントを購読
         cardView.OnCardClicked
             .Subscribe(cardData => _onCardClicked.OnNext(cardData))
-            .AddTo(_disposables);
+            .AddTo(Disposables);
 
         _cardViews.Add(cardView);
     }
@@ -175,21 +165,18 @@ public class DeckView : MonoBehaviour
         showCollapsedButton.GetComponent<Image>().color = collapsedButtonColor;
     }
     
-    private void Awake()
+    protected override void Awake()
     {
-        // ボタンイベントの設定
-        closeButton.OnClickAsObservable().Subscribe(_ => HideDeck()).AddTo(_disposables);
-        showAllButton.OnClickAsObservable().Subscribe(_ => SetDisplayMode(DeckDisplayMode.All)).AddTo(_disposables);
-        showActiveButton.OnClickAsObservable().Subscribe(_ => SetDisplayMode(DeckDisplayMode.Active)).AddTo(_disposables);
-        showCollapsedButton.OnClickAsObservable().Subscribe(_ => SetDisplayMode(DeckDisplayMode.Collapsed)).AddTo(_disposables);
-        
-        // 初期状態では非表示
-        HideDeck();
+        base.Awake();
+
+        showAllButton.OnClickAsObservable().Subscribe(_ => SetDisplayMode(DeckDisplayMode.All)).AddTo(Disposables);
+        showActiveButton.OnClickAsObservable().Subscribe(_ => SetDisplayMode(DeckDisplayMode.Active)).AddTo(Disposables);
+        showCollapsedButton.OnClickAsObservable().Subscribe(_ => SetDisplayMode(DeckDisplayMode.Collapsed)).AddTo(Disposables);
     }
-    
-    private void OnDestroy()
+
+    protected override void OnDestroy()
     {
-        _disposables?.Dispose();
+        base.OnDestroy();
         _onCardClicked?.Dispose();
     }
 }
