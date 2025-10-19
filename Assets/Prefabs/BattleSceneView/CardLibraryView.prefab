@@ -260,7 +260,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5435219371793749136
 RectTransform:
   m_ObjectHideFlags: 0
@@ -481,6 +481,7 @@ GameObject:
   m_Component:
   - component: {fileID: 884553807400850925}
   - component: {fileID: 7882393031624379923}
+  - component: {fileID: 8494103153874636217}
   m_Layer: 5
   m_Name: CardLibraryView
   m_TagString: Untagged
@@ -520,12 +521,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67228469229544944995d62df00c98e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  libraryPanel: {fileID: 3281456432169995484}
   closeButton: {fileID: 8507088020441161181}
   scrollRect: {fileID: 6362972301616104690}
   contentContainer: {fileID: 6597918954721080472}
   cardPrefab: {fileID: 1019977483416546224, guid: 4bcef9ab048c64ec1b0422b435240502, type: 3}
   statisticsText: {fileID: 2927856651136737927}
+--- !u!225 &8494103153874636217
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8451384843221407306}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &806601982529337141
 PrefabInstance:
   m_ObjectHideFlags: 0

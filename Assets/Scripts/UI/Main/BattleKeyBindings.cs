@@ -23,7 +23,7 @@ public static class BattleKeyBindings
         // 人格ログを開く
         inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
             .Where(_ => battleRootView.IsRootSelected)
-            .Subscribe(_ => personalityLogView.ShowLog())
+            .Subscribe(_ => personalityLogView.Show())
             .AddTo(disposables);
 
         // テーマのキーワードをトグル表示
