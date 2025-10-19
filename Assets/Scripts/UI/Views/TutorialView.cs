@@ -82,7 +82,7 @@ public class TutorialView : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));
 
         // ルートボタンを選択
-        SafeNavigationManager.SelectRootForceSelectable();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
 
         // ボタンクリック待機
         await _onClickAdvance.FirstAsync();

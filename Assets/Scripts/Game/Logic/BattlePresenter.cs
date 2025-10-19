@@ -171,7 +171,7 @@ public class BattlePresenter: IStartable
                 HandleBattleEnd().Forget();
                 break;
             case GameState.GameOver:
-                HandleGameOver().Forget();
+                HandleGameOver();
                 break;
         }
     }
@@ -599,7 +599,7 @@ public class BattlePresenter: IStartable
     /// <summary>
     /// ゲームオーバーフェーズ
     /// </summary>
-    private async UniTask HandleGameOver()
+    private void HandleGameOver()
     {
         // ゲームオーバーの理由を判定
         var gameOverReason = "";
