@@ -331,13 +331,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     /// 次の選択肢またはカード獲得までのインデックスを探索
     /// </summary>
     private int FindNextInteractionPoint(int startIndex)
-    {
-        // 境界値チェックしてダメなら最後を早期リターン
-        if (startIndex >= _currentDialogList.Count)
-        {
-            return _currentDialogList.Count;
-        }
-        
+    {        
         // その先の選択肢/カード獲得を探索
         for (var i = startIndex + 1; i < _currentDialogList.Count; i++)
         {
