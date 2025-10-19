@@ -1,4 +1,5 @@
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VContainer.Unity;
@@ -23,18 +24,26 @@ public class SafeNavigationManager : ITickable
         _eventSystem.SetSelectedGameObject(go);
     }
 
-    public static void SelectRootForceSelectable()
+    public static async UniTask SelectRootForceSelectable()
     {
-        if (!_eventSystem) _eventSystem = EventSystem.current;
-        var canvas = Object.FindAnyObjectByType<Canvas>();
-        var selectable = canvas.transform.GetComponentsInChildren<ForceSelectable>().FirstOrDefault();
-        if (selectable != null)
+        while (true)
         {
+            _eventSystem = EventSystem.current;
+            var canvas = Object.FindAnyObjectByType<Canvas>();
+            var selectable = canvas?.transform.GetComponentsInChildren<ForceSelectable>().FirstOrDefault();
+            if (!_eventSystem || !canvas || canvas.name == "SceneTransitionCanvas" || !selectable)
+            {
+                await UniTask.Yield();
+                continue;
+            }
+
             SetSelectedGameObjectSafe(selectable.gameObject);
-        }
-        else
-        {
-            Debug.LogWarning("ルートのForceSelectableが見つかりません");
+            // Tick()で_allowProgrammaticChangeがfalseにリセットされるまで待機
+            while (_allowProgrammaticChange)
+            {
+                await UniTask.Yield();
+            }
+            break;
         }
     }
     
@@ -56,14 +65,19 @@ public class SafeNavigationManager : ITickable
     
     public void Tick()
     {
-        if (!_eventSystem) return;
-        
+        if (!_eventSystem)
+        {
+            _allowProgrammaticChange = false;
+            return;
+        }
+
         var currentSelected = _eventSystem.currentSelectedGameObject;
 
         if (!currentSelected)
         {
             _previousSelected = null;
-            SelectRootForceSelectable();
+            SelectRootForceSelectable().Forget();
+            _allowProgrammaticChange = false;
             return;
         }
 
@@ -82,6 +96,7 @@ public class SafeNavigationManager : ITickable
                 if (!IsSameCanvasGroup(currentSelected, _previousSelected))
                 {
                     _eventSystem.SetSelectedGameObject(_previousSelected);
+                    _allowProgrammaticChange = false;
                     return;
                 }
             }
