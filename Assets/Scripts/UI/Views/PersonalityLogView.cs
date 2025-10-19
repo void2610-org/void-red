@@ -9,13 +9,11 @@ using R3;
 /// <summary>
 /// 人格ログを表示するViewコンポーネント
 /// </summary>
-public class PersonalityLogView : MonoBehaviour
+public class PersonalityLogView : BaseWindowView
 {
     [Header("UIコンポーネント")]
-    [SerializeField] private GameObject logPanel;
     [SerializeField] private TextMeshProUGUI logText;
     [SerializeField] private ScrollRect scrollRect;
-    [SerializeField] private Button closeButton;
     
     private GameProgressService _gameProgressService;
     private RectTransform _scrollContent;
@@ -27,30 +25,14 @@ public class PersonalityLogView : MonoBehaviour
     {
         _scrollContent = scrollRect.content;
         _gameProgressService = gameProgressService;
-        closeButton.OnClickAsObservable().Subscribe(_ => HideLog()).AddTo(this);
-        
-        HideLog();
     }
-    
-    /// <summary>
-    /// ログを表示
-    /// </summary>
-    public void ShowLog()
+
+    public override void Show()
     {
-        logPanel.SetActive(true);
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
         UpdateLogDisplay();
+        base.Show();
     }
-    
-    /// <summary>
-    /// ログを非表示
-    /// </summary>
-    public void HideLog()
-    {
-        logPanel.SetActive(false);
-        SafeNavigationManager.SelectRootForceSelectable();
-    }
-    
+
     /// <summary>
     /// ログ表示を更新（UniTask版）
     /// </summary>

@@ -62,7 +62,7 @@ public class UIPresenter : IStartable, System.IDisposable
     public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
     public void ShowPlayButton() => _playButtonView.Show();
     public void HidePlayButton() => _playButtonView.Hide();
-    public async UniTask ShowGameOverScreen(string reason)  => await _gameOverView.ShowGameOverScreen(reason);
+    public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
 
@@ -323,7 +323,7 @@ public class UIPresenter : IStartable, System.IDisposable
     private void SetUpButtonEvents()
     {
         _personalityLogButtonView?.OnButtonClicked.Subscribe(
-            _ => _personalityLogView.ShowLog())
+            _ => _personalityLogView.Show())
             .AddTo(_disposables);
         _gameOverView.OnRetryClicked.Subscribe(
                 _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle).Forget())

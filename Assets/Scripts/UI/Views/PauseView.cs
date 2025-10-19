@@ -9,10 +9,9 @@ using R3;
 /// <summary>
 /// ポーズ画面を表示するViewコンポーネント
 /// </summary>
-public class PauseView : MonoBehaviour
+public class PauseView : BaseWindowView
 {
-    [Header("UIコンポーネント")]
-    [SerializeField] private GameObject panel;
+    [Header("ポーズ固有UIコンポーネント")]
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button titleButton;
 
@@ -22,28 +21,24 @@ public class PauseView : MonoBehaviour
     private readonly Subject<Unit> _onTitleButtonClicked = new();
     private readonly Subject<Unit> _onResumeButtonClicked = new();
 
-    public void Show()
+    public override void Show()
     {
         Time.timeScale = 0;
-        panel.SetActive(true);
-        SafeNavigationManager.SetSelectedGameObjectSafe(resumeButton.gameObject);
+        base.Show();
     }
 
-    public void Hide()
+    public override void Hide()
     {
         Time.timeScale = 1;
-        panel.SetActive(false);
-        SafeNavigationManager.SelectRootForceSelectable();
+        base.Hide();
     }
 
-    public bool IsShowing => panel.activeSelf;
-
-    private void Awake()
+    protected override void Awake()
     {
-        // ボタンイベントの設定
+        closeButton = resumeButton;
+        base.Awake();
+
         resumeButton.onClick.AddListener(() => _onResumeButtonClicked.OnNext(Unit.Default));
         titleButton.onClick.AddListener(() => _onTitleButtonClicked.OnNext(Unit.Default));
-
-        panel.SetActive(false);
     }
 }
