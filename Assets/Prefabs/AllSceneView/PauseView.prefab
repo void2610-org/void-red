@@ -221,6 +221,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1273531213396507733}
   - component: {fileID: 733771216565741089}
+  - component: {fileID: 7983642213163210908}
   m_Layer: 5
   m_Name: PauseView
   m_TagString: Untagged
@@ -260,9 +261,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ee68749b68548879ac18b5970e51bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panel: {fileID: 6304947263233117903}
+  closeButton: {fileID: 5984631764413849503}
   resumeButton: {fileID: 5984631764413849503}
   titleButton: {fileID: 8282290358405290812}
+--- !u!225 &7983642213163210908
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4107963480110281205}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &6304947263233117903
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,7 +339,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

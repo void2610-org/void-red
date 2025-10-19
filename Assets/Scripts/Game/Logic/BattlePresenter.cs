@@ -609,6 +609,6 @@ public class BattlePresenter: IStartable
             gameOverReason = "すべてのカードが崩壊しました";
 
         // ゲームオーバー画面を表示
-        await _uiPresenter.ShowGameOverScreen(gameOverReason);
+        _uiPresenter.ShowGameOverScreen(gameOverReason);
     }
 }
