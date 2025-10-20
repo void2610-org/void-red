@@ -54,8 +54,9 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
 
-        // このウィンドウをアクティブなウィンドウリストに追加
-        _activeWindows.Add(this);
+        // このウィンドウをアクティブなウィンドウリストに追加（重複チェック）
+        if (!_activeWindows.Contains(this))
+            _activeWindows.Add(this);
 
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
@@ -79,7 +80,7 @@ public abstract class BaseWindowView : MonoBehaviour
         if (_activeWindows.Count > 0)
         {
             var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
-            if (topWindow && topWindow.closeButton)
+            if (topWindow)
             {
                 SafeNavigationManager.SetSelectedGameObjectSafe(topWindow.closeButton.gameObject);
             }
@@ -106,5 +107,8 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         Disposables.Dispose();
         _currentFadeHandle.TryCancel();
+
+        // リストから自身を削除（シーン遷移時のクリーンアップ）
+        _activeWindows.Remove(this);
     }
 }
