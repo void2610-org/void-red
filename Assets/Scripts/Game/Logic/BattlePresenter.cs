@@ -28,7 +28,9 @@ public class BattlePresenter: IStartable
     private bool _playerCollapse;
     private bool _npcCollapse;
     private readonly List<ThemeData> _wonThemes = new();
-    public GameState CurrentGameState { get; private set; }
+    private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
+    
+    public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
 
     /// <summary>
     /// コンストラクタ（依存性注入）
@@ -61,6 +63,9 @@ public class BattlePresenter: IStartable
     
     public void Start()
     {
+        // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
+        _uiPresenter.SetBattlePresenter(this);
+
         InitializeGame(true).Forget();
         BgmManager.Instance.PlayRandomBGM(BgmType.Battle);
     }
@@ -148,6 +153,8 @@ public class BattlePresenter: IStartable
     /// </summary>
     private async UniTask ChangeState(GameState newState)
     {
+        _currentGameState.Value = newState;
+        
         switch (newState)
         {
             case GameState.ThemeAnnouncement:
@@ -175,8 +182,6 @@ public class BattlePresenter: IStartable
                 HandleGameOver();
                 break;
         }
-        
-        CurrentGameState  = newState;
     }
     
     /// <summary>
@@ -247,6 +252,7 @@ public class BattlePresenter: IStartable
         while (true)
         {
             await UniTask.Yield();
+            Debug.Log(_currentGameState);
             
             var selectedCard = _player.SelectedCard.CurrentValue;
             if (selectedCard == null) continue;
