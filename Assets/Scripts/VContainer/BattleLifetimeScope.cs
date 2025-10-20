@@ -39,9 +39,9 @@ public class BattleLifetimeScope : LifetimeScope
 
         // === エントリーポイントとPresenterの登録 ===
 
+        builder.RegisterEntryPoint<BattlePresenter>().AsSelf();
         builder.RegisterEntryPoint<UIPresenter>().AsSelf();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
-        builder.RegisterEntryPoint<BattlePresenter>();
         builder.RegisterEntryPoint<MentalPowerEffectController>();
     }
 }
