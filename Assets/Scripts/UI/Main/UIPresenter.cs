@@ -50,6 +50,17 @@ public class UIPresenter : IStartable, System.IDisposable
     private ThemeData _currentTheme;
     private readonly HandView _playerHandView;
     private BattleRootView _battleRootView;
+    private BattlePresenter _battlePresenter;
+
+    /// <summary>
+    /// BattlePresenterを設定（循環依存を避けるため後から設定）
+    /// </summary>
+    public void SetBattlePresenter(BattlePresenter battlePresenter)
+    {
+        _battlePresenter = battlePresenter;
+        // BattlePresenterが設定されたらキーバインドをセットアップ
+        BattleKeyBindings.Setup(_inputActionsProvider, this, _battlePresenter.CurrentGameState, _battleRootView, _disposables);
+    }
 
     public void SetTheme(ThemeData theme)
     {
@@ -68,7 +79,7 @@ public class UIPresenter : IStartable, System.IDisposable
 
     public void InitializeEnemy(EnemyData enemyData)
     {
-        _enemyView　= UnityEngine.Object.FindFirstObjectByType<EnemyView>();
+        _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
     }
 
@@ -346,9 +357,6 @@ public class UIPresenter : IStartable, System.IDisposable
         // ボタンのイベント設定
         SetUpButtonEvents();
 
-        // キーバインドを設定
-        BattleKeyBindings.Setup(_inputActionsProvider, this, _battleRootView, _disposables);
-
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
         UpdateMentalBetDisplay();
@@ -357,7 +365,7 @@ public class UIPresenter : IStartable, System.IDisposable
         UpdateDetailButtonVisibility();
 
         // ルートボタンを初期選択
-        SafeNavigationManager.SelectRootForceSelectable();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
 
     public void Dispose()

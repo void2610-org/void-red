@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
@@ -18,9 +19,12 @@ public abstract class BaseWindowView : MonoBehaviour
     private const float FADE_ANIMATION_DURATION = 0.15f;
 
     protected readonly CompositeDisposable Disposables = new();
-    
+
     private CanvasGroup _canvasGroup;
     private MotionHandle _currentFadeHandle;
+
+    // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
+    private static readonly List<BaseWindowView> _activeWindows = new();
 
     /// <summary>
     /// ウィンドウの表示状態
@@ -50,6 +54,10 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
 
+        // このウィンドウをアクティブなウィンドウリストに追加（重複チェック）
+        if (!_activeWindows.Contains(this))
+            _activeWindows.Add(this);
+
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
@@ -62,9 +70,25 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
+        // リストから自身を削除（順序に関係なく確実に削除）
+        _activeWindows.Remove(this);
+
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
-        SafeNavigationManager.SelectRootForceSelectable();
+
+        // リストに他のウィンドウがあればそのcloseButtonを選択、なければルートを選択
+        if (_activeWindows.Count > 0)
+        {
+            var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
+            if (topWindow)
+            {
+                SafeNavigationManager.SetSelectedGameObjectSafe(topWindow.closeButton.gameObject);
+            }
+        }
+        else
+        {
+            SafeNavigationManager.SelectRootForceSelectable().Forget();
+        }
     }
 
     protected virtual void Awake()
@@ -83,5 +107,8 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         Disposables.Dispose();
         _currentFadeHandle.TryCancel();
+
+        // リストから自身を削除（シーン遷移時のクリーンアップ）
+        _activeWindows.Remove(this);
     }
 }
