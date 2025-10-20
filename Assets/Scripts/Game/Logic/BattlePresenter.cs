@@ -8,9 +8,6 @@ using Void2610.UnityTemplate;
 
 public class BattlePresenter: IStartable
 {
-    private const int WINS_TO_VICTORY = 3;
-    
-    private readonly CardPoolService _cardPoolService;
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
@@ -36,7 +33,6 @@ public class BattlePresenter: IStartable
     /// コンストラクタ（依存性注入）
     /// </summary>
     public BattlePresenter(
-        CardPoolService cardPoolService,
         UIPresenter uiPresenter,
         Player player,
         Enemy enemy,
@@ -47,7 +43,6 @@ public class BattlePresenter: IStartable
         AllEnemyData allEnemyData,
         DiscordService discordService)
     {
-        _cardPoolService = cardPoolService;
         _uiPresenter = uiPresenter;
         _player = player;
         _enemy = enemy;
@@ -547,7 +542,7 @@ public class BattlePresenter: IStartable
         else _enemyWins++;
         
         // 3勝に達したかチェック
-        return _playerWins >= WINS_TO_VICTORY || _enemyWins >= WINS_TO_VICTORY;
+        return _playerWins >= GameConstants.WINS_TO_VICTORY || _enemyWins >= GameConstants.WINS_TO_VICTORY;
     }
     
     /// <summary>
@@ -557,7 +552,7 @@ public class BattlePresenter: IStartable
     {
         await UniTask.Delay(500);
         
-        var playerWon = _playerWins >= WINS_TO_VICTORY;
+        var playerWon = _playerWins >= GameConstants.WINS_TO_VICTORY;
 
         _uiPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
         
