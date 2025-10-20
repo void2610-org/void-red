@@ -23,8 +23,8 @@ public abstract class BaseWindowView : MonoBehaviour
     private CanvasGroup _canvasGroup;
     private MotionHandle _currentFadeHandle;
 
-    // アクティブなウィンドウをスタックで管理
-    private static readonly Stack<BaseWindowView> _activeWindows = new();
+    // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
+    private static readonly List<BaseWindowView> _activeWindows = new();
 
     /// <summary>
     /// ウィンドウの表示状態
@@ -54,8 +54,8 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
 
-        // このウィンドウをアクティブなウィンドウスタックに追加
-        _activeWindows.Push(this);
+        // このウィンドウをアクティブなウィンドウリストに追加
+        _activeWindows.Add(this);
 
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
@@ -69,19 +69,16 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
-        // スタックから自身を削除
-        if (_activeWindows.Count > 0 && _activeWindows.Peek() == this)
-        {
-            _activeWindows.Pop();
-        }
+        // リストから自身を削除（順序に関係なく確実に削除）
+        _activeWindows.Remove(this);
 
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
 
-        // スタックに他のウィンドウがあればそのcloseButtonを選択、なければルートを選択
+        // リストに他のウィンドウがあればそのcloseButtonを選択、なければルートを選択
         if (_activeWindows.Count > 0)
         {
-            var topWindow = _activeWindows.Peek();
+            var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
             if (topWindow && topWindow.closeButton)
             {
                 SafeNavigationManager.SetSelectedGameObjectSafe(topWindow.closeButton.gameObject);
