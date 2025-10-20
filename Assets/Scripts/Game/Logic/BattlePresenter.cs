@@ -8,9 +8,6 @@ using Void2610.UnityTemplate;
 
 public class BattlePresenter: IStartable
 {
-    private const int WINS_TO_VICTORY = 3;
-    
-    private readonly CardPoolService _cardPoolService;
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
@@ -31,12 +28,14 @@ public class BattlePresenter: IStartable
     private bool _playerCollapse;
     private bool _npcCollapse;
     private readonly List<ThemeData> _wonThemes = new();
+    private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
+    
+    public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
 
     /// <summary>
     /// コンストラクタ（依存性注入）
     /// </summary>
     public BattlePresenter(
-        CardPoolService cardPoolService,
         UIPresenter uiPresenter,
         Player player,
         Enemy enemy,
@@ -47,7 +46,6 @@ public class BattlePresenter: IStartable
         AllEnemyData allEnemyData,
         DiscordService discordService)
     {
-        _cardPoolService = cardPoolService;
         _uiPresenter = uiPresenter;
         _player = player;
         _enemy = enemy;
@@ -65,6 +63,9 @@ public class BattlePresenter: IStartable
     
     public void Start()
     {
+        // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
+        _uiPresenter.SetBattlePresenter(this);
+
         InitializeGame(true).Forget();
         BgmManager.Instance.PlayRandomBGM(BgmType.Battle);
     }
@@ -90,9 +91,14 @@ public class BattlePresenter: IStartable
         }
         
         _currentEnemyData = _allEnemyData.GetEnemyById(battleNode.EnemyId);
+        if (!_currentEnemyData)
+        {
+            Debug.LogError("[GameManager] 敵データが見つかりません");
+            return;
+        }
         
         // Discord Rich Presence更新（バトル開始）
-        _discordService?.SetState("対戦相手", _currentEnemyData?.EnemyName ?? "不明");
+        _discordService?.SetState("対戦相手", _currentEnemyData.EnemyName);
         
         // 人格ログ: チャプター開始
         _personalityLogService.StartChapter(_currentEnemyData);
@@ -139,39 +145,41 @@ public class BattlePresenter: IStartable
             await _uiPresenter.StartTutorial("Battle");
         
         // ゲーム開始
-        ChangeState(GameState.ThemeAnnouncement);
+        ChangeState(GameState.ThemeAnnouncement).Forget();
     }
     
     /// <summary>
     /// ステートを変更
     /// </summary>
-    private void ChangeState(GameState newState)
+    private async UniTask ChangeState(GameState newState)
     {
+        _currentGameState.Value = newState;
+        
         switch (newState)
         {
             case GameState.ThemeAnnouncement:
                 _playerCollapse = false; // 崩壊フラグリセット
                 _npcCollapse = false; // 崩壊フラグリセット
                 _uiPresenter.ResetEnemyToDefault().Forget();
-                HandleThemeAnnouncement().Forget();
+                await HandleThemeAnnouncement();
                 break;
             case GameState.PlayerCardSelection:
                 HandlePlayerCardSelection().Forget();
                 break;
             case GameState.EnemyCardSelection:
-                HandleEnemyCardSelection().Forget();
+                await HandleEnemyCardSelection();
                 break;
             case GameState.Evaluation:
-                HandleEvaluation().Forget();
+                await HandleEvaluation();
                 break;
             case GameState.ResultDisplay:
-                HandleResultDisplay().Forget();
+                await HandleResultDisplay();
                 break;
             case GameState.BattleEnd:
-                HandleBattleEnd().Forget();
+                await HandleBattleEnd();
                 break;
             case GameState.GameOver:
-                HandleGameOver().Forget();
+                HandleGameOver();
                 break;
         }
     }
@@ -188,12 +196,12 @@ public class BattlePresenter: IStartable
         ThemeData newTheme = null;
 
         // どちらかが2勝している場合は大テーマを使用
-        if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData?.MajorTheme != null)
+        if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData.MajorTheme != null)
         {
             newTheme = _currentEnemyData.MajorTheme;
         }
         // 小テーマが設定されている場合はランダムに選択
-        else if (_currentEnemyData?.MinorThemes is { Count: > 0 })
+        else if (_currentEnemyData.MinorThemes is { Count: > 0 })
         {
             var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
             newTheme = _currentEnemyData.MinorThemes[randomIndex];
@@ -206,7 +214,7 @@ public class BattlePresenter: IStartable
         // 会話シーケンスを表示してからカード選択へ
         // await ShowThemeDialoguesAsync();
         
-        ChangeState(GameState.PlayerCardSelection);
+        ChangeState(GameState.PlayerCardSelection).Forget();
     }
 
     /// <summary>
@@ -217,7 +225,7 @@ public class BattlePresenter: IStartable
         if (_currentTheme == null || _currentTheme.Dialogues == null)
         {
             await UniTask.Delay(300);
-            ChangeState(GameState.PlayerCardSelection);
+            ChangeState(GameState.PlayerCardSelection).Forget();
             return;
         }
 
@@ -285,7 +293,7 @@ public class BattlePresenter: IStartable
         _personalityLogService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
         
         await UniTask.Delay(500);
-        ChangeState(GameState.EnemyCardSelection);
+        ChangeState(GameState.EnemyCardSelection).Forget();
     }
     
     /// <summary>
@@ -323,7 +331,7 @@ public class BattlePresenter: IStartable
         await _uiPresenter.ShowBlackOverlay();
         
         // 評価フェーズへ
-        ChangeState(GameState.Evaluation);
+        ChangeState(GameState.Evaluation).Forget();
     }
     
     /// <summary>
@@ -364,7 +372,7 @@ public class BattlePresenter: IStartable
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
-        ChangeState(GameState.ResultDisplay);
+        ChangeState(GameState.ResultDisplay).Forget();
     }
     
     /// <summary>
@@ -443,7 +451,7 @@ public class BattlePresenter: IStartable
         if (UpdateWinsAndCheckBattleEnd(playerWon))
         {
             // 3勝に達した場合、カード処理をスキップしてバトル終了へ
-            ChangeState(GameState.BattleEnd);
+            ChangeState(GameState.BattleEnd).Forget();
             return;
         }
         
@@ -519,7 +527,7 @@ public class BattlePresenter: IStartable
         _personalityLogService.EndTurn();
         
         // ゲームオーバー条件をチェック
-        ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement);
+        ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement).Forget();
     }
     
     /// <summary>
@@ -547,7 +555,7 @@ public class BattlePresenter: IStartable
         else _enemyWins++;
         
         // 3勝に達したかチェック
-        return _playerWins >= WINS_TO_VICTORY || _enemyWins >= WINS_TO_VICTORY;
+        return _playerWins >= GameConstants.WINS_TO_VICTORY || _enemyWins >= GameConstants.WINS_TO_VICTORY;
     }
     
     /// <summary>
@@ -557,7 +565,7 @@ public class BattlePresenter: IStartable
     {
         await UniTask.Delay(500);
         
-        var playerWon = _playerWins >= WINS_TO_VICTORY;
+        var playerWon = _playerWins >= GameConstants.WINS_TO_VICTORY;
 
         _uiPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
         
@@ -599,7 +607,7 @@ public class BattlePresenter: IStartable
     /// <summary>
     /// ゲームオーバーフェーズ
     /// </summary>
-    private async UniTask HandleGameOver()
+    private void HandleGameOver()
     {
         // ゲームオーバーの理由を判定
         var gameOverReason = "";
