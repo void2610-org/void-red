@@ -85,9 +85,14 @@ public class BattlePresenter: IStartable
         }
         
         _currentEnemyData = _allEnemyData.GetEnemyById(battleNode.EnemyId);
+        if (!_currentEnemyData)
+        {
+            Debug.LogError("[GameManager] 敵データが見つかりません");
+            return;
+        }
         
         // Discord Rich Presence更新（バトル開始）
-        _discordService?.SetState("対戦相手", _currentEnemyData?.EnemyName ?? "不明");
+        _discordService?.SetState("対戦相手", _currentEnemyData.EnemyName);
         
         // 人格ログ: チャプター開始
         _personalityLogService.StartChapter(_currentEnemyData);
@@ -183,12 +188,12 @@ public class BattlePresenter: IStartable
         ThemeData newTheme = null;
 
         // どちらかが2勝している場合は大テーマを使用
-        if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData?.MajorTheme != null)
+        if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData.MajorTheme != null)
         {
             newTheme = _currentEnemyData.MajorTheme;
         }
         // 小テーマが設定されている場合はランダムに選択
-        else if (_currentEnemyData?.MinorThemes is { Count: > 0 })
+        else if (_currentEnemyData.MinorThemes is { Count: > 0 })
         {
             var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
             newTheme = _currentEnemyData.MinorThemes[randomIndex];
