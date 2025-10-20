@@ -77,6 +77,7 @@ public class SettingsView : BaseWindowView
     /// 外部から設定データを注入してUIを更新
     /// </summary>
     /// <param name="settingsData">設定データ配列</param>
+    /// <param name="confirmationDialog">確認ダイアログサービス</param>
     public void SetSettings(SettingDisplayData[] settingsData, ConfirmationDialogService confirmationDialog)
     {
         _confirmationDialogService = confirmationDialog;
@@ -134,10 +135,10 @@ public class SettingsView : BaseWindowView
         var textComponent = titleObject.GetComponentInChildren<TextMeshProUGUI>();
         textComponent.text = titleText;
         // レイアウト要素を追加してタイトル幅を固定
-        var layoutElement = titleObject.GetComponent<UnityEngine.UI.LayoutElement>();
+        var layoutElement = titleObject.GetComponent<LayoutElement>();
         if (!layoutElement)
         {
-            layoutElement = titleObject.AddComponent<UnityEngine.UI.LayoutElement>();
+            layoutElement = titleObject.AddComponent<LayoutElement>();
         }
         layoutElement.preferredWidth = 150f; // タイトルの固定幅
         layoutElement.flexibleWidth = 0f;    // 伸縮しない
@@ -146,15 +147,15 @@ public class SettingsView : BaseWindowView
     /// <summary>
     /// スライダー設定のUIを生成
     /// </summary>
-    private GameObject CreateSliderUI(SettingDisplayData settingData, Transform parent)
+    private void CreateSliderUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(sliderSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
-        var layoutElement = uiObject.GetComponent<UnityEngine.UI.LayoutElement>();
+        var layoutElement = uiObject.GetComponent<LayoutElement>();
         if (!layoutElement)
         {
-            layoutElement = uiObject.AddComponent<UnityEngine.UI.LayoutElement>();
+            layoutElement = uiObject.AddComponent<LayoutElement>();
         }
         layoutElement.flexibleWidth = 1f; // 残りの幅を使用
         
@@ -178,22 +179,20 @@ public class SettingsView : BaseWindowView
         
         // 値テキストの初期化
         UpdateValueText(valueText, settingData.floatValue);
-        
-        return uiObject;
     }
     
     /// <summary>
     /// ボタン設定のUIを生成
     /// </summary>
-    private GameObject CreateButtonUI(SettingDisplayData settingData, Transform parent)
+    private void CreateButtonUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(buttonSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
-        var layoutElement = uiObject.GetComponent<UnityEngine.UI.LayoutElement>();
+        var layoutElement = uiObject.GetComponent<LayoutElement>();
         if (!layoutElement)
         {
-            layoutElement = uiObject.AddComponent<UnityEngine.UI.LayoutElement>();
+            layoutElement = uiObject.AddComponent<LayoutElement>();
         }
         layoutElement.flexibleWidth = 1f; // 残りの幅を使用
         
@@ -218,8 +217,6 @@ public class SettingsView : BaseWindowView
                 }
             });
         }
-        
-        return uiObject;
     }
     
     /// <summary>
@@ -229,8 +226,7 @@ public class SettingsView : BaseWindowView
     {
         var result = await _confirmationDialogService.ShowDialog(
             settingData.confirmationMessage,
-            "実行",
-            "キャンセル"
+            "実行"
         );
         
         if (result)
@@ -253,15 +249,15 @@ public class SettingsView : BaseWindowView
     /// <summary>
     /// Enum設定のUIを生成
     /// </summary>
-    private GameObject CreateEnumUI(SettingDisplayData settingData, Transform parent)
+    private void CreateEnumUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(enumSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
-        var layoutElement = uiObject.GetComponent<UnityEngine.UI.LayoutElement>();
+        var layoutElement = uiObject.GetComponent<LayoutElement>();
         if (!layoutElement)
         {
-            layoutElement = uiObject.AddComponent<UnityEngine.UI.LayoutElement>();
+            layoutElement = uiObject.AddComponent<LayoutElement>();
         }
         layoutElement.flexibleWidth = 1f; // 残りの幅を使用
         
@@ -271,14 +267,14 @@ public class SettingsView : BaseWindowView
         var valueText = uiObject.transform.Find("ValueText")?.GetComponent<TextMeshProUGUI>();
         
         // 現在のインデックスを計算
-        int currentIndex = System.Array.IndexOf(settingData.options ?? new string[0], settingData.stringValue);
+        int currentIndex = Array.IndexOf(settingData.options ?? Array.Empty<string>(), settingData.stringValue);
         if (currentIndex < 0) currentIndex = 0;
         
         // ボタンの設定
         if (prevButton)
         {
             prevButton.onClick.AddListener(() => {
-                if (settingData.options != null && settingData.options.Length > 0)
+                if (settingData.options is { Length: > 0 })
                 {
                     currentIndex = (currentIndex - 1 + settingData.options.Length) % settingData.options.Length;
                     var newValue = settingData.options[currentIndex];
@@ -291,7 +287,7 @@ public class SettingsView : BaseWindowView
         if (nextButton)
         {
             nextButton.onClick.AddListener(() => {
-                if (settingData.options != null && settingData.options.Length > 0)
+                if (settingData.options is { Length: > 0 })
                 {
                     currentIndex = (currentIndex + 1) % settingData.options.Length;
                     var newValue = settingData.options[currentIndex];
@@ -303,8 +299,6 @@ public class SettingsView : BaseWindowView
         
         // 値テキストの初期化
         UpdateEnumValueText(valueText, settingData, currentIndex);
-        
-        return uiObject;
     }
     
     /// <summary>
