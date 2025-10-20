@@ -7,7 +7,7 @@ using VContainer.Unity;
 public class SafeNavigationManager : ITickable
 {
     private GameObject _previousSelected;
-    private static bool _allowProgrammaticChange = false;
+    private static bool _allowProgrammaticChange;
     private static EventSystem _eventSystem;
     
     public static GameObject GetCurrentSelected() => _eventSystem?.currentSelectedGameObject;
