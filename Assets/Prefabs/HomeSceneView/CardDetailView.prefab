@@ -282,6 +282,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3049846448106285744}
   - component: {fileID: 4996783905398363937}
+  - component: {fileID: 515078507906374864}
   m_Layer: 5
   m_Name: CardDetailView
   m_TagString: Untagged
@@ -321,7 +322,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2617b480c190e48c9868154d0c268311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detailPanel: {fileID: 6309898049417374640}
   closeButton: {fileID: 7381890099540197794}
   playButton: {fileID: 773560690412555627}
   cardView: {fileID: 1711684293830712452}
@@ -330,6 +330,18 @@ MonoBehaviour:
   collapseThresholdText: {fileID: 211017072674139371}
   keywordsText: {fileID: 3027133022815263198}
   evolutionInfoText: {fileID: 3882269556209920356}
+--- !u!225 &515078507906374864
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2345645635233192588}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2489288369420233574
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,7 +441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.9490196}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -866,7 +878,7 @@ GameObject:
   - component: {fileID: 4368612841632696196}
   m_Layer: 5
   m_Name: Block
-  m_TagString: Untagged
+  m_TagString: IgnoreHoverSelection
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1173,6 +1185,10 @@ PrefabInstance:
     - target: {fileID: 8089064917827832581, guid: 4bcef9ab048c64ec1b0422b435240502, type: 3}
       propertyPath: m_Name
       value: DeckCardView
+      objectReference: {fileID: 0}
+    - target: {fileID: 8089064917827832581, guid: 4bcef9ab048c64ec1b0422b435240502, type: 3}
+      propertyPath: m_TagString
+      value: IgnoreHoverSelection
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
