@@ -252,7 +252,6 @@ public class BattlePresenter: IStartable
         while (true)
         {
             await UniTask.Yield();
-            Debug.Log(_currentGameState);
             
             var selectedCard = _player.SelectedCard.CurrentValue;
             if (selectedCard == null) continue;
