@@ -28,6 +28,7 @@ public class BattlePresenter: IStartable
     private bool _playerCollapse;
     private bool _npcCollapse;
     private readonly List<ThemeData> _wonThemes = new();
+    public GameState CurrentGameState { get; private set; }
 
     /// <summary>
     /// コンストラクタ（依存性注入）
@@ -139,13 +140,13 @@ public class BattlePresenter: IStartable
             await _uiPresenter.StartTutorial("Battle");
         
         // ゲーム開始
-        ChangeState(GameState.ThemeAnnouncement);
+        ChangeState(GameState.ThemeAnnouncement).Forget();
     }
     
     /// <summary>
     /// ステートを変更
     /// </summary>
-    private void ChangeState(GameState newState)
+    private async UniTask ChangeState(GameState newState)
     {
         switch (newState)
         {
@@ -153,27 +154,29 @@ public class BattlePresenter: IStartable
                 _playerCollapse = false; // 崩壊フラグリセット
                 _npcCollapse = false; // 崩壊フラグリセット
                 _uiPresenter.ResetEnemyToDefault().Forget();
-                HandleThemeAnnouncement().Forget();
+                await HandleThemeAnnouncement();
                 break;
             case GameState.PlayerCardSelection:
                 HandlePlayerCardSelection().Forget();
                 break;
             case GameState.EnemyCardSelection:
-                HandleEnemyCardSelection().Forget();
+                await HandleEnemyCardSelection();
                 break;
             case GameState.Evaluation:
-                HandleEvaluation().Forget();
+                await HandleEvaluation();
                 break;
             case GameState.ResultDisplay:
-                HandleResultDisplay().Forget();
+                await HandleResultDisplay();
                 break;
             case GameState.BattleEnd:
-                HandleBattleEnd().Forget();
+                await HandleBattleEnd();
                 break;
             case GameState.GameOver:
                 HandleGameOver();
                 break;
         }
+        
+        CurrentGameState  = newState;
     }
     
     /// <summary>
@@ -206,7 +209,7 @@ public class BattlePresenter: IStartable
         // 会話シーケンスを表示してからカード選択へ
         // await ShowThemeDialoguesAsync();
         
-        ChangeState(GameState.PlayerCardSelection);
+        ChangeState(GameState.PlayerCardSelection).Forget();
     }
 
     /// <summary>
@@ -217,7 +220,7 @@ public class BattlePresenter: IStartable
         if (_currentTheme == null || _currentTheme.Dialogues == null)
         {
             await UniTask.Delay(300);
-            ChangeState(GameState.PlayerCardSelection);
+            ChangeState(GameState.PlayerCardSelection).Forget();
             return;
         }
 
@@ -285,7 +288,7 @@ public class BattlePresenter: IStartable
         _personalityLogService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
         
         await UniTask.Delay(500);
-        ChangeState(GameState.EnemyCardSelection);
+        ChangeState(GameState.EnemyCardSelection).Forget();
     }
     
     /// <summary>
@@ -323,7 +326,7 @@ public class BattlePresenter: IStartable
         await _uiPresenter.ShowBlackOverlay();
         
         // 評価フェーズへ
-        ChangeState(GameState.Evaluation);
+        ChangeState(GameState.Evaluation).Forget();
     }
     
     /// <summary>
@@ -364,7 +367,7 @@ public class BattlePresenter: IStartable
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
-        ChangeState(GameState.ResultDisplay);
+        ChangeState(GameState.ResultDisplay).Forget();
     }
     
     /// <summary>
@@ -443,7 +446,7 @@ public class BattlePresenter: IStartable
         if (UpdateWinsAndCheckBattleEnd(playerWon))
         {
             // 3勝に達した場合、カード処理をスキップしてバトル終了へ
-            ChangeState(GameState.BattleEnd);
+            ChangeState(GameState.BattleEnd).Forget();
             return;
         }
         
@@ -519,7 +522,7 @@ public class BattlePresenter: IStartable
         _personalityLogService.EndTurn();
         
         // ゲームオーバー条件をチェック
-        ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement);
+        ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement).Forget();
     }
     
     /// <summary>
