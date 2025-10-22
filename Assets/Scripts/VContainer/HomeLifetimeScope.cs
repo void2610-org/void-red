@@ -12,11 +12,14 @@ public class HomeLifetimeScope : LifetimeScope
     
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterComponentInHierarchy<HomeUIPresenter>();
+        builder.RegisterComponentInHierarchy<HomeView>();
         builder.RegisterInstance(allCardData);
         builder.Register<CardPoolService>(Lifetime.Singleton);
-        
+
         // 設定機能
         builder.RegisterEntryPoint<SettingsPresenter>().AsSelf();
+
+        // ホームPresenter
+        builder.RegisterEntryPoint<HomePresenter>();
     }
 }
