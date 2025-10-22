@@ -11,7 +11,7 @@ public static class BattleKeyBindings
     /// </summary>
     public static void Setup(
         InputActionsProvider inputActionsProvider,
-        UIPresenter uiPresenter,
+        BattleUIPresenter battleUIPresenter,
         ReadOnlyReactiveProperty<GameState> currentGameState,
         BattleRootView battleRootView,
         CompositeDisposable disposables)
@@ -46,28 +46,28 @@ public static class BattleKeyBindings
         inputActionsProvider.Battle.MinusMentalBet.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => battleRootView.IsRootSelected)
-            .Subscribe(_ => uiPresenter.DecrementMentalBet())
+            .Subscribe(_ => battleUIPresenter.DecrementMentalBet())
             .AddTo(disposables);
 
         // 精神ベットを増やす
         inputActionsProvider.Battle.PlusMentalBet.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => battleRootView.IsRootSelected)
-            .Subscribe(_ => uiPresenter.IncrementMentalBet())
+            .Subscribe(_ => battleUIPresenter.IncrementMentalBet())
             .AddTo(disposables);
 
         // カード詳細を表示
         inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => battleRootView.IsRootSelected)
-            .Subscribe(_ => uiPresenter.ShowSelectedCardDetail())
+            .Subscribe(_ => battleUIPresenter.ShowSelectedCardDetail())
             .AddTo(disposables);
 
         // カードをプレイ
         inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => battleRootView.IsRootSelected)
-            .Subscribe(_ => uiPresenter.TryPlayCard())
+            .Subscribe(_ => battleUIPresenter.TryPlayCard())
             .AddTo(disposables);
 
         // カードナビゲーション
@@ -80,12 +80,12 @@ public static class BattleKeyBindings
                 if (direction.x > 0.5f)
                 {
                     // 右方向：次のカード
-                    uiPresenter.NavigateToNextCard();
+                    battleUIPresenter.NavigateToNextCard();
                 }
                 else if (direction.x < -0.5f)
                 {
                     // 左方向：前のカード
-                    uiPresenter.NavigateToPreviousCard();
+                    battleUIPresenter.NavigateToPreviousCard();
                 }
             })
             .AddTo(disposables);
