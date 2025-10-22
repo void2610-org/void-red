@@ -6,7 +6,7 @@ using VContainer.Unity;
 using UnityEngine;
 using Void2610.UnityTemplate;
 
-public class BattlePresenter: IStartable
+public class BattlePresenter: IStartable, ISceneInitializable
 {
     private readonly BattleUIPresenter _battleUIPresenter;
     private readonly Player _player;
@@ -17,7 +17,9 @@ public class BattlePresenter: IStartable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
     private readonly DiscordService _discordService;
-    
+
+    private readonly UniTaskCompletionSource _initializationComplete = new();
+
     private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
     private PlayerMove _playerMove;
@@ -31,6 +33,11 @@ public class BattlePresenter: IStartable
     private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
     
     public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
+
+    /// <summary>
+    /// シーンの初期化完了を待つ（ISceneInitializable実装）
+    /// </summary>
+    public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
 
     /// <summary>
     /// コンストラクタ（依存性注入）
@@ -66,15 +73,26 @@ public class BattlePresenter: IStartable
         // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
         _battleUIPresenter.SetBattlePresenter(this);
 
-        InitializeGame(true).Forget();
+        InitializeGameAsync().Forget();
         BgmManager.Instance.PlayRandomBGM(BgmType.Battle);
+    }
+
+    /// <summary>
+    /// ゲーム初期化（非同期）
+    /// 完了後にSceneReadyNotifierに通知
+    /// </summary>
+    private async UniTaskVoid InitializeGameAsync()
+    {
+        await InitializeGame(true);
+        _initializationComplete.TrySetResult();
+        await StartGame();
     }
     
     /// <summary>
     /// ゲームを初期化
     /// </summary>
     /// <param name="isInitialStart">ゲームの最初の起動かどうか</param>
-    private async UniTaskVoid InitializeGame(bool isInitialStart)
+    private async UniTask InitializeGame(bool isInitialStart)
     {
         await _cardNarrationService.InitializeAsync();
         await UniTask.Delay(500);
@@ -135,6 +153,12 @@ public class BattlePresenter: IStartable
         // 敵デッキ: 固定デッキを使用
         var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);
         _enemy.InitializeDeck(enemyDeck);
+        
+    }
+
+    private async UniTask StartGame()
+    {
+        await UniTask.Delay(1000);
         
         _player.DrawCardsWithDelay(3, 300).Forget();
         await UniTask.Delay(200);
