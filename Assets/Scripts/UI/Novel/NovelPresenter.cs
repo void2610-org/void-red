@@ -10,7 +10,7 @@ using Void2610.UnityTemplate;
 /// ノベルシーンのUI管理を担当するプレゼンター
 /// ダイアログの進行制御とViewの管理を行う
 /// </summary>
-public class NovelUIPresenter : IStartable, System.IDisposable
+public class NovelPresenter : IStartable, System.IDisposable
 {
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
@@ -32,7 +32,7 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     private string _currentScenarioId;
     private readonly CompositeDisposable _disposables = new();
     
-    public NovelUIPresenter(bool useLocalExcel)
+    public NovelPresenter(bool useLocalExcel)
     {
         // ビルドでは必ずローカルExcelを使用
         #if !UNITY_EDITOR
