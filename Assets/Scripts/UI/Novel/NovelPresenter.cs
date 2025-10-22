@@ -10,7 +10,7 @@ using Void2610.UnityTemplate;
 /// ノベルシーンのUI管理を担当するプレゼンター
 /// ダイアログの進行制御とViewの管理を行う
 /// </summary>
-public class NovelUIPresenter : IStartable, System.IDisposable
+public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposable
 {
     private GameProgressService _gameProgressService;
     private SceneTransitionManager _sceneTransitionManager;
@@ -25,14 +25,21 @@ public class NovelUIPresenter : IStartable, System.IDisposable
     private ChoiceView _choiceView;
     private NovelSeManager _novelSeManager;
 
+    private readonly UniTaskCompletionSource _initializationComplete = new();
+
     // ダイアログ制御用
     private List<DialogData> _currentDialogList;
     private int _currentDialogIndex;
     private int _choiceCounter;
     private string _currentScenarioId;
     private readonly CompositeDisposable _disposables = new();
-    
-    public NovelUIPresenter(bool useLocalExcel)
+
+    /// <summary>
+    /// シーンの初期化完了を待つ（ISceneInitializable実装）
+    /// </summary>
+    public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
+
+    public NovelPresenter(bool useLocalExcel)
     {
         // ビルドでは必ずローカルExcelを使用
         #if !UNITY_EDITOR
@@ -115,6 +122,10 @@ public class NovelUIPresenter : IStartable, System.IDisposable
         // キャラクター画像を事前に読み込み
         Debug.Log("[NovelUIPresenter] キャラクター画像を事前読み込み中...");
         await PreloadCharacterImages(dialogList);
+
+        // シーン初期化完了を通知
+        _initializationComplete.TrySetResult();
+
         // ダイアログシーケンスを開始
         Debug.Log("[NovelUIPresenter] ダイアログシーケンスを開始");
         await StartDialogSequence(dialogList);

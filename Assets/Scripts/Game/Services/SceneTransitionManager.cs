@@ -116,7 +116,10 @@ public class SceneTransitionManager : IDisposable
             
             // Discord Rich Presence更新
             _discordService.SetSceneState(targetScene);
-            
+
+            // シーンの初期化完了を待つ
+            await WaitForSceneReady();
+
             await FadeOut(fadeDuration);
         }
         finally
@@ -125,6 +128,25 @@ public class SceneTransitionManager : IDisposable
         }
     }
     
+    /// <summary>
+    /// シーンの初期化完了を待つ
+    /// </summary>
+    private async UniTask WaitForSceneReady()
+    {
+        // 現在のシーンのLifetimeScopeからISceneInitializableを取得
+        var currentLifetimeScope = VContainer.Unity.LifetimeScope.Find<VContainer.Unity.LifetimeScope>();
+        if (currentLifetimeScope != null)
+        {
+            if (currentLifetimeScope.Container.TryResolve(typeof(ISceneInitializable), out var obj))
+            {
+                var initializable = (ISceneInitializable)obj;
+                Debug.Log("[SceneTransitionManager] シーン初期化完了を待機中...");
+                await initializable.WaitForInitializationAsync();
+                Debug.Log("[SceneTransitionManager] シーン初期化完了");
+            }
+        }
+    }
+
     /// <summary>
     /// 画面をフェードイン（暗転）
     /// </summary>

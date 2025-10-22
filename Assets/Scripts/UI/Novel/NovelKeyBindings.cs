@@ -11,7 +11,7 @@ public static class NovelKeyBindings
     /// </summary>
     public static void Setup(
         InputActionsProvider inputActionsProvider,
-        NovelUIPresenter novelUIPresenter,
+        NovelPresenter novelPresenter,
         CompositeDisposable disposables)
     {
         var dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
@@ -25,7 +25,7 @@ public static class NovelKeyBindings
         // スキップ（clickAreaButton選択時のみ）
         inputActionsProvider.Novel.Skip.OnPerformedAsObservable()
             .Where(_ => dialogView.IsClickAreaButtonSelected)
-            .Subscribe(_ => novelUIPresenter.RequestSkipAllDialogs())
+            .Subscribe(_ => novelPresenter.RequestSkipAllDialogs())
             .AddTo(disposables);
 
         // ダイアログを進める（clickAreaButton選択時のみ）

@@ -6,9 +6,9 @@ using VContainer.Unity;
 using UnityEngine;
 using Void2610.UnityTemplate;
 
-public class BattlePresenter: IStartable
+public class BattlePresenter: IStartable, ISceneInitializable
 {
-    private readonly UIPresenter _uiPresenter;
+    private readonly BattleUIPresenter _battleUIPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
     private readonly CardNarrationService _cardNarrationService;
@@ -17,7 +17,9 @@ public class BattlePresenter: IStartable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
     private readonly DiscordService _discordService;
-    
+
+    private readonly UniTaskCompletionSource _initializationComplete = new();
+
     private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
     private PlayerMove _playerMove;
@@ -33,10 +35,15 @@ public class BattlePresenter: IStartable
     public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
 
     /// <summary>
+    /// シーンの初期化完了を待つ（ISceneInitializable実装）
+    /// </summary>
+    public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
+
+    /// <summary>
     /// コンストラクタ（依存性注入）
     /// </summary>
     public BattlePresenter(
-        UIPresenter uiPresenter,
+        BattleUIPresenter battleUIPresenter,
         Player player,
         Enemy enemy,
         CardNarrationService cardNarrationService,
@@ -46,7 +53,7 @@ public class BattlePresenter: IStartable
         AllEnemyData allEnemyData,
         DiscordService discordService)
     {
-        _uiPresenter = uiPresenter;
+        _battleUIPresenter = battleUIPresenter;
         _player = player;
         _enemy = enemy;
         _cardNarrationService = cardNarrationService;
@@ -64,17 +71,28 @@ public class BattlePresenter: IStartable
     public void Start()
     {
         // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
-        _uiPresenter.SetBattlePresenter(this);
+        _battleUIPresenter.SetBattlePresenter(this);
 
-        InitializeGame(true).Forget();
+        InitializeGameAsync().Forget();
         BgmManager.Instance.PlayRandomBGM(BgmType.Battle);
+    }
+
+    /// <summary>
+    /// ゲーム初期化（非同期）
+    /// 完了後にSceneReadyNotifierに通知
+    /// </summary>
+    private async UniTaskVoid InitializeGameAsync()
+    {
+        await InitializeGame(true);
+        _initializationComplete.TrySetResult();
+        await StartGame();
     }
     
     /// <summary>
     /// ゲームを初期化
     /// </summary>
     /// <param name="isInitialStart">ゲームの最初の起動かどうか</param>
-    private async UniTaskVoid InitializeGame(bool isInitialStart)
+    private async UniTask InitializeGame(bool isInitialStart)
     {
         await _cardNarrationService.InitializeAsync();
         await UniTask.Delay(500);
@@ -123,11 +141,11 @@ public class BattlePresenter: IStartable
         
         // 敵を初期化して表示
         _enemy.SetEnemyData(_currentEnemyData);
-        _uiPresenter.InitializeEnemy(_currentEnemyData);
-        await _uiPresenter.ShowEnemy();
+        _battleUIPresenter.InitializeEnemy(_currentEnemyData);
+        await _battleUIPresenter.ShowEnemy();
         
         // 敵情報をアナウンス
-        await _uiPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
+        await _battleUIPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
         
         // セーブデータからデッキを初期化
         _player.LoadDeckFromSaveData();
@@ -136,13 +154,19 @@ public class BattlePresenter: IStartable
         var enemyDeck = new List<CardData>(_currentEnemyData.InitialDeck);
         _enemy.InitializeDeck(enemyDeck);
         
+    }
+
+    private async UniTask StartGame()
+    {
+        await UniTask.Delay(1000);
+        
         _player.DrawCardsWithDelay(3, 300).Forget();
         await UniTask.Delay(200);
         await _enemy.DrawCardsWithDelay(3, 300);
         
         // 敵がアルヴならチュートリアルを表示
         if (_currentEnemyData.EnemyId == "E001")
-            await _uiPresenter.StartTutorial("Battle");
+            await _battleUIPresenter.StartTutorial("Battle");
         
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement).Forget();
@@ -160,7 +184,7 @@ public class BattlePresenter: IStartable
             case GameState.ThemeAnnouncement:
                 _playerCollapse = false; // 崩壊フラグリセット
                 _npcCollapse = false; // 崩壊フラグリセット
-                _uiPresenter.ResetEnemyToDefault().Forget();
+                _battleUIPresenter.ResetEnemyToDefault().Forget();
                 await HandleThemeAnnouncement();
                 break;
             case GameState.PlayerCardSelection:
@@ -209,7 +233,7 @@ public class BattlePresenter: IStartable
 
         _currentTheme = newTheme;
 
-        _uiPresenter.SetTheme(_currentTheme);
+        _battleUIPresenter.SetTheme(_currentTheme);
 
         // 会話シーケンスを表示してからカード選択へ
         // await ShowThemeDialoguesAsync();
@@ -235,9 +259,9 @@ public class BattlePresenter: IStartable
             if (string.IsNullOrEmpty(dialogue.Message)) continue;
 
             if (dialogue.IsPlayer)
-                await _uiPresenter.ShowNarration(dialogue.Message);
+                await _battleUIPresenter.ShowNarration(dialogue.Message);
             else
-                await _uiPresenter.ShowEnemyNarration(dialogue.Message);
+                await _battleUIPresenter.ShowEnemyNarration(dialogue.Message);
         }
 
         await UniTask.Delay(300);
@@ -256,14 +280,14 @@ public class BattlePresenter: IStartable
             var selectedCard = _player.SelectedCard.CurrentValue;
             if (selectedCard == null) continue;
             // カードが選択されたらプレイボタンを表示
-            _uiPresenter.ShowPlayButton();
+            _battleUIPresenter.ShowPlayButton();
             break;
         }
         
         // プレイボタンが押されるのを待つ
         try
         {
-            await _uiPresenter.PlayButtonClicked.FirstAsync();
+            await _battleUIPresenter.PlayButtonClicked.FirstAsync();
         }
         catch (InvalidOperationException)
         {
@@ -271,18 +295,18 @@ public class BattlePresenter: IStartable
             return;
         }
         
-        _uiPresenter.HidePlayButton();
+        _battleUIPresenter.HidePlayButton();
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
         if (finalSelectedCard == null) return;
         
-        _uiPresenter.UpdateEnemySprite(finalSelectedCard.Data.Attribute).Forget();
+        _battleUIPresenter.UpdateEnemySprite(finalSelectedCard.Data.Attribute).Forget();
         
         // プレイヤーの手を作成
-        var playStyle = _uiPresenter.GetSelectedPlayStyle();
+        var playStyle = _battleUIPresenter.GetSelectedPlayStyle();
         
         // 精神力を消費
-        var mentalBet = _uiPresenter.GetMentalBetValue();
+        var mentalBet = _battleUIPresenter.GetMentalBetValue();
         _player.ConsumeMentalPower(mentalBet);
         _playerMove = new PlayerMove(finalSelectedCard.Data, playStyle, mentalBet);
         
@@ -323,12 +347,12 @@ public class BattlePresenter: IStartable
         // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
         var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
         var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
-        await _uiPresenter.ShowNarration(displayContent);
+        await _battleUIPresenter.ShowNarration(displayContent);
         
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
         // 結果表示の背景を表示
-        await _uiPresenter.ShowBlackOverlay();
+        await _battleUIPresenter.ShowBlackOverlay();
         
         // 評価フェーズへ
         ChangeState(GameState.Evaluation).Forget();
@@ -344,7 +368,7 @@ public class BattlePresenter: IStartable
         var npcScore = ScoreCalculator.CalculateScore(_enemyMove, _playerMove, _currentTheme);
         
         // 評価結果をスコア専用Viewで同時表示
-        await _uiPresenter.ShowScores(playerScore, npcScore);
+        await _battleUIPresenter.ShowScores(playerScore, npcScore);
         
         // カード崩壊判定
         _playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
@@ -362,7 +386,7 @@ public class BattlePresenter: IStartable
                 collapseMessage = "対戦相手のカードが崩壊した";
 
             // 崩壊演出を実行
-            var tasks = new List<UniTask> { _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f) };
+            var tasks = new List<UniTask> { _battleUIPresenter.ShowAnnouncement(collapseMessage, 1.0f) };
 
             if (_playerCollapse) tasks.Add(_player.CollapseSelectedCard());
             if (_npcCollapse) tasks.Add(_enemy.CollapseSelectedCard());
@@ -425,9 +449,9 @@ public class BattlePresenter: IStartable
         }
 
         // 結果を表示（スコアと内訳付き）
-        await _uiPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _enemyMove, _currentTheme);
+        await _battleUIPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _enemyMove, _currentTheme);
         await UniTask.Delay(500);
-        await _uiPresenter.HideBlackOverlay();
+        await _battleUIPresenter.HideBlackOverlay();
 
         // プレイヤー勝利時は現在のテーマを記録
         if (playerWon) _wonThemes.Add(_currentTheme);
@@ -436,13 +460,13 @@ public class BattlePresenter: IStartable
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
         var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, playerNarrationType, _playerMove.PlayStyle);
         var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
-        await _uiPresenter.ShowNarration(displayNarration);
+        await _battleUIPresenter.ShowNarration(displayNarration);
         
         // 敵の勝敗確定後のナレーション
         var enemyNarrationType = playerScore > npcScore ? NarrationType.PostBattleLoseEnemy : NarrationType.PostBattleWinEnemy;
         var enemyPostBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, enemyNarrationType, _playerMove.PlayStyle);
         var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
-        await _uiPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
+        await _battleUIPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
         
         // ゲーム結果を統計に記録（進化チェック前に実行）
         _gameProgressService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
@@ -479,7 +503,7 @@ public class BattlePresenter: IStartable
                     
                     // 人格ログ: プレイヤーカード進化イベント記録
                     _personalityLogService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
-                    await _uiPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
+                    await _battleUIPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
                 }
                 
                 // 共鳴チェック
@@ -487,7 +511,7 @@ public class BattlePresenter: IStartable
                 {
                     // 人格ログ: 共鳴イベント記録
                     _personalityLogService.LogResonance("Player", selectedCard.Data);
-                    await _uiPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
+                    await _battleUIPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
                 }
                 
                 // カードをプレイ（崩壊しない）
@@ -567,13 +591,13 @@ public class BattlePresenter: IStartable
         
         var playerWon = _playerWins >= GameConstants.WINS_TO_VICTORY;
 
-        _uiPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
+        _battleUIPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
         
         // 敵がアルヴならチュートリアルを表示
         if (_currentEnemyData.EnemyId == "E001")
-            await _uiPresenter.StartTutorial("BattleResult");
+            await _battleUIPresenter.StartTutorial("BattleResult");
         
-        await _uiPresenter.WaitForBattleResultClose();
+        await _battleUIPresenter.WaitForBattleResultClose();
         
         // 人格ログ: チャプター完了
         _personalityLogService.CompleteChapter();
@@ -617,6 +641,6 @@ public class BattlePresenter: IStartable
             gameOverReason = "すべてのカードが崩壊しました";
 
         // ゲームオーバー画面を表示
-        _uiPresenter.ShowGameOverScreen(gameOverReason);
+        _battleUIPresenter.ShowGameOverScreen(gameOverReason);
     }
 }
