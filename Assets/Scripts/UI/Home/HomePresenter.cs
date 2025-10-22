@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using R3;
 using VContainer.Unity;
@@ -8,7 +9,7 @@ using Void2610.UnityTemplate;
 /// ホーム画面のPresenter
 /// ビジネスロジックとイベント処理を担当
 /// </summary>
-public class HomePresenter : IStartable
+public class HomePresenter : IStartable, IDisposable
 {
     private readonly HomeView _homeView;
     private readonly GameProgressService _gameProgressService;
@@ -147,5 +148,10 @@ public class HomePresenter : IStartable
     {
         var viewedCardIds = _gameProgressService.GetViewedCardIds();
         _homeView.ShowCardLibrary(_allCardData, viewedCardIds);
+    }
+    
+    public void Dispose()
+    {
+        _disposables.Dispose();
     }
 }
