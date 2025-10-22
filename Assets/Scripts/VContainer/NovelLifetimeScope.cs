@@ -18,8 +18,5 @@ public class NovelLifetimeScope : LifetimeScope
 
         builder.RegisterEntryPoint<NovelPresenter>().WithParameter(useLocalExcel).AsSelf().As<ISceneInitializable>();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
-
-        this.gameObject.AddComponent<SceneInitializationBridge>();
-        builder.RegisterComponentInHierarchy<SceneInitializationBridge>();
     }
 }

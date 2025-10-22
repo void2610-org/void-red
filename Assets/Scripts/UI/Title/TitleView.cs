@@ -38,6 +38,8 @@ public class TitleView : MonoBehaviour
     /// </summary>
     public void SetContinueButtonState(bool enabled)
     {
+        if (!this) return;
+        
         continueButton.interactable = enabled;
         continueButtonText.color = enabled ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
     }
