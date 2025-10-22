@@ -9,7 +9,7 @@ using VContainer.Unity;
 /// UIのビジネスロジックとイベント処理を担当するPresenterクラス
 /// VContainerで依存性注入される
 /// </summary>
-public class UIPresenter : IStartable, System.IDisposable
+public class BattleUIPresenter : IStartable, System.IDisposable
 {
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
@@ -176,7 +176,7 @@ public class UIPresenter : IStartable, System.IDisposable
             _cardDetailButtonView?.Hide();
     }
     
-    public UIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
+    public BattleUIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
     {
         _player = player;
         _enemy = enemy;

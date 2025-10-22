@@ -1,0 +1,99 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using R3;
+using Cysharp.Threading.Tasks;
+using TMPro;
+using Void2610.UnityTemplate;
+
+/// <summary>
+/// ホーム画面のView
+/// UI要素の参照とイベントの公開を担当
+/// </summary>
+public class HomeView : MonoBehaviour
+{
+    [Header("UIコンポーネント")]
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private Button titleButton;
+    [SerializeField] private Button deckButton;
+    [SerializeField] private Button libraryButton;
+    [SerializeField] private Button storyButton;
+    [SerializeField] private Button personButton;
+    [SerializeField] private Button dreamButton;
+    [SerializeField] private DeckView deckView;
+    [SerializeField] private CardLibraryView cardLibraryView;
+    [SerializeField] private CardDetailView cardDetailView;
+    [SerializeField] private TextMeshProUGUI speakingText;
+
+    // ボタンクリックイベントをObservableとして公開
+    public Observable<Unit> SettingsButtonClicked => settingsButton.OnClickAsObservable();
+    public Observable<Unit> TitleButtonClicked => titleButton.OnClickAsObservable();
+    public Observable<Unit> StoryButtonClicked => storyButton.OnClickAsObservable();
+    public Observable<Unit> DeckButtonClicked => deckButton.OnClickAsObservable();
+    public Observable<Unit> LibraryButtonClicked => libraryButton.OnClickAsObservable();
+
+    // カードクリックイベント
+    public Observable<CardData> DeckCardClicked => deckView.OnCardClicked;
+    public Observable<CardData> LibraryCardClicked => cardLibraryView.OnCardClicked;
+
+    /// <summary>
+    /// 初期化
+    /// </summary>
+    public void Initialize()
+    {
+        // 未実装のボタンを無効化
+        personButton.interactable = false;
+        dreamButton.interactable = false;
+
+        InitSpeaking().Forget();
+    }
+
+    /// <summary>
+    /// デッキデータを表示
+    /// </summary>
+    public void ShowDeckData(List<CardModel> cardModels)
+    {
+        deckView.Show(cardModels);
+    }
+
+    /// <summary>
+    /// カード図鑑を表示
+    /// </summary>
+    public void ShowCardLibrary(AllCardData allCardData, HashSet<string> viewedCardIds)
+    {
+        cardLibraryView.Show(allCardData, viewedCardIds);
+    }
+
+    /// <summary>
+    /// カード詳細を表示
+    /// </summary>
+    public void ShowCardDetail(CardData cardData)
+    {
+        cardDetailView.ShowCardDetail(cardData, false);
+    }
+
+    /// <summary>
+    /// Personボタンのinteractable設定
+    /// </summary>
+    public void SetPersonButtonInteractable(bool interactable)
+    {
+        personButton.interactable = interactable;
+    }
+
+    /// <summary>
+    /// Dreamボタンのinteractable設定
+    /// </summary>
+    public void SetDreamButtonInteractable(bool interactable)
+    {
+        dreamButton.interactable = interactable;
+    }
+
+    /// <summary>
+    /// セリフテキストの初期化
+    /// </summary>
+    private async UniTask InitSpeaking()
+    {
+        await UniTask.Delay(1000);
+        speakingText.TypewriterAnimation("...").Forget();
+    }
+}

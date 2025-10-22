@@ -1182,6 +1182,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7682182006361424895, guid: 4bcef9ab048c64ec1b0422b435240502, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8089064917827832581, guid: 4bcef9ab048c64ec1b0422b435240502, type: 3}
       propertyPath: m_Name
       value: DeckCardView

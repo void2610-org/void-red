@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 21796593}
   - component: {fileID: 21796592}
   m_Layer: 0
-  m_Name: TitleUIPresenter
+  m_Name: TitleView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 21796591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f15b55f48fc4349a89753582b2ad4e11, type: 3}
+  m_Script: {fileID: 11500000, guid: 131d364f311724e2bad7712da6ee2065, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   startButton: {fileID: 342615769}
