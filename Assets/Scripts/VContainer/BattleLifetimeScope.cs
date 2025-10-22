@@ -30,10 +30,6 @@ public class BattleLifetimeScope : LifetimeScope
 
         builder.RegisterEntryPoint<BattlePresenter>().AsSelf().As<ISceneInitializable>();
         builder.RegisterEntryPoint<BattleUIPresenter>().AsSelf();
-
-        this.gameObject.AddComponent<SceneInitializationBridge>();
-        builder.RegisterComponentInHierarchy<SceneInitializationBridge>();
-        
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
         builder.RegisterEntryPoint<MentalPowerEffectController>();
     }

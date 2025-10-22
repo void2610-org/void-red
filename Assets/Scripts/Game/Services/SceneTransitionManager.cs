@@ -133,13 +133,17 @@ public class SceneTransitionManager : IDisposable
     /// </summary>
     private async UniTask WaitForSceneReady()
     {
-        // SceneInitializationBridgeを検索
-        var bridge = UnityEngine.Object.FindAnyObjectByType<SceneInitializationBridge>();
-        if (bridge != null)
+        // 現在のシーンのLifetimeScopeからISceneInitializableを取得
+        var currentLifetimeScope = VContainer.Unity.LifetimeScope.Find<VContainer.Unity.LifetimeScope>();
+        if (currentLifetimeScope != null)
         {
-            Debug.Log("[SceneTransitionManager] シーン初期化完了を待機中...");
-            await bridge.WaitForInitializationAsync();
-            Debug.Log("[SceneTransitionManager] シーン初期化完了");
+            if (currentLifetimeScope.Container.TryResolve(typeof(ISceneInitializable), out var obj))
+            {
+                var initializable = (ISceneInitializable)obj;
+                Debug.Log("[SceneTransitionManager] シーン初期化完了を待機中...");
+                await initializable.WaitForInitializationAsync();
+                Debug.Log("[SceneTransitionManager] シーン初期化完了");
+            }
         }
     }
 
