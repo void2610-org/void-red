@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using R3;
 using VContainer.Unity;
@@ -8,7 +9,7 @@ using Void2610.UnityTemplate;
 /// タイトル画面のPresenter
 /// ビジネスロジックとイベント処理を担当
 /// </summary>
-public class TitlePresenter : IStartable
+public class TitlePresenter : IStartable, IDisposable
 {
     private readonly TitleView _titleView;
     private readonly SettingsPresenter _settingsPresenter;
@@ -144,5 +145,10 @@ public class TitlePresenter : IStartable
     private void OnReviewFormButtonClicked()
     {
         Application.OpenURL("https://docs.google.com/forms/d/e/1FAIpQLSfNMqCyXFzWijWAv__wTpDVRN6AtEfFXpdPxyFcIkMbiq2UKw/viewform");
+    }
+    
+    public void Dispose()
+    {
+        _disposables.Dispose();
     }
 }
