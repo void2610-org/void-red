@@ -1368,6 +1368,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 289993832176348528, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5052638610521521187, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
       propertyPath: m_Name
       value: ChoiceView
