@@ -69,8 +69,12 @@ public class GameProgressService
             case 2:
                 nextNode = new NovelNode("prologue2");
                 break;
+            // セリカ1 - 最初はノベル
+            case 3:
+                nextNode = new BattleNode("serika", false);
+                break;
+            // この先は未定
             default:
-                // この先は未定
                 nextNode = new NovelNode("ending");
                 break;
         }
