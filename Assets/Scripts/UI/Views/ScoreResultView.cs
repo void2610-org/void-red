@@ -13,7 +13,6 @@ using Void2610.UnityTemplate;
 public class ScoreResultView : MonoBehaviour
 {
     [Header("結果表示要素")]
-    [SerializeField] private Image gavelImage;
     [SerializeField] private TextMeshProUGUI resultText;
     [SerializeField] private Image textBackgroundImage;
     [SerializeField] private CanvasGroup textsCanvasGroup;
@@ -42,18 +41,14 @@ public class ScoreResultView : MonoBehaviour
     {
         await _canvasGroup.FadeIn(0.3f);
 
+        await UniTask.Delay(1000);
+
         // ガベルのアニメーション
         SeManager.Instance.PlaySe("Gavel");
-        await gavelImage.FadeIn(0.25f);
-        await UniTask.Delay(1000);
-        await gavelImage.FadeOut(0.25f);
-
-        await UniTask.Delay(1000);
 
         // テキストのアニメーション
         resultText.text = result;
         textBackgroundImage.color = isPlayerWin ? playerWinColor : enemyWinColor;
-
         // スコア表示
         scoreText.text = $"{playerScore:F1} vs {enemyScore:F1}";
 
@@ -116,7 +111,6 @@ public class ScoreResultView : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
         
-        gavelImage.color = new Color(1f, 1f, 1f, 0f);
         textsCanvasGroup.alpha = 0f;
     }
 }
