@@ -116,6 +116,8 @@ public class TutorialView : MonoBehaviour
         
         // フェードイン
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_DURATION);
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
         
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
@@ -135,11 +137,20 @@ public class TutorialView : MonoBehaviour
         
         // フェードアウト
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_DURATION);
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
         
         await _currentFadeHandle.ToUniTask();
         
         // 次回のために初期化
         _currentMaskSize = Vector2.zero;
+    }
+
+    private void Update()
+    {
+        if (!_canvasGroup.interactable) return;
+        
+        SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
     }
     
     private void Awake()
