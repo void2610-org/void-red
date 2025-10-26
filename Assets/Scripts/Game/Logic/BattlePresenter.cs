@@ -236,7 +236,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _battleUIPresenter.SetTheme(_currentTheme);
 
         // 会話シーケンスを表示してからカード選択へ
-        // await ShowThemeDialoguesAsync();
+        await ShowThemeDialoguesAsync();
         
         ChangeState(GameState.PlayerCardSelection).Forget();
     }
