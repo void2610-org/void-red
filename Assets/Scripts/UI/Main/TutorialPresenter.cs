@@ -42,6 +42,7 @@ public class TutorialPresenter : IDisposable
         _themeView.OnPointerEnter(null);
         await UniTask.Delay(2000);
         _themeView.OnPointerExit(null);
+        await UniTask.Delay(500);
         
         await StartTutorial("Battle1-2", true);
         
