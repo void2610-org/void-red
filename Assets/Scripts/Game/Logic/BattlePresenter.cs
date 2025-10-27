@@ -490,33 +490,32 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
         else
         {
-            // プレイヤーカードの進化処理（InstanceIdを保持）
+            // プレイヤーカードの進化処理
             var selectedCard = _player.SelectedCard.CurrentValue;
-            if (selectedCard != null)
-            {
-                // 進化チェック
-                var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(selectedCard.Data);
-                if (playerCardAfterEvolution != selectedCard.Data)
-                {
-                    // カードを進化後のデータで置換（InstanceIdは保持）
-                    _player.ReplaceCard(selectedCard, playerCardAfterEvolution);
-                    
-                    // 人格ログ: プレイヤーカード進化イベント記録
-                    _personalityLogService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
-                    await _battleUIPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
-                }
-                
-                // 共鳴チェック
-                if (_currentEnemyData && _currentEnemyData.ResonanceCard && selectedCard.Data == _currentEnemyData.ResonanceCard)
-                {
-                    // 人格ログ: 共鳴イベント記録
-                    _personalityLogService.LogResonance("Player", selectedCard.Data);
-                    await _battleUIPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
-                }
-                
-                // カードをプレイ（崩壊しない）
-                _player.PlaySelectedCard(false);
-            }
+            var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(selectedCard.Data);
+            
+            // FIXME: 現段階では進化機能は無効化
+            // 元のカードと異なる場合は進化が発生
+            // if (playerCardAfterEvolution != selectedCard.Data)
+            // {
+            //     _player.ReplaceCard(selectedCard, playerCardAfterEvolution);
+            //     
+            //     // 人格ログ: プレイヤーカード進化イベント記録
+            //     _personalityLogService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
+            //     await _battleUIPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
+            // }
+            
+            // FIXME: 現段階では共鳴機能も無効化
+            // 共鳴チェック
+            // if (_currentEnemyData && _currentEnemyData.ResonanceCard && selectedCard.Data == _currentEnemyData.ResonanceCard)
+            // {
+            //     // 人格ログ: 共鳴イベント記録
+            //     _personalityLogService.LogResonance("Player", selectedCard.Data);
+            //     await _battleUIPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
+            // }
+            
+            // カードをプレイ（崩壊しない）
+            _player.PlaySelectedCard(false);
         }
 
         if (_npcCollapse)
