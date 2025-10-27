@@ -164,10 +164,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         await UniTask.Delay(200);
         await _enemy.DrawCardsWithDelay(3, 300);
 
-        // 敵がアルヴならチュートリアルを表示
-        if (_currentEnemyData.EnemyId == "E001")
-            await _battleUIPresenter.StartBattleTutorial();
-
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement).Forget();
     }
@@ -234,6 +230,10 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _currentTheme = newTheme;
 
         _battleUIPresenter.SetTheme(_currentTheme);
+        
+        // 敵がアルヴならチュートリアルを表示
+        if (_currentEnemyData.EnemyId == "E001")
+            await _battleUIPresenter.StartBattleTutorial();
 
         // 会話シーケンスを表示してからカード選択へ
         await ShowThemeDialoguesAsync();
