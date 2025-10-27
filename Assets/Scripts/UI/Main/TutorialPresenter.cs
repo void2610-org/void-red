@@ -44,7 +44,7 @@ public class TutorialPresenter : IDisposable
         _themeView.OnPointerExit(null);
         await UniTask.Delay(500);
         
-        await StartTutorial("Battle1-2", true);
+        await StartTutorial("Battle2", true);
         
         // 手札の最初のカード（インデックス0）を自動選択
         await UniTask.Delay(500);
@@ -56,15 +56,15 @@ public class TutorialPresenter : IDisposable
         await UniTask.Delay(500);
 
         // Battle2を表示(簡易ウィンドウで表示)
-        await StartTutorial("Battle2");
+        await StartTutorial("Battle3");
 
         // カード詳細ウィンドウを閉じる
         _cardDetailView.Hide();
         await UniTask.Delay(500);
 
-        await StartTutorial("Battle3", true);
         await StartTutorial("Battle4", true);
         await StartTutorial("Battle5", true);
+        await StartTutorial("Battle6", true);
     }
     
     public async UniTask StartResultTutorial()
