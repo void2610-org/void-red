@@ -71,8 +71,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
     public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
-    public void ShowPlayButton() => _playButtonView.Show();
-    public void HidePlayButton() => _playButtonView.Hide();
+    public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
     public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
@@ -167,14 +166,12 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     /// <summary>
-    /// 詳細ボタンの表示状態を現在の選択状態に基づいて更新
+    /// 詳細ボタンの有効/無効を現在の選択状態に基づいて更新
     /// </summary>
     private void UpdateDetailButtonVisibility()
     {
-        if (_player.SelectedCard.CurrentValue != null)
-            _cardDetailButtonView?.Show();
-        else
-            _cardDetailButtonView?.Hide();
+        var hasSelectedCard = _player.SelectedCard.CurrentValue != null;
+        _cardDetailButtonView?.SetInteractable(hasSelectedCard);
     }
     
     public BattleUIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
