@@ -208,7 +208,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
-        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player, _cardDetailView);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
         _sceneTransitionManager = sceneTransitionManager;
 
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
