@@ -10,18 +10,18 @@ using Void2610.UnityTemplate;
 /// ISelectHandler/IDeselectHandlerを使用してSelectable選択状態に基づいてグロー画像を制御
 /// </summary>
 [RequireComponent(typeof(Selectable))]
-public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHandler
+public class HomeButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHandler
 {
     [SerializeField] private Image target;
-    [SerializeField] private Color selectedColor;
-    [SerializeField] private Color unselectedColor;
     [SerializeField] private float selectedScale;
+    [SerializeField] private Color selectedColor = Color.white;
+    [SerializeField] private Color unselectedColor = Color.white;
     
-    private MotionHandle _colorMotion;
     private MotionHandle _scaleMotion;
+    private MotionHandle _colorMotion;
     private float _defaultScale;
     
-    private const float DURATION = 0.3f;
+    private const float DURATION = 0.1f;
     private const Ease EASE = Ease.OutCubic;
 
     private void Awake()
@@ -37,11 +37,11 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     /// </summary>
     public void OnSelect(BaseEventData eventData)
     {
-        _colorMotion.TryCancel();
         _scaleMotion.TryCancel();
-
-        _colorMotion = target.ColorTo(selectedColor, DURATION, EASE, ignoreTimeScale: true);
+        _colorMotion.TryCancel();
+        
         _scaleMotion = target.rectTransform.ScaleTo(Vector3.one * _defaultScale * selectedScale, DURATION, EASE, ignoreTimeScale: true);
+        _colorMotion = target.ColorTo(selectedColor, DURATION, EASE, ignoreTimeScale: true);
     }
     
     /// <summary>
@@ -49,16 +49,16 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     /// </summary>
     public void OnDeselect(BaseEventData eventData)
     {
-        _colorMotion.TryCancel();
         _scaleMotion.TryCancel();
-
-        _colorMotion = target.ColorTo(unselectedColor, DURATION, EASE, ignoreTimeScale: true);
+        _colorMotion.TryCancel();
+        
         _scaleMotion = target.rectTransform.ScaleTo(Vector3.one * _defaultScale, DURATION, EASE, ignoreTimeScale: true);
+        _colorMotion = target.ColorTo(unselectedColor, DURATION, EASE, ignoreTimeScale: true);
     }
     
     private void OnDestroy()
     {
-        _colorMotion.TryCancel();
         _scaleMotion.TryCancel();
+        _colorMotion.TryCancel();
     }
 }

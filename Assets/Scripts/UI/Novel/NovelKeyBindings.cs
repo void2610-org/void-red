@@ -16,21 +16,21 @@ public static class NovelKeyBindings
     {
         var dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
 
-        // オートモードをトグル（clickAreaButton選択時のみ）
+        // オートモードをトグル
         inputActionsProvider.Novel.Auto.OnPerformedAsObservable()
-            .Where(_ => dialogView.IsClickAreaButtonSelected)
+            .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ => dialogView.ToggleAutoMode())
             .AddTo(disposables);
 
-        // スキップ（clickAreaButton選択時のみ）
+        // スキップ
         inputActionsProvider.Novel.Skip.OnPerformedAsObservable()
-            .Where(_ => dialogView.IsClickAreaButtonSelected)
+            .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ => novelPresenter.RequestSkipAllDialogs())
             .AddTo(disposables);
 
-        // ダイアログを進める（clickAreaButton選択時のみ）
+        // ダイアログを進める
         inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
-            .Where(_ => dialogView.IsClickAreaButtonSelected)
+            .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ => dialogView.OnClick())
             .AddTo(disposables);
     }

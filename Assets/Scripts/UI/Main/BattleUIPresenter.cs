@@ -59,7 +59,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _battlePresenter = battlePresenter;
         // BattlePresenterが設定されたらキーバインドをセットアップ
-        BattleKeyBindings.Setup(_inputActionsProvider, this, _battlePresenter.CurrentGameState, _battleRootView, _disposables);
+        BattleKeyBindings.Setup(_inputActionsProvider, this, _battlePresenter.CurrentGameState, _disposables);
     }
 
     public void SetTheme(ThemeData theme)

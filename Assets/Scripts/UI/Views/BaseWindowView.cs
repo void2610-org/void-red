@@ -27,6 +27,11 @@ public abstract class BaseWindowView : MonoBehaviour
     private static readonly List<BaseWindowView> _activeWindows = new();
 
     /// <summary>
+    /// アクティブなウィンドウが存在するか
+    /// </summary>
+    public static bool HasActiveWindows => _activeWindows.Count > 0;
+
+    /// <summary>
     /// ウィンドウの表示状態
     /// </summary>
     public bool IsShowing => _canvasGroup.interactable;
