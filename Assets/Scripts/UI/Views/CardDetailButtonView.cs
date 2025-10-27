@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
+using TMPro;
 
 /// <summary>
 /// カード詳細ボタン管理を担当するViewクラス
@@ -15,7 +16,12 @@ public class CardDetailButtonView : MonoBehaviour
     /// <summary>
     /// ボタンの有効/無効を設定
     /// </summary>
-    public void SetInteractable(bool interactable) => detailButton.interactable = interactable;
+    public void SetInteractable(bool interactable)
+    {
+        detailButton.interactable = interactable;
+        var c = interactable ? detailButton.colors.normalColor : detailButton.colors.disabledColor;
+        detailButton.GetComponentInChildren<TextMeshProUGUI>().color = c;
+    }
 
     private void Awake()
     {
