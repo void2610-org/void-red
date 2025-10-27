@@ -103,7 +103,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask WaitForBattleResultClose() => await _battleResultView.WaitForUntilClose();
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
-    public async UniTask StartTutorial(string tutorialId) => await _tutorialPresenter.StartTutorial(tutorialId);
+    public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
+    public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
     
     /// <summary>
     /// 選択されたカードの詳細を表示（InputSystem用の公開メソッド）
@@ -210,7 +211,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
-        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player, _cardDetailView);
         _sceneTransitionManager = sceneTransitionManager;
 
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
