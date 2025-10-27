@@ -13,11 +13,9 @@ public class CardDetailView : BaseWindowView
     [Header("UIコンポーネント")]
     [SerializeField] private Button playButton;
     [SerializeField] private DeckCardView cardView;
-    [SerializeField] private TextMeshProUGUI attributeText;
-    [SerializeField] private TextMeshProUGUI scoreMultiplierText;
-    [SerializeField] private TextMeshProUGUI collapseThresholdText;
     [SerializeField] private TextMeshProUGUI keywordsText;
-    [SerializeField] private TextMeshProUGUI evolutionInfoText;
+    [SerializeField] private TextMeshProUGUI attributeText;
+    [SerializeField] private TextMeshProUGUI collapseThresholdText;
     
     public Observable<Unit> PlayButtonClicked => playButton.OnClickAsObservable();
 
@@ -45,16 +43,12 @@ public class CardDetailView : BaseWindowView
         var cardModel = new CardModel(cardData);
         cardView.Initialize(cardModel);
         
-        // 詳細情報を更新
-        attributeText.text = $"属性: {cardData.Attribute.ToJapaneseName()}";
-        scoreMultiplierText.text = $"スコア倍率: {cardData.ScoreMultiplier:F1}x";
-        collapseThresholdText.text = $"崩壊閾値: {cardData.CollapseThreshold}";
-
         // キーワード情報
         UpdateKeywordsInfo(cardData);
-
-        // 進化情報
-        UpdateEvolutionInfo(cardData);
+        
+        // 詳細情報を更新
+        attributeText.text = $"属性: {cardData.Attribute.ToJapaneseName()}";
+        collapseThresholdText.text = $"崩壊閾値: {cardData.CollapseThreshold}";
     }
     
     /// <summary>
@@ -75,31 +69,5 @@ public class CardDetailView : BaseWindowView
             .Select(k => k.GetJapaneseName());
 
         keywordsText.text = $"キーワード: {string.Join(", ", keywordNames)}";
-    }
-
-    /// <summary>
-    /// 進化情報を更新
-    /// </summary>
-    /// <param name="cardData">カードデータ</param>
-    private void UpdateEvolutionInfo(CardData cardData)
-    {
-        var evolutionInfo = "";
-        
-        if (cardData.CanEvolve)
-        {
-            evolutionInfo += $"進化先: {cardData.EvolutionTarget?.CardName}\n";
-        }
-        
-        if (cardData.CanDegrade)
-        {
-            evolutionInfo += $"劣化先: {cardData.DegradationTarget?.CardName}\n";
-        }
-        
-        if (string.IsNullOrEmpty(evolutionInfo))
-        {
-            evolutionInfo = "進化・劣化なし";
-        }
-        
-        evolutionInfoText.text = evolutionInfo.TrimEnd('\n');
     }
 }

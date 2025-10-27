@@ -15,9 +15,8 @@ public static class TutorialKeyBindings
         TutorialView tutorialView,
         CompositeDisposable disposables)
     {
-        // チュートリアルを進める（clickAreaButton選択時のみ）
-        inputActionsProvider.UI.Submit.OnPerformedAsObservable()
-            // .Where(_ => tutorialView.IsClickAreaButtonSelected)
+        // チュートリアルを進める
+        inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
             .Subscribe(_ => tutorialView.NotifyAdvance())
             .AddTo(disposables);
     }

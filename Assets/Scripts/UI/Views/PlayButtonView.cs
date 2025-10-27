@@ -10,16 +10,19 @@ public class PlayButtonView : MonoBehaviour
     [SerializeField] private Button playButton;
 
     public Observable<Unit> PlayButtonClicked => playButton.OnClickAsObservable();
-    public void Show() => playButton.gameObject.SetActive(true);
-    public void Hide() => playButton.gameObject.SetActive(false);
+
+    /// <summary>
+    /// ボタンの有効/無効を設定
+    /// </summary>
+    public void SetInteractable(bool interactable) => playButton.interactable = interactable;
 
     /// <summary>
     /// ボタンクリックをシミュレート（InputSystemアクション用）
     /// </summary>
     public void SimulateClick() => playButton.onClick.Invoke();
-    
+
     private void Awake()
     {
-        Hide(); // 初期状態では非表示
+        SetInteractable(false); // 初期状態では無効
     }
 }

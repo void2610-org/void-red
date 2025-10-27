@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardId: CARD_005B
   cardName: "\u58F0\u306A\u304D\u5951\u7D04"
-  attribute: 3
+  attribute: 4
   image: {fileID: 0}
   scoreMultiplier: 1
   collapseThreshold: 3

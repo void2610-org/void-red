@@ -11,13 +11,14 @@ public class CardDetailButtonView : MonoBehaviour
     [SerializeField] private Button detailButton;
 
     public Observable<Unit> DetailButtonClicked => detailButton.OnClickAsObservable();
-    public void Show() => detailButton.gameObject.SetActive(true);
-    public void Hide() => detailButton.gameObject.SetActive(false);
-    
+
+    /// <summary>
+    /// ボタンの有効/無効を設定
+    /// </summary>
+    public void SetInteractable(bool interactable) => detailButton.interactable = interactable;
+
     private void Awake()
     {
-        Hide(); // 初期状態では非表示
+        SetInteractable(false); // 初期状態では無効
     }
-    
-    // OnDestroy is no longer needed since there are no listeners or subjects to clean up
 }

@@ -101,9 +101,9 @@ public static class PlayStyleExtensions
     {
         return playStyle switch
         {
-            PlayStyle.Hesitation => opponent == PlayStyle.Conviction,  // 迷い は 確信 に勝つ
-            PlayStyle.Conviction => opponent == PlayStyle.Impulse,      // 確信 は 衝動 に勝つ
-            PlayStyle.Impulse => opponent == PlayStyle.Hesitation,      // 衝動 は 迷い に勝つ
+            PlayStyle.Conviction => opponent == PlayStyle.Hesitation,    // 確信 は 迷い に勝つ
+            PlayStyle.Hesitation => opponent == PlayStyle.Impulse, // 迷い は 衝動 に勝つ
+            PlayStyle.Impulse => opponent == PlayStyle.Conviction,  // 衝動 は 確信 に勝つ
             _ => false
         };
     }

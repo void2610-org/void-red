@@ -71,8 +71,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
     public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
-    public void ShowPlayButton() => _playButtonView.Show();
-    public void HidePlayButton() => _playButtonView.Hide();
+    public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
     public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
@@ -103,7 +102,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask WaitForBattleResultClose() => await _battleResultView.WaitForUntilClose();
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
-    public async UniTask StartTutorial(string tutorialId) => await _tutorialPresenter.StartTutorial(tutorialId);
+    public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
+    public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
     
     /// <summary>
     /// 選択されたカードの詳細を表示（InputSystem用の公開メソッド）
@@ -166,14 +166,12 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     /// <summary>
-    /// 詳細ボタンの表示状態を現在の選択状態に基づいて更新
+    /// 詳細ボタンの有効/無効を現在の選択状態に基づいて更新
     /// </summary>
     private void UpdateDetailButtonVisibility()
     {
-        if (_player.SelectedCard.CurrentValue != null)
-            _cardDetailButtonView?.Show();
-        else
-            _cardDetailButtonView?.Hide();
+        var hasSelectedCard = _player.SelectedCard.CurrentValue != null;
+        _cardDetailButtonView?.SetInteractable(hasSelectedCard);
     }
     
     public BattleUIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
@@ -210,7 +208,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
-        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
         _sceneTransitionManager = sceneTransitionManager;
 
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
