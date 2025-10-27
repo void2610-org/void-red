@@ -372,12 +372,8 @@ PrefabInstance:
       value: "\u30DB\u30FC\u30E0"
       objectReference: {fileID: 0}
     - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
-      propertyPath: m_fontSize
-      value: 35
-      objectReference: {fileID: 0}
-    - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_fontSizeBase
-      value: 35
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_Navigation.m_Mode
@@ -517,12 +513,8 @@ PrefabInstance:
       value: "\u518D\u958B"
       objectReference: {fileID: 0}
     - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
-      propertyPath: m_fontSize
-      value: 35
-      objectReference: {fileID: 0}
-    - target: {fileID: 1376291353251977134, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_fontSizeBase
-      value: 35
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_Navigation.m_Mode
