@@ -24,7 +24,7 @@ public static class BattleKeyBindings
         // 人格ログを開く
         inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ => personalityLogView.Show())
             .AddTo(disposables);
 
@@ -66,14 +66,14 @@ public static class BattleKeyBindings
         // カードをプレイ
         inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ => battleUIPresenter.TryPlayCard())
             .AddTo(disposables);
 
         // カードナビゲーション
         inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ =>
             {
                 var direction = inputActionsProvider.UI.Navigate.ReadValue<UnityEngine.Vector2>();
