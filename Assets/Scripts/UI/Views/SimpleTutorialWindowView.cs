@@ -13,12 +13,13 @@ public class SimpleTutorialWindowView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI tutorialText;
     [SerializeField] private Image backgroundImage;
-    
+
     private const float FADE_DURATION = 0.3f;
-    
+
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentNarrationCts;
     private CancellationTokenSource _dialogSeCancellationTokenSource;
+    private bool _isTyping;
 
     /// <summary>
     /// ナレーションを表示
@@ -31,13 +32,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
         
         // 新しいキャンセレーショントークンを作成
         _currentNarrationCts = new CancellationTokenSource();
-        
-        // アプリケーション終了時にもキャンセルされるようにする  
-        var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
-            _currentNarrationCts.Token,
-            this.GetCancellationTokenOnDestroy(), 
-            Application.exitCancellationToken
-        ).Token;
+        var cancellationToken = _currentNarrationCts.Token;
         
         _canvasGroup.alpha = 1f;
         
@@ -59,7 +54,9 @@ public class SimpleTutorialWindowView : MonoBehaviour
             SeManager.Instance.PlaySeLoop("Dialog", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
 
             // 1文字ずつ表示するアニメーション
+            _isTyping = true;
             await tutorialText.TypewriterAnimation(message, cancellationToken: cancellationToken);
+            _isTyping = false;
 
             // dialogSeループを停止
             _dialogSeCancellationTokenSource?.Cancel();
@@ -80,6 +77,24 @@ public class SimpleTutorialWindowView : MonoBehaviour
         catch (System.OperationCanceledException) { }
     }
     
+    /// <summary>
+    /// タイピングアニメーションをスキップ
+    /// </summary>
+    public void SkipTyping()
+    {
+        if (!_isTyping) return;
+
+        // タイピングアニメーションをキャンセル
+        _currentNarrationCts?.Cancel();
+
+        // ダイアログSEを停止
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = null;
+
+        _isTyping = false;
+    }
+
     /// <summary>
     /// ナレーションを非表示にする
     /// </summary>
