@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
+using TMPro;
 
 /// <summary>
 /// プレイボタン管理を担当するViewクラス
@@ -14,7 +15,12 @@ public class PlayButtonView : MonoBehaviour
     /// <summary>
     /// ボタンの有効/無効を設定
     /// </summary>
-    public void SetInteractable(bool interactable) => playButton.interactable = interactable;
+    public void SetInteractable(bool interactable)
+    {
+        playButton.interactable = interactable;
+        var c = interactable ? playButton.colors.normalColor : playButton.colors.disabledColor;
+        playButton.GetComponentInChildren<TextMeshProUGUI>().color = c;
+    }
 
     /// <summary>
     /// ボタンクリックをシミュレート（InputSystemアクション用）
