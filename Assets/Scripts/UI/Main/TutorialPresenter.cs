@@ -15,17 +15,19 @@ public class TutorialPresenter : IDisposable
     private readonly CompositeDisposable _disposables = new();
     private readonly Player _player;
     private readonly CardDetailView _cardDetailView;
+    private readonly ThemeView _themeView;
     private readonly SimpleTutorialWindowView _simpleTutorialWindowView;
 
-    public TutorialPresenter(AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider, Player player, CardDetailView cardDetailView)
+    public TutorialPresenter(AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider, Player player)
     {
         _allTutorialData = allTutorialData;
         _inputActionsProvider = inputActionsProvider;
         _player = player;
-        _cardDetailView = cardDetailView;
         _allTutorialData.RegisterAllTutorials();
+        _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _tutorialView = UnityEngine.Object.FindFirstObjectByType<TutorialView>();
         _simpleTutorialWindowView = UnityEngine.Object.FindFirstObjectByType<SimpleTutorialWindowView>();
+        _themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
     }
 
     /// <summary>
@@ -34,8 +36,14 @@ public class TutorialPresenter : IDisposable
     /// </summary>
     public async UniTask StartBattleTutorial()
     {
-        // Battle1を表示
         await StartTutorial("Battle1", true);
+        
+        // テーマのキーワード表示
+        _themeView.OnPointerEnter(null);
+        await UniTask.Delay(2000);
+        _themeView.OnPointerExit(null);
+        
+        await StartTutorial("Battle1-2", true);
         
         // 手札の最初のカード（インデックス0）を自動選択
         await UniTask.Delay(500);
