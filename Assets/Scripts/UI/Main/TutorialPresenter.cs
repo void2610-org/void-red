@@ -15,6 +15,7 @@ public class TutorialPresenter : IDisposable
     private readonly CompositeDisposable _disposables = new();
     private readonly Player _player;
     private readonly CardDetailView _cardDetailView;
+    private readonly SimpleTutorialWindowView _simpleTutorialWindowView;
 
     public TutorialPresenter(AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider, Player player, CardDetailView cardDetailView)
     {
@@ -24,6 +25,7 @@ public class TutorialPresenter : IDisposable
         _cardDetailView = cardDetailView;
         _allTutorialData.RegisterAllTutorials();
         _tutorialView = UnityEngine.Object.FindFirstObjectByType<TutorialView>();
+        _simpleTutorialWindowView = UnityEngine.Object.FindFirstObjectByType<SimpleTutorialWindowView>();
     }
 
     /// <summary>
@@ -39,7 +41,7 @@ public class TutorialPresenter : IDisposable
 
         // 手札の最初のカード（インデックス0）を自動選択
         _player.SelectCardAt(0);
-        await UniTask.Delay(500);
+        await UniTask.Delay(1000);
 
         // カード詳細ウィンドウを開く
         _cardDetailView.ShowCardDetail(_player.SelectedCard.CurrentValue.Data, true);
@@ -83,6 +85,12 @@ public class TutorialPresenter : IDisposable
         {
             var step = tutorialData.GetStep(i);
             await _tutorialView.ShowStepAndWaitForClick(step, isBattleTutorial);
+        }
+
+        if (!isBattleTutorial)
+        {
+            // SimpleTutorialWindowViewを明示的に閉じる
+            await _simpleTutorialWindowView.HideNarration();
         }
 
         await _tutorialView.Hide();
