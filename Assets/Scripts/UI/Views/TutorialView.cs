@@ -39,6 +39,7 @@ public class TutorialView : MonoBehaviour
         {
             playerNarrationView.SkipTyping();
             enemyNarrationView.SkipTyping();
+            simpleTutorialWindow.SkipTyping();
             return;
         }
         _onClickAdvance.OnNext(Unit.Default);
@@ -93,10 +94,12 @@ public class TutorialView : MonoBehaviour
         if (!isBattleTutorial)
         {
             // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
+            _isTyping = true;
             await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
+            _isTyping = false;
             return;
         }
-        
+
         var narrationView = isPlayerDialog ? playerNarrationView : enemyNarrationView;
         var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
         disableView.HideNarration().Forget();
