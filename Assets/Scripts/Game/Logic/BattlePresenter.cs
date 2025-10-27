@@ -163,11 +163,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _player.DrawCardsWithDelay(3, 300).Forget();
         await UniTask.Delay(200);
         await _enemy.DrawCardsWithDelay(3, 300);
-        
-        // 敵がアルヴならチュートリアルを表示
-        if (_currentEnemyData.EnemyId == "E001")
-            await _battleUIPresenter.StartTutorial("Battle");
-        
+
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement).Forget();
     }
@@ -234,9 +230,13 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _currentTheme = newTheme;
 
         _battleUIPresenter.SetTheme(_currentTheme);
+        
+        // 敵がアルヴならチュートリアルを表示
+        if (_currentEnemyData.EnemyId == "E001")
+            await _battleUIPresenter.StartBattleTutorial();
 
         // 会話シーケンスを表示してからカード選択へ
-        // await ShowThemeDialoguesAsync();
+        await ShowThemeDialoguesAsync();
         
         ChangeState(GameState.PlayerCardSelection).Forget();
     }
@@ -279,11 +279,11 @@ public class BattlePresenter: IStartable, ISceneInitializable
             
             var selectedCard = _player.SelectedCard.CurrentValue;
             if (selectedCard == null) continue;
-            // カードが選択されたらプレイボタンを表示
-            _battleUIPresenter.ShowPlayButton();
+            // カードが選択されたらプレイボタンを有効化
+            _battleUIPresenter.SetPlayButtonInteractable(true);
             break;
         }
-        
+
         // プレイボタンが押されるのを待つ
         try
         {
@@ -294,8 +294,8 @@ public class BattlePresenter: IStartable, ISceneInitializable
             // PlayButtonが破棄された場合は処理を中断
             return;
         }
-        
-        _battleUIPresenter.HidePlayButton();
+
+        _battleUIPresenter.SetPlayButtonInteractable(false);
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
         if (finalSelectedCard == null) return;
@@ -595,7 +595,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         
         // 敵がアルヴならチュートリアルを表示
         if (_currentEnemyData.EnemyId == "E001")
-            await _battleUIPresenter.StartTutorial("BattleResult");
+            await _battleUIPresenter.StartResultTutorial();
         
         await _battleUIPresenter.WaitForBattleResultClose();
         

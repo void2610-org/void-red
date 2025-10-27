@@ -62,15 +62,7 @@ public static class ScoreCalculator
     private static float GetKeywordMatchBonus(CardData card, ThemeData theme)
     {
         var matchCount = GetKeywordMatchCount(card, theme);
-
-        return matchCount switch
-        {
-            0 => 1.0f,   // ボーナスなし
-            1 => 1.1f,   // +10%
-            2 => 1.25f,  // +25%
-            3 => 1.5f,   // +50%
-            _ => 1.5f + (matchCount - 3) * 0.2f // 4つ以上: +50% + 追加20%/キーワード
-        };
+        return 1 + (matchCount * 0.1f);
     }
 
     public static float CalculateScoreWithoutEnemy(PlayerMove playerMove, ThemeData theme)

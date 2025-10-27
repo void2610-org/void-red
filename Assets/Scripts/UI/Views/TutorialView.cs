@@ -39,6 +39,7 @@ public class TutorialView : MonoBehaviour
         {
             playerNarrationView.SkipTyping();
             enemyNarrationView.SkipTyping();
+            simpleTutorialWindow.SkipTyping();
             return;
         }
         _onClickAdvance.OnNext(Unit.Default);
@@ -93,10 +94,12 @@ public class TutorialView : MonoBehaviour
         if (!isBattleTutorial)
         {
             // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
+            _isTyping = true;
             await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
+            _isTyping = false;
             return;
         }
-        
+
         var narrationView = isPlayerDialog ? playerNarrationView : enemyNarrationView;
         var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
         disableView.HideNarration().Forget();
@@ -116,6 +119,8 @@ public class TutorialView : MonoBehaviour
         
         // フェードイン
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_DURATION);
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
         
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
@@ -135,11 +140,20 @@ public class TutorialView : MonoBehaviour
         
         // フェードアウト
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_DURATION);
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
         
         await _currentFadeHandle.ToUniTask();
         
         // 次回のために初期化
         _currentMaskSize = Vector2.zero;
+    }
+
+    private void Update()
+    {
+        if (!_canvasGroup.interactable) return;
+        
+        SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
     }
     
     private void Awake()

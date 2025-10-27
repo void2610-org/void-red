@@ -31,35 +31,35 @@ public static class BattleKeyBindings
         // テーマのキーワードをトグル表示
         inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ => themeView.ToggleKeywords())
             .AddTo(disposables);
 
         // プレイスタイルを切り替え
         inputActionsProvider.Battle.ChangePlayStyle.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ => playStyleView.RotateWheel())
             .AddTo(disposables);
 
         // 精神ベットを減らす
         inputActionsProvider.Battle.MinusMentalBet.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ => battleUIPresenter.DecrementMentalBet())
             .AddTo(disposables);
 
         // 精神ベットを増やす
         inputActionsProvider.Battle.PlusMentalBet.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ => battleUIPresenter.IncrementMentalBet())
             .AddTo(disposables);
 
         // カード詳細を表示
         inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => battleRootView.IsRootSelected)
+            // .Where(_ => battleRootView.IsRootSelected)
             .Subscribe(_ => battleUIPresenter.ShowSelectedCardDetail())
             .AddTo(disposables);
 
