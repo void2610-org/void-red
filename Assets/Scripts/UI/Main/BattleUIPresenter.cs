@@ -38,6 +38,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly BlackOverlayView _blackOverlayView;
     private readonly CardDetailButtonView _cardDetailButtonView;
     private readonly CardDetailView _cardDetailView;
+    private readonly ThemeDetailView _themeDetailView;
     private readonly BattleResultView _battleResultView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Impulse;
     private int _mentalBetValue = 1;
@@ -68,6 +69,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _themeView.DisplayThemeWithKeywords(theme);
     }
     
+    public void ShowThemeDetail() => _themeDetailView.ShowThemeDetail(_currentTheme);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
     public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
@@ -207,6 +209,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
         _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
+        _themeDetailView = UnityEngine.Object.FindFirstObjectByType<ThemeDetailView>();
         _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
         _sceneTransitionManager = sceneTransitionManager;
