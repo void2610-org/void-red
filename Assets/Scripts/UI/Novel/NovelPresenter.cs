@@ -23,6 +23,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     private DialogView _dialogView;
     private ItemGetEffectView _itemGetEffectView;
     private ChoiceView _choiceView;
+    private CardChoiceView _cardChoiceView;
     private NovelSeManager _novelSeManager;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
@@ -81,6 +82,10 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         _dialogView = Object.FindAnyObjectByType<DialogView>();
         _itemGetEffectView = Object.FindAnyObjectByType<ItemGetEffectView>();
         _choiceView = Object.FindAnyObjectByType<ChoiceView>();
+        _dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
+        _itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
+        _choiceView = UnityEngine.Object.FindAnyObjectByType<ChoiceView>();
+        _cardChoiceView = UnityEngine.Object.FindAnyObjectByType<CardChoiceView>();
 
         // キーバインドを初期化
         NovelKeyBindings.Setup(_inputActionsProvider, this, _disposables);
@@ -158,6 +163,12 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             if (currentDialog.HasChoice)
             {
                 await ShowChoiceEffect(currentDialog);
+            }
+            
+            // カード風選択肢表示がある場合は実行
+            if (currentDialog.HasCardChoice)
+            {
+                await ShowCardChoiceEffect(currentDialog);
             }
             
             // カード獲得演出がある場合は実行
@@ -255,6 +266,35 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         
         // 選択結果をログ出力
         Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
+    }
+    
+    /// <summary>
+    /// カード風選択肢表示を実行
+    /// </summary>
+    private async UniTask ShowCardChoiceEffect(DialogData dialogData)
+    {
+        var cardChoiceData = dialogData.CardChoiceData;
+        
+        _dialogView.SetInteractable(false);
+        
+        // カード画像を読み込み
+        var cardImage1 = await _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName1);
+        var cardImage2 = await _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName2);
+        
+        // カード風選択肢を表示して結果を取得
+        var selectedIndex = await _cardChoiceView.ShowCardChoice(cardChoiceData, cardImage1, cardImage2);
+        
+        // 選択結果をGameProgressServiceに記録
+        var novelRes = new NovelChoiceResult(_currentScenarioId, _choiceCounter, selectedIndex);
+        _gameProgressService.RecordNovelChoiceAndSave(novelRes);
+        
+        // 選択肢番号をインクリメント
+        _choiceCounter++;
+        
+        // 選択結果をログ出力
+        Debug.Log($"[NovelPresenter] ユーザーが選択したカード選択肢: {selectedIndex} - {cardChoiceData.GetOption(selectedIndex)}");
+        
+        _dialogView.SetInteractable(true);
     }
     
     /// <summary>
