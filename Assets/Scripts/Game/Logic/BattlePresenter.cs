@@ -244,7 +244,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
             _currentTheme = newTheme;
         }
 
-        _battleUIPresenter.SetTheme(_currentTheme);
+        await _battleUIPresenter.SetTheme(_currentTheme);
 
         // 初回ターン かつ 敵がアルヴならチュートリアルを表示
         // if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "E001")
