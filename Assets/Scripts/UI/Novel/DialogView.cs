@@ -15,6 +15,7 @@ using R3;
 public class DialogView : MonoBehaviour
 {
     [Header("UI要素")]
+    [SerializeField] private GameObject dialogTextPanel;
     [SerializeField] private TextMeshProUGUI speakerNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
@@ -393,6 +394,26 @@ public class DialogView : MonoBehaviour
             var localPos = indicatorRectTransform.parent.GetComponent<RectTransform>().InverseTransformPoint(worldPos);
             indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
         }
+    }
+    
+    /// <summary>
+    /// DialogViewの操作可能状態を設定（アイテム取得演出中の制御用）
+    /// </summary>
+    /// <param name="interactable">操作可能かどうか</param>
+    public void SetInteractable(bool interactable)
+    {
+        if (!this) return;
+        clickAreaButton.interactable = interactable;
+    }
+    
+    /// <summary>
+    /// ダイアログパネルと立ち絵を表示/非表示（Backは残す）
+    /// </summary>
+    public void SetDialogPanelVisible(bool visible)
+    {
+        dialogTextPanel.SetActive(visible);
+        characterImage.gameObject.SetActive(visible);
+        nextIndicator.SetActive(visible);
     }
     
     /// <summary>
