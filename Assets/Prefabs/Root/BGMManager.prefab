@@ -51,10 +51,14 @@ MonoBehaviour:
     volume: 0.15
     bgmType: 0
   - name: Scenario
-    audioClip: {fileID: 8300000, guid: 405fecb88521b497ca9edabbdc3ec0cd, type: 3}
+    audioClip: {fileID: 8300000, guid: 5fb64eacf247243ac91f4c2ba363eb62, type: 3}
     volume: 0.3
     bgmType: 2
   - name: Battle
     audioClip: {fileID: 8300000, guid: 5c51d0e3a6eaf448eb6b7494181295c3, type: 3}
     volume: 0.3
     bgmType: 3
+  - name: Home
+    audioClip: {fileID: 8300000, guid: 53f2983d39624484590ff583ac6c5c63, type: 3}
+    volume: 0.3
+    bgmType: 1

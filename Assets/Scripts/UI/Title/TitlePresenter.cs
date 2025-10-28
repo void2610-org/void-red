@@ -75,7 +75,7 @@ public class TitlePresenter : IStartable, IDisposable
             .AddTo(_disposables);
 
         // タイトルBGMを再生
-        BgmManager.Instance.PlayRandomBGM(BgmType.Title);
+        BgmManager.Instance.PlayBGMBySceneType(BgmType.Title);
 
         // Steam実績解除
         _steamService.UnlockAchievement(SteamAchieveType.FIRST_BOOT);
