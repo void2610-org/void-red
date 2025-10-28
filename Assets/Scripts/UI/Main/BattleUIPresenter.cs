@@ -69,7 +69,12 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _themeView.DisplayThemeWithKeywords(theme);
     }
     
-    public void ShowThemeDetail() => _themeDetailView.ShowThemeDetail(_currentTheme);
+    public async UniTask ShowThemeDetailAndWait()
+    {
+        _themeDetailView.ShowThemeDetail(_currentTheme);
+        await _themeDetailView.WaitForClose();
+    }
+
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
     public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);

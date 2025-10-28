@@ -16,6 +16,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private readonly PersonalityLogService _personalityLogService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
+    private readonly AllThemeData _allThemeData;
     private readonly DiscordService _discordService;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
@@ -51,6 +52,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         PersonalityLogService personalityLogService,
         SceneTransitionManager sceneTransitionManager,
         AllEnemyData allEnemyData,
+        AllThemeData allThemeData,
         DiscordService discordService)
     {
         _battleUIPresenter = battleUIPresenter;
@@ -61,6 +63,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _personalityLogService = personalityLogService;
         _sceneTransitionManager = sceneTransitionManager;
         _allEnemyData = allEnemyData;
+        _allThemeData = allThemeData;
         _discordService = discordService;
 
         // 崩壊フラグを初期化
@@ -228,12 +231,18 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
 
         _currentTheme = newTheme;
+        // 敵がアルヴならチュートリアル用のテーマに上書き
+        if (_currentEnemyData.EnemyId == "E001")
+            _currentTheme = _allThemeData.ThemeList.Find(theme => theme.name == "THEME_00");
 
         _battleUIPresenter.SetTheme(_currentTheme);
-        
+
         // 敵がアルヴならチュートリアルを表示
-        if (_currentEnemyData.EnemyId == "E001")
-            await _battleUIPresenter.StartBattleTutorial();
+        // if (_currentEnemyData.EnemyId == "E001")
+            // await _battleUIPresenter.StartBattleTutorial();
+
+        // テーマ詳細を表示して閉じられるまで待機
+        await _battleUIPresenter.ShowThemeDetailAndWait();
 
         // 会話シーケンスを表示してからカード選択へ
         await ShowThemeDialoguesAsync();
