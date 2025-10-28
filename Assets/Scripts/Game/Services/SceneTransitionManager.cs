@@ -97,7 +97,6 @@ public class SceneTransitionManager : IDisposable
             // 念の為timeScaleを1に戻す
             Time.timeScale = 1;
             
-            BgmManager.Instance.Stop().Forget();
             await FadeIn(fadeDuration);
             
             // シーンをロード
