@@ -30,6 +30,8 @@ namespace Void2610.UnityTemplate
         private bool _isFading;
         private SoundData _currentBGM;
         private MotionHandle _fadeHandle;
+        private MotionHandle _duckingHandle;
+        private float _originalVolume = 1.0f;
 
         public float BgmVolume
         {
@@ -53,7 +55,7 @@ namespace Void2610.UnityTemplate
             _isPlaying = true;
             _audioSource.Play();
             
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+            _fadeHandle.TryCancel();
             _fadeHandle = LMotion.Create(_audioSource.volume, _currentBGM.volume, FADE_TIME)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
@@ -68,7 +70,7 @@ namespace Void2610.UnityTemplate
         
         private async UniTaskVoid PauseInternal()
         {
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+            _fadeHandle.TryCancel();
             await LMotion.Create(_audioSource.volume, 0f, FADE_TIME)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
@@ -80,15 +82,48 @@ namespace Void2610.UnityTemplate
         public async UniTask Stop()
         {
             _isPlaying = false;
-            
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+
+            _fadeHandle.TryCancel();
             await LMotion.Create(_audioSource.volume, 0f, FADE_TIME)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
                 .ToUniTask();
-            
+
             _audioSource.Stop();
             _currentBGM = null;
+        }
+
+        /// <summary>
+        /// BGMボリュームを一時的に下げる（SE再生時のダッキング用）
+        /// </summary>
+        /// <param name="duckVolume">下げる先のボリューム（0.0f～1.0f）</param>
+        /// <param name="fadeTime">フェード時間</param>
+        public async UniTask DuckVolume(float duckVolume = 0.2f, float fadeTime = 0.5f)
+        {
+            _originalVolume = _audioSource.volume;
+
+            _duckingHandle.TryCancel();
+            _duckingHandle = LMotion.Create(_audioSource.volume, _originalVolume * duckVolume, fadeTime)
+                .WithEase(Ease.OutQuad)
+                .BindToVolume(_audioSource)
+                .AddTo(this);
+
+            await _duckingHandle.ToUniTask();
+        }
+
+        /// <summary>
+        /// ダッキングしたボリュームを元に戻す
+        /// </summary>
+        /// <param name="fadeTime">フェード時間</param>
+        public async UniTask RestoreVolume(float fadeTime = 0.5f)
+        {
+            _duckingHandle.TryCancel();
+            _duckingHandle = LMotion.Create(_audioSource.volume, _originalVolume, fadeTime)
+                .WithEase(Ease.InQuad)
+                .BindToVolume(_audioSource)
+                .AddTo(this);
+
+            await _duckingHandle.ToUniTask();
         }
 
         public void PlayBGMBySceneType(BgmType bgmType)
@@ -103,7 +138,7 @@ namespace Void2610.UnityTemplate
             // 現在のBGMをフェードアウト
             if (_currentBGM != null)
             {
-                if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+                _fadeHandle.TryCancel();
                 await LMotion.Create(_audioSource.volume, 0f, FADE_TIME)
                     .WithEase(Ease.InQuad)
                     .BindToVolume(_audioSource)
@@ -178,7 +213,7 @@ namespace Void2610.UnityTemplate
 
             var currentBgmType = _currentBGM.bgmType;
 
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+            _fadeHandle.TryCancel();
             await LMotion.Create(_audioSource.volume, 0f, fadeTime)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
