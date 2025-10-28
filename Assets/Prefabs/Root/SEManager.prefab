@@ -73,3 +73,6 @@ MonoBehaviour:
   - name: Dialog2
     audioClip: {fileID: 8300000, guid: 72547479258c2447297409140b8191c0, type: 3}
     volume: 0.2
+  - name: ThemeAppearance
+    audioClip: {fileID: 8300000, guid: 33de1d472fba848b880c6c42fdd1b300, type: 3}
+    volume: 0.3
