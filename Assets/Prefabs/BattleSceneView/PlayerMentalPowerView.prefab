@@ -147,7 +147,6 @@ GameObject:
   - component: {fileID: 1834663718435131733}
   - component: {fileID: 4874198783927502312}
   - component: {fileID: 124844505426928945}
-  - component: {fileID: 7560556880499993116}
   m_Layer: 5
   m_Name: CharacterIcon
   m_TagString: Untagged
@@ -212,24 +211,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7560556880499993116
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1397362640785711204}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2156c1af7d784e4ab46bf9b184b4b1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mentalPowerText: {fileID: 0}
-  mentalStateImage: {fileID: 0}
-  highMentalColor: {r: 0, g: 6.7810993, b: 23.96863, a: 1}
-  midMentalColor: {r: 23.96863, g: 23.96863, b: 0.3759785, a: 1}
-  lowMentalColor: {r: 23.96863, g: 2.3393447, b: 0, a: 1}
-  colorTransitionDuration: 0.5
 --- !u!1 &4583499581680457900
 GameObject:
   m_ObjectHideFlags: 0
