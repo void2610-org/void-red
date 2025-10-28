@@ -106,7 +106,6 @@ public class TitlePresenter : IStartable, IDisposable
         // 新規開始時は次のノードに直接遷移
         var nextScene = _gameProgressService.GetNextSceneType();
         _sceneTransitionManager.TransitionToSceneWithFade(nextScene).Forget();
-        BgmManager.Instance.Stop().Forget();
     }
 
     /// <summary>
@@ -116,7 +115,6 @@ public class TitlePresenter : IStartable, IDisposable
     {
         // 続きから開始時は一旦ホームに遷移
         _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget();
-        BgmManager.Instance.Stop().Forget();
     }
 
     /// <summary>

@@ -93,12 +93,7 @@ namespace Void2610.UnityTemplate
 
         public void PlayBGMBySceneType(BgmType bgmType)
         {
-            if (bgmList.Count == 0) return;
-            if (_currentBGM != null && _currentBGM.bgmType == bgmType) return;
-
             var targetBgmList = bgmList.FindAll(x => x.bgmType == bgmType);
-            if (targetBgmList.Count == 0) return;
-            
             var data = targetBgmList[Random.Range(0, targetBgmList.Count)];
             PlayBGMInternal(data).Forget();
         }
@@ -143,14 +138,15 @@ namespace Void2610.UnityTemplate
             base.Awake();
             _audioSource = gameObject.AddComponent<AudioSource>();
             _audioSource.outputAudioMixerGroup = bgmMixerGroup;
+            _audioSource.playOnAwake = false;
             _audioSource.loop = false; // ループは手動で管理
+            _audioSource.volume = 0f;
         }
         
         private void Start()
         {
             _currentBGM = null;
             bgmMixerGroup.audioMixer.SetFloat("BgmVolume", Mathf.Log10(_bgmVolume) * 20);
-            _audioSource.volume = 0;
         }
 
         private void Update()
