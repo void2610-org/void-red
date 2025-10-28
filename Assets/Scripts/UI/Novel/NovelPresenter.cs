@@ -377,7 +377,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         for (var i = startIndex + 1; i < _currentDialogList.Count; i++)
         {
             var dialog = _currentDialogList[i];
-            if (dialog.HasChoice || dialog.HasGetCard)
+            if (dialog.HasChoice || dialog.HasCardChoice || dialog.HasGetCard)
             {
                 return i - 1;
             }
