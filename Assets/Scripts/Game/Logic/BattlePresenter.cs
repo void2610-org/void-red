@@ -509,8 +509,8 @@ public class BattlePresenter: IStartable, ISceneInitializable
         else
         {
             // プレイヤーカードの進化処理
-            var selectedCard = _player.SelectedCard.CurrentValue;
-            var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(selectedCard.Data);
+            // var selectedCard = _player.SelectedCard.CurrentValue;
+            // var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(selectedCard.Data);
             
             // FIXME: 現段階では進化機能は無効化
             // 元のカードと異なる場合は進化が発生
