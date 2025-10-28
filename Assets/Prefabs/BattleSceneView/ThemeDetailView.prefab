@@ -144,7 +144,6 @@ MonoBehaviour:
   closeButton: {fileID: 4907141397734823493}
   titleText: {fileID: 4794511299940161839}
   descriptionText: {fileID: 3006587550207399249}
-  keywordsText: {fileID: 0}
 --- !u!1 &6693718865842432229
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,7 +179,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 199.95996}
-  m_SizeDelta: {x: 800, y: 80}
+  m_SizeDelta: {x: 750, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3881756623870106123
 CanvasRenderer:
