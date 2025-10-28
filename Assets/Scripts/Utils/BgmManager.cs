@@ -115,6 +115,7 @@ namespace Void2610.UnityTemplate
             _audioSource.clip = _currentBGM.audioClip;
             _audioSource.volume = 0;
             _audioSource.Play();
+            _isPlaying = true;
 
             // フェードイン
             _isFading = true;
@@ -122,7 +123,7 @@ namespace Void2610.UnityTemplate
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
                 .AddTo(this);
-            
+
             // フェードイン完了を待機
             FadeInComplete().Forget();
         }
@@ -153,24 +154,37 @@ namespace Void2610.UnityTemplate
         {
             if (_isPlaying && _audioSource.clip && !_isFading)
             {
-                var remainingTime = _audioSource.clip.length - _audioSource.time;
-                if (remainingTime <= FADE_TIME)
+                if (!_audioSource.isPlaying)
                 {
+                    // 曲が終了したので次の曲を再生
                     _isFading = true;
-                    LoopToNextBGM(remainingTime).Forget();
+                    LoopToNextBGM(0f).Forget();
+                }
+                else
+                {
+                    var remainingTime = _audioSource.clip.length - _audioSource.time;
+                    if (remainingTime <= FADE_TIME)
+                    {
+                        _isFading = true;
+                        LoopToNextBGM(remainingTime).Forget();
+                    }
                 }
             }
         }
         
         private async UniTaskVoid LoopToNextBGM(float fadeTime)
         {
+            if (_currentBGM == null) return;
+
+            var currentBgmType = _currentBGM.bgmType;
+
             if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
             await LMotion.Create(_audioSource.volume, 0f, fadeTime)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
                 .ToUniTask();
-            
-            PlayBGMBySceneType(_currentBGM.bgmType);
+
+            PlayBGMBySceneType(currentBgmType);
         }
     }
 }
