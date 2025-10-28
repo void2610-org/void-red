@@ -30,6 +30,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private int _enemyWins;
     private bool _playerCollapse;
     private bool _npcCollapse;
+    private int _currentTurnNumber;
     private readonly List<ThemeData> _wonThemes = new();
     private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
     
@@ -69,6 +70,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // 崩壊フラグを初期化
         _playerCollapse = false;
         _npcCollapse = false;
+        _currentTurnNumber = 0;
     }
     
     public void Start()
@@ -212,41 +214,48 @@ public class BattlePresenter: IStartable, ISceneInitializable
     /// </summary>
     private async UniTask HandleThemeAnnouncement()
     {
+        _currentTurnNumber++;
+
         // 人格ログ: ターン開始
         _personalityLogService.StartTurn();
 
-        // 勝利数に基づいてテーマを選択
-        ThemeData newTheme = null;
-
-        // どちらかが2勝している場合は大テーマを使用
-        if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData.MajorTheme != null)
+        // 初回ターン かつ 敵がアルヴの場合はチュートリアル用のテーマを使用
+        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "E001")
         {
-            newTheme = _currentEnemyData.MajorTheme;
-        }
-        // 小テーマが設定されている場合はランダムに選択
-        else if (_currentEnemyData.MinorThemes is { Count: > 0 })
-        {
-            var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
-            newTheme = _currentEnemyData.MinorThemes[randomIndex];
-        }
-
-        _currentTheme = newTheme;
-        // 敵がアルヴならチュートリアル用のテーマに上書き
-        if (_currentEnemyData.EnemyId == "E001")
             _currentTheme = _allThemeData.ThemeList.Find(theme => theme.name == "THEME_00");
+        }
+        else
+        {
+            // 勝利数に基づいてテーマを選択
+            ThemeData newTheme = null;
+
+            // どちらかが2勝している場合は大テーマを使用
+            if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData.MajorTheme != null)
+            {
+                newTheme = _currentEnemyData.MajorTheme;
+            }
+            // 小テーマが設定されている場合はランダムに選択
+            else if (_currentEnemyData.MinorThemes is { Count: > 0 })
+            {
+                var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
+                newTheme = _currentEnemyData.MinorThemes[randomIndex];
+            }
+
+            _currentTheme = newTheme;
+        }
 
         _battleUIPresenter.SetTheme(_currentTheme);
 
-        // 敵がアルヴならチュートリアルを表示
-        // if (_currentEnemyData.EnemyId == "E001")
-            // await _battleUIPresenter.StartBattleTutorial();
+        // 初回ターン かつ 敵がアルヴならチュートリアルを表示
+        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "E001")
+            await _battleUIPresenter.StartBattleTutorial();
 
         // テーマ詳細を表示して閉じられるまで待機
         await _battleUIPresenter.ShowThemeDetailAndWait();
 
         // 会話シーケンスを表示してからカード選択へ
         await ShowThemeDialoguesAsync();
-        
+
         ChangeState(GameState.PlayerCardSelection).Forget();
     }
 
