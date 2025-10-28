@@ -22,6 +22,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
     private CanvasGroup _canvasGroup;
     private MotionHandle _currentFadeHandle;
+    private readonly Subject<Unit> _onClosed = new();
 
     // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
     private static readonly List<BaseWindowView> _activeWindows = new();
@@ -52,6 +53,14 @@ public abstract class BaseWindowView : MonoBehaviour
         HideWithAnimation().Forget();
     }
 
+    /// <summary>
+    /// ウィンドウが閉じられるまで待機
+    /// </summary>
+    public async UniTask WaitForClose()
+    {
+        await _onClosed.FirstAsync();
+    }
+
     private async UniTaskVoid ShowWithAnimation()
     {
         _currentFadeHandle.TryCancel();
@@ -80,6 +89,9 @@ public abstract class BaseWindowView : MonoBehaviour
 
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
+
+        // 閉じたことを通知
+        _onClosed.OnNext(Unit.Default);
 
         // リストに他のウィンドウがあればそのcloseButtonを選択、なければルートを選択
         if (_activeWindows.Count > 0)
@@ -112,6 +124,7 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         Disposables.Dispose();
         _currentFadeHandle.TryCancel();
+        _onClosed?.Dispose();
 
         // リストから自身を削除（シーン遷移時のクリーンアップ）
         _activeWindows.Remove(this);

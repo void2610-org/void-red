@@ -38,6 +38,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly BlackOverlayView _blackOverlayView;
     private readonly CardDetailButtonView _cardDetailButtonView;
     private readonly CardDetailView _cardDetailView;
+    private readonly ThemeDetailView _themeDetailView;
     private readonly BattleResultView _battleResultView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Impulse;
     private int _mentalBetValue = 1;
@@ -49,7 +50,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private ThemeData _currentTheme;
     private readonly HandView _playerHandView;
-    private BattleRootView _battleRootView;
     private BattlePresenter _battlePresenter;
 
     /// <summary>
@@ -68,6 +68,12 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _themeView.DisplayThemeWithKeywords(theme);
     }
     
+    public async UniTask ShowThemeDetailAndWait()
+    {
+        _themeDetailView.ShowThemeDetail(_currentTheme);
+        await _themeDetailView.WaitForClose();
+    }
+
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
     public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
@@ -78,7 +84,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
     public void InitializeEnemy(EnemyData enemyData)
     {
-        _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
+        _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
     }
 
@@ -180,43 +186,41 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemy = enemy;
 
         // 初期化
-        _themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
-        _announcementView = UnityEngine.Object.FindFirstObjectByType<AnnouncementView>();
+        _themeView = Object.FindFirstObjectByType<ThemeView>();
+        _announcementView = Object.FindFirstObjectByType<AnnouncementView>();
 
         // 複数のNarrationViewを取得して、プレイヤー用と敵用を区別
-        var narrationViews = UnityEngine.Object.FindObjectsByType<NarrationView>(UnityEngine.FindObjectsSortMode.None);
+        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
         if (narrationViews.Length != 2) throw new System.Exception("Expected exactly two NarrationViews in the scene.");
         _narrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
         _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
 
-        _playButtonView = UnityEngine.Object.FindFirstObjectByType<PlayButtonView>();
-        _playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
-        _mentalBetView = UnityEngine.Object.FindFirstObjectByType<MentalBetView>();
+        _playButtonView = Object.FindFirstObjectByType<PlayButtonView>();
+        _playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
+        _mentalBetView = Object.FindFirstObjectByType<MentalBetView>();
 
-        var mentalPowerViews = UnityEngine.Object.FindObjectsByType<MentalPowerView>(UnityEngine.FindObjectsSortMode.None);
+        var mentalPowerViews = Object.FindObjectsByType<MentalPowerView>(FindObjectsSortMode.None);
         // Y座標が低い方をプレイヤー、高い方を敵とする
         _playerMentalPowerView = mentalPowerViews[0].transform.position.y < mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
         _enemyMentalPowerView = mentalPowerViews[0].transform.position.y > mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
 
-        _gameOverView = UnityEngine.Object.FindFirstObjectByType<GameOverView>();
-        _enemyView = UnityEngine.Object.FindFirstObjectByType<EnemyView>();
-        _personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
-        _personalityLogButtonView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogButtonView>();
-        _scoreView = UnityEngine.Object.FindFirstObjectByType<ScoreView>();
-        _scoreResultView = UnityEngine.Object.FindFirstObjectByType<ScoreResultView>();
-        _blackOverlayView = UnityEngine.Object.FindFirstObjectByType<BlackOverlayView>();
-        _cardDetailButtonView = UnityEngine.Object.FindFirstObjectByType<CardDetailButtonView>();
-        _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
-        _battleResultView = UnityEngine.Object.FindFirstObjectByType<BattleResultView>();
+        _gameOverView = Object.FindFirstObjectByType<GameOverView>();
+        _enemyView = Object.FindFirstObjectByType<EnemyView>();
+        _personalityLogView = Object.FindFirstObjectByType<PersonalityLogView>();
+        _personalityLogButtonView = Object.FindFirstObjectByType<PersonalityLogButtonView>();
+        _scoreView = Object.FindFirstObjectByType<ScoreView>();
+        _scoreResultView = Object.FindFirstObjectByType<ScoreResultView>();
+        _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
+        _cardDetailButtonView = Object.FindFirstObjectByType<CardDetailButtonView>();
+        _cardDetailView = Object.FindFirstObjectByType<CardDetailView>();
+        _themeDetailView = Object.FindFirstObjectByType<ThemeDetailView>();
+        _battleResultView = Object.FindFirstObjectByType<BattleResultView>();
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
         _sceneTransitionManager = sceneTransitionManager;
 
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
         var handViews = Object.FindObjectsByType<HandView>(FindObjectsSortMode.None);
         _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
-
-        // BattleRootViewを取得
-        _battleRootView = UnityEngine.Object.FindFirstObjectByType<BattleRootView>();
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)

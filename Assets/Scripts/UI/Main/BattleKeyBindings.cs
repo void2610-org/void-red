@@ -17,7 +17,6 @@ public static class BattleKeyBindings
     {
         // ViewをシーンからFind
         var personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
-        var themeView = UnityEngine.Object.FindFirstObjectByType<ThemeView>();
         var playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
 
         // 人格ログを開く
@@ -25,13 +24,6 @@ public static class BattleKeyBindings
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ => personalityLogView.Show())
-            .AddTo(disposables);
-
-        // テーマのキーワードをトグル表示
-        inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => themeView.ToggleKeywords())
             .AddTo(disposables);
 
         // プレイスタイルを切り替え
