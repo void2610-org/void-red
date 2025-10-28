@@ -91,19 +91,7 @@ namespace Void2610.UnityTemplate
             _currentBGM = null;
         }
 
-        public void PlayBGM(string bgmName)
-        {
-            var data = bgmList.FirstOrDefault(t => t.name == bgmName);
-            if (data == null)
-            {
-                Debug.LogError($"BGM '{bgmName}' が見つかりません。");
-                return;
-            }
-            
-            PlayBGMInternal(data).Forget();
-        }
-
-        public void PlayRandomBGM(BgmType bgmType)
+        public void PlayBGMBySceneType(BgmType bgmType)
         {
             if (bgmList.Count == 0) return;
             if (_currentBGM != null && _currentBGM.bgmType == bgmType) return;
@@ -186,7 +174,7 @@ namespace Void2610.UnityTemplate
                 .BindToVolume(_audioSource)
                 .ToUniTask();
             
-            PlayRandomBGM(_currentBGM.bgmType);
+            PlayBGMBySceneType(_currentBGM.bgmType);
         }
     }
 }

@@ -79,7 +79,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _battleUIPresenter.SetBattlePresenter(this);
 
         InitializeGameAsync().Forget();
-        BgmManager.Instance.PlayRandomBGM(BgmType.Battle);
+        BgmManager.Instance.PlayBGMBySceneType(BgmType.Battle);
     }
 
     /// <summary>
