@@ -200,6 +200,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65d4bb5098ce0c5458b3cfdd1e50554a
+    m_Address: "Assets/Sprites/Item/\u5149\u306E\u672D.png"
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 662dbee2ec75a47adbf1ffd469ff3af9
     m_Address: Assets/Sprites/Character/Alv/2-4.png
     m_ReadOnly: 0
@@ -417,6 +422,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dbd9d78e045314a78af872aff7db913d
     m_Address: Assets/Sprites/Character/Alv/2-2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df33a4a076a680b4a8c8fc692c24f006
+    m_Address: "Assets/Sprites/Item/\u5F71\u306E\u672D.png"
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
