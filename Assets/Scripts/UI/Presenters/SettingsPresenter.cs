@@ -40,12 +40,9 @@ public class SettingsPresenter : IStartable, IDisposable
             .AddTo(_disposables);
 
         // 設定ボタンのイベント設定
-        if (_settingButtonView != null)
-        {
-            _settingButtonView.OnButtonClicked.Subscribe(
-                _ => ShowSettings())
-                .AddTo(_disposables);
-        }
+        _settingButtonView.OnButtonClicked.Subscribe(
+            _ => ShowSettings())
+            .AddTo(_disposables);
 
         SubscribeToViewEvents();
         RefreshSettingsView();

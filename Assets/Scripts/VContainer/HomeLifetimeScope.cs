@@ -17,7 +17,8 @@ public class HomeLifetimeScope : LifetimeScope
         builder.Register<CardPoolService>(Lifetime.Singleton);
 
         // 設定機能
-        builder.RegisterEntryPoint<SettingsPresenter>().AsSelf();
+        builder.RegisterEntryPoint<SettingsPresenter>();
+        builder.RegisterEntryPoint<HelpPresenter>();
 
         // ホームPresenter
         builder.RegisterEntryPoint<HomePresenter>();

@@ -12,7 +12,6 @@ using Void2610.UnityTemplate;
 public class TitlePresenter : IStartable, IDisposable
 {
     private readonly TitleView _titleView;
-    private readonly SettingsPresenter _settingsPresenter;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly GameProgressService _gameProgressService;
     private readonly ConfirmationDialogService _confirmationDialogService;
@@ -25,14 +24,12 @@ public class TitlePresenter : IStartable, IDisposable
     /// </summary>
     public TitlePresenter(
         TitleView titleView,
-        SettingsPresenter settingsPresenter,
         SceneTransitionManager sceneTransitionManager,
         GameProgressService gameProgressService,
         ConfirmationDialogService confirmationDialogService,
         SteamService steamService)
     {
         _titleView = titleView;
-        _settingsPresenter = settingsPresenter;
         _sceneTransitionManager = sceneTransitionManager;
         _gameProgressService = gameProgressService;
         _confirmationDialogService = confirmationDialogService;
@@ -55,10 +52,6 @@ public class TitlePresenter : IStartable, IDisposable
 
         _titleView.QuitButtonClicked
             .Subscribe(_ => OnQuitButtonClicked())
-            .AddTo(_disposables);
-
-        _titleView.SettingsButtonClicked
-            .Subscribe(_ => OnSettingsButtonClicked())
             .AddTo(_disposables);
 
         _titleView.ReviewFormButtonClicked
@@ -127,14 +120,6 @@ public class TitlePresenter : IStartable, IDisposable
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
         Application.Quit();
-    }
-
-    /// <summary>
-    /// 設定ボタンがクリックされた時の処理
-    /// </summary>
-    private void OnSettingsButtonClicked()
-    {
-        _settingsPresenter.ShowSettings();
     }
 
     /// <summary>

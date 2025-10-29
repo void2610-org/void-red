@@ -49,7 +49,6 @@ public class RootLifetimeScope : LifetimeScope
 
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
-        builder.RegisterEntryPoint<HelpPresenter>();
         builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
             .WithParameter(confirmationDialogView);
 
