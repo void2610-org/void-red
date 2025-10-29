@@ -58,17 +58,6 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     }
 
     /// <summary>
-    /// キーワードViewをクリア
-    /// </summary>
-    private void ClearKeywords()
-    {
-        foreach (var view in _keywordViews)
-            if (view) Destroy(view.gameObject);
-        _keywordViews.Clear();
-        _keywordPositions.Clear();
-    }
-
-    /// <summary>
     /// マウスカーソルが乗ったときの処理
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
@@ -114,27 +103,20 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         _isKeywordsVisible = !_isKeywordsVisible;
 
         if (_isKeywordsVisible)
-        {
-            foreach (var view in _keywordViews)
-                view.FadeIn();
-
-            if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
-            _lensFlareMotionHandle = LMotion.Create(0f, 1f, 0.3f)
-                .WithEase(Ease.OutCubic)
-                .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
-                .AddTo(this);
-        }
+            OnPointerEnter(null);
         else
-        {
-            foreach (var view in _keywordViews)
-                view.FadeOut();
-
-            if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
-            _lensFlareMotionHandle = LMotion.Create(1f, 0f, 0.3f)
-                .WithEase(Ease.OutCubic)
-                .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
-                .AddTo(this);
-        }
+            OnPointerExit(null);
+    }
+    
+    /// <summary>
+    /// キーワードViewをクリア
+    /// </summary>
+    private void ClearKeywords()
+    {
+        foreach (var view in _keywordViews)
+            if (view) Destroy(view.gameObject);
+        _keywordViews.Clear();
+        _keywordPositions.Clear();
     }
     
     /// <summary>
