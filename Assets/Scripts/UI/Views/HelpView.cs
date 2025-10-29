@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// ヘルプ画面を表示するViewクラス
@@ -54,9 +55,14 @@ public class HelpView : BaseWindowView
         // ページ番号表示（1始まりで表示）
         pageText.text = $"{currentIndex + 1} / {totalCount}";
 
+        var currentSelected = SafeNavigationManager.GetCurrentSelected();
+        
         // 前へ/次へボタンの有効/無効
         previousButton.interactable = currentIndex > 0;
         nextButton.interactable = currentIndex < totalCount - 1;
+
+        // 選択が外れた場合に再選択
+        SafeNavigationManager.SetSelectedGameObjectSafe(currentSelected);
     }
 
     protected override void OnDestroy()
