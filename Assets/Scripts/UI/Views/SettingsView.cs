@@ -99,7 +99,6 @@ public class SettingsView : BaseWindowView
     {
         // 設定項目のコンテナを作成（横並び用）
         var containerObject = Instantiate(settingsContentContainerPrefab, settingsContainer);
-        // containerObject.transform.localScale = Vector3.one;
         
         // タイトルテキストを作成（左側）
         CreateTitleText(containerObject.transform, settingData.displayName);
@@ -231,11 +230,17 @@ public class SettingsView : BaseWindowView
     private void CreateEnumUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(enumSettingPrefab, parent);
-        
+
         // レイアウト要素を追加して残り幅を使用
         if (!uiObject.TryGetComponent<LayoutElement>(out var layoutElement))
             layoutElement = uiObject.AddComponent<LayoutElement>();
         layoutElement.flexibleWidth = 1f; // 残りの幅を使用
+
+        // RectTransformを取得して左マージンを追加
+        var rectTransform = uiObject.GetComponent<RectTransform>();
+        var offsetMin = rectTransform.offsetMin;
+        offsetMin.x += 140f;
+        rectTransform.offsetMin = offsetMin;
         
         // UIコンポーネントを取得
         var prevButton = uiObject.transform.Find("PrevButton")?.GetComponent<Button>();
