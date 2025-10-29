@@ -63,15 +63,23 @@ public class GameProgressService
                 break;
             // アルヴ - バトル後は次のノベルへ直接遷移
             case 1:
-                nextNode = new BattleNode("E001", false);
+                nextNode = new BattleNode("alv", false);
                 break;
-            // プロローグ2 - ノベル後はホームに戻る（デフォルトtrue）
+            // プロローグ2 - ノベル後はホームに戻る
             case 2:
                 nextNode = new NovelNode("prologue2");
                 break;
-            // セリカ1 - 最初はノベル
+            // セリカ1 - セリカと出会う
             case 3:
-                nextNode = new BattleNode("serika", false);
+                nextNode = new NovelNode("cerica1", false);
+                break;
+            // セリカ2 - 商品提示
+            case 4:
+                nextNode = new NovelNode("cerica2", false);
+                break;
+            // セリカバトル
+            case 5:
+                nextNode = new BattleNode("cerica", false);
                 break;
             // この先は未定
             default:
