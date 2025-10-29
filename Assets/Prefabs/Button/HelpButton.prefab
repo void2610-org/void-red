@@ -9,13 +9,37 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 68422378695653237, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: a6ccdaf4ba8634988b7088a68d549be5, type: 3}
+    - target: {fileID: 68422378695653237, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
       propertyPath: m_PreserveAspect
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 277754951790194367, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
       propertyPath: m_Name
-      value: PauseButton
+      value: HelpButton
       objectReference: {fileID: 0}
+    - target: {fileID: 2037910451654054128, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3888889
+      objectReference: {fileID: 0}
+    - target: {fileID: 2037910451654054128, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2037910451654054128, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.1111112
+      objectReference: {fileID: 0}
+    - target: {fileID: 2037910451654054128, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5405259558118760043, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: inputActionReference
+      value: 
+      objectReference: {fileID: -8862917553937234927, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
     - target: {fileID: 9037413902010202566, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -115,14 +139,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 277754951790194367, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6961624936524525074}
+      addedObject: {fileID: 7268029802273372328}
   m_SourcePrefab: {fileID: 100100000, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
 --- !u!1 &2388141028732612707 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 277754951790194367, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
   m_PrefabInstance: {fileID: 2521638886190079708}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6961624936524525074
+--- !u!114 &7268029802273372328
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,6 +155,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2388141028732612707}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ef7ea477a829434a885e9465c7bb51e, type: 3}
+  m_Script: {fileID: 11500000, guid: c6108bbb06a0d4a9a86872b957d95a74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
