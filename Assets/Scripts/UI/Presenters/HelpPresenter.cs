@@ -29,7 +29,7 @@ public class HelpPresenter : IStartable, IDisposable
         _helpButtonView = UnityEngine.Object.FindFirstObjectByType<HelpButtonView>();
         
         // Helpアクションの購読
-        _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
+        _inputActionsProvider.UI.Help.OnPerformedAsObservable()
             .Subscribe(_ => ShowHelp())
             .AddTo(_disposables);
 
