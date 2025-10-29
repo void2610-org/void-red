@@ -68,7 +68,9 @@ public class TutorialPresenter : IDisposable
     
     public async UniTask StartResultTutorial()
     {
-        await StartTutorial("Result");
+        await StartTutorial("BattleResult");
+        var b = BaseWindowView.GetTopActiveWindowCloseButton();
+        SafeNavigationManager.SetSelectedGameObjectSafe(b);
     }
 
     /// <summary>
