@@ -12,16 +12,20 @@ public class RootLifetimeScope : LifetimeScope
     [SerializeField] private BgmManager bgmManager;
     [SerializeField] private SeManager seManager;
     [SerializeField] private AllEnemyData allEnemyData;
+    [SerializeField] private AllThemeData allThemeData;
     [SerializeField] private AllCardData allCardData;
     [SerializeField] private AllTutorialData allTutorialData;
+    [SerializeField] private AllHelpData allHelpData;
     [SerializeField] private ConfirmationDialogView confirmationDialogView;
     
     protected override void Configure(IContainerBuilder builder)
     {
         // データの登録と初期化
         builder.RegisterInstance(allEnemyData);
+        builder.RegisterInstance(allThemeData);
         builder.RegisterInstance(allCardData);
         builder.RegisterInstance(allTutorialData);
+        builder.RegisterInstance(allHelpData);
         RegisterAllData();
 
         // カードプールサービス（GameProgressServiceが依存）
@@ -45,6 +49,7 @@ public class RootLifetimeScope : LifetimeScope
 
         // その他の設定管理
         builder.Register<SettingsManager>(Lifetime.Singleton);
+        builder.RegisterEntryPoint<HelpPresenter>();
         builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
             .WithParameter(confirmationDialogView);
 
@@ -61,7 +66,10 @@ public class RootLifetimeScope : LifetimeScope
     {
         #if UNITY_EDITOR
         allCardData.RegisterAllCards();
+        allThemeData.RegisterAllThemes();
         allEnemyData.RegisterAllEnemies();
+        allTutorialData.RegisterAllTutorials();
+        allHelpData.RegisterAllHelps();
         #endif
     }
     

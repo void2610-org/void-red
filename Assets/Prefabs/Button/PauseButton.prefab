@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 68422378695653237, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 277754951790194367, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
       propertyPath: m_Name
       value: PauseButton
