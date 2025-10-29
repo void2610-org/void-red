@@ -14,7 +14,6 @@ public class TitleView : MonoBehaviour
     [SerializeField] private Button startButton;
     [SerializeField] private Button continueButton;
     [SerializeField] private Button quitButton;
-    [SerializeField] private Button settingsButton;
     [SerializeField] private Button reviewFormButton;
     [SerializeField] private TextMeshProUGUI continueButtonText;
 
@@ -22,7 +21,6 @@ public class TitleView : MonoBehaviour
     public Observable<Unit> StartButtonClicked => startButton.OnClickAsObservable();
     public Observable<Unit> ContinueButtonClicked => continueButton.OnClickAsObservable();
     public Observable<Unit> QuitButtonClicked => quitButton.OnClickAsObservable();
-    public Observable<Unit> SettingsButtonClicked => settingsButton.OnClickAsObservable();
     public Observable<Unit> ReviewFormButtonClicked => reviewFormButton.OnClickAsObservable();
 
     /// <summary>

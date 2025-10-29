@@ -9,7 +9,7 @@ public class TitleLifetimeScope : LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterEntryPoint<SettingsPresenter>().AsSelf();
+        builder.RegisterEntryPoint<SettingsPresenter>();
         builder.RegisterComponentInHierarchy<TitleView>();
         builder.RegisterEntryPoint<TitlePresenter>();
         builder.RegisterComponentInHierarchy<DebugController>();

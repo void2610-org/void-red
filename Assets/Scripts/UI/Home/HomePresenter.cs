@@ -16,7 +16,6 @@ public class HomePresenter : IStartable, IDisposable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllCardData _allCardData;
     private readonly ConfirmationDialogService _confirmationDialogService;
-    private readonly SettingsPresenter _settingsPresenter;
 
     private StoryNode _currentNode;
     private readonly CompositeDisposable _disposables = new();
@@ -29,26 +28,19 @@ public class HomePresenter : IStartable, IDisposable
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
         AllCardData allCardData,
-        ConfirmationDialogService confirmationDialogService,
-        SettingsPresenter settingsPresenter)
+        ConfirmationDialogService confirmationDialogService)
     {
         _homeView = homeView;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _allCardData = allCardData;
         _confirmationDialogService = confirmationDialogService;
-        _settingsPresenter = settingsPresenter;
     }
 
     public void Start()
     {
         // Viewを初期化
         _homeView.Initialize();
-
-        // ボタンイベントの購読
-        _homeView.SettingsButtonClicked
-            .Subscribe(_ => _settingsPresenter.ShowSettings())
-            .AddTo(_disposables);
 
         _homeView.TitleButtonClicked
             .Subscribe(_ => OnTitleButtonClicked())

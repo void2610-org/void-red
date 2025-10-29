@@ -12,8 +12,6 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class HomeView : MonoBehaviour
 {
-    [Header("UIコンポーネント")]
-    [SerializeField] private Button settingsButton;
     [SerializeField] private Button titleButton;
     [SerializeField] private Button deckButton;
     [SerializeField] private Button libraryButton;
@@ -26,7 +24,6 @@ public class HomeView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI speakingText;
 
     // ボタンクリックイベントをObservableとして公開
-    public Observable<Unit> SettingsButtonClicked => settingsButton.OnClickAsObservable();
     public Observable<Unit> TitleButtonClicked => titleButton.OnClickAsObservable();
     public Observable<Unit> StoryButtonClicked => storyButton.OnClickAsObservable();
     public Observable<Unit> DeckButtonClicked => deckButton.OnClickAsObservable();
