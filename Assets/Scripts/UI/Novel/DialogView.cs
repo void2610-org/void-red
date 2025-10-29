@@ -295,7 +295,6 @@ public class DialogView : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
-        Debug.Log("OnClick");
         if (_isTyping)
         {
             // 文字送り中のクリックで即座に全文表示
@@ -382,15 +381,6 @@ public class DialogView : MonoBehaviour
             var localPos = indicatorRectTransform.parent.GetComponent<RectTransform>().InverseTransformPoint(worldPos);
             indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
         }
-    }
-    
-    /// <summary>
-    /// DialogViewの操作可能状態を設定（アイテム取得演出中の制御用）
-    /// </summary>
-    /// <param name="interactable">操作可能かどうか</param>
-    public void SetInteractable(bool interactable)
-    {
-        if (!this) return;
     }
     
     /// <summary>
