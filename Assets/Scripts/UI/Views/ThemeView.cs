@@ -34,7 +34,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // BGMボリュームを下げる
         await BgmManager.Instance.DuckVolume();
 
-        SeManager.Instance.PlaySe("ThemeAppearance");
+        SeManager.Instance.PlaySe("ThemeAppearance", pitch:1f);
         _themeData = themeData;
         themeText.TypewriterAnimation(themeData.Title, skipOnClick:false).Forget();
         await UniTask.Delay(4000);
