@@ -52,6 +52,7 @@ public class TutorialPresenter : IDisposable
 
         // カード詳細ウィンドウを開く
         _cardDetailView.ShowCardDetail(_player.SelectedCard.CurrentValue.Data, true);
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
         await UniTask.Delay(500);
 
         // Battle2を表示(簡易ウィンドウで表示)
