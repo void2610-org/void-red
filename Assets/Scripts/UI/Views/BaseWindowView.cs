@@ -79,9 +79,9 @@ public abstract class BaseWindowView : MonoBehaviour
         if (!_activeWindows.Contains(this))
             _activeWindows.Add(this);
 
+        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
     }
 
     private async UniTaskVoid HideWithAnimation()
