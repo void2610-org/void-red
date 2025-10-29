@@ -1,6 +1,7 @@
 using System;
 using R3;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VContainer.Unity;
 
 /// <summary>
@@ -24,6 +25,9 @@ public class HelpPresenter : IStartable, IDisposable
 
     public void Start()
     {
+        // タイトルではヘルプ無し
+        if (SceneManager.GetActiveScene().name == "TitleScene") return;
+        
         // ビューの取得
         _helpView = UnityEngine.Object.FindFirstObjectByType<HelpView>();
         _helpButtonView = UnityEngine.Object.FindFirstObjectByType<HelpButtonView>();

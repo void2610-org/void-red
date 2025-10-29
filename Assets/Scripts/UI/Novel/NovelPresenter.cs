@@ -216,8 +216,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             return;
         }
         
-        _dialogView.SetInteractable(false);
-        
         // アイテム画像を読み込み
         Sprite itemSprite = null;
         if (!string.IsNullOrEmpty(itemGetData.ItemImageName))
@@ -229,8 +227,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // アイテム取得演出を実行
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime:1f, pitch: 1f);
         await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
-        
-        _dialogView.SetInteractable(true);
     }
     
     /// <summary>
@@ -247,8 +243,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             return;
         }
         
-        _dialogView.SetInteractable(false);
-        
         // 選択肢を表示して結果を取得
         var selectedIndex = await _choiceView.ShowChoice(choiceData);
         
@@ -261,8 +255,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         
         // 選択結果をログ出力
         Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
-        
-        _dialogView.SetInteractable(true);
     }
     
     /// <summary>
@@ -298,16 +290,12 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // ItemGetDataとしてカード獲得演出データを作成
         var cardGetData = new ItemGetData("", cardData.CardName, cardDescription);
         
-        _dialogView.SetInteractable(false);
-        
         // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
         await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
 
         // カードをデッキに追加（セーブはシナリオ完了時にまとめて実行）
         _gameProgressService.AddCardToDeck(cardModel);
-
-        _dialogView.SetInteractable(true);
     }
 
     /// <summary>

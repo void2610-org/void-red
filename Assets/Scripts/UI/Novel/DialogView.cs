@@ -25,7 +25,6 @@ public class DialogView : MonoBehaviour
     [SerializeField] private Button autoButton;
     [SerializeField] private TextMeshProUGUI autoButtonText;
     [SerializeField] private Button skipButton;
-    [SerializeField] private Button clickAreaButton;
     
     [Header("オートボタン表示設定")]
     [SerializeField] private Color autoButtonNormalColor = Color.white;
@@ -54,8 +53,6 @@ public class DialogView : MonoBehaviour
     
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
 
-    public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
-    
     private void Awake()
     {
         dialogText.text = "";
@@ -66,7 +63,6 @@ public class DialogView : MonoBehaviour
         
         autoButton.OnClickAsObservable().Subscribe(_ => ToggleAutoMode()).AddTo(this);
         skipButton.OnClickAsObservable().Subscribe(_ => _onSkipRequested.OnNext(Unit.Default)).AddTo(this);
-        clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
         
         // オートボタンの初期色を設定
         UpdateAutoButtonColor();
@@ -385,16 +381,6 @@ public class DialogView : MonoBehaviour
             var localPos = indicatorRectTransform.parent.GetComponent<RectTransform>().InverseTransformPoint(worldPos);
             indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
         }
-    }
-    
-    /// <summary>
-    /// DialogViewの操作可能状態を設定（アイテム取得演出中の制御用）
-    /// </summary>
-    /// <param name="interactable">操作可能かどうか</param>
-    public void SetInteractable(bool interactable)
-    {
-        if (!this) return;
-        clickAreaButton.interactable = interactable;
     }
     
     /// <summary>
