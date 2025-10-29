@@ -25,7 +25,6 @@ public class DialogView : MonoBehaviour
     [SerializeField] private Button autoButton;
     [SerializeField] private TextMeshProUGUI autoButtonText;
     [SerializeField] private Button skipButton;
-    [SerializeField] private Button clickAreaButton;
     
     [Header("オートボタン表示設定")]
     [SerializeField] private Color autoButtonNormalColor = Color.white;
@@ -54,8 +53,6 @@ public class DialogView : MonoBehaviour
     
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
 
-    public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
-    
     private void Awake()
     {
         dialogText.text = "";
@@ -66,7 +63,6 @@ public class DialogView : MonoBehaviour
         
         autoButton.OnClickAsObservable().Subscribe(_ => ToggleAutoMode()).AddTo(this);
         skipButton.OnClickAsObservable().Subscribe(_ => _onSkipRequested.OnNext(Unit.Default)).AddTo(this);
-        clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
         
         // オートボタンの初期色を設定
         UpdateAutoButtonColor();
@@ -299,6 +295,7 @@ public class DialogView : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
+        Debug.Log("OnClick");
         if (_isTyping)
         {
             // 文字送り中のクリックで即座に全文表示
@@ -394,7 +391,6 @@ public class DialogView : MonoBehaviour
     public void SetInteractable(bool interactable)
     {
         if (!this) return;
-        clickAreaButton.interactable = interactable;
     }
     
     /// <summary>
