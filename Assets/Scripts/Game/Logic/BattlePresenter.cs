@@ -220,7 +220,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _personalityLogService.StartTurn();
 
         // 初回ターン かつ 敵がアルヴの場合はチュートリアル用のテーマを使用
-        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "E001")
+        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "alv")
         {
             _currentTheme = _allThemeData.ThemeList.Find(theme => theme.name == "THEME_00");
         }
@@ -247,8 +247,8 @@ public class BattlePresenter: IStartable, ISceneInitializable
         await _battleUIPresenter.SetTheme(_currentTheme);
 
         // 初回ターン かつ 敵がアルヴならチュートリアルを表示
-        // if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "E001")
-        //     await _battleUIPresenter.StartBattleTutorial();
+        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartBattleTutorial();
 
         // テーマ詳細を表示して閉じられるまで待機
         await _battleUIPresenter.ShowThemeDetailAndWait();
@@ -611,7 +611,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _battleUIPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
         
         // 敵がアルヴならチュートリアルを表示
-        if (_currentEnemyData.EnemyId == "E001")
+        if (_currentEnemyData.EnemyId == "alv")
             await _battleUIPresenter.StartResultTutorial();
         
         await _battleUIPresenter.WaitForBattleResultClose();

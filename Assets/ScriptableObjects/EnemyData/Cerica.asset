@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb4da0a364b7b422689a16d3223488ab, type: 3}
-  m_Name: Test2
+  m_Name: Cerica
   m_EditorClassIdentifier: 
-  enemyId: E002
+  enemyId: cerica
   enemyName: "\u30BB\u30EA\u30AB"
-  description: "\u6575\u306E\u8AAC\u660E\u6587\u304C\u3053\u3053\u306B\u5165\u308A\u307E\u305922222"
-  defaultSprite: {fileID: 8573975999917033648, guid: 23d672323e6124c4fb41ef4b88caad3b, type: 3}
+  description: "\u6575\u306E\u8AAC\u660E\u6587\u304C\u3053\u3053\u306B\u5165\u308A\u307E\u3059"
+  defaultSprite: {fileID: 21300000, guid: 021a93a055b804f418cd07b3416b25a0, type: 3}
   attributeSprites:
     serializedList:
     - key: 0
@@ -32,6 +32,14 @@ MonoBehaviour:
       value: {fileID: -7340421124048253533, guid: 3f0119e639c1845cd9f1ef6014408650, type: 3}
   maxMentalPower: 10
   initialMentalPower: 10
+  playstyleWeights:
+    serializedList:
+    - key: 0
+      value: 0
+    - key: 1
+      value: 1
+    - key: 2
+      value: 1
   initialDeck:
   - {fileID: 11400000, guid: 49cdb945655a048a09f967ca7e3420b9, type: 2}
   - {fileID: 11400000, guid: 7837cafdc41164c51b9798d876501fcb, type: 2}
@@ -39,3 +47,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e0fc958e1d16741e6a114ae6fbc556ba, type: 2}
   - {fileID: 11400000, guid: 7ad383a5532d94c388d7b947a6c5757e, type: 2}
   resonanceCard: {fileID: 11400000, guid: 5ecb5aa2c56fa41448a2e55ccf2af044, type: 2}
+  majorTheme: {fileID: 11400000, guid: db655a0ad5e674761a2f9d44351cf842, type: 2}
+  minorThemes:
+  - {fileID: 11400000, guid: 01136d71471194f54b19c069b86688f3, type: 2}

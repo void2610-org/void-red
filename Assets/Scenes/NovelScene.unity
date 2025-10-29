@@ -780,7 +780,7 @@ MonoBehaviour:
   autoInjectGameObjects:
   - {fileID: 0}
   novelSeManager: {fileID: 1113668051}
-  useLocalExcel: 0
+  useLocalExcel: 1
 --- !u!1001 &1324742070
 PrefabInstance:
   m_ObjectHideFlags: 0
