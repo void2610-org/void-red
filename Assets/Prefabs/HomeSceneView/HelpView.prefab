@@ -817,6 +817,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 910003218416728329, guid: 50eb9c40ff09940a5bb4bc873467d5ac, type: 3}
+      propertyPath: m_Navigation.m_SelectOnUp
+      value: 
+      objectReference: {fileID: 6104654863598461413}
+    - target: {fileID: 910003218416728329, guid: 50eb9c40ff09940a5bb4bc873467d5ac, type: 3}
+      propertyPath: m_Navigation.m_SelectOnDown
+      value: 
+      objectReference: {fileID: 6104654863598461413}
+    - target: {fileID: 910003218416728329, guid: 50eb9c40ff09940a5bb4bc873467d5ac, type: 3}
       propertyPath: m_Navigation.m_SelectOnLeft
       value: 
       objectReference: {fileID: 5136180362684337923}
@@ -1143,6 +1151,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 910003218416728329, guid: 50eb9c40ff09940a5bb4bc873467d5ac, type: 3}
+      propertyPath: m_Navigation.m_SelectOnUp
+      value: 
+      objectReference: {fileID: 6104654863598461413}
+    - target: {fileID: 910003218416728329, guid: 50eb9c40ff09940a5bb4bc873467d5ac, type: 3}
+      propertyPath: m_Navigation.m_SelectOnDown
+      value: 
+      objectReference: {fileID: 6104654863598461413}
     - target: {fileID: 910003218416728329, guid: 50eb9c40ff09940a5bb4bc873467d5ac, type: 3}
       propertyPath: m_Navigation.m_SelectOnRight
       value: 
