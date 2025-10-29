@@ -29,11 +29,18 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// テーマとキーワードを表示
     /// </summary>
     /// <param name="themeData">テーマデータ</param>
-    public void DisplayThemeWithKeywords(ThemeData themeData)
+    public async UniTask DisplayThemeWithKeywords(ThemeData themeData)
     {
+        // BGMボリュームを下げる
+        await BgmManager.Instance.DuckVolume();
+
+        SeManager.Instance.PlaySe("ThemeAppearance");
         _themeData = themeData;
-        // テーマタイトルを表示
         themeText.TypewriterAnimation(themeData.Title, skipOnClick:false).Forget();
+        await UniTask.Delay(4000);
+
+        // BGMボリュームを元に戻す
+        BgmManager.Instance.RestoreVolume().Forget();
 
         // 既存のキーワードViewをクリア
         ClearKeywords();

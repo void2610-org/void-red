@@ -73,7 +73,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     {
         Initialize().Forget();
         SafeNavigationManager.SelectRootForceSelectable().Forget();
-        BgmManager.Instance.PlayRandomBGM(BgmType.Novel);
+        BgmManager.Instance.PlayBGMBySceneType(BgmType.Novel);
     }
     
     private async UniTaskVoid Initialize()

@@ -79,7 +79,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _battleUIPresenter.SetBattlePresenter(this);
 
         InitializeGameAsync().Forget();
-        BgmManager.Instance.PlayRandomBGM(BgmType.Battle);
+        BgmManager.Instance.PlayBGMBySceneType(BgmType.Battle);
     }
 
     /// <summary>
@@ -244,11 +244,11 @@ public class BattlePresenter: IStartable, ISceneInitializable
             _currentTheme = newTheme;
         }
 
-        _battleUIPresenter.SetTheme(_currentTheme);
+        await _battleUIPresenter.SetTheme(_currentTheme);
 
         // 初回ターン かつ 敵がアルヴならチュートリアルを表示
-        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "E001")
-            await _battleUIPresenter.StartBattleTutorial();
+        // if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "E001")
+        //     await _battleUIPresenter.StartBattleTutorial();
 
         // テーマ詳細を表示して閉じられるまで待機
         await _battleUIPresenter.ShowThemeDetailAndWait();
