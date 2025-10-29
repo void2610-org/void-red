@@ -23,7 +23,6 @@ public class TutorialPresenter : IDisposable
         _allTutorialData = allTutorialData;
         _inputActionsProvider = inputActionsProvider;
         _player = player;
-        _allTutorialData.RegisterAllTutorials();
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _tutorialView = UnityEngine.Object.FindFirstObjectByType<TutorialView>();
         _simpleTutorialWindowView = UnityEngine.Object.FindFirstObjectByType<SimpleTutorialWindowView>();
