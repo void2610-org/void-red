@@ -56,7 +56,7 @@ MonoBehaviour:
   settingsContentContainerPrefab: {fileID: 7225325487053053027, guid: 900fe155ca4c242cbb5e4864027fad36, type: 3}
   titleTextPrefab: {fileID: 4424128005466119772, guid: 8d8b7750925fd4f768c86fb8130c0b1f, type: 3}
   sliderSettingPrefab: {fileID: 7030880041223794483, guid: fadfad5c893fa4c0bac5fc50324f17c3, type: 3}
-  buttonSettingPrefab: {fileID: 7651081926481070851, guid: 943b7cbed17ff40ebaaf0c39c6c21fe0, type: 3}
+  buttonSettingPrefab: {fileID: 277754951790194367, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
   enumSettingPrefab: {fileID: 7336120262016937810, guid: 06fbcdcc90c844d1caad0f52ad5db100, type: 3}
 --- !u!225 &1528704412222517414
 CanvasGroup:
