@@ -112,7 +112,9 @@ public class PlayStyleView : MonoBehaviour
     private void Awake()
     {
         // ボタンイベントの設定
-        wheelButton.onClick.AddListener(RotateWheel);
+        wheelButton.OnClickAsObservable()
+            .Subscribe(_ => RotateWheel())
+            .AddTo(this);
         
         // 初期状態を設定
         UpdateImageHighlight();
@@ -122,6 +124,5 @@ public class PlayStyleView : MonoBehaviour
     private void OnDestroy()
     {
         _playStyleSelected?.Dispose();
-        wheelButton.onClick.RemoveAllListeners();
     }
 }

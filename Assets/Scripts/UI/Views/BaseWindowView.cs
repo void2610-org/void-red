@@ -26,6 +26,13 @@ public abstract class BaseWindowView : MonoBehaviour
 
     // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
     private static readonly List<BaseWindowView> _activeWindows = new();
+    
+    public static GameObject GetTopActiveWindowCloseButton()
+    {
+        if (_activeWindows.Count == 0) return null;
+        var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
+        return topWindow ? topWindow.closeButton.gameObject : null;
+    }
 
     /// <summary>
     /// アクティブなウィンドウが存在するか
@@ -72,9 +79,9 @@ public abstract class BaseWindowView : MonoBehaviour
         if (!_activeWindows.Contains(this))
             _activeWindows.Add(this);
 
+        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
     }
 
     private async UniTaskVoid HideWithAnimation()

@@ -99,7 +99,6 @@ public class SettingsView : BaseWindowView
     {
         // 設定項目のコンテナを作成（横並び用）
         var containerObject = Instantiate(settingsContentContainerPrefab, settingsContainer);
-        // containerObject.transform.localScale = Vector3.one;
         
         // タイトルテキストを作成（左側）
         CreateTitleText(containerObject.transform, settingData.displayName);
@@ -135,11 +134,8 @@ public class SettingsView : BaseWindowView
         var textComponent = titleObject.GetComponentInChildren<TextMeshProUGUI>();
         textComponent.text = titleText;
         // レイアウト要素を追加してタイトル幅を固定
-        var layoutElement = titleObject.GetComponent<LayoutElement>();
-        if (!layoutElement)
-        {
+        if (!titleObject.TryGetComponent<LayoutElement>(out var layoutElement))
             layoutElement = titleObject.AddComponent<LayoutElement>();
-        }
         layoutElement.preferredWidth = 150f; // タイトルの固定幅
         layoutElement.flexibleWidth = 0f;    // 伸縮しない
     }
@@ -152,11 +148,8 @@ public class SettingsView : BaseWindowView
         var uiObject = Instantiate(sliderSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
-        var layoutElement = uiObject.GetComponent<LayoutElement>();
-        if (!layoutElement)
-        {
+        if (!uiObject.TryGetComponent<LayoutElement>(out var layoutElement))
             layoutElement = uiObject.AddComponent<LayoutElement>();
-        }
         layoutElement.flexibleWidth = 1f; // 残りの幅を使用
         
         // UIコンポーネントを取得
@@ -164,18 +157,15 @@ public class SettingsView : BaseWindowView
         var valueText = uiObject.transform.Find("ValueText")?.GetComponent<TextMeshProUGUI>();
         
         // スライダーの設定
-        if (slider)
-        {
-            slider.minValue = settingData.minValue;
-            slider.maxValue = settingData.maxValue;
-            slider.value = settingData.floatValue;
-            
-            // スライダー変更時のイベント - 外部に通知
-            slider.onValueChanged.AddListener(value => {
-                UpdateValueText(valueText, value);
-                _onSliderChanged.OnNext((settingData.name, value));
-            });
-        }
+        slider.minValue = settingData.minValue;
+        slider.maxValue = settingData.maxValue;
+        slider.value = settingData.floatValue;
+        
+        // スライダー変更時のイベント - 外部に通知
+        slider.onValueChanged.AddListener(value => {
+            UpdateValueText(valueText, value);
+            _onSliderChanged.OnNext((settingData.name, value));
+        });
         
         // 値テキストの初期化
         UpdateValueText(valueText, settingData.floatValue);
@@ -189,34 +179,22 @@ public class SettingsView : BaseWindowView
         var uiObject = Instantiate(buttonSettingPrefab, parent);
         
         // レイアウト要素を追加して残り幅を使用
-        var layoutElement = uiObject.GetComponent<LayoutElement>();
-        if (!layoutElement)
-        {
+        if (!uiObject.TryGetComponent<LayoutElement>(out var layoutElement))
             layoutElement = uiObject.AddComponent<LayoutElement>();
-        }
         layoutElement.flexibleWidth = 1f; // 残りの幅を使用
         
-        // UIコンポーネントを取得
         var button = uiObject.GetComponentInChildren<Button>();
-        var buttonText = button?.GetComponentInChildren<TextMeshProUGUI>();
+        var buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
         
-        // ボタンテキストを設定
-        if (buttonText) buttonText.text = settingData.buttonText;
+        buttonText.text = settingData.buttonText;
         
         // ボタンクリック時のイベント - 外部に通知
-        if (button)
-        {
-            button.onClick.AddListener(() => {
-                if (settingData.requiresConfirmation)
-                {
-                    ShowConfirmationDialog(settingData).Forget();
-                }
-                else
-                {
-                    _onButtonClicked.OnNext(settingData.name);
-                }
-            });
-        }
+        button.onClick.AddListener(() => {
+            if (settingData.requiresConfirmation)
+                ShowConfirmationDialog(settingData).Forget();
+            else
+                _onButtonClicked.OnNext(settingData.name);
+        });
     }
     
     /// <summary>
@@ -252,14 +230,17 @@ public class SettingsView : BaseWindowView
     private void CreateEnumUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(enumSettingPrefab, parent);
-        
+
         // レイアウト要素を追加して残り幅を使用
-        var layoutElement = uiObject.GetComponent<LayoutElement>();
-        if (!layoutElement)
-        {
+        if (!uiObject.TryGetComponent<LayoutElement>(out var layoutElement))
             layoutElement = uiObject.AddComponent<LayoutElement>();
-        }
         layoutElement.flexibleWidth = 1f; // 残りの幅を使用
+
+        // RectTransformを取得して左マージンを追加
+        var rectTransform = uiObject.GetComponent<RectTransform>();
+        var offsetMin = rectTransform.offsetMin;
+        offsetMin.x += 140f;
+        rectTransform.offsetMin = offsetMin;
         
         // UIコンポーネントを取得
         var prevButton = uiObject.transform.Find("PrevButton")?.GetComponent<Button>();
@@ -271,31 +252,25 @@ public class SettingsView : BaseWindowView
         if (currentIndex < 0) currentIndex = 0;
         
         // ボタンの設定
-        if (prevButton)
-        {
-            prevButton.onClick.AddListener(() => {
-                if (settingData.options is { Length: > 0 })
-                {
-                    currentIndex = (currentIndex - 1 + settingData.options.Length) % settingData.options.Length;
-                    var newValue = settingData.options[currentIndex];
-                    UpdateEnumValueText(valueText, settingData, currentIndex);
-                    _onEnumChanged.OnNext((settingData.name, newValue));
-                }
-            });
-        }
+        prevButton.onClick.AddListener(() => {
+            if (settingData.options is { Length: > 0 })
+            {
+                currentIndex = (currentIndex - 1 + settingData.options.Length) % settingData.options.Length;
+                var newValue = settingData.options[currentIndex];
+                UpdateEnumValueText(valueText, settingData, currentIndex);
+                _onEnumChanged.OnNext((settingData.name, newValue));
+            }
+        });
         
-        if (nextButton)
-        {
-            nextButton.onClick.AddListener(() => {
-                if (settingData.options is { Length: > 0 })
-                {
-                    currentIndex = (currentIndex + 1) % settingData.options.Length;
-                    var newValue = settingData.options[currentIndex];
-                    UpdateEnumValueText(valueText, settingData, currentIndex);
-                    _onEnumChanged.OnNext((settingData.name, newValue));
-                }
-            });
-        }
+        nextButton.onClick.AddListener(() => {
+            if (settingData.options is { Length: > 0 })
+            {
+                currentIndex = (currentIndex + 1) % settingData.options.Length;
+                var newValue = settingData.options[currentIndex];
+                UpdateEnumValueText(valueText, settingData, currentIndex);
+                _onEnumChanged.OnNext((settingData.name, newValue));
+            }
+        });
         
         // 値テキストの初期化
         UpdateEnumValueText(valueText, settingData, currentIndex);

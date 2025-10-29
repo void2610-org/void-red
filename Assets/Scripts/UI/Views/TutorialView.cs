@@ -31,8 +31,6 @@ public class TutorialView : MonoBehaviour
 
     private readonly Subject<Unit> _onClickAdvance = new();
 
-    public bool IsClickAreaButtonSelected => SafeNavigationManager.GetCurrentSelected() == clickAreaButton.gameObject;
-
     public void NotifyAdvance()
     {
         if (_isTyping)
@@ -149,13 +147,6 @@ public class TutorialView : MonoBehaviour
         _currentMaskSize = Vector2.zero;
     }
 
-    private void Update()
-    {
-        if (!_canvasGroup.interactable) return;
-        
-        SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
-    }
-    
     private void Awake()
     {
         _canvasGroup = this.GetComponent<CanvasGroup>();

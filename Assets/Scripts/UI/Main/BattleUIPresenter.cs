@@ -135,11 +135,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
     /// <summary>
     /// カードをプレイ（InputSystem用の公開メソッド）
-    /// カードが選択されており、プレイボタンが表示されている場合のみ実行
     /// </summary>
     public void TryPlayCard()
     {
-        if (_player.SelectedCard.CurrentValue != null && _playButtonView.gameObject.activeSelf)
+        if (_player.SelectedCard.CurrentValue != null)
         {
             _playButtonView.SimulateClick();
         }
