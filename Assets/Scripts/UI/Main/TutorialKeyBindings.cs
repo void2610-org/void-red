@@ -16,7 +16,7 @@ public static class TutorialKeyBindings
         CompositeDisposable disposables)
     {
         // チュートリアルを進める
-        inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
+        inputActionsProvider.UI.Submit.OnPerformedAsObservable()
             .Subscribe(_ => tutorialView.NotifyAdvance())
             .AddTo(disposables);
     }
