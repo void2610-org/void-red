@@ -221,8 +221,16 @@ public class CardView : BaseCardView
 
         _edgeColorTween.TryCancel();
         
+        // 知覚的輝度を計算
+        float PerceptualLuminance(Color color)
+        {
+            return 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
+        }
+        
+        var intensity =  score * (1.2f * (1 - PerceptualLuminance(CardData.Color)));
+        
         // EdgeUIEffectのColorをTween
-        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, score * 1.2f, 0.3f)
+        _edgeColorTween = LMotion.Create(edgeUIEffect.edgeColor.a, intensity, 0.3f)
             .WithEase(Ease.OutCubic)
             .Bind(v => edgeUIEffect.edgeColor = Color.white * v);
     }

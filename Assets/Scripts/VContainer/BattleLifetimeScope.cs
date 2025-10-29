@@ -4,7 +4,6 @@ using VContainer.Unity;
 
 public class BattleLifetimeScope : LifetimeScope
 {
-    [SerializeField] private AllThemeData allThemeData;
     [SerializeField] private HandView playerHandView;
     [SerializeField] private HandView enemyHandView;
     
@@ -28,9 +27,6 @@ public class BattleLifetimeScope : LifetimeScope
         builder.Register<PersonalityLogService>(Lifetime.Singleton);
         builder.RegisterComponentInHierarchy<VolumeController>();
         
-        allThemeData.RegisterAllThemes();
-        builder.RegisterInstance(allThemeData).AsSelf();
-
         builder.RegisterEntryPoint<BattlePresenter>().AsSelf().As<ISceneInitializable>();
         builder.RegisterEntryPoint<BattleUIPresenter>().AsSelf();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();

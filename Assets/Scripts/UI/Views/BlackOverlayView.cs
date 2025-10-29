@@ -23,17 +23,7 @@ public class BlackOverlayView : MonoBehaviour
     /// <summary>
     /// 現在表示されているかどうか
     /// </summary>
-    public bool IsVisible { get; private set; }
-    
-    private void Awake()
-    {
-        _overlayImage = GetComponent<Image>();
-        
-        // 初期状態は非表示
-        _overlayImage.color = new Color(0f, 0f, 0f, 0f);
-        gameObject.SetActive(false);
-        IsVisible = false;
-    }
+    private bool IsVisible { get; set; }
     
     /// <summary>
     /// 背景をフェードイン
@@ -72,25 +62,11 @@ public class BlackOverlayView : MonoBehaviour
         gameObject.SetActive(false);
     }
     
-    /// <summary>
-    /// 即座に表示
-    /// </summary>
-    public void Show()
+    private void Awake()
     {
-        if (_currentFadeHandle.IsActive()) _currentFadeHandle.Cancel();
+        _overlayImage = GetComponent<Image>();
         
-        gameObject.SetActive(true);
-        _overlayImage.color = new Color(0f, 0f, 0f, maxOpacity);
-        IsVisible = true;
-    }
-    
-    /// <summary>
-    /// 即座に非表示
-    /// </summary>
-    public void Hide()
-    {
-        if (_currentFadeHandle.IsActive()) _currentFadeHandle.Cancel();
-        
+        // 初期状態は非表示
         _overlayImage.color = new Color(0f, 0f, 0f, 0f);
         gameObject.SetActive(false);
         IsVisible = false;
