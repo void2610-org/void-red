@@ -12,13 +12,21 @@ public static class BattleKeyBindings
     public static void Setup(
         InputActionsProvider inputActionsProvider,
         BattleUIPresenter battleUIPresenter,
+        ThemeView themeView,
         ReadOnlyReactiveProperty<GameState> currentGameState,
         CompositeDisposable disposables)
     {
         // ViewをシーンからFind
         var personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
         var playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
-
+        
+        // テーマのキーワードをトグル表示
+        inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
+            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+            .Where(_ => !BaseWindowView.HasActiveWindows)
+            .Subscribe(_ => themeView.ToggleKeywords())
+            .AddTo(disposables);
+        
         // 人格ログを開く
         inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)

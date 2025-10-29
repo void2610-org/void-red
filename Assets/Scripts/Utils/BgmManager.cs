@@ -30,6 +30,8 @@ namespace Void2610.UnityTemplate
         private bool _isFading;
         private SoundData _currentBGM;
         private MotionHandle _fadeHandle;
+        private MotionHandle _duckingHandle;
+        private float _originalVolume = 1.0f;
 
         public float BgmVolume
         {
@@ -53,7 +55,7 @@ namespace Void2610.UnityTemplate
             _isPlaying = true;
             _audioSource.Play();
             
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+            _fadeHandle.TryCancel();
             _fadeHandle = LMotion.Create(_audioSource.volume, _currentBGM.volume, FADE_TIME)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
@@ -68,7 +70,7 @@ namespace Void2610.UnityTemplate
         
         private async UniTaskVoid PauseInternal()
         {
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+            _fadeHandle.TryCancel();
             await LMotion.Create(_audioSource.volume, 0f, FADE_TIME)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
@@ -80,37 +82,53 @@ namespace Void2610.UnityTemplate
         public async UniTask Stop()
         {
             _isPlaying = false;
-            
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+
+            _fadeHandle.TryCancel();
             await LMotion.Create(_audioSource.volume, 0f, FADE_TIME)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
                 .ToUniTask();
-            
+
             _audioSource.Stop();
             _currentBGM = null;
         }
 
-        public void PlayBGM(string bgmName)
+        /// <summary>
+        /// BGMボリュームを一時的に下げる（SE再生時のダッキング用）
+        /// </summary>
+        /// <param name="duckVolume">下げる先のボリューム（0.0f～1.0f）</param>
+        /// <param name="fadeTime">フェード時間</param>
+        public async UniTask DuckVolume(float duckVolume = 0.2f, float fadeTime = 0.5f)
         {
-            var data = bgmList.FirstOrDefault(t => t.name == bgmName);
-            if (data == null)
-            {
-                Debug.LogError($"BGM '{bgmName}' が見つかりません。");
-                return;
-            }
-            
-            PlayBGMInternal(data).Forget();
+            _originalVolume = _audioSource.volume;
+
+            _duckingHandle.TryCancel();
+            _duckingHandle = LMotion.Create(_audioSource.volume, _originalVolume * duckVolume, fadeTime)
+                .WithEase(Ease.OutQuad)
+                .BindToVolume(_audioSource)
+                .AddTo(this);
+
+            await _duckingHandle.ToUniTask();
         }
 
-        public void PlayRandomBGM(BgmType bgmType)
+        /// <summary>
+        /// ダッキングしたボリュームを元に戻す
+        /// </summary>
+        /// <param name="fadeTime">フェード時間</param>
+        public async UniTask RestoreVolume(float fadeTime = 0.5f)
         {
-            if (bgmList.Count == 0) return;
-            if (_currentBGM != null && _currentBGM.bgmType == bgmType) return;
+            _duckingHandle.TryCancel();
+            _duckingHandle = LMotion.Create(_audioSource.volume, _originalVolume, fadeTime)
+                .WithEase(Ease.InQuad)
+                .BindToVolume(_audioSource)
+                .AddTo(this);
 
+            await _duckingHandle.ToUniTask();
+        }
+
+        public void PlayBGMBySceneType(BgmType bgmType)
+        {
             var targetBgmList = bgmList.FindAll(x => x.bgmType == bgmType);
-            if (targetBgmList.Count == 0) return;
-            
             var data = targetBgmList[Random.Range(0, targetBgmList.Count)];
             PlayBGMInternal(data).Forget();
         }
@@ -120,7 +138,7 @@ namespace Void2610.UnityTemplate
             // 現在のBGMをフェードアウト
             if (_currentBGM != null)
             {
-                if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+                _fadeHandle.TryCancel();
                 await LMotion.Create(_audioSource.volume, 0f, FADE_TIME)
                     .WithEase(Ease.InQuad)
                     .BindToVolume(_audioSource)
@@ -132,6 +150,7 @@ namespace Void2610.UnityTemplate
             _audioSource.clip = _currentBGM.audioClip;
             _audioSource.volume = 0;
             _audioSource.Play();
+            _isPlaying = true;
 
             // フェードイン
             _isFading = true;
@@ -139,7 +158,7 @@ namespace Void2610.UnityTemplate
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
                 .AddTo(this);
-            
+
             // フェードイン完了を待機
             FadeInComplete().Forget();
         }
@@ -155,38 +174,52 @@ namespace Void2610.UnityTemplate
             base.Awake();
             _audioSource = gameObject.AddComponent<AudioSource>();
             _audioSource.outputAudioMixerGroup = bgmMixerGroup;
+            _audioSource.playOnAwake = false;
             _audioSource.loop = false; // ループは手動で管理
+            _audioSource.volume = 0f;
         }
         
         private void Start()
         {
             _currentBGM = null;
             bgmMixerGroup.audioMixer.SetFloat("BgmVolume", Mathf.Log10(_bgmVolume) * 20);
-            _audioSource.volume = 0;
         }
 
         private void Update()
         {
             if (_isPlaying && _audioSource.clip && !_isFading)
             {
-                var remainingTime = _audioSource.clip.length - _audioSource.time;
-                if (remainingTime <= FADE_TIME)
+                if (!_audioSource.isPlaying)
                 {
+                    // 曲が終了したので次の曲を再生
                     _isFading = true;
-                    LoopToNextBGM(remainingTime).Forget();
+                    LoopToNextBGM(0f).Forget();
+                }
+                else
+                {
+                    var remainingTime = _audioSource.clip.length - _audioSource.time;
+                    if (remainingTime <= FADE_TIME)
+                    {
+                        _isFading = true;
+                        LoopToNextBGM(remainingTime).Forget();
+                    }
                 }
             }
         }
         
         private async UniTaskVoid LoopToNextBGM(float fadeTime)
         {
-            if (_fadeHandle.IsActive()) _fadeHandle.Cancel();
+            if (_currentBGM == null) return;
+
+            var currentBgmType = _currentBGM.bgmType;
+
+            _fadeHandle.TryCancel();
             await LMotion.Create(_audioSource.volume, 0f, fadeTime)
                 .WithEase(Ease.InQuad)
                 .BindToVolume(_audioSource)
                 .ToUniTask();
-            
-            PlayRandomBGM(_currentBGM.bgmType);
+
+            PlayBGMBySceneType(currentBgmType);
         }
     }
 }
