@@ -1619,6 +1619,10 @@ PrefabInstance:
       propertyPath: m_Navigation.m_SelectOnDown
       value: 
       objectReference: {fileID: 865001916}
+    - target: {fileID: 8781312253566003751, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
+      propertyPath: m_Navigation.m_SelectOnLeft
+      value: 
+      objectReference: {fileID: 1291362557}
     - target: {fileID: 9037413902010202566, guid: f65dc8979a47647bcb8b61aed6cfd5dd, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1843,6 +1847,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: HelpButton
       objectReference: {fileID: 0}
+    - target: {fileID: 6567327757825340667, guid: 3efb9ea216e824c0a907f3c24fa2e9f2, type: 3}
+      propertyPath: m_Navigation.m_SelectOnDown
+      value: 
+      objectReference: {fileID: 865001916}
+    - target: {fileID: 6567327757825340667, guid: 3efb9ea216e824c0a907f3c24fa2e9f2, type: 3}
+      propertyPath: m_Navigation.m_SelectOnLeft
+      value: 
+      objectReference: {fileID: 558389026}
+    - target: {fileID: 6567327757825340667, guid: 3efb9ea216e824c0a907f3c24fa2e9f2, type: 3}
+      propertyPath: m_Navigation.m_SelectOnRight
+      value: 
+      objectReference: {fileID: 1533597610}
     - target: {fileID: 6887676441548646170, guid: 3efb9ea216e824c0a907f3c24fa2e9f2, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1933,6 +1949,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6887676441548646170, guid: 3efb9ea216e824c0a907f3c24fa2e9f2, type: 3}
   m_PrefabInstance: {fileID: 1291362555}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1291362557 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6567327757825340667, guid: 3efb9ea216e824c0a907f3c24fa2e9f2, type: 3}
+  m_PrefabInstance: {fileID: 1291362555}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb52b1a925d94b5c87565507a70d245, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1336976330
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2583,7 +2610,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc7d8e9b3755e47cc8ce204ff5672e87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settingsButton: {fileID: 1533597610}
   titleButton: {fileID: 558389026}
   deckButton: {fileID: 1591245447}
   libraryButton: {fileID: 432333996}
