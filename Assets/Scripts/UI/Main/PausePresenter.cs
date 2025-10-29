@@ -51,13 +51,9 @@ public class PausePresenter : IStartable, System.IDisposable
     private void TogglePause()
     {
         if (_pauseView.IsShowing)
-        {
             _pauseView.Hide();
-        }
         else
-        {
             _pauseView.Show();
-        }
     }
 
     public void Dispose()

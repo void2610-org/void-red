@@ -27,10 +27,10 @@ public class HelpPresenter : IStartable, IDisposable
         // ビューの取得
         _helpView = UnityEngine.Object.FindFirstObjectByType<HelpView>();
         _helpButtonView = UnityEngine.Object.FindFirstObjectByType<HelpButtonView>();
-        
-        // Helpアクションの購読
+
+        // Helpアクションの購読（トグル処理）
         _inputActionsProvider.UI.Help.OnPerformedAsObservable()
-            .Subscribe(_ => ShowHelp())
+            .Subscribe(_ => ToggleHelp())
             .AddTo(_disposables);
 
         // ヘルプボタンのイベント購読
@@ -49,12 +49,21 @@ public class HelpPresenter : IStartable, IDisposable
     }
 
     /// <summary>
+    /// ヘルプ画面の表示/非表示を切り替え
+    /// </summary>
+    private void ToggleHelp()
+    {
+        if (_helpView.IsShowing)
+            _helpView.Hide();
+        else
+            ShowHelp();
+    }
+
+    /// <summary>
     /// ヘルプ画面を表示
     /// </summary>
-    public void ShowHelp()
+    private void ShowHelp()
     {
-        if (!_helpView || _allHelpData.Count == 0) return;
-
         _currentIndex = 0;
         UpdateHelpDisplay();
         _helpView.Show();
@@ -90,10 +99,9 @@ public class HelpPresenter : IStartable, IDisposable
     private void UpdateHelpDisplay()
     {
         var helpData = _allHelpData.GetHelpByIndex(_currentIndex);
-        if (helpData)
-        {
-            _helpView.DisplayHelp(helpData, _currentIndex, _allHelpData.Count);
-        }
+        if (!helpData) return;
+        
+        _helpView.DisplayHelp(helpData, _currentIndex, _allHelpData.Count);
     }
 
     public void Dispose()
