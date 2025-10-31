@@ -10,7 +10,9 @@ using UnityEngine.UI;
 public class MentalPowerView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI mentalPowerText;
-    [SerializeField] private Image mentalStateImage;
+    [SerializeField] private Image mentalFireImage;
+    [SerializeField] private Image characterIconImage;
+    [SerializeField] private Image frameImage;
     [ColorUsage(false, true), SerializeField] private Color highMentalColor = Color.blue;
     [ColorUsage(false, true), SerializeField] private Color midMentalColor = Color.yellow;
     [ColorUsage(false, true), SerializeField] private Color lowMentalColor = Color.red;
@@ -18,6 +20,12 @@ public class MentalPowerView : MonoBehaviour
 
     private Material _mentalFireMaterial;
     private MotionHandle _colorMotionHandle;
+
+    public void SetCharacterIcon(Sprite icon, Sprite frame)
+    {
+        characterIconImage.sprite = icon;
+        frameImage.sprite = frame;
+    }
     
     /// <summary>
     /// 精神力表示を更新（現在値と割合でスプライトを切り替え）
@@ -49,8 +57,8 @@ public class MentalPowerView : MonoBehaviour
 
     private void Awake()
     {
-        _mentalFireMaterial = Instantiate(mentalStateImage.material);
-        mentalStateImage.material = _mentalFireMaterial;
+        _mentalFireMaterial = Instantiate(mentalFireImage.material);
+        mentalFireImage.material = _mentalFireMaterial;
         
         UpdateDisplay(20, 20);
     }

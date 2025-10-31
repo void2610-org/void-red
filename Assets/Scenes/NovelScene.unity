@@ -780,7 +780,7 @@ MonoBehaviour:
   autoInjectGameObjects:
   - {fileID: 0}
   novelSeManager: {fileID: 1113668051}
-  useLocalExcel: 1
+  useLocalExcel: 0
 --- !u!1001 &1324742070
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1170,6 +1170,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 4576503207100050310, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Name
       value: DialogView
@@ -1253,6 +1257,10 @@ PrefabInstance:
     - target: {fileID: 8503395000404048060, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8519973265354147594, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

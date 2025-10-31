@@ -11,18 +11,15 @@ public class EnemyData : ScriptableObject
     [Header("基本情報")]
     [SerializeField] private string enemyId;
     [SerializeField] private string enemyName;
-    [SerializeField, TextArea(3, 5)] private string description;
     
     [Header("敵画像")]
     [SerializeField] private Sprite defaultSprite;
+    [SerializeField] private Sprite iconSprite;
+    [SerializeField] private Sprite frameSprite;
     
     [Header("属性別画像")]
     [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
     
-    [Header("ステータス")]
-    [SerializeField] private int maxMentalPower = 10;
-    [SerializeField] private int initialMentalPower = 10;
-
     [SerializeField] private SerializableDictionary<PlayStyle, float> playstyleWeights = new ();
     
     [Header("デッキ構成")]
@@ -32,21 +29,18 @@ public class EnemyData : ScriptableObject
     [SerializeField] private CardData resonanceCard;
 
     [Header("テーマ設定")]
-    [SerializeField] private ThemeData majorTheme; // 大テーマ（どちらかが2勝時）
-    [SerializeField] private List<ThemeData> minorThemes = new(); // 小テーマ（通常時）
+    [SerializeField] private List<ThemeData> themes = new(); // 各ターンのテーマ（3つ固定）
 
     // プロパティ
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
-    public string Description => description;
     public Sprite DefaultSprite => defaultSprite;
-    public int MaxMentalPower => maxMentalPower;
-    public int InitialMentalPower => initialMentalPower;
+    public Sprite IconSprite => iconSprite;
+    public Sprite FrameSprite => frameSprite;
     public SerializableDictionary<PlayStyle, float> PlaystyleWeights => playstyleWeights;
     public List<CardData> InitialDeck => initialDeck;
     public CardData ResonanceCard => resonanceCard;
-    public ThemeData MajorTheme => majorTheme;
-    public List<ThemeData> MinorThemes => minorThemes;
+    public List<ThemeData> Themes => themes;
     
     /// <summary>
     /// 指定された属性に対応するSpriteを取得

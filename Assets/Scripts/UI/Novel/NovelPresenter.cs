@@ -78,9 +78,9 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     
     private async UniTaskVoid Initialize()
     {
-        _dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
-        _itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
-        _choiceView = UnityEngine.Object.FindAnyObjectByType<ChoiceView>();
+        _dialogView = Object.FindAnyObjectByType<DialogView>();
+        _itemGetEffectView = Object.FindAnyObjectByType<ItemGetEffectView>();
+        _choiceView = Object.FindAnyObjectByType<ChoiceView>();
 
         // キーバインドを初期化
         NovelKeyBindings.Setup(_inputActionsProvider, this, _disposables);

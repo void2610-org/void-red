@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyId: alv
   enemyName: "\u30A2\u30EB\u30F4"
-  description: "\u6575\u306E\u8AAC\u660E\u6587\u304C\u3053\u3053\u306B\u5165\u308A\u307E\u305911111"
   defaultSprite: {fileID: 21300000, guid: 021a93a055b804f418cd07b3416b25a0, type: 3}
+  iconSprite: {fileID: 21300000, guid: 9211241a8471d4b319e21e9e18ef4aec, type: 3}
+  frameSprite: {fileID: 21300000, guid: d10bb60b880c34b8faed64d901a39fb8, type: 3}
   attributeSprites:
     serializedList:
     - key: 0
@@ -30,8 +31,6 @@ MonoBehaviour:
       value: {fileID: 21300000, guid: 5ab3d58af953648619198c0ebb508f72, type: 3}
     - key: 5
       value: {fileID: 21300000, guid: dbd9d78e045314a78af872aff7db913d, type: 3}
-  maxMentalPower: 10
-  initialMentalPower: 10
   playstyleWeights:
     serializedList:
     - key: 0
@@ -47,6 +46,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5ecb5aa2c56fa41448a2e55ccf2af044, type: 2}
   - {fileID: 11400000, guid: 340062878b38c4d26abf33d3bf2cc4d3, type: 2}
   resonanceCard: {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
-  majorTheme: {fileID: 11400000, guid: 01136d71471194f54b19c069b86688f3, type: 2}
-  minorThemes:
+  themes:
+  - {fileID: 11400000, guid: 88efa80b87a1648a498bf38eff4b79f9, type: 2}
   - {fileID: 11400000, guid: db655a0ad5e674761a2f9d44351cf842, type: 2}
+  - {fileID: 11400000, guid: ad279f2457096402485e64580c368031, type: 2}
