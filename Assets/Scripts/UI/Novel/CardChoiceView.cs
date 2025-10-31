@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
 using R3;
+using LitMotion;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カード風選択肢表示を担当するViewクラス
@@ -21,6 +23,7 @@ public class CardChoiceView : MonoBehaviour
     
     private readonly Subject<int> _choiceSelectedSubject = new();
     private readonly CompositeDisposable _disposables = new();
+    private MotionHandle _panelFadeMotion;
     
     private void Awake()
     {
@@ -47,9 +50,9 @@ public class CardChoiceView : MonoBehaviour
     public async UniTask<int> ShowCardChoice(CardChoiceData cardChoiceData, Sprite cardImage1, Sprite cardImage2)
     {
         SetupUIElements(cardChoiceData, cardImage1, cardImage2);
-        ShowPanel();
+        await ShowPanel();
         var selectedIndex = await WaitForUserChoice();
-        HidePanel();
+        await HidePanel();
         
         return selectedIndex;
     }
@@ -69,11 +72,19 @@ public class CardChoiceView : MonoBehaviour
     /// <summary>
     /// パネルを表示状態にする
     /// </summary>
-    private void ShowPanel()
+    private async UniTask ShowPanel()
     {
-        cardChoicePanelCanvasGroup.alpha = 1f;
-        cardChoicePanelCanvasGroup.interactable = true;
+        const float fadeDuration = 0.45f;
+
+        // 表示開始時は操作を無効にしてからフェードイン
+        cardChoicePanelCanvasGroup.alpha = 0f;
+        cardChoicePanelCanvasGroup.interactable = false;
         cardChoicePanelCanvasGroup.blocksRaycasts = true;
+
+        _panelFadeMotion = cardChoicePanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+        await _panelFadeMotion.ToUniTask();
+
+        cardChoicePanelCanvasGroup.interactable = true;
     }
     
     /// <summary>
@@ -87,10 +98,14 @@ public class CardChoiceView : MonoBehaviour
     /// <summary>
     /// パネルを非表示状態にする
     /// </summary>
-    private void HidePanel()
+    private async UniTask HidePanel()
     {
-        cardChoicePanelCanvasGroup.alpha = 0f;
+        const float fadeDuration = 0.35f;
+
+        // 非表示時は操作を無効化してフェードアウト
         cardChoicePanelCanvasGroup.interactable = false;
+        _panelFadeMotion = cardChoicePanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
+        await _panelFadeMotion.ToUniTask();
         cardChoicePanelCanvasGroup.blocksRaycasts = false;
     }
     

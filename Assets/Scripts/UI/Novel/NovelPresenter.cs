@@ -276,7 +276,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         var cardChoiceData = dialogData.CardChoiceData;
         
         // ダイアログパネルと立ち絵を非表示（背景は残す）
-        _dialogView.SetDialogPanelVisible(false);
+        await _dialogView.SetDialogPanelVisible(false);
         
         // カード画像を読み込み
         var cardImage1 = await _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName1);
@@ -296,7 +296,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         Debug.Log($"[NovelPresenter] ユーザーが選択したカード選択肢: {selectedIndex} - {cardChoiceData.GetOption(selectedIndex)}");
         
         // ダイアログパネルと立ち絵を再表示
-        _dialogView.SetDialogPanelVisible(true);
+        await _dialogView.SetDialogPanelVisible(true);
     }
     
     /// <summary>

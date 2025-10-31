@@ -16,10 +16,12 @@ public class DialogView : MonoBehaviour
 {
     [Header("UI要素")]
     [SerializeField] private GameObject dialogTextPanel;
+    [SerializeField] private CanvasGroup dialogTextPanelCanvasGroup;
     [SerializeField] private TextMeshProUGUI speakerNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
+    [SerializeField] private CanvasGroup characterImageCanvasGroup;
     [SerializeField] private Image backgroundImage;
     
     [Header("操作ボタン")]
@@ -45,6 +47,8 @@ public class DialogView : MonoBehaviour
 
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
+    private MotionHandle _panelFadeMotion;
+    private MotionHandle _characterFadeMotion;
 
     private string _currentImageName;
     private float _additionalWaitTime;
@@ -397,23 +401,36 @@ public class DialogView : MonoBehaviour
     }
     
     /// <summary>
-    /// DialogViewの操作可能状態を設定（アイテム取得演出中の制御用）
-    /// </summary>
-    /// <param name="interactable">操作可能かどうか</param>
-    public void SetInteractable(bool interactable)
-    {
-        if (!this) return;
-        clickAreaButton.interactable = interactable;
-    }
-    
-    /// <summary>
     /// ダイアログパネルと立ち絵を表示/非表示（Backは残す）
+    /// Tweenでフェードイン/アウト。表示時はGameObject有効化→alpha 0→1、非表示時はalpha 1→0→GameObject無効化。
+    /// nextIndicatorは即時切り替え。
     /// </summary>
-    public void SetDialogPanelVisible(bool visible)
+    public async UniTask SetDialogPanelVisible(bool visible)
     {
-        dialogTextPanel.SetActive(visible);
-        characterImage.gameObject.SetActive(visible);
-        nextIndicator.SetActive(visible);
+        CancelActiveMotions();
+
+        const float fadeDuration = 0.5f;
+        if (visible)
+        {
+            dialogTextPanel.SetActive(true);
+            characterImage.gameObject.SetActive(true);
+            dialogTextPanelCanvasGroup.alpha = 0f;
+            characterImageCanvasGroup.alpha = 0f;
+
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+            _characterFadeMotion = characterImageCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+            nextIndicator.SetActive(true);
+            await UniTask.WhenAll(_panelFadeMotion.ToUniTask(), _characterFadeMotion.ToUniTask());
+        }
+        else
+        {
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
+            _characterFadeMotion = characterImageCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
+            nextIndicator.SetActive(false);
+            await UniTask.WhenAll(_panelFadeMotion.ToUniTask(), _characterFadeMotion.ToUniTask());
+            dialogTextPanel.SetActive(false);
+            characterImage.gameObject.SetActive(false);
+        }
     }
     
     /// <summary>
@@ -425,6 +442,10 @@ public class DialogView : MonoBehaviour
             _fadeMotion.Cancel();
         if (_indicatorMotion.IsActive())
             _indicatorMotion.Cancel();
+        if (_panelFadeMotion.IsActive())
+            _panelFadeMotion.Cancel();
+        if (_characterFadeMotion.IsActive())
+            _characterFadeMotion.Cancel();
     }
     
     private void UpdateAutoButtonColor()
