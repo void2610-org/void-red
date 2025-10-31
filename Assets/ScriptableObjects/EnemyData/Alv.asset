@@ -47,6 +47,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5ecb5aa2c56fa41448a2e55ccf2af044, type: 2}
   - {fileID: 11400000, guid: 340062878b38c4d26abf33d3bf2cc4d3, type: 2}
   resonanceCard: {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
-  majorTheme: {fileID: 11400000, guid: 01136d71471194f54b19c069b86688f3, type: 2}
-  minorThemes:
+  themes:
+  - {fileID: 11400000, guid: 88efa80b87a1648a498bf38eff4b79f9, type: 2}
   - {fileID: 11400000, guid: db655a0ad5e674761a2f9d44351cf842, type: 2}
+  - {fileID: 11400000, guid: ad279f2457096402485e64580c368031, type: 2}
