@@ -64,10 +64,6 @@ public class CardDetailView : BaseWindowView
         }
 
         // キーワードを日本語名に変換してカンマ区切りで表示
-        var keywordNames = cardData.Keywords
-            .Where(k => k != KeywordType.None)
-            .Select(k => k.GetJapaneseName());
-
-        keywordsText.text = $"キーワード: {string.Join(", ", keywordNames)}";
+        keywordsText.text = $"キーワード: {string.Join(", ", cardData.Keywords)}";
     }
 }

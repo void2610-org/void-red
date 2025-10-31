@@ -25,9 +25,9 @@ public class KeywordTextView : MonoBehaviour
     private float _randomSeedX;
     private float _randomSeedY;
 
-    public void SetKeyword(KeywordType keyword)
+    public void SetKeyword(string keyword)
     {
-        _keywordText.text = keyword.GetJapaneseName();
+        _keywordText.text = keyword;
 
         // 初期位置を保存
         _initialPosition = _rectTransform.anchoredPosition;
