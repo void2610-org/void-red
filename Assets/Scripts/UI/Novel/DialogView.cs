@@ -87,7 +87,7 @@ public class DialogView : MonoBehaviour
         SetSpeakerName(dialogData.SpeakerName);
         
         // キャラクター画像を設定
-        SetCharacterImage(characterSprite);
+        SetCharacterImage(characterSprite, dialogData.CharacterImageName.Contains("Alv"));
         
         // 背景画像を設定（nullの場合は現状維持）
         if (dialogData.HasBackgroundImage && backgroundSprite) 
@@ -198,10 +198,22 @@ public class DialogView : MonoBehaviour
     /// <summary>
     /// キャラクター画像を設定
     /// </summary>
-    private void SetCharacterImage(Sprite sprite)
+    private void SetCharacterImage(Sprite sprite, bool isAlv)
     {
-            characterImage.sprite = sprite;
-            characterImage.color = sprite ? Color.white : Color.clear;
+        characterImage.sprite = sprite; 
+        characterImage.color = sprite ? Color.white : Color.clear;
+        
+        // アルヴだけ別サイズにする
+        if (isAlv)
+        {
+            characterImage.transform.localPosition = new Vector3(0f, -30f, 0f);
+            characterImage.transform.localScale = Vector3.one * 0.265f;
+        }
+        else
+        {
+            characterImage.transform.localPosition = new Vector3(0f, -110f, 0f);
+            characterImage.transform.localScale = Vector3.one * 0.35f;
+        }
     }
     
     /// <summary>
