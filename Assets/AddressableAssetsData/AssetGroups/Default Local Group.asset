@@ -85,6 +85,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2dff48227540a480ca996fd111421e94
+    m_Address: Assets/Sprites/Character/Cerica/Sad.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 319882228aac24a0ca56683db2243fca
     m_Address: Assets/Sprites/Input/mouse/scrollup.png
     m_ReadOnly: 0
@@ -325,6 +330,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b063bcd88614148daada9555a196f363
+    m_Address: Assets/Sprites/Character/Cerica/Smile.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b605c2f9307684c0fad67f28322427f6
     m_Address: Assets/Sprites/Character/Alv/1-2.png
     m_ReadOnly: 0
@@ -472,6 +482,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fa6b5c7a99d5546cea064b3451dfac8e
     m_Address: Assets/Sprites/Input/keyboard/backspace.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd1631e001c6d4cc994b5fdf5f128ad8
+    m_Address: Assets/Sprites/Character/Cerica/Normal.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
