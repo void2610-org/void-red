@@ -19,8 +19,7 @@ public class CardChoiceView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI choice2Text;
     [SerializeField] private Image choice2CardImage;
     
-    private bool _isWaitingForChoice;
-    private int _selectedChoiceIndex = -1;
+    private readonly Subject<int> _choiceSelectedSubject = new();
     private readonly CompositeDisposable _disposables = new();
     
     private void Awake()
@@ -82,12 +81,7 @@ public class CardChoiceView : MonoBehaviour
     /// </summary>
     private async UniTask<int> WaitForUserChoice()
     {
-        _isWaitingForChoice = true;
-        _selectedChoiceIndex = -1;
-        
-        await UniTask.WaitUntil(() => !_isWaitingForChoice);
-        
-        return _selectedChoiceIndex;
+        return await _choiceSelectedSubject.FirstAsync();
     }
     
     /// <summary>
@@ -105,15 +99,15 @@ public class CardChoiceView : MonoBehaviour
     /// </summary>
     private void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (!cardChoicePanelCanvasGroup.interactable || !_isWaitingForChoice) 
+        if (!cardChoicePanelCanvasGroup.interactable) 
             return;
         
-        _selectedChoiceIndex = choiceIndex;
-        _isWaitingForChoice = false;
+        _choiceSelectedSubject.OnNext(choiceIndex);
     }
     
     private void OnDestroy()
     {
+        _choiceSelectedSubject?.Dispose();
         _disposables?.Dispose();
     }
 }
