@@ -226,22 +226,17 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
         else
         {
-            // 勝利数に基づいてテーマを選択
-            ThemeData newTheme = null;
-
-            // どちらかが2勝している場合は大テーマを使用
-            if ((_playerWins == 2 || _enemyWins == 2) && _currentEnemyData.MajorTheme != null)
+            // ターン番号に基づいてテーマを順番に選択（1ターン目 = index 0, 2ターン目 = index 1, 3ターン目 = index 2）
+            var themeIndex = _currentTurnNumber - 1;
+            if (_currentEnemyData.Themes != null && themeIndex >= 0 && themeIndex < _currentEnemyData.Themes.Count)
             {
-                newTheme = _currentEnemyData.MajorTheme;
+                _currentTheme = _currentEnemyData.Themes[themeIndex];
             }
-            // 小テーマが設定されている場合はランダムに選択
-            else if (_currentEnemyData.MinorThemes is { Count: > 0 })
+            else
             {
-                var randomIndex = UnityEngine.Random.Range(0, _currentEnemyData.MinorThemes.Count);
-                newTheme = _currentEnemyData.MinorThemes[randomIndex];
+                Debug.LogWarning($"[BattlePresenter] ターン{_currentTurnNumber}のテーマが設定されていません");
+                _currentTheme = null;
             }
-
-            _currentTheme = newTheme;
         }
 
         await _battleUIPresenter.SetTheme(_currentTheme);
@@ -594,9 +589,8 @@ public class BattlePresenter: IStartable, ISceneInitializable
     {
         if (isPlayerWon) _playerWins++;
         else _enemyWins++;
-        
-        // 3勝に達したかチェック
-        return _playerWins >= GameConstants.WINS_TO_VICTORY || _enemyWins >= GameConstants.WINS_TO_VICTORY;
+
+        return _currentTurnNumber >= GameConstants.BATTLE_TURNS;
     }
     
     /// <summary>
@@ -605,8 +599,9 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private async UniTask HandleBattleEnd()
     {
         await UniTask.Delay(500);
-        
-        var playerWon = _playerWins >= GameConstants.WINS_TO_VICTORY;
+
+        // 3ターン終了後、勝利数が多い方が勝利（同数の場合はプレイヤー勝利）
+        var playerWon = _playerWins >= _enemyWins;
 
         _battleUIPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
         

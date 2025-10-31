@@ -17,9 +17,9 @@ public static class GameConstants
     /// 精神力ベットの最大値
     /// </summary>
     public const int MAX_MENTAL_BET = 7;
-    
+
     /// <summary>
-    /// ゲーム勝利に必要な勝利数
+    /// バトルのターン数（固定）
     /// </summary>
-    public const int WINS_TO_VICTORY = 3;
+    public const int BATTLE_TURNS = 3;
 }
