@@ -39,6 +39,22 @@ public class EnemyView : MonoBehaviour
         
         // 初期状態では非表示
         gameObject.SetActive(false);
+        
+        // アルヴだけサイズを変える
+        if (enemyData.name == "Alv")
+        {
+            enemyImage.transform.localPosition = new Vector3(0f, 0f, 0f);
+            enemyImage.transform.localScale = Vector3.one;
+            enemyImageBack.transform.localPosition = new Vector3(0f, 0f, 0f);
+            enemyImageBack.transform.localScale = Vector3.one;
+        }
+        else
+        {
+            enemyImage.transform.localPosition = new Vector3(0f, -300f, 0f);
+            enemyImage.transform.localScale = Vector3.one * 1.4f;
+            enemyImageBack.transform.localPosition = new Vector3(0f, -300f, 0f);
+            enemyImageBack.transform.localScale = Vector3.one * 1.4f;
+        }
     }
     
     /// <summary>
