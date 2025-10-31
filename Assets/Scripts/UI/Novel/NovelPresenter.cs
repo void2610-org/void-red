@@ -278,9 +278,11 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // ダイアログパネルと立ち絵を非表示（背景は残す）
         await _dialogView.SetDialogPanelVisible(false);
         
-        // カード画像を読み込み
-        var cardImage1 = await _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName1);
-        var cardImage2 = await _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName2);
+        // カード画像を並列で読み込み（待機時間短縮）
+        var (cardImage1, cardImage2) = await UniTask.WhenAll(
+            _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName1),
+            _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName2)
+        );
         
         // カード風選択肢を表示して結果を取得
         var selectedIndex = await _cardChoiceView.ShowCardChoice(cardChoiceData, cardImage1, cardImage2);
