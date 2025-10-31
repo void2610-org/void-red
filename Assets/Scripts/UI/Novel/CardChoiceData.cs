@@ -35,7 +35,7 @@ public class CardChoiceData
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public CardChoiceData(string option1, string imageName1, string option2, string imageName2)
+    private CardChoiceData(string option1, string imageName1, string option2, string imageName2)
     {
         this.option1 = option1;
         this.imageName1 = imageName1;
