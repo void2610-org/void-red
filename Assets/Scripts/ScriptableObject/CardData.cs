@@ -19,7 +19,7 @@ public class CardData : ScriptableObject
     [SerializeField] private int collapseThreshold = 3;
     [SerializeField] private Color color = Color.white;
     [SerializeField] private bool isTextColorBlack = false;
-    [SerializeField] private List<KeywordType> keywords = new();
+    [SerializeField] private List<string> keywords = new();
     
     [Header("進化システム")]
     [SerializeField] private List<EvolutionConditionGroup> evolutionConditionGroups = new List<EvolutionConditionGroup>();
@@ -40,7 +40,7 @@ public class CardData : ScriptableObject
     public int CollapseThreshold => collapseThreshold;
     public Color Color => color;
     public bool IsTextColorBlack => isTextColorBlack;
-    public List<KeywordType> Keywords => keywords;
+    public List<string> Keywords => keywords;
     
     public List<EvolutionConditionGroup> EvolutionConditionGroups => evolutionConditionGroups;
     public CardData EvolutionTarget => evolutionTarget;
@@ -66,10 +66,10 @@ public class CardData : ScriptableObject
     public string GetCardDescription()
     {
         // カードのタイプや効果に基づいて説明文を生成
-        var keywords = Keywords != null && Keywords.Count > 0
-            ? string.Join(", ", Keywords.Select(k => k.GetJapaneseName()))
+        var ks = Keywords is { Count: > 0 }
+            ? string.Join(", ", Keywords)
             : "なし";
 
-        return $"属性: {Attribute.ToJapaneseName()}\nキーワード: {keywords}";
+        return $"属性: {Attribute.ToJapaneseName()}\nキーワード: {ks}";
     }
 }

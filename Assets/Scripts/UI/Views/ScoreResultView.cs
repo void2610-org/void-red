@@ -78,7 +78,7 @@ public class ScoreResultView : MonoBehaviour
         var matchedKeywords = ScoreCalculator.GetMatchedKeywords(playerMove.SelectedCard, theme);
         if (matchedKeywords.Count > 0)
         {
-            var keywordNames = string.Join("、", matchedKeywords.Select(k => k.GetJapaneseName()));
+            var keywordNames = string.Join(", ", matchedKeywords);
             breakdown += $"・一致キーワード: {keywordNames}\n";
         }
 
