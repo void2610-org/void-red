@@ -86,6 +86,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
+        _enemyMentalPowerView.SetCharacterIcon(enemyData.IconSprite, enemyData.FrameSprite);
     }
 
     public async UniTask ShowEnemy() => await _enemyView.Show();

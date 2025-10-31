@@ -303,7 +303,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mentalPowerText: {fileID: 996941127505191294}
-  mentalStateImage: {fileID: 3540298938563778505}
+  mentalFireImage: {fileID: 3540298938563778505}
+  characterIconImage: {fileID: 124844505426928945}
+  frameImage: {fileID: 1639939350189737485}
   highMentalColor: {r: 0, g: 6.7810993, b: 23.96863, a: 1}
   midMentalColor: {r: 23.96863, g: 23.96863, b: 0.3759785, a: 1}
   lowMentalColor: {r: 23.96863, g: 2.3393447, b: 0, a: 1}
