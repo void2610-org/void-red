@@ -41,7 +41,7 @@ public class EnemyView : MonoBehaviour
         gameObject.SetActive(false);
         
         // アルヴだけサイズを変える
-        if (enemyData.name == "Alv")
+        if (enemyData.EnemyId == "alv")
         {
             enemyImage.transform.localPosition = new Vector3(0f, 0f, 0f);
             enemyImage.transform.localScale = Vector3.one;
