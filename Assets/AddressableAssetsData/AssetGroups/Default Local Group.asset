@@ -201,7 +201,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 65d4bb5098ce0c5458b3cfdd1e50554a
-    m_Address: "Assets/Sprites/Item/\u5149\u306E\u672D.png"
+    m_Address: Assets/Sprites/Item/LightCard.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -426,7 +426,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: df33a4a076a680b4a8c8fc692c24f006
-    m_Address: "Assets/Sprites/Item/\u5F71\u306E\u672D.png"
+    m_Address: Assets/Sprites/Item/ShadowCard.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
