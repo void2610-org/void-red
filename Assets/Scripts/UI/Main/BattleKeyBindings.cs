@@ -1,4 +1,5 @@
 using R3;
+using UnityEngine;
 
 /// <summary>
 /// バトルシーンのキーバインド設定
@@ -17,8 +18,8 @@ public static class BattleKeyBindings
         CompositeDisposable disposables)
     {
         // ViewをシーンからFind
-        var personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
-        var playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
+        var personalityLogView = Object.FindFirstObjectByType<PersonalityLogView>();
+        var playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
         
         // テーマのキーワードをトグル表示
         inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
@@ -75,7 +76,7 @@ public static class BattleKeyBindings
             .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ =>
             {
-                var direction = inputActionsProvider.UI.Navigate.ReadValue<UnityEngine.Vector2>();
+                var direction = inputActionsProvider.UI.Navigate.ReadValue<Vector2>();
                 if (direction.x > 0.5f)
                 {
                     // 右方向：次のカード
@@ -86,6 +87,17 @@ public static class BattleKeyBindings
                     // 左方向：前のカード
                     battleUIPresenter.NavigateToPreviousCard();
                 }
+            })
+            .AddTo(disposables);
+        
+        // ナレーションをスキップする
+        var narrationView = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
+        inputActionsProvider.UI.Submit.OnPerformedAsObservable()
+            .Where(_ => !BaseWindowView.HasActiveWindows)
+            .Subscribe(_ =>
+            {
+                narrationView[0].OnClick();
+                narrationView[1].OnClick();
             })
             .AddTo(disposables);
     }

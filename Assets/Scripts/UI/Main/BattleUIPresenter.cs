@@ -75,8 +75,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
-    public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
-    public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
+    public async UniTask ShowNarration(string message, bool autoAdvance) => await _narrationView.DisplayNarration(message, 2f, autoAdvance);
+    public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
     public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;

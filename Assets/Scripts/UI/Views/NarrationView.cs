@@ -23,7 +23,9 @@ public class NarrationView : MonoBehaviour
     private CancellationTokenSource _currentNarrationCts;
     private CancellationTokenSource _dialogSeCancellationTokenSource;
     private CancellationTokenSource _typingCancellationTokenSource;
+    private CancellationTokenSource _waitCancellationTokenSource;
     private bool _isTyping;
+    private bool _isWaitingForNext;
 
     /// <summary>
     /// ナレーションを表示
@@ -82,18 +84,28 @@ public class NarrationView : MonoBehaviour
 
             // 文字送り完了
             _isTyping = false;
+            _isWaitingForNext = true;
 
             // dialogSeループを停止
             _dialogSeCancellationTokenSource?.Cancel();
             _dialogSeCancellationTokenSource?.Dispose();
             _dialogSeCancellationTokenSource = null;
-            
+
             // autoAdvanceフラグに基づいた待機処理
             if (autoAdvance)
             {
                 // 自動進行の場合は指定された時間を待つ
                 await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
-                
+
+                // backgroundImageとテキストのフェードアウトを同時実行
+                backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+                await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
+            }
+            else
+            {
+                // 手動進行の場合はユーザー入力を待つ
+                await WaitForNext();
+
                 // backgroundImageとテキストのフェードアウトを同時実行
                 backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
                 await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
@@ -121,6 +133,55 @@ public class NarrationView : MonoBehaviour
 
         // 状態をリセット
         _isTyping = false;
+    }
+
+    /// <summary>
+    /// 次へ進むのを待つ（手動進行モード用）
+    /// </summary>
+    private async UniTask WaitForNext()
+    {
+        _waitCancellationTokenSource = new CancellationTokenSource();
+        try
+        {
+            while (_isWaitingForNext)
+            {
+                await UniTask.Yield(_waitCancellationTokenSource.Token);
+            }
+        }
+        catch (System.OperationCanceledException) { }
+        finally
+        {
+            _waitCancellationTokenSource?.Dispose();
+            _waitCancellationTokenSource = null;
+        }
+    }
+
+    /// <summary>
+    /// クリック時の処理（キーボード入力でも使用）
+    /// </summary>
+    public void OnClick()
+    {
+        if (_isTyping)
+        {
+            // 文字送り中のクリックで即座に全文表示
+            _typingCancellationTokenSource?.Cancel();
+            _typingCancellationTokenSource?.Dispose();
+            _typingCancellationTokenSource = null;
+
+            // SEループを停止
+            _dialogSeCancellationTokenSource?.Cancel();
+            _dialogSeCancellationTokenSource?.Dispose();
+            _dialogSeCancellationTokenSource = null;
+
+            _isTyping = false;
+            _isWaitingForNext = true;
+            return;
+        }
+
+        if (!_isWaitingForNext) return;
+
+        // 通常モードのクリックで次へ進む
+        _isWaitingForNext = false;
     }
 
     /// <summary>
@@ -165,7 +226,6 @@ public class NarrationView : MonoBehaviour
         backgroundImage.SetAlpha(0f);
     }
     
-    
     private void OnDestroy()
     {
         // ナレーションのキャンセレーショントークンをクリーンアップ
@@ -179,5 +239,9 @@ public class NarrationView : MonoBehaviour
         // タイプライターアニメーションのキャンセレーショントークンをクリーンアップ
         _typingCancellationTokenSource?.Cancel();
         _typingCancellationTokenSource?.Dispose();
+
+        // 待機のキャンセレーショントークンをクリーンアップ
+        _waitCancellationTokenSource?.Cancel();
+        _waitCancellationTokenSource?.Dispose();
     }
 }
