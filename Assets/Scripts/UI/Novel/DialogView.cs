@@ -103,7 +103,7 @@ public class DialogView : MonoBehaviour
         _typingCancellationTokenSource?.Dispose();
         _typingCancellationTokenSource = new CancellationTokenSource();
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
-        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, true, _typingCancellationTokenSource.Token);
+        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, false, _typingCancellationTokenSource.Token);
 
         // dialogSeループを停止
         _dialogSeCancellationTokenSource?.Cancel();
@@ -375,7 +375,7 @@ public class DialogView : MonoBehaviour
         const float fadeDuration = 0.5f;
         if (visible)
         {
-            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic).AddTo(this);
             await _panelFadeMotion.ToUniTask();
             dialogTextPanelCanvasGroup.blocksRaycasts = true;
             dialogTextPanelCanvasGroup.interactable = true;
@@ -384,7 +384,7 @@ public class DialogView : MonoBehaviour
         {
             dialogTextPanelCanvasGroup.blocksRaycasts = false;
             dialogTextPanelCanvasGroup.interactable = false;
-            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic).AddTo(this);
             await _panelFadeMotion.ToUniTask();
         }
     }
