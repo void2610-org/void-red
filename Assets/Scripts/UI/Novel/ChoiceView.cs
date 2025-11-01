@@ -64,13 +64,9 @@ public class ChoiceView : MonoBehaviour
     /// </summary>
     private void SetupUIElements(ChoiceData choiceData)
     {
-        // 質問文を設定
         questionText.text = choiceData.Question;
         
-        // 既存のボタンを削除
         ClearChoiceButtons();
-        
-        // 選択肢ボタンを動的生成
         CreateChoiceButtons(choiceData.Options);
     }
     
@@ -104,9 +100,7 @@ public class ChoiceView : MonoBehaviour
     private void ClearChoiceButtons()
     {
         foreach (var button in _choiceButtons)
-        {
             Destroy(button.gameObject);
-        }
         _choiceButtons.Clear();
     }
     
