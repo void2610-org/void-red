@@ -31,7 +31,12 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private Color backgroundOverlayColor = new Color(0f, 0f, 0f, 0.7f);
     
     private bool _isWaitingForClick;
-    
+
+    /// <summary>
+    /// 演出が表示されているか（クリック可能な状態か）
+    /// </summary>
+    public bool IsShowing => effectPanelCanvasGroup.interactable;
+
     private void Awake()
     {
         // EffectPanelの初期状態を設定
@@ -210,9 +215,9 @@ public class ItemGetEffectView : MonoBehaviour
     }
     
     /// <summary>
-    /// クリック処理
+    /// クリック処理（InputActionからも呼び出し可能）
     /// </summary>
-    private void OnClick()
+    public void OnClick()
     {
         if (!effectPanelCanvasGroup.interactable || !_isWaitingForClick) return;
         
