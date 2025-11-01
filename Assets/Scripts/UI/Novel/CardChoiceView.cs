@@ -34,6 +34,7 @@ public class CardChoiceView : MonoBehaviour
     {
         SetupUIElements(cardChoiceData, cardImage1, cardImage2);
         await ShowPanel();
+        SafeNavigationManager.SetSelectedGameObjectSafe(choice1Button.gameObject);
         var selectedIndex = await _choiceSelectedSubject.FirstAsync();
         await HidePanel();
         
