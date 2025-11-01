@@ -1456,10 +1456,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ItemGetEffectView
       objectReference: {fileID: 0}
-    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
-      propertyPath: m_Alpha
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
