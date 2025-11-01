@@ -223,7 +223,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         
         // 選択結果をGameProgressServiceに記録
         var novelRes = new NovelChoiceResult(_currentScenarioId, _choiceCounter, selectedIndex);
-        _gameProgressService.RecordNovelChoiceAndSave(novelRes);
+        _gameProgressService.RecordNovelChoice(novelRes);
         
         // 選択肢番号をインクリメント
         _choiceCounter++;
@@ -252,7 +252,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         
         // 選択結果をGameProgressServiceに記録
         var novelRes = new NovelChoiceResult(_currentScenarioId, _choiceCounter, selectedIndex);
-        _gameProgressService.RecordNovelChoiceAndSave(novelRes);
+        _gameProgressService.RecordNovelChoice(novelRes);
         
         // 選択肢番号をインクリメント
         _choiceCounter++;
@@ -423,14 +423,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // 現在のノードを結果記録前に取得
         var currentNode = _gameProgressService.GetCurrentNode();
 
-        // ダイアログ結果を記録（内部でセーブ実行）
-        var choices = new Dictionary<string, string>
-        {
-            { "dialog_completed", "true" },
-            { "scenario_id", currentNode.NodeId }
-        };
-
-        _gameProgressService.RecordNovelResultAndSave(choices);
+        _gameProgressService.RecordNovelResultAndSave();
         
         // 記録前に取得したノードの設定を確認
         if (currentNode.ReturnToHome)
