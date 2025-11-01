@@ -119,6 +119,7 @@ GameObject:
   - component: {fileID: 8581034581683863317}
   - component: {fileID: 3041684160039519}
   - component: {fileID: 2271619381025066616}
+  - component: {fileID: 2320492470228358681}
   m_Layer: 0
   m_Name: CardChoiceView
   m_TagString: Untagged
@@ -133,7 +134,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6116264079152724370}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -1000}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -174,10 +175,22 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6116264079152724370}
   m_Enabled: 1
-  m_Alpha: 0
-  m_Interactable: 0
-  m_BlocksRaycasts: 0
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &2320492470228358681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6116264079152724370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08ff77b3328e243858a317c63345a977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7054468026223078585
 GameObject:
   m_ObjectHideFlags: 0
