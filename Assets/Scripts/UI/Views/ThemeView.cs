@@ -20,7 +20,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     [SerializeField] private Transform keywordContainer;
     [SerializeField] private VisualEffect visualEffect;
 
-    private readonly List<KeywordTextView> _keywordViews = new();
+    private readonly Dictionary<string, KeywordTextView> _keywordViews = new();
     private readonly List<Vector2> _keywordPositions = new();
 
     private ThemeData _themeData;
@@ -54,9 +54,15 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             var pos = GetFarthestPosition(220f, 30);
             keywordView.transform.localPosition = new Vector3(pos.x, pos.y, 0);
             keywordView.SetKeyword(keyword);
-            _keywordViews.Add(keywordView);
+            _keywordViews.Add(keyword, keywordView);
             _keywordPositions.Add(pos);
         }
+    }
+
+    public void UpdateKeywordHighlight(CardData cardData)
+    {
+        foreach (var pair in _keywordViews)
+            pair.Value.SetHighlight(cardData.Keywords.Contains(pair.Key));
     }
 
     /// <summary>
@@ -66,7 +72,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if (!_themeData) return;
         
-        foreach (var view in _keywordViews)
+        foreach (var view in _keywordViews.Values)
             view.FadeIn();
         
         if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
@@ -84,7 +90,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if (!_themeData) return;
 
-        foreach (var view in _keywordViews)
+        foreach (var view in _keywordViews.Values)
             view.FadeOut();
 
         if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
@@ -115,7 +121,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     private void ClearKeywords()
     {
-        foreach (var view in _keywordViews)
+        foreach (var view in _keywordViews.Values)
             if (view) Destroy(view.gameObject);
         _keywordViews.Clear();
         _keywordPositions.Clear();
