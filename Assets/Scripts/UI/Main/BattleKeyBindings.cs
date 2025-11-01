@@ -91,13 +91,13 @@ public static class BattleKeyBindings
             .AddTo(disposables);
         
         // ナレーションをスキップする
-        var narrationView = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
+        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
         inputActionsProvider.UI.Submit.OnPerformedAsObservable()
             .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ =>
             {
-                narrationView[0].OnClick();
-                narrationView[1].OnClick();
+                narrationViews[0].OnClick();
+                narrationViews[1].OnClick();
             })
             .AddTo(disposables);
     }
