@@ -116,6 +116,16 @@ public class DialogData
     public List<string> ChoiceOptions => ChoiceData?.Options ?? new List<string>();
     
     /// <summary>
+    /// カード風選択肢データ
+    /// </summary>
+    public CardChoiceData CardChoiceData => GetParameterValue<CardChoiceData>(DialogParameterType.CardChoice, null);
+    
+    /// <summary>
+    /// カード風選択肢表示があるかどうか
+    /// </summary>
+    public bool HasCardChoice => CardChoiceData != null;
+    
+    /// <summary>
     /// カード獲得演出があるかどうか
     /// </summary>
     public bool HasGetCard => GetParameterValue<bool>(DialogParameterType.GetCard, false);
