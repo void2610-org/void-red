@@ -82,10 +82,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         _dialogView = Object.FindAnyObjectByType<DialogView>();
         _itemGetEffectView = Object.FindAnyObjectByType<ItemGetEffectView>();
         _choiceView = Object.FindAnyObjectByType<ChoiceView>();
-        _dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
-        _itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
-        _choiceView = UnityEngine.Object.FindAnyObjectByType<ChoiceView>();
-        _cardChoiceView = UnityEngine.Object.FindAnyObjectByType<CardChoiceView>();
+        _cardChoiceView = Object.FindAnyObjectByType<CardChoiceView>();
 
         // キーバインドを初期化
         NovelKeyBindings.Setup(_inputActionsProvider, this, _disposables);
@@ -153,29 +150,10 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             // ダイアログを表示（完了まで待機）
             await ShowSingleDialog(currentDialog);
             
-            // アイテム取得演出がある場合は実行
-            if (currentDialog.HasGetItem)
-            {
-                await ShowItemGetEffect(currentDialog);
-            }
-            
-            // 選択肢表示がある場合は実行
-            if (currentDialog.HasChoice)
-            {
-                await ShowChoiceEffect(currentDialog);
-            }
-            
-            // カード風選択肢表示がある場合は実行
-            if (currentDialog.HasCardChoice)
-            {
-                await ShowCardChoiceEffect(currentDialog);
-            }
-            
-            // カード獲得演出がある場合は実行
-            if (currentDialog.HasGetCard)
-            {
-                await ShowCardGetEffect();
-            }
+            if (currentDialog.HasGetItem) await ShowItemGetEffect(currentDialog.GetItemData);
+            if (currentDialog.HasChoice) await ShowChoiceEffect(currentDialog.ChoiceData);
+            if (currentDialog.HasCardChoice) await ShowCardChoiceEffect(currentDialog.CardChoiceData);
+            if (currentDialog.HasGetCard) await ShowCardGetEffect();
             
             _currentDialogIndex++;
         }
@@ -216,17 +194,8 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     /// <summary>
     /// アイテム取得演出を表示
     /// </summary>
-    /// <param name="dialogData">アイテム取得情報を含むダイアログデータ</param>
-    private async UniTask ShowItemGetEffect(DialogData dialogData)
+    private async UniTask ShowItemGetEffect(ItemGetData itemGetData)
     {
-        // アイテムデータを取得
-        var itemGetData = dialogData.GetItemData;
-        if (itemGetData == null)
-        {
-            Debug.LogWarning("[NovelUIPresenter] アイテム取得データが存在しません");
-            return;
-        }
-        
         // アイテム画像を読み込み
         Sprite itemSprite = null;
         if (!string.IsNullOrEmpty(itemGetData.ItemImageName))
@@ -243,17 +212,8 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     /// <summary>
     /// 選択肢表示を実行
     /// </summary>
-    /// <param name="dialogData">選択肢情報を含むダイアログデータ</param>
-    private async UniTask ShowChoiceEffect(DialogData dialogData)
+    private async UniTask ShowChoiceEffect(ChoiceData choiceData)
     {
-        // 選択肢データを取得
-        var choiceData = dialogData.ChoiceData;
-        if (choiceData == null)
-        {
-            Debug.LogWarning("[NovelUIPresenter] 選択肢データが存在しません");
-            return;
-        }
-        
         // 選択肢を表示して結果を取得
         var selectedIndex = await _choiceView.ShowChoice(choiceData);
         
@@ -271,10 +231,8 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     /// <summary>
     /// カード風選択肢表示を実行
     /// </summary>
-    private async UniTask ShowCardChoiceEffect(DialogData dialogData)
+    private async UniTask ShowCardChoiceEffect(CardChoiceData cardChoiceData)
     {
-        var cardChoiceData = dialogData.CardChoiceData;
-        
         // ダイアログパネルと立ち絵を非表示（背景は残す）
         await _dialogView.SetDialogPanelVisible(false);
         
@@ -313,11 +271,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // 選択結果に基づいてカードIDを決定
         var selectedCardId = NovelCardSelectionService.SelectCardByChoices(_currentScenarioId, choiceResults);
         
-        if (string.IsNullOrEmpty(selectedCardId))
-        {
-            // カードが選択されなかった場合は演出をスキップ
-            return;
-        }
+        if (string.IsNullOrEmpty(selectedCardId)) return;
         
         // CardPoolServiceから実際のCardDataを取得
         var cardData = _cardPoolService.GetCardById(selectedCardId);
