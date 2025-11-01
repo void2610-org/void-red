@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using R3;
 using Void2610.UnityTemplate;
 
@@ -10,32 +12,16 @@ using Void2610.UnityTemplate;
 /// 選択肢表示を担当するViewクラス
 /// 質問文と選択肢ボタンを表示し、ユーザーの選択を受け取る
 /// </summary>
-public class ChoiceView : MonoBehaviour
+public class ChoiceView : BaseWindowView
 {
     [Header("UI要素")]
-    [SerializeField] private CanvasGroup choicePanelCanvasGroup;
     [SerializeField] private Image questionBackground;
     [SerializeField] private TextMeshProUGUI questionText;
     [SerializeField] private Transform buttonContainer;
     [SerializeField] private Button choiceButtonPrefab;
-    
+
     private readonly List<Button> _choiceButtons = new();
-    private bool _isWaitingForChoice;
-    private int _selectedChoiceIndex = -1;
-    
-    private void Awake()
-    {
-        // ChoicePanelの初期状態を設定
-        choicePanelCanvasGroup.alpha = 0f;
-        choicePanelCanvasGroup.interactable = false;
-        choicePanelCanvasGroup.blocksRaycasts = false;
-        
-        questionBackground.color = Color.white;
-        questionText.text = "";
-        
-        // プレハブボタンは非表示にする
-        choiceButtonPrefab.gameObject.SetActive(false);
-    }
+    private readonly Subject<int> _choiceSelectedSubject = new();
     
     /// <summary>
     /// 選択肢を表示して選択を待つ
@@ -44,30 +30,25 @@ public class ChoiceView : MonoBehaviour
     /// <returns>選択されたインデックス</returns>
     public async UniTask<int> ShowChoice(ChoiceData choiceData)
     {
-        // UI要素を設定
-        SetupUIElements(choiceData);
-        
-        // 表示状態にする
-        ShowPanel();
-        
-        // ユーザーの選択待ち
-        var selectedIndex = await WaitForUserChoice();
-        
-        // 非表示にする
-        HidePanel();
-        
-        return selectedIndex;
-    }
-    
-    /// <summary>
-    /// UI要素を設定
-    /// </summary>
-    private void SetupUIElements(ChoiceData choiceData)
-    {
         questionText.text = choiceData.Question;
-        
         ClearChoiceButtons();
         CreateChoiceButtons(choiceData.Options);
+
+        Show(); // Show()内でGetPreferredNavigationTarget()が呼ばれ、最初の選択肢が選択される
+        await UniTask.Delay(500);
+
+        var selectedIndex = await _choiceSelectedSubject.FirstAsync();
+        Hide();
+
+        return selectedIndex;
+    }
+
+    /// <summary>
+    /// 優先ナビゲーション対象を返す（最初の選択肢ボタン）
+    /// </summary>
+    protected override GameObject GetPreferredNavigationTarget()
+    {
+        return _choiceButtons.Count > 0 ? _choiceButtons[0].gameObject : null;
     }
     
     /// <summary>
@@ -92,6 +73,9 @@ public class ChoiceView : MonoBehaviour
             
             _choiceButtons.Add(button);
         }
+        
+        //ナビゲーションを設定
+        _choiceButtons.Select(b => b as Selectable).ToList().SetNavigation(isHorizontal: false, wrapAround: true);
     }
     
     /// <summary>
@@ -103,58 +87,29 @@ public class ChoiceView : MonoBehaviour
             Destroy(button.gameObject);
         _choiceButtons.Clear();
     }
-    
-    /// <summary>
-    /// パネルを表示状態にする
-    /// </summary>
-    private void ShowPanel()
-    {
-        choicePanelCanvasGroup.alpha = 1f;
-        choicePanelCanvasGroup.interactable = true;
-        choicePanelCanvasGroup.blocksRaycasts = true;
-    }
-    
-    /// <summary>
-    /// ユーザーの選択を待つ
-    /// </summary>
-    private async UniTask<int> WaitForUserChoice()
-    {
-        _isWaitingForChoice = true;
-        _selectedChoiceIndex = -1;
-        
-        // 選択されるまで待機
-        await UniTask.WaitUntil(() => !_isWaitingForChoice);
-        
-        return _selectedChoiceIndex;
-    }
-    
-    /// <summary>
-    /// パネルを非表示状態にする
-    /// </summary>
-    private void HidePanel()
-    {
-        choicePanelCanvasGroup.alpha = 0f;
-        choicePanelCanvasGroup.interactable = false;
-        choicePanelCanvasGroup.blocksRaycasts = false;
-        
-        // ボタンをクリア
-        ClearChoiceButtons();
-    }
-    
+
     /// <summary>
     /// 選択肢ボタンがクリックされた時の処理
     /// </summary>
     private void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (!choicePanelCanvasGroup.interactable || !_isWaitingForChoice) 
-            return;
-        
-        _selectedChoiceIndex = choiceIndex;
-        _isWaitingForChoice = false;
+        if (!IsShowing) return;
+
+        _choiceSelectedSubject.OnNext(choiceIndex);
     }
-    
-    private void OnDestroy()
+
+    protected override void Awake()
     {
+        base.Awake();
+
+        questionBackground.color = Color.white;
+        questionText.text = "";
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        _choiceSelectedSubject?.Dispose();
         ClearChoiceButtons();
     }
 }
