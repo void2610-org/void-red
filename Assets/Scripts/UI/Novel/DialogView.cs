@@ -15,13 +15,11 @@ using R3;
 public class DialogView : MonoBehaviour
 {
     [Header("UI要素")]
-    [SerializeField] private GameObject dialogTextPanel;
     [SerializeField] private CanvasGroup dialogTextPanelCanvasGroup;
     [SerializeField] private TextMeshProUGUI speakerNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
     [SerializeField] private Image characterImage;
-    [SerializeField] private CanvasGroup characterImageCanvasGroup;
     [SerializeField] private Image backgroundImage;
     
     [Header("操作ボタン")]
@@ -408,29 +406,21 @@ public class DialogView : MonoBehaviour
     public async UniTask SetDialogPanelVisible(bool visible)
     {
         CancelActiveMotions();
-
+        nextIndicator.SetActive(visible);
+        
         const float fadeDuration = 0.5f;
         if (visible)
         {
-            dialogTextPanel.SetActive(true);
-            characterImage.gameObject.SetActive(true);
-            dialogTextPanelCanvasGroup.alpha = 0f;
-            characterImageCanvasGroup.alpha = 0f;
-
             _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
-            _characterFadeMotion = characterImageCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
-            nextIndicator.SetActive(true);
-            await UniTask.WhenAll(_panelFadeMotion.ToUniTask(), _characterFadeMotion.ToUniTask());
+            _characterFadeMotion = characterImage.FadeIn(fadeDuration, Ease.InCubic);
         }
         else
         {
             _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
-            _characterFadeMotion = characterImageCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
-            nextIndicator.SetActive(false);
-            await UniTask.WhenAll(_panelFadeMotion.ToUniTask(), _characterFadeMotion.ToUniTask());
-            dialogTextPanel.SetActive(false);
-            characterImage.gameObject.SetActive(false);
+            _characterFadeMotion = characterImage.FadeOut(fadeDuration, Ease.InCubic);
         }
+
+        await UniTask.WhenAll(_panelFadeMotion.ToUniTask(), _characterFadeMotion.ToUniTask());
     }
     
     /// <summary>
@@ -438,14 +428,10 @@ public class DialogView : MonoBehaviour
     /// </summary>
     private void CancelActiveMotions()
     {
-        if (_fadeMotion.IsActive())
-            _fadeMotion.Cancel();
-        if (_indicatorMotion.IsActive())
-            _indicatorMotion.Cancel();
-        if (_panelFadeMotion.IsActive())
-            _panelFadeMotion.Cancel();
-        if (_characterFadeMotion.IsActive())
-            _characterFadeMotion.Cancel();
+        _fadeMotion.TryCancel();
+        _indicatorMotion.TryCancel();
+        _panelFadeMotion.TryCancel();
+        _characterFadeMotion.TryCancel();
     }
     
     private void UpdateAutoButtonColor()

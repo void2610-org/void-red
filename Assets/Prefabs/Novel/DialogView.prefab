@@ -264,6 +264,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d1f145550aa9d4ab932f7ee7c23fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dialogTextPanelCanvasGroup: {fileID: 5470601498904622307}
   speakerNameText: {fileID: 2467004453087818755}
   dialogText: {fileID: 1666317025185700510}
   nextIndicator: {fileID: 5656026911901862804}
@@ -272,7 +273,6 @@ MonoBehaviour:
   autoButton: {fileID: 1526341870938500661}
   autoButtonText: {fileID: 170024925333391186}
   skipButton: {fileID: 9104940760093943567}
-  clickAreaButton: {fileID: 1870428648679653052}
   autoButtonNormalColor: {r: 1, g: 1, b: 1, a: 1}
   autoButtonActiveColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   defaultCharSpeed: 0.05
@@ -306,7 +306,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &222567067317627015
 RectTransform:
   m_ObjectHideFlags: 0
@@ -511,6 +511,8 @@ GameObject:
   - component: {fileID: 723847380985712605}
   - component: {fileID: 5764851786821247301}
   - component: {fileID: 5685253921237877943}
+  - component: {fileID: 5470601498904622307}
+  - component: {fileID: 3811373631468442355}
   m_Layer: 5
   m_Name: DialogTextPanel
   m_TagString: Untagged
@@ -582,6 +584,30 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &5470601498904622307
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7054270134955406353}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &3811373631468442355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7054270134955406353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08ff77b3328e243858a317c63345a977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7527884749298515451
 GameObject:
   m_ObjectHideFlags: 0
