@@ -19,8 +19,6 @@ public class DialogView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI speakerNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
-    [SerializeField] private Image characterImage;
-    [SerializeField] private Image backgroundImage;
     
     [Header("操作ボタン")]
     [SerializeField] private Button autoButton;
@@ -46,7 +44,6 @@ public class DialogView : MonoBehaviour
     private MotionHandle _fadeMotion;
     private MotionHandle _indicatorMotion;
     private MotionHandle _panelFadeMotion;
-    private MotionHandle _characterFadeMotion;
 
     private string _currentImageName;
     private float _additionalWaitTime;
@@ -59,14 +56,12 @@ public class DialogView : MonoBehaviour
     private void Awake()
     {
         dialogText.text = "";
-        
+
         nextIndicator.SetActive(false);
-        characterImage.color = Color.clear;
-        characterImage.sprite = null;
-        
+
         autoButton.OnClickAsObservable().Subscribe(_ => ToggleAutoMode()).AddTo(this);
         skipButton.OnClickAsObservable().Subscribe(_ => _onSkipRequested.OnNext(Unit.Default)).AddTo(this);
-        
+
         // オートボタンの初期色を設定
         UpdateAutoButtonColor();
     }
@@ -75,10 +70,8 @@ public class DialogView : MonoBehaviour
     /// 単一のダイアログを表示する
     /// </summary>
     /// <param name="dialogData">ダイアログデータ</param>
-    /// <param name="characterSprite">キャラクター画像</param>
-    /// <param name="backgroundSprite">背景画像</param>
     /// <param name="additionalWaitTime">追加の待機時間（SE再生時間など）</param>
-    public async UniTask ShowSingleDialog(DialogData dialogData, Sprite characterSprite = null, Sprite backgroundSprite = null, float additionalWaitTime = 0f)
+    public async UniTask ShowSingleDialog(DialogData dialogData, float additionalWaitTime = 0f)
     {
         if (!this) return;
         
@@ -88,14 +81,7 @@ public class DialogView : MonoBehaviour
         
         // 話者名を設定
         SetSpeakerName(dialogData.SpeakerName);
-        
-        // キャラクター画像を設定
-        SetCharacterImage(characterSprite, dialogData.CharacterImageName.Contains("Alv"));
-        
-        // 背景画像を設定（nullの場合は現状維持）
-        if (dialogData.HasBackgroundImage && backgroundSprite) 
-            backgroundImage.sprite = backgroundSprite;
-        
+
         // ダイアログテキストをクリア
         dialogText.text = "";
         
@@ -196,27 +182,6 @@ public class DialogView : MonoBehaviour
     {
         var hasSpeaker = !string.IsNullOrEmpty(speakerName);
         speakerNameText.text = hasSpeaker ? speakerName : "";
-    }
-    
-    /// <summary>
-    /// キャラクター画像を設定
-    /// </summary>
-    private void SetCharacterImage(Sprite sprite, bool isAlv)
-    {
-        characterImage.sprite = sprite; 
-        characterImage.color = sprite ? Color.white : Color.clear;
-        
-        // アルヴだけ別サイズにする
-        if (isAlv)
-        {
-            characterImage.transform.localPosition = new Vector3(0f, -30f, 0f);
-            characterImage.transform.localScale = Vector3.one * 0.265f;
-        }
-        else
-        {
-            characterImage.transform.localPosition = new Vector3(0f, -110f, 0f);
-            characterImage.transform.localScale = Vector3.one * 0.35f;
-        }
     }
     
     /// <summary>
@@ -407,20 +372,12 @@ public class DialogView : MonoBehaviour
     {
         CancelActiveMotions();
         nextIndicator.SetActive(visible);
-        
-        const float fadeDuration = 0.5f;
-        if (visible)
-        {
-            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
-            _characterFadeMotion = characterImage.FadeIn(fadeDuration, Ease.InCubic);
-        }
-        else
-        {
-            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
-            _characterFadeMotion = characterImage.FadeOut(fadeDuration, Ease.InCubic);
-        }
 
-        await UniTask.WhenAll(_panelFadeMotion.ToUniTask(), _characterFadeMotion.ToUniTask());
+        const float fadeDuration = 0.5f;
+        if (visible) _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+        else _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
+
+        await _panelFadeMotion.ToUniTask();
     }
     
     /// <summary>
@@ -431,7 +388,6 @@ public class DialogView : MonoBehaviour
         _fadeMotion.TryCancel();
         _indicatorMotion.TryCancel();
         _panelFadeMotion.TryCancel();
-        _characterFadeMotion.TryCancel();
     }
     
     private void UpdateAutoButtonColor()
