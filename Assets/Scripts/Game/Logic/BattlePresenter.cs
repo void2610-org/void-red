@@ -222,7 +222,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // ターン番号に基づいてテーマを順番に選択（1ターン目 = index 0, 2ターン目 = index 1, 3ターン目 = index 2）
         _currentTheme = _currentEnemyData.Themes[_currentTurnNumber - 1];
 
-        await _battleUIPresenter.SetTheme(_currentTheme);
+        await _battleUIPresenter.SetTheme(_currentTheme, _currentTurnNumber == 3);
 
         // 初回ターン かつ 敵がアルヴならチュートリアルを表示
         if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "alv")
