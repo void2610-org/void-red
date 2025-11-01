@@ -582,6 +582,9 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private async UniTask HandleBattleEnd()
     {
         await UniTask.Delay(500);
+        
+        // Volumeエフェクトを全てデフォルトに戻す
+        VolumeController.Instance.ResetToDefault();
 
         // 3ターン終了後、勝利数が多い方が勝利（同数の場合はプレイヤー勝利）
         var playerWon = _playerWins >= _enemyWins;
