@@ -94,22 +94,18 @@ public class NarrationView : MonoBehaviour
             // autoAdvanceフラグに基づいた待機処理
             if (autoAdvance)
             {
-                // 自動進行の場合は指定された時間を待つ
-                await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
-
-                // backgroundImageとテキストのフェードアウトを同時実行
-                backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-                await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
+                // 自動進行の場合はタイムアウト付きで待つ（ユーザー入力でもスキップ可能）
+                await WaitForNextWithTimeout(duration);
             }
             else
             {
                 // 手動進行の場合はユーザー入力を待つ
                 await WaitForNext();
-
-                // backgroundImageとテキストのフェードアウトを同時実行
-                backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-                await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
             }
+
+            // backgroundImageとテキストのフェードアウトを同時実行
+            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+            await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
         }
         catch (System.OperationCanceledException) { }
     }
@@ -157,6 +153,33 @@ public class NarrationView : MonoBehaviour
     }
 
     /// <summary>
+    /// タイムアウト付きで次へ進むのを待つ（自動進行モード用）
+    /// </summary>
+    private async UniTask WaitForNextWithTimeout(float duration)
+    {
+        if (_isWaitingForNext)
+        {
+            _waitCancellationTokenSource = new CancellationTokenSource();
+            try
+            {
+                await UniTask.Delay((int)(duration * 1000), cancellationToken: _waitCancellationTokenSource.Token);
+
+                // タイムアウト後もまだ待機中の場合は自動で進む
+                if (_isWaitingForNext) _isWaitingForNext = false;
+            }
+            catch (System.OperationCanceledException)
+            {
+                // ユーザーがクリックして手動で進んだ場合
+            }
+            finally
+            {
+                _waitCancellationTokenSource?.Dispose();
+                _waitCancellationTokenSource = null;
+            }
+        }
+    }
+
+    /// <summary>
     /// クリック時の処理（キーボード入力でも使用）
     /// </summary>
     public void OnClick()
@@ -180,7 +203,10 @@ public class NarrationView : MonoBehaviour
 
         if (!_isWaitingForNext) return;
 
-        // 通常モードのクリックで次へ進む
+        // 待機をキャンセル（自動進行の場合のタイムアウトをキャンセル）
+        _waitCancellationTokenSource?.Cancel();
+
+        // 次へ進む
         _isWaitingForNext = false;
     }
 
