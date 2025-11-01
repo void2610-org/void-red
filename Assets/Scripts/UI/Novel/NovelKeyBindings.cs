@@ -15,6 +15,7 @@ public static class NovelKeyBindings
         CompositeDisposable disposables)
     {
         var dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
+        var itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
 
         // オートモードをトグル
         inputActionsProvider.Novel.Auto.OnPerformedAsObservable()
@@ -28,10 +29,21 @@ public static class NovelKeyBindings
             .Subscribe(_ => novelPresenter.RequestSkipAllDialogs())
             .AddTo(disposables);
 
-        // ダイアログを進める
+        // ダイアログ/アイテム取得演出を進める
         inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => dialogView.OnClick())
+            .Subscribe(_ =>
+            {
+                // アイテム取得演出が表示中ならそちらを優先
+                if (itemGetEffectView && itemGetEffectView.IsShowing)
+                {
+                    itemGetEffectView.OnClick();
+                }
+                // ウィンドウが開いていない場合はダイアログを進める
+                else if (!BaseWindowView.HasActiveWindows)
+                {
+                    dialogView.OnClick();
+                }
+            })
             .AddTo(disposables);
     }
 }

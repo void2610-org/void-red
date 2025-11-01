@@ -161,6 +161,7 @@ GameObject:
   - component: {fileID: 9221868408885396068}
   - component: {fileID: 1629921137405583612}
   - component: {fileID: 3235354022197378893}
+  - component: {fileID: 4980326934102920885}
   m_Layer: 5
   m_Name: DialogCharacterView
   m_TagString: Untagged
@@ -215,3 +216,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterImage: {fileID: 1504056130314864841}
   characterImageBack: {fileID: 2810515689296869880}
+--- !u!114 &4980326934102920885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8054005500315313569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08ff77b3328e243858a317c63345a977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

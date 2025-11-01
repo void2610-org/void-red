@@ -219,25 +219,8 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // 人格ログ: ターン開始
         _personalityLogService.StartTurn();
 
-        // 初回ターン かつ 敵がアルヴの場合はチュートリアル用のテーマを使用
-        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "alv")
-        {
-            _currentTheme = _allThemeData.ThemeList.Find(theme => theme.name == "THEME_00");
-        }
-        else
-        {
-            // ターン番号に基づいてテーマを順番に選択（1ターン目 = index 0, 2ターン目 = index 1, 3ターン目 = index 2）
-            var themeIndex = _currentTurnNumber - 1;
-            if (_currentEnemyData.Themes != null && themeIndex >= 0 && themeIndex < _currentEnemyData.Themes.Count)
-            {
-                _currentTheme = _currentEnemyData.Themes[themeIndex];
-            }
-            else
-            {
-                Debug.LogWarning($"[BattlePresenter] ターン{_currentTurnNumber}のテーマが設定されていません");
-                _currentTheme = null;
-            }
-        }
+        // ターン番号に基づいてテーマを順番に選択（1ターン目 = index 0, 2ターン目 = index 1, 3ターン目 = index 2）
+        _currentTheme = _currentEnemyData.Themes[_currentTurnNumber - 1];
 
         await _battleUIPresenter.SetTheme(_currentTheme);
 

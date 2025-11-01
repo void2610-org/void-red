@@ -122,7 +122,7 @@ public class GameProgressService
     /// <summary>
     /// ノベル完了（複数選択記録 + 進行 + セーブを統合）
     /// </summary>
-    public void RecordNovelResultAndSave(Dictionary<string, string> choices)
+    public void RecordNovelResultAndSave()
     {
         _repository.StoryProgress.AdvanceStep();
         _repository.StoryProgress.CurrentNode = GetNextNode();
@@ -132,11 +132,10 @@ public class GameProgressService
     /// <summary>
     /// ノベル選択結果を記録してセーブ
     /// </summary>
-    public void RecordNovelChoiceAndSave(NovelChoiceResult choiceResult)
+    public void RecordNovelChoice(NovelChoiceResult choiceResult)
     {
         _repository.NovelProgress.RecordChoice(choiceResult);
         Debug.Log($"[GameProgressService] 選択結果を記録: {choiceResult.ScenarioId} - Choice{choiceResult.ChoiceIndex}: {choiceResult.SelectedOptionIndex}");
-        _repository.SaveAll();
     }
 
     /// <summary>

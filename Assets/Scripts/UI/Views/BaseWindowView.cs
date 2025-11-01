@@ -31,7 +31,7 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         if (_activeWindows.Count == 0) return null;
         var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
-        return topWindow ? topWindow.closeButton.gameObject : null;
+        return topWindow ? topWindow.GetPreferredNavigationTarget() : null;
     }
 
     /// <summary>
@@ -43,6 +43,15 @@ public abstract class BaseWindowView : MonoBehaviour
     /// ウィンドウの表示状態
     /// </summary>
     public bool IsShowing => _canvasGroup.interactable;
+
+    /// <summary>
+    /// このウィンドウが再アクティブになったときに選択すべきGameObject
+    /// デフォルトはcloseButton、継承先でオーバーライド可能
+    /// </summary>
+    protected virtual GameObject GetPreferredNavigationTarget()
+    {
+        return closeButton ? closeButton.gameObject : null;
+    }
 
     /// <summary>
     /// ウィンドウを表示
@@ -79,7 +88,10 @@ public abstract class BaseWindowView : MonoBehaviour
         if (!_activeWindows.Contains(this))
             _activeWindows.Add(this);
 
-        SafeNavigationManager.SetSelectedGameObjectSafe(closeButton.gameObject);
+        var navigationTarget = GetPreferredNavigationTarget();
+        if (navigationTarget)
+            SafeNavigationManager.SetSelectedGameObjectSafe(navigationTarget);
+
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_ANIMATION_DURATION, ignoreTimeScale: true);
         await _currentFadeHandle.ToUniTask();
     }
@@ -100,13 +112,17 @@ public abstract class BaseWindowView : MonoBehaviour
         // 閉じたことを通知
         _onClosed.OnNext(Unit.Default);
 
-        // リストに他のウィンドウがあればそのcloseButtonを選択、なければルートを選択
+        // リストに他のウィンドウがあればその優先ナビゲーション対象を選択、なければルートを選択
         if (_activeWindows.Count > 0)
         {
             var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
             if (topWindow)
             {
-                SafeNavigationManager.SetSelectedGameObjectSafe(topWindow.closeButton.gameObject);
+                var navigationTarget = topWindow.GetPreferredNavigationTarget();
+                if (navigationTarget)
+                {
+                    SafeNavigationManager.SetSelectedGameObjectSafe(navigationTarget);
+                }
             }
         }
         else
@@ -122,9 +138,12 @@ public abstract class BaseWindowView : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
-        closeButton.OnClickAsObservable()
-            .Subscribe(_ => Hide())
-            .AddTo(Disposables);
+        if (closeButton)
+        {
+            closeButton.OnClickAsObservable()
+                .Subscribe(_ => Hide())
+                .AddTo(Disposables);
+        }
     }
 
     protected virtual void OnDestroy()
