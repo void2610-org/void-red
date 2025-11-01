@@ -364,8 +364,7 @@ public class DialogView : MonoBehaviour
     }
     
     /// <summary>
-    /// ダイアログパネルと立ち絵を表示/非表示（Backは残す）
-    /// Tweenでフェードイン/アウト。表示時はGameObject有効化→alpha 0→1、非表示時はalpha 1→0→GameObject無効化。
+    /// ダイアログパネルと立ち絵を表示/非表示
     /// nextIndicatorは即時切り替え。
     /// </summary>
     public async UniTask SetDialogPanelVisible(bool visible)
@@ -374,10 +373,20 @@ public class DialogView : MonoBehaviour
         nextIndicator.SetActive(visible);
 
         const float fadeDuration = 0.5f;
-        if (visible) _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
-        else _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
-
-        await _panelFadeMotion.ToUniTask();
+        if (visible)
+        {
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+            await _panelFadeMotion.ToUniTask();
+            dialogTextPanelCanvasGroup.blocksRaycasts = true;
+            dialogTextPanelCanvasGroup.interactable = true;
+        }
+        else
+        {
+            dialogTextPanelCanvasGroup.blocksRaycasts = false;
+            dialogTextPanelCanvasGroup.interactable = false;
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
+            await _panelFadeMotion.ToUniTask();
+        }
     }
     
     /// <summary>
