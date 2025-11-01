@@ -20,29 +20,12 @@ public class CardChoiceView : MonoBehaviour
     [SerializeField] private Button choice2Button;
     [SerializeField] private TextMeshProUGUI choice2Text;
     [SerializeField] private Image choice2CardImage;
+
+    private const float FADE_DURATION = 0.35f;
     
     private readonly Subject<int> _choiceSelectedSubject = new();
     private readonly CompositeDisposable _disposables = new();
     private MotionHandle _panelFadeMotion;
-    
-    private void Awake()
-    {
-        cardChoicePanelCanvasGroup.alpha = 0f;
-        cardChoicePanelCanvasGroup.interactable = false;
-        cardChoicePanelCanvasGroup.blocksRaycasts = false;
-        
-        choice1Text.text = "";
-        choice2Text.text = "";
-        
-        // ボタンクリックイベントを購読
-        choice1Button.OnClickAsObservable()
-            .Subscribe(_ => OnChoiceButtonClicked(0))
-            .AddTo(_disposables);
-        
-        choice2Button.OnClickAsObservable()
-            .Subscribe(_ => OnChoiceButtonClicked(1))
-            .AddTo(_disposables);
-    }
     
     /// <summary>
     /// カード風選択肢を表示して選択を待つ
@@ -51,7 +34,7 @@ public class CardChoiceView : MonoBehaviour
     {
         SetupUIElements(cardChoiceData, cardImage1, cardImage2);
         await ShowPanel();
-        var selectedIndex = await WaitForUserChoice();
+        var selectedIndex = await _choiceSelectedSubject.FirstAsync();
         await HidePanel();
         
         return selectedIndex;
@@ -74,25 +57,11 @@ public class CardChoiceView : MonoBehaviour
     /// </summary>
     private async UniTask ShowPanel()
     {
-        const float fadeDuration = 0.45f;
-
-        // 表示開始時は操作を無効にしてからフェードイン
-        cardChoicePanelCanvasGroup.alpha = 0f;
-        cardChoicePanelCanvasGroup.interactable = false;
-        cardChoicePanelCanvasGroup.blocksRaycasts = true;
-
-        _panelFadeMotion = cardChoicePanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic);
+        _panelFadeMotion = cardChoicePanelCanvasGroup.FadeIn(FADE_DURATION, Ease.InCubic);
         await _panelFadeMotion.ToUniTask();
 
         cardChoicePanelCanvasGroup.interactable = true;
-    }
-    
-    /// <summary>
-    /// ユーザーの選択を待つ
-    /// </summary>
-    private async UniTask<int> WaitForUserChoice()
-    {
-        return await _choiceSelectedSubject.FirstAsync();
+        cardChoicePanelCanvasGroup.blocksRaycasts = true;
     }
     
     /// <summary>
@@ -100,13 +69,11 @@ public class CardChoiceView : MonoBehaviour
     /// </summary>
     private async UniTask HidePanel()
     {
-        const float fadeDuration = 0.35f;
-
-        // 非表示時は操作を無効化してフェードアウト
         cardChoicePanelCanvasGroup.interactable = false;
-        _panelFadeMotion = cardChoicePanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
-        await _panelFadeMotion.ToUniTask();
         cardChoicePanelCanvasGroup.blocksRaycasts = false;
+        
+        _panelFadeMotion = cardChoicePanelCanvasGroup.FadeOut(FADE_DURATION, Ease.InCubic);
+        await _panelFadeMotion.ToUniTask();
     }
     
     /// <summary>
@@ -124,5 +91,24 @@ public class CardChoiceView : MonoBehaviour
     {
         _choiceSelectedSubject?.Dispose();
         _disposables?.Dispose();
+    }
+    
+    private void Awake()
+    {
+        cardChoicePanelCanvasGroup.alpha = 0f;
+        cardChoicePanelCanvasGroup.interactable = false;
+        cardChoicePanelCanvasGroup.blocksRaycasts = false;
+        
+        choice1Text.text = "";
+        choice2Text.text = "";
+        
+        // ボタンクリックイベントを購読
+        choice1Button.OnClickAsObservable()
+            .Subscribe(_ => OnChoiceButtonClicked(0))
+            .AddTo(_disposables);
+        
+        choice2Button.OnClickAsObservable()
+            .Subscribe(_ => OnChoiceButtonClicked(1))
+            .AddTo(_disposables);
     }
 }
