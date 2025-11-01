@@ -12,10 +12,9 @@ using Void2610.UnityTemplate;
 /// 選択肢表示を担当するViewクラス
 /// 質問文と選択肢ボタンを表示し、ユーザーの選択を受け取る
 /// </summary>
-public class ChoiceView : MonoBehaviour
+public class ChoiceView : BaseWindowView
 {
     [Header("UI要素")]
-    [SerializeField] private CanvasGroup choicePanelCanvasGroup;
     [SerializeField] private Image questionBackground;
     [SerializeField] private TextMeshProUGUI questionText;
     [SerializeField] private Transform buttonContainer;
@@ -34,13 +33,22 @@ public class ChoiceView : MonoBehaviour
         questionText.text = choiceData.Question;
         ClearChoiceButtons();
         CreateChoiceButtons(choiceData.Options);
-        
-        await ShowPanel();
-        SafeNavigationManager.SetSelectedGameObjectSafe(_choiceButtons[0].gameObject);
+
+        Show(); // Show()内でGetPreferredNavigationTarget()が呼ばれ、最初の選択肢が選択される
+        await UniTask.Delay(500);
+
         var selectedIndex = await _choiceSelectedSubject.FirstAsync();
-        await HidePanel();
+        Hide();
 
         return selectedIndex;
+    }
+
+    /// <summary>
+    /// 優先ナビゲーション対象を返す（最初の選択肢ボタン）
+    /// </summary>
+    protected override GameObject GetPreferredNavigationTarget()
+    {
+        return _choiceButtons.Count > 0 ? _choiceButtons[0].gameObject : null;
     }
     
     /// <summary>
@@ -79,53 +87,28 @@ public class ChoiceView : MonoBehaviour
             Destroy(button.gameObject);
         _choiceButtons.Clear();
     }
-    
-    /// <summary>
-    /// パネルを表示状態にする
-    /// </summary>
-    private async UniTask ShowPanel()
-    {
-        await choicePanelCanvasGroup.FadeIn(0.5f).ToUniTask();
-        choicePanelCanvasGroup.interactable = true;
-        choicePanelCanvasGroup.blocksRaycasts = true;
-    }
 
-    /// <summary>
-    /// パネルを非表示状態にする
-    /// </summary>
-    private async UniTask HidePanel()
-    {
-        choicePanelCanvasGroup.interactable = false;
-        choicePanelCanvasGroup.blocksRaycasts = false;
-        await choicePanelCanvasGroup.FadeOut(0.5f).ToUniTask();
-        
-        // ボタンをクリア
-        ClearChoiceButtons();
-    }
-    
     /// <summary>
     /// 選択肢ボタンがクリックされた時の処理
     /// </summary>
     private void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (!choicePanelCanvasGroup.interactable) return;
+        if (!IsShowing) return;
 
         _choiceSelectedSubject.OnNext(choiceIndex);
     }
 
-    private void Awake()
+    protected override void Awake()
     {
-        // ChoicePanelの初期状態を設定
-        choicePanelCanvasGroup.alpha = 0f;
-        choicePanelCanvasGroup.interactable = false;
-        choicePanelCanvasGroup.blocksRaycasts = false;
-        
+        base.Awake();
+
         questionBackground.color = Color.white;
         questionText.text = "";
     }
-    
-    private void OnDestroy()
+
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         _choiceSelectedSubject?.Dispose();
         ClearChoiceButtons();
     }
