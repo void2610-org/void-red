@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -35,6 +36,7 @@ public class ChoiceView : MonoBehaviour
         CreateChoiceButtons(choiceData.Options);
         
         await ShowPanel();
+        SafeNavigationManager.SetSelectedGameObjectSafe(_choiceButtons[0].gameObject);
         var selectedIndex = await _choiceSelectedSubject.FirstAsync();
         await HidePanel();
 
@@ -63,6 +65,9 @@ public class ChoiceView : MonoBehaviour
             
             _choiceButtons.Add(button);
         }
+        
+        //ナビゲーションを設定
+        _choiceButtons.Select(b => b as Selectable).ToList().SetNavigation(isHorizontal: false, wrapAround: true);
     }
     
     /// <summary>
