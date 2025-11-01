@@ -1,5 +1,7 @@
+using System;
 using R3;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// バトルシーンのキーバインド設定
@@ -72,6 +74,7 @@ public static class BattleKeyBindings
 
         // カードナビゲーション
         inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
+            .ThrottleFirst(TimeSpan.FromMilliseconds(200))
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ =>
