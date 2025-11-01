@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine.EventSystems;
+using UnityEngine.VFX;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -17,6 +18,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     [SerializeField] private TextMeshProUGUI themeText;
     [SerializeField] private KeywordTextView keywordTextPrefab;
     [SerializeField] private Transform keywordContainer;
+    [SerializeField] private VisualEffect visualEffect;
 
     private readonly List<KeywordTextView> _keywordViews = new();
     private readonly List<Vector2> _keywordPositions = new();
@@ -29,17 +31,17 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// テーマとキーワードを表示
     /// </summary>
     /// <param name="themeData">テーマデータ</param>
-    public async UniTask DisplayThemeWithKeywords(ThemeData themeData)
+    public async UniTask DisplayThemeWithKeywords(ThemeData themeData, bool isMainTheme)
     {
-        // BGMボリュームを下げる
+        // メインテーマならVFX再生
+        visualEffect.SetInt("Rate", isMainTheme ? 1 : 0);
+        
+        // BGMボリュームを下げてからME再生
         await BgmManager.Instance.DuckVolume();
-
         SeManager.Instance.PlaySe("ThemeAppearance", pitch:1f);
         _themeData = themeData;
         themeText.TypewriterAnimation(themeData.Title, skipOnClick:false).Forget();
         await UniTask.Delay(4000);
-
-        // BGMボリュームを元に戻す
         BgmManager.Instance.RestoreVolume().Forget();
 
         // 既存のキーワードViewをクリア
@@ -150,6 +152,11 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
 
         return bestPosition;
+    }
+
+    private void Awake()
+    {
+        visualEffect.SetInt("Rate", 0);
     }
 
     private void OnDestroy()

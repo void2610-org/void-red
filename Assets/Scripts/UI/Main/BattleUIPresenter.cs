@@ -62,10 +62,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         BattleKeyBindings.Setup(_inputActionsProvider, this, _themeView, _battlePresenter.CurrentGameState, _disposables);
     }
 
-    public async UniTask SetTheme(ThemeData theme)
+    public async UniTask SetTheme(ThemeData theme, bool isMainTheme)
     {
         _currentTheme = theme;
-        await _themeView.DisplayThemeWithKeywords(theme);
+        await _themeView.DisplayThemeWithKeywords(theme, isMainTheme);
     }
     
     public async UniTask ShowThemeDetailAndWait()
