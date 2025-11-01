@@ -120,7 +120,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         var selectedCard = _player.SelectedCard.CurrentValue;
         if (selectedCard?.Data != null)
         {
-            _cardDetailView.ShowCardDetail(selectedCard.Data, true);
+            _cardDetailView.ShowCardDetail(selectedCard.Data, true, _currentTheme);
         }
     }
 
