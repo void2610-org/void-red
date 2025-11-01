@@ -21,6 +21,8 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     private CardPoolService _cardPoolService;
     private InputActionsProvider _inputActionsProvider;
     private DialogView _dialogView;
+    private DialogCharacterView _dialogCharacterView;
+    private DialogBackgroundView _dialogBackgroundView;
     private ItemGetEffectView _itemGetEffectView;
     private ChoiceView _choiceView;
     private CardChoiceView _cardChoiceView;
@@ -80,6 +82,8 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     private async UniTaskVoid Initialize()
     {
         _dialogView = Object.FindAnyObjectByType<DialogView>();
+        _dialogCharacterView = Object.FindAnyObjectByType<DialogCharacterView>();
+        _dialogBackgroundView = Object.FindAnyObjectByType<DialogBackgroundView>();
         _itemGetEffectView = Object.FindAnyObjectByType<ItemGetEffectView>();
         _choiceView = Object.FindAnyObjectByType<ChoiceView>();
         _cardChoiceView = Object.FindAnyObjectByType<CardChoiceView>();
@@ -164,20 +168,20 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     /// </summary>
     private async UniTask ShowSingleDialog(DialogData dialogData)
     {
-        // キャラクター画像を読み込み（事前読み込み済みなのでキャッシュから取得）
-        Sprite characterSprite = null;
-        if (!string.IsNullOrEmpty(dialogData.CharacterImageName))
-        {
-            characterSprite = await _addressableImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
-        }
-        
         // 背景画像を読み込み
-        Sprite backgroundSprite = null;
         if (!string.IsNullOrEmpty(dialogData.BackgroundImageName))
         {
-            backgroundSprite = await _addressableImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
+            var backgroundSprite = await _addressableImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
+            await _dialogBackgroundView.SetBackground(backgroundSprite);
         }
         
+        // キャラクター画像を読み込み（事前読み込み済みなのでキャッシュから取得）
+        if (!string.IsNullOrEmpty(dialogData.CharacterImageName))
+        {
+            var characterSprite = await _addressableImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
+            _dialogCharacterView.SetCharacterImage(characterSprite, dialogData.CharacterImageName.Contains("Alv"));
+        }
+
         // SE再生と再生時間の取得
         _novelSeManager.StopSe();
         var seWaitTime = 0f;
@@ -186,9 +190,9 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             // SEのクリップ長を取得（オートモード時のため）
             seWaitTime = _novelSeManager.PlaySe(dialogData.SeClipName);
         }
-        
+
         // ダイアログを表示（完了まで待機）
-        await _dialogView.ShowSingleDialog(dialogData, characterSprite, backgroundSprite, seWaitTime);
+        await _dialogView.ShowSingleDialog(dialogData, seWaitTime);
     }
     
     /// <summary>
@@ -233,7 +237,8 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     /// </summary>
     private async UniTask ShowCardChoiceEffect(CardChoiceData cardChoiceData)
     {
-        // ダイアログパネルと立ち絵を非表示（背景は残す）
+        // ダイアログパネルと立ち絵を非表示
+        _dialogCharacterView.FadeOut().Forget();
         await _dialogView.SetDialogPanelVisible(false);
         
         // カード画像を並列で読み込み（待機時間短縮）
@@ -256,6 +261,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         Debug.Log($"[NovelPresenter] ユーザーが選択したカード選択肢: {selectedIndex} - {cardChoiceData.GetOption(selectedIndex)}");
         
         // ダイアログパネルと立ち絵を再表示
+        _dialogCharacterView.FadeIn().Forget();
         await _dialogView.SetDialogPanelVisible(true);
     }
     
