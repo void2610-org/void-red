@@ -43,6 +43,11 @@ public enum DialogParameterType
     Choice,
     
     /// <summary>
+    /// カード風選択肢表示（CardChoiceData - [選択肢1,画像1]/[選択肢2,画像2]）
+    /// </summary>
+    CardChoice,
+    
+    /// <summary>
     /// カード獲得演出（パラメータなし - 列が存在すれば発火。選択結果に基づいてカードを決定）
     /// </summary>
     GetCard
@@ -80,6 +85,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.AutoAdvance => typeof(float),
             DialogParameterType.GetItem => typeof(ItemGetData),
             DialogParameterType.Choice => typeof(ChoiceData),
+            DialogParameterType.CardChoice => typeof(CardChoiceData),
             DialogParameterType.GetCard => typeof(bool),
             _ => typeof(string)
         };
@@ -107,6 +113,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.AutoAdvance => float.TryParse(valueString, out var autoValue) ? autoValue : -1f,
             DialogParameterType.GetItem => ItemGetData.FromCommaSeparatedString(valueString),
             DialogParameterType.Choice => ChoiceData.FromCommaSeparatedString(valueString),
+            DialogParameterType.CardChoice => CardChoiceData.FromSlashSeparatedString(valueString),
             DialogParameterType.GetCard => true,
             _ => valueString
         };
@@ -128,6 +135,7 @@ public static class DialogParameterTypeExtensions
             DialogParameterType.AutoAdvance => -1f,
             DialogParameterType.GetItem => null,
             DialogParameterType.Choice => null,
+            DialogParameterType.CardChoice => null,
             DialogParameterType.GetCard => false,
             _ => ""
         };
