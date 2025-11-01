@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using R3;
 using Void2610.UnityTemplate;
 
@@ -18,24 +19,9 @@ public class ChoiceView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI questionText;
     [SerializeField] private Transform buttonContainer;
     [SerializeField] private Button choiceButtonPrefab;
-    
+
     private readonly List<Button> _choiceButtons = new();
-    private bool _isWaitingForChoice;
-    private int _selectedChoiceIndex = -1;
-    
-    private void Awake()
-    {
-        // ChoicePanelの初期状態を設定
-        choicePanelCanvasGroup.alpha = 0f;
-        choicePanelCanvasGroup.interactable = false;
-        choicePanelCanvasGroup.blocksRaycasts = false;
-        
-        questionBackground.color = Color.white;
-        questionText.text = "";
-        
-        // プレハブボタンは非表示にする
-        choiceButtonPrefab.gameObject.SetActive(false);
-    }
+    private readonly Subject<int> _choiceSelectedSubject = new();
     
     /// <summary>
     /// 選択肢を表示して選択を待つ
@@ -44,30 +30,15 @@ public class ChoiceView : MonoBehaviour
     /// <returns>選択されたインデックス</returns>
     public async UniTask<int> ShowChoice(ChoiceData choiceData)
     {
-        // UI要素を設定
-        SetupUIElements(choiceData);
-        
-        // 表示状態にする
-        ShowPanel();
-        
-        // ユーザーの選択待ち
-        var selectedIndex = await WaitForUserChoice();
-        
-        // 非表示にする
-        HidePanel();
-        
-        return selectedIndex;
-    }
-    
-    /// <summary>
-    /// UI要素を設定
-    /// </summary>
-    private void SetupUIElements(ChoiceData choiceData)
-    {
         questionText.text = choiceData.Question;
-        
         ClearChoiceButtons();
         CreateChoiceButtons(choiceData.Options);
+        
+        await ShowPanel();
+        var selectedIndex = await _choiceSelectedSubject.FirstAsync();
+        await HidePanel();
+
+        return selectedIndex;
     }
     
     /// <summary>
@@ -107,35 +78,21 @@ public class ChoiceView : MonoBehaviour
     /// <summary>
     /// パネルを表示状態にする
     /// </summary>
-    private void ShowPanel()
+    private async UniTask ShowPanel()
     {
-        choicePanelCanvasGroup.alpha = 1f;
+        await choicePanelCanvasGroup.FadeIn(0.5f).ToUniTask();
         choicePanelCanvasGroup.interactable = true;
         choicePanelCanvasGroup.blocksRaycasts = true;
     }
-    
-    /// <summary>
-    /// ユーザーの選択を待つ
-    /// </summary>
-    private async UniTask<int> WaitForUserChoice()
-    {
-        _isWaitingForChoice = true;
-        _selectedChoiceIndex = -1;
-        
-        // 選択されるまで待機
-        await UniTask.WaitUntil(() => !_isWaitingForChoice);
-        
-        return _selectedChoiceIndex;
-    }
-    
+
     /// <summary>
     /// パネルを非表示状態にする
     /// </summary>
-    private void HidePanel()
+    private async UniTask HidePanel()
     {
-        choicePanelCanvasGroup.alpha = 0f;
         choicePanelCanvasGroup.interactable = false;
         choicePanelCanvasGroup.blocksRaycasts = false;
+        await choicePanelCanvasGroup.FadeOut(0.5f).ToUniTask();
         
         // ボタンをクリア
         ClearChoiceButtons();
@@ -146,15 +103,25 @@ public class ChoiceView : MonoBehaviour
     /// </summary>
     private void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (!choicePanelCanvasGroup.interactable || !_isWaitingForChoice) 
-            return;
+        if (!choicePanelCanvasGroup.interactable) return;
+
+        _choiceSelectedSubject.OnNext(choiceIndex);
+    }
+
+    private void Awake()
+    {
+        // ChoicePanelの初期状態を設定
+        choicePanelCanvasGroup.alpha = 0f;
+        choicePanelCanvasGroup.interactable = false;
+        choicePanelCanvasGroup.blocksRaycasts = false;
         
-        _selectedChoiceIndex = choiceIndex;
-        _isWaitingForChoice = false;
+        questionBackground.color = Color.white;
+        questionText.text = "";
     }
     
     private void OnDestroy()
     {
+        _choiceSelectedSubject?.Dispose();
         ClearChoiceButtons();
     }
 }
