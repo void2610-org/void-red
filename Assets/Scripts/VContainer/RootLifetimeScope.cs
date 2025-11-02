@@ -48,7 +48,7 @@ public class RootLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<SafeNavigationManager>();
 
         // その他の設定管理
-        builder.Register<SettingsManager>(Lifetime.Singleton);
+        builder.RegisterEntryPoint<SettingsManager>().AsSelf();
         builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
             .WithParameter(confirmationDialogView);
 
