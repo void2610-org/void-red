@@ -1,4 +1,9 @@
 using R3;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// ノベルシーンのキーバインド設定
@@ -33,6 +38,9 @@ public static class NovelKeyBindings
         inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
             .Subscribe(_ =>
             {
+                // マウスクリックの場合、UIボタン上かチェック
+                if (IsPointerOverUI()) return;
+
                 // アイテム取得演出が表示中ならそちらを優先
                 if (itemGetEffectView && itemGetEffectView.IsShowing)
                 {
@@ -45,5 +53,22 @@ public static class NovelKeyBindings
                 }
             })
             .AddTo(disposables);
+    }
+
+    /// <summary>
+    /// 現在のポインター位置にUIがあるかチェック
+    /// </summary>
+    private static bool IsPointerOverUI()
+    {
+        if (!EventSystem.current) return false;
+
+        var pointerPosition = Mouse.current?.position.ReadValue() ?? Vector2.zero;
+        var pointerEventData = new PointerEventData(EventSystem.current) { position = pointerPosition };
+        var raycastResults = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+
+        // UIがヒットした場合はtrue
+        var res = raycastResults.Where(o => o.gameObject.name != "ClickAreaButton").ToList();
+        return res.Count > 0;
     }
 }
