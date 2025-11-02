@@ -49,8 +49,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     /// </summary>
     public void StartDizzyEffect()
     {
-        // 既存のモーションを停止
-        if (_dizzyMotionHandle.IsActive()) _dizzyMotionHandle.Cancel();
+        _dizzyMotionHandle.TryCancel();
 
         // 焦点距離を往復させるモーションを作成
         _dizzyMotionHandle = LMotion.Create(dizzyMinDistance, dizzyMaxDistance, dizzyEffectDuration)
@@ -65,7 +64,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     /// </summary>
     public void StopDizzyEffect()
     {
-        if (_dizzyMotionHandle.IsActive()) _dizzyMotionHandle.Cancel();
+        _dizzyMotionHandle.TryCancel();
 
         // デフォルト値に戻す
         _depthOfField.focalLength.value = defaultDepthOfFieldFocusDistance;
