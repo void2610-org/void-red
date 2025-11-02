@@ -69,7 +69,6 @@ public static class NovelKeyBindings
         EventSystem.current.RaycastAll(pointerEventData, raycastResults);
 
         // UIがヒットした場合はtrue
-        var res = raycastResults.Where(o => o.gameObject.name != "ClickAreaButton").ToList();
-        return res.Count > 0;
+        return raycastResults.Any(o => o.gameObject.name != "ClickAreaButton");
     }
 }
