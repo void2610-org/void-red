@@ -37,7 +37,7 @@ namespace Void2610.UnityTemplate
             {
                 _seVolume = Mathf.Clamp01(value);
                 if (_seVolume <= 0.0f) _seVolume = 0.0001f;
-                
+
                 seMixerGroup.audioMixer.SetFloat("SeVolume", Mathf.Log10(_seVolume) * 20);
             }
         }
@@ -228,22 +228,13 @@ namespace Void2610.UnityTemplate
         protected override void Awake()
         {
             base.Awake();
-            
+
             // AudioSourceリストを初期化
             for (var i = 0; i < _seAudioSourceList.Length; ++i)
             {
                 _seAudioSourceList[i] = gameObject.AddComponent<AudioSource>();
                 _seAudioSourceList[i].outputAudioMixerGroup = seMixerGroup;
                 _seAudioSourceList[i].playOnAwake = false;
-            }
-        }
-        
-        private void Start()
-        {
-            // AudioMixerの初期設定
-            if (seMixerGroup && seMixerGroup.audioMixer)
-            {
-                seMixerGroup.audioMixer.SetFloat("SeVolume", Mathf.Log10(_seVolume) * 20);
             }
         }
     }

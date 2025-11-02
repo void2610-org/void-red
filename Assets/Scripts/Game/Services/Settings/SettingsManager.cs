@@ -3,38 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using R3;
 using UnityEngine;
+using VContainer.Unity;
 using Void2610.UnityTemplate;
 
 /// <summary>
 /// ゲーム設定の管理を行うサービスクラス
 /// VContainerでシングルトンとして注入される
 /// </summary>
-public class SettingsManager : IDisposable
+public class SettingsManager : IStartable, IDisposable
 {
     private readonly List<ISettingBase> _settings = new();
     private readonly Subject<string> _onSettingChanged = new();
     private readonly CompositeDisposable _disposables = new();
     private readonly SaveDataManager _saveDataManager;
     private readonly GameProgressService _gameProgressService;
-    
+
     private const string SETTINGS_KEY = "game_settings";
-    
+
     /// <summary>
     /// 全ての設定項目の読み取り専用リスト
     /// </summary>
     public IReadOnlyList<ISettingBase> Settings => _settings.AsReadOnly();
-    
+
     public SettingsManager(SaveDataManager saveDataManager, GameProgressService gameProgressService)
     {
         _saveDataManager = saveDataManager;
         _gameProgressService = gameProgressService;
-        
+
         // 既存の設定がない場合は初期設定を作成
         if (_settings.Count == 0) InitializeDefaultSettings();
-        
+
         // 各設定の値変更イベントを監視
         SubscribeToSettingChanges();
-        
+    }
+
+    /// <summary>
+    /// 初期化処理（全てのMonoBehaviourのAwake完了後に実行）
+    /// </summary>
+    public void Start()
+    {
         // セーブデータから設定を読み込む
         LoadSettings();
         ApplyCurrentValues();

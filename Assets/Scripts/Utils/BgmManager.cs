@@ -43,7 +43,7 @@ namespace Void2610.UnityTemplate
                 {
                     value = 0.0001f;
                 }
-                
+
                 bgmMixerGroup.audioMixer.SetFloat("BgmVolume", Mathf.Log10(value) * 20);
             }
         }
@@ -177,12 +177,6 @@ namespace Void2610.UnityTemplate
             _audioSource.playOnAwake = false;
             _audioSource.loop = false; // ループは手動で管理
             _audioSource.volume = 0f;
-        }
-        
-        private void Start()
-        {
-            _currentBGM = null;
-            bgmMixerGroup.audioMixer.SetFloat("BgmVolume", Mathf.Log10(_bgmVolume) * 20);
         }
 
         private void Update()
