@@ -71,6 +71,18 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
         _depthOfField.focalLength.value = defaultDepthOfFieldFocusDistance;
     }
 
+    /// <summary>
+    /// 全てのエフェクトをデフォルト値に戻す
+    /// </summary>
+    public void ResetToDefault()
+    {
+        SetFilmGrainIntensity(0f);
+        SetChromaticAberrationIntensity(0f);
+        SetVignetteIntensity(0f);
+        SetScreenSpaceLensFlareIntensity(0f);
+        StopDizzyEffect();
+    }
+
     protected override void Awake()
     {
         base.Awake();

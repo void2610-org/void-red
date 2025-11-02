@@ -222,7 +222,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // ターン番号に基づいてテーマを順番に選択（1ターン目 = index 0, 2ターン目 = index 1, 3ターン目 = index 2）
         _currentTheme = _currentEnemyData.Themes[_currentTurnNumber - 1];
 
-        await _battleUIPresenter.SetTheme(_currentTheme);
+        await _battleUIPresenter.SetTheme(_currentTheme, _currentTurnNumber == 3);
 
         // 初回ターン かつ 敵がアルヴならチュートリアルを表示
         if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "alv")
@@ -255,9 +255,9 @@ public class BattlePresenter: IStartable, ISceneInitializable
             if (string.IsNullOrEmpty(dialogue.Message)) continue;
 
             if (dialogue.IsPlayer)
-                await _battleUIPresenter.ShowNarration(dialogue.Message);
+                await _battleUIPresenter.ShowNarration(dialogue.Message, autoAdvance: true);
             else
-                await _battleUIPresenter.ShowEnemyNarration(dialogue.Message);
+                await _battleUIPresenter.ShowEnemyNarration(dialogue.Message, autoAdvance: true);
         }
 
         await UniTask.Delay(300);
@@ -343,7 +343,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
         var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
         var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
-        await _battleUIPresenter.ShowNarration(displayContent);
+        await _battleUIPresenter.ShowNarration(displayContent, true);
         
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
@@ -456,13 +456,13 @@ public class BattlePresenter: IStartable, ISceneInitializable
         var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
         var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, playerNarrationType, _playerMove.PlayStyle);
         var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
-        await _battleUIPresenter.ShowNarration(displayNarration);
+        await _battleUIPresenter.ShowNarration(displayNarration, autoAdvance: true);
         
         // 敵の勝敗確定後のナレーション
         var enemyNarrationType = playerScore > npcScore ? NarrationType.PostBattleLoseEnemy : NarrationType.PostBattleWinEnemy;
         var enemyPostBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, enemyNarrationType, _playerMove.PlayStyle);
         var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
-        await _battleUIPresenter.ShowEnemyNarration(enemyDisplayNarration, 3f);
+        await _battleUIPresenter.ShowEnemyNarration(enemyDisplayNarration, true);
         
         // ゲーム結果を統計に記録（進化チェック前に実行）
         _gameProgressService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
@@ -582,6 +582,9 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private async UniTask HandleBattleEnd()
     {
         await UniTask.Delay(500);
+        
+        // Volumeエフェクトを全てデフォルトに戻す
+        VolumeController.Instance.ResetToDefault();
 
         // 3ターン終了後、勝利数が多い方が勝利（同数の場合はプレイヤー勝利）
         var playerWon = _playerWins >= _enemyWins;

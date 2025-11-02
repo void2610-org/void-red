@@ -1,4 +1,7 @@
+using System;
 using R3;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// バトルシーンのキーバインド設定
@@ -17,8 +20,8 @@ public static class BattleKeyBindings
         CompositeDisposable disposables)
     {
         // ViewをシーンからFind
-        var personalityLogView = UnityEngine.Object.FindFirstObjectByType<PersonalityLogView>();
-        var playStyleView = UnityEngine.Object.FindFirstObjectByType<PlayStyleView>();
+        var personalityLogView = Object.FindFirstObjectByType<PersonalityLogView>();
+        var playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
         
         // テーマのキーワードをトグル表示
         inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
@@ -71,11 +74,12 @@ public static class BattleKeyBindings
 
         // カードナビゲーション
         inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
+            .ThrottleFirst(TimeSpan.FromMilliseconds(200))
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ =>
             {
-                var direction = inputActionsProvider.UI.Navigate.ReadValue<UnityEngine.Vector2>();
+                var direction = inputActionsProvider.UI.Navigate.ReadValue<Vector2>();
                 if (direction.x > 0.5f)
                 {
                     // 右方向：次のカード
@@ -86,6 +90,17 @@ public static class BattleKeyBindings
                     // 左方向：前のカード
                     battleUIPresenter.NavigateToPreviousCard();
                 }
+            })
+            .AddTo(disposables);
+        
+        // ナレーションをスキップする
+        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
+        inputActionsProvider.UI.Submit.OnPerformedAsObservable()
+            .Where(_ => !BaseWindowView.HasActiveWindows)
+            .Subscribe(_ =>
+            {
+                narrationViews[0].OnClick();
+                narrationViews[1].OnClick();
             })
             .AddTo(disposables);
     }
