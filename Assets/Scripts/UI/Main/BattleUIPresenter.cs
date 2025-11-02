@@ -62,10 +62,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         BattleKeyBindings.Setup(_inputActionsProvider, this, _themeView, _battlePresenter.CurrentGameState, _disposables);
     }
 
-    public async UniTask SetTheme(ThemeData theme)
+    public async UniTask SetTheme(ThemeData theme, bool isMainTheme)
     {
         _currentTheme = theme;
-        await _themeView.DisplayThemeWithKeywords(theme);
+        await _themeView.DisplayThemeWithKeywords(theme, isMainTheme);
     }
     
     public async UniTask ShowThemeDetailAndWait()
@@ -75,8 +75,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
-    public async UniTask ShowNarration(string message, float duration = 2f) => await _narrationView.DisplayNarration(message, duration);
-    public async UniTask ShowEnemyNarration(string message, float duration = 2f) => await _enemyNarrationView.DisplayNarration(message, duration);
+    public async UniTask ShowNarration(string message, bool autoAdvance) => await _narrationView.DisplayNarration(message, 2f, autoAdvance);
+    public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
     public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
@@ -120,7 +120,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         var selectedCard = _player.SelectedCard.CurrentValue;
         if (selectedCard?.Data != null)
         {
-            _cardDetailView.ShowCardDetail(selectedCard.Data, true);
+            _cardDetailView.ShowCardDetail(selectedCard.Data, true, _currentTheme);
         }
     }
 
@@ -221,6 +221,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
         var handViews = Object.FindObjectsByType<HandView>(FindObjectsSortMode.None);
         _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
+        
+        // プレイヤーの選択したカードでキーワード更新
+        _player.SelectedCard.Subscribe(card => _themeView.UpdateKeywordHighlight(card.Data)).AddTo(_disposables);
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)

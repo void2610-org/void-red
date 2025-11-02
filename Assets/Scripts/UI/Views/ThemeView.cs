@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine.EventSystems;
+using UnityEngine.VFX;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -17,8 +18,9 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     [SerializeField] private TextMeshProUGUI themeText;
     [SerializeField] private KeywordTextView keywordTextPrefab;
     [SerializeField] private Transform keywordContainer;
+    [SerializeField] private VisualEffect visualEffect;
 
-    private readonly List<KeywordTextView> _keywordViews = new();
+    private readonly Dictionary<string, KeywordTextView> _keywordViews = new();
     private readonly List<Vector2> _keywordPositions = new();
 
     private ThemeData _themeData;
@@ -29,17 +31,17 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// テーマとキーワードを表示
     /// </summary>
     /// <param name="themeData">テーマデータ</param>
-    public async UniTask DisplayThemeWithKeywords(ThemeData themeData)
+    public async UniTask DisplayThemeWithKeywords(ThemeData themeData, bool isMainTheme)
     {
-        // BGMボリュームを下げる
+        // メインテーマならVFX再生
+        visualEffect.SetInt("Rate", isMainTheme ? 1 : 0);
+        
+        // BGMボリュームを下げてからME再生
         await BgmManager.Instance.DuckVolume();
-
         SeManager.Instance.PlaySe("ThemeAppearance", pitch:1f);
         _themeData = themeData;
         themeText.TypewriterAnimation(themeData.Title, skipOnClick:false).Forget();
         await UniTask.Delay(4000);
-
-        // BGMボリュームを元に戻す
         BgmManager.Instance.RestoreVolume().Forget();
 
         // 既存のキーワードViewをクリア
@@ -52,9 +54,15 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             var pos = GetFarthestPosition(220f, 30);
             keywordView.transform.localPosition = new Vector3(pos.x, pos.y, 0);
             keywordView.SetKeyword(keyword);
-            _keywordViews.Add(keywordView);
+            _keywordViews.Add(keyword, keywordView);
             _keywordPositions.Add(pos);
         }
+    }
+
+    public void UpdateKeywordHighlight(CardData cardData)
+    {
+        foreach (var pair in _keywordViews)
+            pair.Value.SetHighlight(cardData.Keywords.Contains(pair.Key));
     }
 
     /// <summary>
@@ -64,7 +72,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if (!_themeData) return;
         
-        foreach (var view in _keywordViews)
+        foreach (var view in _keywordViews.Values)
             view.FadeIn();
         
         if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
@@ -82,7 +90,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if (!_themeData) return;
 
-        foreach (var view in _keywordViews)
+        foreach (var view in _keywordViews.Values)
             view.FadeOut();
 
         if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
@@ -113,7 +121,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     private void ClearKeywords()
     {
-        foreach (var view in _keywordViews)
+        foreach (var view in _keywordViews.Values)
             if (view) Destroy(view.gameObject);
         _keywordViews.Clear();
         _keywordPositions.Clear();
@@ -150,6 +158,11 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
 
         return bestPosition;
+    }
+
+    private void Awake()
+    {
+        visualEffect.SetInt("Rate", 0);
     }
 
     private void OnDestroy()

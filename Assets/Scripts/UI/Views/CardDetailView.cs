@@ -23,10 +23,12 @@ public class CardDetailView : BaseWindowView
     /// カード詳細を表示
     /// </summary>
     /// <param name="cardData">表示するカードデータ</param>
-    public void ShowCardDetail(CardData cardData, bool isPlayable)
+    /// <param name="isPlayable">プレイボタンを表示するか</param>
+    /// <param name="themeData">現在のテーマ（nullの場合は色分けなし）</param>
+    public void ShowCardDetail(CardData cardData, bool isPlayable, ThemeData themeData = null)
     {
         // カード詳細情報を設定
-        UpdateCardDisplay(cardData);
+        UpdateCardDisplay(cardData, themeData);
         playButton.gameObject.SetActive(isPlayable);
 
         // パネルを表示
@@ -37,15 +39,16 @@ public class CardDetailView : BaseWindowView
     /// カード表示を更新
     /// </summary>
     /// <param name="cardData">表示するカードデータ</param>
-    private void UpdateCardDisplay(CardData cardData)
+    /// <param name="themeData">現在のテーマ（nullの場合は色分けなし）</param>
+    private void UpdateCardDisplay(CardData cardData, ThemeData themeData)
     {
         // 新しいカードViewを作成
         var cardModel = new CardModel(cardData);
         cardView.Initialize(cardModel);
-        
+
         // キーワード情報
-        UpdateKeywordsInfo(cardData);
-        
+        UpdateKeywordsInfo(cardData, themeData);
+
         // 詳細情報を更新
         attributeText.text = $"属性: {cardData.Attribute.ToJapaneseName()}";
         collapseThresholdText.text = $"崩壊閾値: {cardData.CollapseThreshold}";
@@ -55,7 +58,8 @@ public class CardDetailView : BaseWindowView
     /// キーワード情報を更新
     /// </summary>
     /// <param name="cardData">カードデータ</param>
-    private void UpdateKeywordsInfo(CardData cardData)
+    /// <param name="themeData">現在のテーマ（nullの場合は色分けなし）</param>
+    private void UpdateKeywordsInfo(CardData cardData, ThemeData themeData)
     {
         if (cardData.Keywords == null || cardData.Keywords.Count == 0)
         {
@@ -63,11 +67,17 @@ public class CardDetailView : BaseWindowView
             return;
         }
 
-        // キーワードを日本語名に変換してカンマ区切りで表示
-        var keywordNames = cardData.Keywords
-            .Where(k => k != KeywordType.None)
-            .Select(k => k.GetJapaneseName());
+        // テーマのキーワードと一致するものを赤色で表示
+        var formattedKeywords = cardData.Keywords.Select(keyword =>
+        {
+            // テーマが存在し、かつテーマのキーワードに含まれる場合は赤色
+            if (themeData != null && themeData.Keywords.Contains(keyword))
+            {
+                return $"<color=#FF0000>{keyword}</color>";
+            }
+            return keyword;
+        });
 
-        keywordsText.text = $"キーワード: {string.Join(", ", keywordNames)}";
+        keywordsText.text = $"キーワード: {string.Join(", ", formattedKeywords)}";
     }
 }

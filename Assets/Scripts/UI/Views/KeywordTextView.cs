@@ -25,9 +25,9 @@ public class KeywordTextView : MonoBehaviour
     private float _randomSeedX;
     private float _randomSeedY;
 
-    public void SetKeyword(KeywordType keyword)
+    public void SetKeyword(string keyword)
     {
-        _keywordText.text = keyword.GetJapaneseName();
+        _keywordText.text = keyword;
 
         // 初期位置を保存
         _initialPosition = _rectTransform.anchoredPosition;
@@ -36,16 +36,23 @@ public class KeywordTextView : MonoBehaviour
         _randomSeedX = Random.Range(0f, 1000f);
         _randomSeedY = Random.Range(0f, 1000f);
     }
+
+    public void SetHighlight(bool highlight)
+    {
+        var a = _keywordText.color.a;
+        var c = highlight ? Color.red : Color.white;
+        _keywordText.color = new Color(c.r, c.g, c.b, a) * hdrIntensity;
+    }
     
     public void FadeIn()
     {
-        if (_fadeMotion.IsActive()) _fadeMotion.Cancel();
+        _fadeMotion.TryCancel();
         _fadeMotion = _keywordText.FadeIn(0.3f);
     }
 
     public void FadeOut()
     {
-        if (_fadeMotion.IsActive()) _fadeMotion.Cancel();
+        _fadeMotion.TryCancel();
         _fadeMotion = _keywordText.FadeOut(0.3f);
     }
     
@@ -73,7 +80,7 @@ public class KeywordTextView : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_fadeMotion.IsActive()) _fadeMotion.Cancel();
+        _fadeMotion.TryCancel();
         if (_materialInstance) Destroy(_materialInstance);
     }
 }

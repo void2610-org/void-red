@@ -45,10 +45,10 @@ public static class ScoreCalculator
     /// <param name="card">カードデータ</param>
     /// <param name="theme">テーマデータ</param>
     /// <returns>一致したキーワードのリスト</returns>
-    public static List<KeywordType> GetMatchedKeywords(CardData card, ThemeData theme)
+    public static List<string> GetMatchedKeywords(CardData card, ThemeData theme)
     {
         if (card.Keywords == null || theme.Keywords == null)
-            return new List<KeywordType>();
+            return new List<string>();
 
         return card.Keywords.Intersect(theme.Keywords).ToList();
     }
