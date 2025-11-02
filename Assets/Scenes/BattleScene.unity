@@ -6291,10 +6291,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6418400225195142292, guid: db20cbf4a2e2e44129d940890d2f5a2c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 9223205478302197101, guid: db20cbf4a2e2e44129d940890d2f5a2c, type: 3}
       propertyPath: m_Name
       value: EnemyMentalPowerView
@@ -8192,10 +8188,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 595253103}
     m_Modifications:
-    - target: {fileID: 1834663718435131733, guid: 5b4ea5259958949a0bfcb3d0b5285cb0, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4583499581680457900, guid: 5b4ea5259958949a0bfcb3d0b5285cb0, type: 3}
       propertyPath: m_Name
       value: PlayerMentalPowerView

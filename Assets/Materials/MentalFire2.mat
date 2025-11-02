@@ -74,7 +74,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Speed: 2.5
-    - _TimeOffset: 5
+    - _TimeOffset: 100
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 0, g: 6.7810993, b: 23.96863, a: 1}

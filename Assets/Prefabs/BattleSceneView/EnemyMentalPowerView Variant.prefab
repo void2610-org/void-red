@@ -20,6 +20,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 115
       objectReference: {fileID: 0}
+    - target: {fileID: 3540298938563778505, guid: 5b4ea5259958949a0bfcb3d0b5285cb0, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: d75aeb61f2e384b81b7ab7acd1b23581, type: 2}
     - target: {fileID: 4583499581680457900, guid: 5b4ea5259958949a0bfcb3d0b5285cb0, type: 3}
       propertyPath: m_Name
       value: EnemyMentalPowerView Variant
