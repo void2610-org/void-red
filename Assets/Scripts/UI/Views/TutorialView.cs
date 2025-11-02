@@ -82,9 +82,6 @@ public class TutorialView : MonoBehaviour
 
         // ルートボタンを選択
         SafeNavigationManager.SelectRootForceSelectable().Forget();
-
-        // ボタンクリック待機
-        await _onClickAdvance.FirstAsync();
     }
     
     private async UniTask UpdateMessageText(string message, bool isPlayerDialog, bool isBattleTutorial)
