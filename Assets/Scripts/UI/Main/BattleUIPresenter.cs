@@ -223,7 +223,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
         
         // プレイヤーの選択したカードでキーワード更新
-        _player.SelectedCard.Subscribe(card => _themeView.UpdateKeywordHighlight(card.Data)).AddTo(_disposables);
+        _player.SelectedCard
+            .Where(card => card != null && card.Data != null)
+            .Subscribe(card => _themeView.UpdateKeywordHighlight(card.Data)).AddTo(_disposables);
     }
     
     private void OnPlayStyleSelected(PlayStyle playStyle)

@@ -6,7 +6,7 @@ public static class GameConstants
     /// <summary>
     /// プレイヤーの最大精神力
     /// </summary>
-    public const int MAX_MENTAL_POWER = 20;
+    public const int MAX_MENTAL_POWER = 10;
     
     /// <summary>
     /// 精神力ベットの最小値
