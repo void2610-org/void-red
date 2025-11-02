@@ -85,7 +85,10 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     protected override void Awake()
     {
         base.Awake();
-        
+
+        // destroyCancellationTokenを初期化（LitMotionのAddTo使用に必要）
+        _ = destroyCancellationToken;
+
         _volume = this.GetComponent<Volume>();
         
         _volume.profile.TryGet(out _filmGrain);
