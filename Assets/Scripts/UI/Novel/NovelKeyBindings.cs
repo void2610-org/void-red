@@ -61,8 +61,9 @@ public static class NovelKeyBindings
     private static bool IsPointerOverUI()
     {
         if (!EventSystem.current) return false;
+        if (Mouse.current == null) return false;
 
-        var pointerPosition = Mouse.current?.position.ReadValue() ?? Vector2.zero;
+        var pointerPosition = Mouse.current.position.ReadValue();
         var pointerEventData = new PointerEventData(EventSystem.current) { position = pointerPosition };
         var raycastResults = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointerEventData, raycastResults);
