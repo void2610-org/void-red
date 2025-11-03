@@ -103,6 +103,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         if (currentNode is not BattleNode battleNode)
         {
             Debug.LogError("[GameManager] 現在のノードがBattleNodeではありません");
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
         
@@ -110,6 +111,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         if (!_currentEnemyData)
         {
             Debug.LogError("[GameManager] 敵データが見つかりません");
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
         
