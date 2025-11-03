@@ -54,17 +54,3 @@ public class NovelNode : StoryNode
         ReturnToHome = returnToHome;
     }
 }
-
-/// <summary>
-/// ゲーム終了を表すノード
-/// </summary>
-public class EndingNode : StoryNode
-{
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public EndingNode()
-    {
-        NodeId = "ending";
-    }
-}

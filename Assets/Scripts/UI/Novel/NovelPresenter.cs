@@ -418,6 +418,10 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
                 _gameProgressService.AddCardToDeck(new CardModel(card));
         }
         
+        // エンディング終了後にSteamストアページを開く
+        if (_currentScenarioId == "ending")
+            Application.OpenURL("https://store.steampowered.com/app/3997140/");
+        
         await UniTask.Delay(1000);
         
         // 現在のノードを結果記録前に取得
