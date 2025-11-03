@@ -8,19 +8,11 @@ using R3;
 [RequireComponent(typeof(Button))]
 public class HelpButtonView : MonoBehaviour
 {
-    public Observable<Unit> OnButtonClicked => _onButtonClicked;
-
-    private Button _button;
-    private readonly Subject<Unit> _onButtonClicked = new();
+    public Observable<Unit> OnButtonClicked { get; private set; }
 
     private void Awake()
     {
-        _button = this.GetComponent<Button>();
-        _button.onClick.AddListener(() => _onButtonClicked.OnNext(Unit.Default));
-    }
-
-    private void OnDestroy()
-    {
-        _onButtonClicked?.Dispose();
+        var button = GetComponent<Button>();
+        OnButtonClicked = button.OnClickAsObservable();
     }
 }
