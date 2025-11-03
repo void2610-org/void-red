@@ -7,10 +7,10 @@ using LitMotion;
 [RequireComponent(typeof(Volume))]
 public class VolumeController : SingletonMonoBehaviour<VolumeController>
 {
-    [SerializeField] private Vector2 filmGrainIntensityRange = new Vector2(0f, 1f);
-    [SerializeField] private Vector2 chromaticAberrationIntensityRange = new Vector2(0f, 1f);
-    [SerializeField] private Vector2 vignetteIntensityRange = new Vector2(0f, 1f);
-    [SerializeField] private Vector2 screenSpaceLensFlareIntensityRange = new Vector2(0f, 1f);
+    [SerializeField] private Vector2 filmGrainIntensityRange = new(0f, 1f);
+    [SerializeField] private Vector2 chromaticAberrationIntensityRange = new(0f, 1f);
+    [SerializeField] private Vector2 vignetteIntensityRange = new(0f, 1f);
+    [SerializeField] private Vector2 screenSpaceLensFlareIntensityRange = new(0f, 1f);
     [SerializeField] private float defaultDepthOfFieldFocusDistance = 50f;
     [SerializeField] private float dizzyEffectDuration = 2f;
     [SerializeField] private float dizzyMinDistance = 1f;

@@ -13,7 +13,7 @@ public class MentalPowerEffectController : IStartable, IDisposable
 
     // めまいエフェクト制御用
     private bool _isDizzyEffectActive;
-    private const float DIZZY_EFFECT_THRESHOLD = 0.3f; // 精神力30%以下でめまい発動
+    private const float DIZZY_EFFECT_THRESHOLD = 0.6f;
 
     public MentalPowerEffectController(Player player, VolumeController volumeController)
     {
@@ -37,22 +37,23 @@ public class MentalPowerEffectController : IStartable, IDisposable
     private void OnMentalPowerChanged(int mentalPower)
     {
         // 精神力割合を計算（0.0～1.0）
-        var ratio = (mentalPower + 3) / (float)GameConstants.MAX_MENTAL_POWER;
-        ratio = Math.Clamp(ratio, 0f, 1f);
+        var ratio = mentalPower / (float)GameConstants.MAX_MENTAL_POWER;
+        if (ratio > 0.7) return;
+        
         var inverseRatio = 1f - ratio; // 精神力が低いほど大きい値
 
         // エフェクト強度を設定
         _volumeController.SetFilmGrainIntensity(inverseRatio);
         _volumeController.SetChromaticAberrationIntensity(inverseRatio);
-        _volumeController.SetVignetteIntensity(inverseRatio); // ビネットは控えめに
+        _volumeController.SetVignetteIntensity(inverseRatio);
 
         // めまいエフェクトの制御
-        if (ratio <= DIZZY_EFFECT_THRESHOLD && !_isDizzyEffectActive)
+        if (inverseRatio > DIZZY_EFFECT_THRESHOLD && !_isDizzyEffectActive)
         {
             _volumeController.StartDizzyEffect();
             _isDizzyEffectActive = true;
         }
-        else if (ratio > DIZZY_EFFECT_THRESHOLD && _isDizzyEffectActive)
+        else if (inverseRatio < DIZZY_EFFECT_THRESHOLD && _isDizzyEffectActive)
         {
             _volumeController.StopDizzyEffect();
             _isDizzyEffectActive = false;
