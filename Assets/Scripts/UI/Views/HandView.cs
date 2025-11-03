@@ -106,20 +106,20 @@ public class HandView : MonoBehaviour
     /// </summary>
     private CardView CreateCardView(CardData cardData)
     {
-        var cardView = _cardViewFactory.CreateHandCard(
-            cardData, 
-            handContainer, 
-            clickedCardView => {
-                var currentIndex = _cardViews.IndexOf(clickedCardView);
+        var cardView = _cardViewFactory.CreateCard(cardData, handContainer, !isEnemyHand);
+
+        // R3のObservableでクリックイベントを購読
+        cardView.OnClicked
+            .Subscribe(cv =>
+            {
+                var currentIndex = _cardViews.IndexOf(cv);
                 if (currentIndex >= 0)
                     _onCardClicked.OnNext(currentIndex);
-            },
-            gameObject,
-            !isEnemyHand
-        );
-        
+            })
+            .AddTo(gameObject);
+
         if(isEnemyHand) cardView.SetToBackside(cardBackSprite);
-        
+
         return cardView;
     }
     
