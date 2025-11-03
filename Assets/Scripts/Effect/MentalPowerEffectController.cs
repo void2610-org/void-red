@@ -15,10 +15,10 @@ public class MentalPowerEffectController : IStartable, IDisposable
     private bool _isDizzyEffectActive;
     private const float DIZZY_EFFECT_THRESHOLD = 0.6f;
 
-    public MentalPowerEffectController(Player player, VolumeController volumeController)
+    public MentalPowerEffectController(Player player)
     {
         _player = player;
-        _volumeController = volumeController;
+        _volumeController = VolumeController.Instance;
     }
 
     /// <summary>

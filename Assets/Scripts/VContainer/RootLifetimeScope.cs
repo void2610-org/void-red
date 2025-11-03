@@ -11,6 +11,7 @@ public class RootLifetimeScope : LifetimeScope
 {
     [SerializeField] private BgmManager bgmManager;
     [SerializeField] private SeManager seManager;
+    [SerializeField] private VolumeController volumeController;
     [SerializeField] private AllEnemyData allEnemyData;
     [SerializeField] private AllThemeData allThemeData;
     [SerializeField] private AllCardData allCardData;
@@ -57,8 +58,7 @@ public class RootLifetimeScope : LifetimeScope
         // Discord統合サービス
         builder.Register<DiscordService>(Lifetime.Singleton);
 
-        // サウンドマネージャーの初期化
-        InitializeSoundManagers();
+        InitializeSingletonMonoBehaviour();
     }
     
     private void RegisterAllData()
@@ -72,9 +72,10 @@ public class RootLifetimeScope : LifetimeScope
         #endif
     }
     
-    private void InitializeSoundManagers()
+    private void InitializeSingletonMonoBehaviour()
     {
         DontDestroyOnLoad(Instantiate(bgmManager).gameObject);
         DontDestroyOnLoad(Instantiate(seManager).gameObject);
+        DontDestroyOnLoad(Instantiate(volumeController).gameObject);
     }
 }
