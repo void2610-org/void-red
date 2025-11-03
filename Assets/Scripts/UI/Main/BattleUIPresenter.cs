@@ -22,7 +22,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
-    private readonly NarrationView _narrationView;
+    private readonly NarrationView _playerNarrationView;
     private readonly NarrationView _enemyNarrationView;
     private readonly PlayButtonView _playButtonView;
     private readonly PlayStyleView _playStyleView;
@@ -75,7 +75,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
-    public async UniTask ShowNarration(string message, bool autoAdvance) => await _narrationView.DisplayNarration(message, 2f, autoAdvance);
+    public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
     public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
@@ -184,26 +184,14 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _player = player;
         _enemy = enemy;
+        _sceneTransitionManager = sceneTransitionManager;
 
         // 初期化
         _themeView = Object.FindFirstObjectByType<ThemeView>();
         _announcementView = Object.FindFirstObjectByType<AnnouncementView>();
-
-        // 複数のNarrationViewを取得して、プレイヤー用と敵用を区別
-        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
-        if (narrationViews.Length != 2) throw new System.Exception("Expected exactly two NarrationViews in the scene.");
-        _narrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
-        _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
-
         _playButtonView = Object.FindFirstObjectByType<PlayButtonView>();
         _playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = Object.FindFirstObjectByType<MentalBetView>();
-
-        var mentalPowerViews = Object.FindObjectsByType<MentalPowerView>(FindObjectsSortMode.None);
-        // Y座標が低い方をプレイヤー、高い方を敵とする
-        _playerMentalPowerView = mentalPowerViews[0].transform.position.y < mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
-        _enemyMentalPowerView = mentalPowerViews[0].transform.position.y > mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
-
         _gameOverView = Object.FindFirstObjectByType<GameOverView>();
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _personalityLogView = Object.FindFirstObjectByType<PersonalityLogView>();
@@ -215,12 +203,21 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardDetailView = Object.FindFirstObjectByType<CardDetailView>();
         _themeDetailView = Object.FindFirstObjectByType<ThemeDetailView>();
         _battleResultView = Object.FindFirstObjectByType<BattleResultView>();
-        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
-        _sceneTransitionManager = sceneTransitionManager;
 
-        // プレイヤーのHandViewを取得（Y座標が低い方がプレイヤー）
+        // 複数のViewを取得して、プレイヤー用と敵用を区別
+        // Y座標が低い方をプレイヤー、高い方を敵とする
+        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
+        _playerNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
+        _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
+
+        var mentalPowerViews = Object.FindObjectsByType<MentalPowerView>(FindObjectsSortMode.None);
+        _playerMentalPowerView = mentalPowerViews[0].transform.position.y < mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
+        _enemyMentalPowerView = mentalPowerViews[0].transform.position.y > mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
+        
         var handViews = Object.FindObjectsByType<HandView>(FindObjectsSortMode.None);
         _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
+
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
         
         // プレイヤーの選択したカードでキーワード更新
         _player.SelectedCard
