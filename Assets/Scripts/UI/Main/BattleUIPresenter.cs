@@ -78,6 +78,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
+    public void SetCardDetailButtonInteractable(bool interactable) => _cardDetailButtonView.SetInteractable(interactable);
     public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
     public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
@@ -171,15 +172,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
             _player.SelectCardAt(0);
     }
 
-    /// <summary>
-    /// 詳細ボタンの有効/無効を現在の選択状態に基づいて更新
-    /// </summary>
-    private void UpdateDetailButtonVisibility()
-    {
-        var hasSelectedCard = _player.SelectedCard.CurrentValue != null;
-        _cardDetailButtonView?.SetInteractable(hasSelectedCard);
-    }
-    
     public BattleUIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
     {
         _player = player;
@@ -320,9 +312,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
             else _enemyView.ResetToDefaultSprite().Forget();
         }).AddTo(_disposables);
 
-        // プレイヤーのカード選択を監視して詳細ボタンの表示制御
-        _player.SelectedCard.Subscribe(_ => UpdateDetailButtonVisibility()).AddTo(_disposables);
-
         // 崩壊ビジュアル更新に関する全てのイベントを統合
         var cardSelectionChange = _player.SelectedCard.Select(_ => Unit.Default);
         var cardIndexChange = _player.SelectedIndex.Select(_ => Unit.Default);
@@ -364,9 +353,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         // 初期表示の更新
         OnPlayStyleSelected(_selectedPlayStyle);
         UpdateMentalBetDisplay();
-
-        // 詳細ボタンの初期状態を設定
-        UpdateDetailButtonVisibility();
 
         // ルートボタンを初期選択
         SafeNavigationManager.SelectRootForceSelectable().Forget();

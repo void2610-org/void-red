@@ -272,6 +272,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
             if (selectedCard == null) continue;
             // カードが選択されたらプレイボタンを有効化
             _battleUIPresenter.SetPlayButtonInteractable(true);
+            _battleUIPresenter.SetCardDetailButtonInteractable(true);
             break;
         }
 
@@ -287,6 +288,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
 
         _battleUIPresenter.SetPlayButtonInteractable(false);
+        _battleUIPresenter.SetCardDetailButtonInteractable(false);
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
         if (finalSelectedCard == null) return;
