@@ -24,7 +24,6 @@ public class BattleLifetimeScope : LifetimeScope
         builder.RegisterInstance(_enemy).AsSelf();
         
         builder.Register<PersonalityLogService>(Lifetime.Singleton);
-        builder.RegisterComponentInHierarchy<VolumeController>();
         
         builder.RegisterEntryPoint<BattlePresenter>().AsSelf().As<ISceneInitializable>();
         builder.RegisterEntryPoint<BattleUIPresenter>().AsSelf();
