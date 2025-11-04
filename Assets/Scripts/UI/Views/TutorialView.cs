@@ -33,14 +33,15 @@ public class TutorialView : MonoBehaviour
 
     public void NotifyAdvance()
     {
-        if (_isTyping)
+        // 各Viewに対してクリックを通知（各Viewが自分の状態に応じて処理）
+        playerNarrationView.OnClick();
+        enemyNarrationView.OnClick();
+        simpleTutorialWindow.OnClick();
+
+        if (!_isTyping)
         {
-            playerNarrationView.SkipTyping();
-            enemyNarrationView.SkipTyping();
-            simpleTutorialWindow.SkipTyping();
-            return;
+            _onClickAdvance.OnNext(Unit.Default);
         }
-        _onClickAdvance.OnNext(Unit.Default);
     }
 
     /// <summary>
