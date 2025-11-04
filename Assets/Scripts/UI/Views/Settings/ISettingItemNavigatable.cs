@@ -1,4 +1,5 @@
 using R3;
+using UnityEngine;
 
 /// <summary>
 /// 設定項目のナビゲーション操作を定義するインターフェース
@@ -6,6 +7,11 @@ using R3;
 /// </summary>
 public interface ISettingItemNavigatable
 {
+    /// <summary>
+    /// EventSystemで選択可能なGameObject
+    /// </summary>
+    GameObject SelectableGameObject { get; }
+
     /// <summary>
     /// 左右のナビゲーション操作（スライダー値変更・enum切り替え）
     /// </summary>

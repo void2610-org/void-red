@@ -16,6 +16,7 @@ public class ButtonSettingItem : MonoBehaviour, ISettingItemNavigatable
     private string _settingName;
     private Button _button;
 
+    public GameObject SelectableGameObject => _button.gameObject;
     public Observable<(string settingName, object value)> OnValueChanged => _onValueChanged;
 
     /// <summary>

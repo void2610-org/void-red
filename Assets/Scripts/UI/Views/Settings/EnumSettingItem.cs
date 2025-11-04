@@ -22,6 +22,7 @@ public class EnumSettingItem : MonoBehaviour, ISettingItemNavigatable
     private string[] _displayNames;
     private int _currentIndex;
 
+    public GameObject SelectableGameObject => gameObject;
     public Observable<(string settingName, object value)> OnValueChanged => _onValueChanged;
 
     /// <summary>
