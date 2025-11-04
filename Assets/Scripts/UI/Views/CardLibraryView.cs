@@ -22,8 +22,8 @@ public class CardLibraryView : BaseWindowView
 
     public Observable<CardData> OnCardClicked => _onCardClicked;
 
-    private const int CARDS_PER_PAGE = 8;
-    private const int CARDS_PER_PAGE_COLS = 4;
+    private const int CARDS_PER_PAGE = 10;
+    private const int CARDS_PER_PAGE_COLS = 5;
 
     private readonly List<DeckCardView> _cardViews = new();
     private readonly Subject<CardData> _onCardClicked = new();
@@ -197,13 +197,15 @@ public class CardLibraryView : BaseWindowView
     /// </summary>
     private void SetupCloseButtonNavigation(List<Selectable> cardButtons)
     {
+        var lastRowStartIndex = ((cardButtons.Count - 1) / CARDS_PER_PAGE_COLS) * CARDS_PER_PAGE_COLS;
+        
         var closeNav = closeButton.navigation;
         closeNav.mode = Navigation.Mode.Explicit;
-        closeNav.selectOnUp = cardButtons[0];
+        closeNav.selectOnUp = cardButtons[lastRowStartIndex + CARDS_PER_PAGE_COLS / 2];
         closeButton.navigation = closeNav;
 
         // 最後のrowのカードから closeButton へのナビゲーションを設定
-        foreach (var cardButton in cardButtons.Skip(cardButtons.Count - cardButtons.Count % CARDS_PER_PAGE_COLS))
+        foreach (var cardButton in cardButtons.Skip(lastRowStartIndex))
         {
             var nav = cardButton.navigation;
             nav.mode = Navigation.Mode.Explicit;
