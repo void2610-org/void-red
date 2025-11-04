@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// デッキ内容を表示するViewクラス
@@ -12,7 +13,6 @@ using R3;
 public class DeckView : BaseWindowView
 {
     [Header("UIコンポーネント")]
-    [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Transform contentContainer;
     [SerializeField] private DeckCardView cardPrefab;
     
@@ -27,6 +27,8 @@ public class DeckView : BaseWindowView
     [SerializeField] private Button showCollapsedButton;
     
     public Observable<CardData> OnCardClicked => _onCardClicked;
+
+    private const int DECK_GRID_COLS = 5;
 
     private readonly List<DeckCardView> _cardViews = new();
     private DeckDisplayMode _currentMode = DeckDisplayMode.All;
@@ -92,12 +94,10 @@ public class DeckView : BaseWindowView
         
         // カードViewを生成
         foreach (var cardModel in displayCards)
-        {
             CreateCardView(cardModel);
-        }
-        
-        // スクロール位置をリセット
-        scrollRect.horizontalNormalizedPosition = 1f;
+
+        // ナビゲーションを設定
+        SetupNavigation();
     }
     
     /// <summary>
@@ -140,16 +140,100 @@ public class DeckView : BaseWindowView
             collapsedCardsText.text = "崩壊: 0枚";
             return;
         }
-        
+
         var totalCount = _cardModels.Count;
         var activeCount = _cardModels.Count(cm => !cm.IsCollapsed);
         var collapsedCount = _cardModels.Count(cm => cm.IsCollapsed);
-        
+
         totalCardsText.text = $"全カード: {totalCount}枚";
         activeCardsText.text = $"使用可能: {activeCount}枚";
         collapsedCardsText.text = $"崩壊: {collapsedCount}枚";
     }
-    
+
+    /// <summary>
+    /// Selectableのナビゲーションを設定
+    /// </summary>
+    private void SetupNavigation()
+    {
+        // カードのボタンを取得
+        var cardButtons = _cardViews
+            .Select(view => view.GetComponentInChildren<Button>())
+            .Where(button => button != null)
+            .Cast<Selectable>()
+            .ToList();
+        
+        if (cardButtons.Count == 0) return;
+
+        // ナビゲーション設定
+        SetupCategoryButtonsNavigation(cardButtons);
+        cardButtons.SetGridNavigation(DECK_GRID_COLS);
+        SetupCloseButtonNavigation(cardButtons);
+    }
+
+    /// <summary>
+    /// カテゴリボタンのナビゲーションを設定
+    /// </summary>
+    private void SetupCategoryButtonsNavigation(List<Selectable> cardButtons)
+    {
+        var categoryButtons = new List<Selectable> { showAllButton, showActiveButton, showCollapsedButton };
+
+        // カテゴリボタン間の水平ナビゲーション
+        categoryButtons.SetNavigation(isHorizontal: true, wrapAround: false);
+
+        // カテゴリボタンからカードグリッドへの下方向ナビゲーション
+        if (cardButtons.Count > 0)
+        {
+            for (int i = 0; i < categoryButtons.Count && i < cardButtons.Count; i++)
+            {
+                var nav = categoryButtons[i].navigation;
+                nav.selectOnDown = cardButtons[i];
+                categoryButtons[i].navigation = nav;
+            }
+
+            // カードグリッド最上段からカテゴリボタンへの上方向ナビゲーション
+            for (int i = 0; i < DECK_GRID_COLS && i < cardButtons.Count; i++)
+            {
+                var nav = cardButtons[i].navigation;
+                nav.selectOnUp = i < categoryButtons.Count ? categoryButtons[i] : categoryButtons[^1];
+                cardButtons[i].navigation = nav;
+            }
+        }
+        else
+        {
+            // カードがない場合はcloseButtonへ
+            foreach (var categoryButton in categoryButtons)
+            {
+                var nav = categoryButton.navigation;
+                nav.selectOnDown = closeButton;
+                categoryButton.navigation = nav;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// closeButtonとカードの連携を設定
+    /// </summary>
+    private void SetupCloseButtonNavigation(List<Selectable> cardButtons)
+    {
+        var closeNav = closeButton.navigation;
+        closeNav.mode = Navigation.Mode.Explicit;
+
+        // 最後の行の開始インデックス
+        var lastRowStartIndex = ((cardButtons.Count - 1) / DECK_GRID_COLS) * DECK_GRID_COLS;
+        closeNav.selectOnUp = cardButtons[lastRowStartIndex + DECK_GRID_COLS / 2];
+
+        // 最後の行のカードから下へ → closeButton
+        foreach (var cardButton in cardButtons.Skip(lastRowStartIndex))
+        {
+            var nav = cardButton.navigation;
+            nav.selectOnDown = closeButton;
+            cardButton.navigation = nav;
+        }
+
+        closeButton.navigation = closeNav;
+    }
+
     /// <summary>
     /// ボタンの状態を更新
     /// </summary>
