@@ -15,11 +15,8 @@ public class PauseView : BaseWindowView
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button titleButton;
 
-    public Observable<Unit> OnTitleButtonClicked => _onTitleButtonClicked;
-    public Observable<Unit> OnResumeButtonClicked => _onResumeButtonClicked;
-
-    private readonly Subject<Unit> _onTitleButtonClicked = new();
-    private readonly Subject<Unit> _onResumeButtonClicked = new();
+    public Observable<Unit> OnTitleButtonClicked { get; private set; }
+    public Observable<Unit> OnResumeButtonClicked { get; private set; }
 
     public override void Show()
     {
@@ -40,7 +37,7 @@ public class PauseView : BaseWindowView
         closeButton = resumeButton;
         base.Awake();
 
-        resumeButton.onClick.AddListener(() => _onResumeButtonClicked.OnNext(Unit.Default));
-        titleButton.onClick.AddListener(() => _onTitleButtonClicked.OnNext(Unit.Default));
+        OnTitleButtonClicked = titleButton.OnClickAsObservable();
+        OnResumeButtonClicked = resumeButton.OnClickAsObservable();
     }
 }

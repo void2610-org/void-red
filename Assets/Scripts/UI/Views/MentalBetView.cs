@@ -61,35 +61,19 @@ public class MentalBetView : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// プラスボタンが押された時の処理
-    /// </summary>
-    private void OnPlusButtonClicked()
-    {
-        _mentalBetChanged.OnNext(1); // +1を通知
-    }
-    
-    /// <summary>
-    /// マイナスボタンが押された時の処理
-    /// </summary>
-    private void OnMinusButtonClicked()
-    {
-        _mentalBetChanged.OnNext(-1); // -1を通知
-    }
-    
     private void Awake()
     {
         // ボタンイベントの設定
-        mentalBetPlusButton.onClick.AddListener(OnPlusButtonClicked);
-        mentalBetMinusButton.onClick.AddListener(OnMinusButtonClicked);
+        mentalBetPlusButton.OnClickAsObservable()
+            .Subscribe(_ => _mentalBetChanged.OnNext(1))
+            .AddTo(this);
+        mentalBetMinusButton.OnClickAsObservable()
+            .Subscribe(_ => _mentalBetChanged.OnNext(-1))
+            .AddTo(this);
     }
     
     private void OnDestroy()
     {
         _mentalBetChanged?.Dispose();
-        
-        // ボタンのイベントをクリーンアップ
-        mentalBetPlusButton.onClick.RemoveListener(OnPlusButtonClicked);
-        mentalBetMinusButton.onClick.RemoveListener(OnMinusButtonClicked);
     }
 }

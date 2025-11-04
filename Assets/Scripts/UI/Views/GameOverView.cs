@@ -18,11 +18,8 @@ public class GameOverView : BaseWindowView
     [SerializeField] private Button retryButton;
     [SerializeField] private Button titleButton;
 
-    public Observable<Unit> OnRetryClicked => _retryClicked;
-    public Observable<Unit> OnTitleClicked => _titleClicked;
-
-    private readonly Subject<Unit> _retryClicked = new();
-    private readonly Subject<Unit> _titleClicked = new();
+    public Observable<Unit> OnRetryClicked { get; private set; }
+    public Observable<Unit> OnTitleClicked { get; private set; }
     
     /// <summary>
     /// ゲームオーバー画面を表示
@@ -34,48 +31,17 @@ public class GameOverView : BaseWindowView
         Show();
     }
     
-    /// <summary>
-    /// リトライボタンがクリックされた時の処理
-    /// </summary>
-    private void OnRetryButtonClicked()
-    {
-        _retryClicked.OnNext(Unit.Default);
-    }
-    
-    /// <summary>
-    /// タイトルボタンがクリックされた時の処理
-    /// </summary>
-    private void OnTitleButtonClicked()
-    {
-        _titleClicked.OnNext(Unit.Default);
-    }
-    
     protected override void Awake()
     {
         closeButton = titleButton;
         base.Awake();
 
         // ボタンイベントの設定
-        retryButton.onClick.AddListener(OnRetryButtonClicked);
-        titleButton.onClick.AddListener(OnTitleButtonClicked);
+        OnRetryClicked = retryButton.OnClickAsObservable();
+        OnTitleClicked = titleButton.OnClickAsObservable();
 
         // デフォルトテキストの設定
         gameOverTitleText.text = "ゲームオーバー";
         gameOverReasonText.text = "";
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-
-        // Subjectの破棄
-        _retryClicked?.Dispose();
-        _titleClicked?.Dispose();
-
-        // ボタンイベントの削除
-        if (retryButton)
-            retryButton.onClick.RemoveListener(OnRetryButtonClicked);
-        if (titleButton)
-            titleButton.onClick.RemoveListener(OnTitleButtonClicked);
     }
 }

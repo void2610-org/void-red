@@ -96,9 +96,6 @@ public class HomePresenter : IStartable, IDisposable
             case NovelNode novelNode:
                 await StartNovelNode(novelNode);
                 break;
-            case EndingNode:
-                Debug.Log("[HomePresenter] ゲームが完了しています");
-                break;
         }
     }
 

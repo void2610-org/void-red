@@ -90,7 +90,6 @@ public class GameProgressService
         return nextNode;
     }
 
-    public SceneType GetCurrentSceneType() => GetSceneTypeForNode(_repository.StoryProgress.CurrentNode);
     public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
 
     /// <summary>
@@ -102,7 +101,6 @@ public class GameProgressService
         {
             BattleNode => SceneType.Battle,
             NovelNode => SceneType.Novel,
-            EndingNode => SceneType.Home,
             _ => SceneType.Home
         };
     }
