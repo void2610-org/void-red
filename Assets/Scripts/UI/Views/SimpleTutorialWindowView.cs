@@ -18,8 +18,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
 
     private CanvasGroup _canvasGroup;
     private CancellationTokenSource _currentNarrationCts;
-    private CancellationTokenSource _dialogSeCancellationTokenSource;
-    private bool _isTyping;
+    private TextProgressController _textProgressController;
 
     /// <summary>
     /// ナレーションを表示
@@ -49,50 +48,51 @@ public class SimpleTutorialWindowView : MonoBehaviour
             backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
             await tutorialText.FadeIn(FADE_DURATION, Ease.OutQuart);
 
+            // 1文字ずつ表示するアニメーション（BeginTyping()でSEループ用トークンも作成される）
+            var typingToken = _textProgressController.BeginTyping();
+
             // ダイアログSEループを開始
-            _dialogSeCancellationTokenSource = new CancellationTokenSource();
-            SeManager.Instance.PlaySeLoop("Dialog", cancellationToken: _dialogSeCancellationTokenSource.Token).Forget();
+            SeManager.Instance.PlaySeLoop("Dialog", cancellationToken: _textProgressController.DialogSeToken).Forget();
 
-            // 1文字ずつ表示するアニメーション
-            _isTyping = true;
-            await tutorialText.TypewriterAnimation(message, cancellationToken: cancellationToken);
-            _isTyping = false;
+            try
+            {
+                await tutorialText.TypewriterAnimation(message, cancellationToken: typingToken);
+            }
+            catch (System.OperationCanceledException)
+            {
+                // キャンセルされた場合は全文を即座に表示
+                tutorialText.text = message;
+            }
 
-            // dialogSeループを停止
-            _dialogSeCancellationTokenSource?.Cancel();
-            _dialogSeCancellationTokenSource?.Dispose();
-            _dialogSeCancellationTokenSource = null;
-            
+            // 文字送り完了（SEループも自動停止される）
+            _textProgressController.CompleteTyping();
+
             // autoAdvanceフラグに基づいた待機処理
             if (autoAdvance)
             {
-                // 自動進行の場合は指定された時間を待つ
-                await UniTask.Delay((int)(duration * 1000), cancellationToken: cancellationToken);
-                
-                // backgroundImageとテキストのフェードアウトを同時実行
-                backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-                await tutorialText.FadeOut(FADE_DURATION, Ease.InQuart);
+                // 自動進行の場合はタイムアウト付きで待つ（ユーザー入力でもスキップ可能）
+                await _textProgressController.WaitForNextWithTimeout(duration);
             }
+            else
+            {
+                // 手動進行の場合はユーザー入力を待つ
+                await _textProgressController.WaitForNext();
+            }
+
+            // backgroundImageとテキストのフェードアウトを同時実行
+            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+            await tutorialText.FadeOut(FADE_DURATION, Ease.InQuart);
         }
         catch (System.OperationCanceledException) { }
     }
     
     /// <summary>
-    /// タイピングアニメーションをスキップ
+    /// クリック時の処理（キーボード入力でも使用）
     /// </summary>
-    public void SkipTyping()
+    public void OnClick()
     {
-        if (!_isTyping) return;
-
-        // タイピングアニメーションをキャンセル
-        _currentNarrationCts?.Cancel();
-
-        // ダイアログSEを停止
-        _dialogSeCancellationTokenSource?.Cancel();
-        _dialogSeCancellationTokenSource?.Dispose();
-        _dialogSeCancellationTokenSource = null;
-
-        _isTyping = false;
+        // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
+        _textProgressController.AdvanceToNext();
     }
 
     /// <summary>
@@ -134,9 +134,12 @@ public class SimpleTutorialWindowView : MonoBehaviour
         _canvasGroup = GetComponent<CanvasGroup>();
         _canvasGroup.alpha = 0f;  // CanvasGroup全体を透明に初期化
         tutorialText.gameObject.SetActive(false);
-        
+
         // backgroundImageの初期状態を透明に設定
         backgroundImage.SetAlpha(0f);
+
+        // TextProgressControllerの初期化
+        _textProgressController = new TextProgressController();
     }
     
     private void OnDestroy()
@@ -145,8 +148,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
         _currentNarrationCts?.Cancel();
         _currentNarrationCts?.Dispose();
 
-        // ダイアログSEのキャンセレーショントークンをクリーンアップ
-        _dialogSeCancellationTokenSource?.Cancel();
-        _dialogSeCancellationTokenSource?.Dispose();
+        // TextProgressControllerのクリーンアップ（SEループも含む）
+        _textProgressController?.Dispose();
     }
 }
