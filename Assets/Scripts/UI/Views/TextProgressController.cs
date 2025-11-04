@@ -14,16 +14,6 @@ public class TextProgressController
     private bool _isWaitingForNext;
 
     /// <summary>
-    /// 現在タイピング中かどうか
-    /// </summary>
-    public bool IsTyping => _isTyping;
-
-    /// <summary>
-    /// 次への進行を待機中かどうか
-    /// </summary>
-    public bool IsWaitingForNext => _isWaitingForNext;
-
-    /// <summary>
     /// SEループ用のキャンセルトークン
     /// </summary>
     public CancellationToken DialogSeToken => _dialogSeCancellationTokenSource?.Token ?? CancellationToken.None;
@@ -68,7 +58,7 @@ public class TextProgressController
     /// <summary>
     /// タイピングアニメーションをスキップ
     /// </summary>
-    public void SkipTyping()
+    private void SkipTyping()
     {
         if (!_isTyping) return;
 

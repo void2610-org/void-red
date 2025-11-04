@@ -31,8 +31,6 @@ public class TutorialView : MonoBehaviour
     public void NotifyAdvance()
     {
         // 各Viewに対してクリックを通知（各Viewが自分の状態に応じて処理）
-        playerNarrationView.OnClick();
-        enemyNarrationView.OnClick();
         simpleTutorialWindow.OnClick();
     }
 
@@ -143,11 +141,6 @@ public class TutorialView : MonoBehaviour
         _canvasGroup.blocksRaycasts = false;
         maskArea.anchoredPosition = Vector2.zero;
         maskArea.sizeDelta = Vector2.zero;
-
-        // ボタンイベントを設定
-        clickAreaButton.OnClickAsObservable()
-            .Subscribe(_ => NotifyAdvance())
-            .AddTo(this);
     }
 
     private void OnDestroy()

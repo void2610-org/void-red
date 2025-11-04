@@ -103,7 +103,7 @@ public class DialogView : MonoBehaviour
         _typingCancellationTokenSource?.Dispose();
         _typingCancellationTokenSource = new CancellationTokenSource();
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
-        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, false, _typingCancellationTokenSource.Token);
+        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, _typingCancellationTokenSource.Token);
 
         // dialogSeループを停止
         _dialogSeCancellationTokenSource?.Cancel();
