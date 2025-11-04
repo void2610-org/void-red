@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カード図鑑を表示するViewクラス
@@ -22,7 +23,7 @@ public class CardLibraryView : BaseWindowView
     public Observable<CardData> OnCardClicked => _onCardClicked;
 
     private const int CARDS_PER_PAGE = 8;
-    private const int CARDS_PER_PAGE_ROW = 2;
+    private const int CARDS_PER_PAGE_COLS = 4;
 
     private readonly List<DeckCardView> _cardViews = new();
     private readonly Subject<CardData> _onCardClicked = new();
@@ -100,6 +101,9 @@ public class CardLibraryView : BaseWindowView
         // ボタンの有効/無効を設定
         previousPageButton.interactable = _currentPage > 0;
         nextPageButton.interactable = _currentPage < totalPages - 1;
+
+        // ナビゲーションを設定
+        SetupNavigation();
     }
     
     /// <summary>
@@ -134,6 +138,7 @@ public class CardLibraryView : BaseWindowView
             _currentPage--;
             UpdateLibraryDisplay(_viewedCardIds);
         }
+        SafeNavigationManager.SetSelectedGameObjectSafe(previousPageButton.gameObject);
     }
 
     /// <summary>
@@ -147,6 +152,64 @@ public class CardLibraryView : BaseWindowView
             _currentPage++;
             UpdateLibraryDisplay(_viewedCardIds);
         }
+        SafeNavigationManager.SetSelectedGameObjectSafe(nextPageButton.gameObject);
+    }
+
+    /// <summary>
+    /// Selectableのナビゲーションを設定
+    /// </summary>
+    private void SetupNavigation()
+    {
+        // カードのボタンを取得
+        var cardButtons = _cardViews
+            .Select(view => view.GetComponentInChildren<Button>())
+            .Where(button => button != null)
+            .Cast<Selectable>()
+            .ToList();
+
+        if (cardButtons.Count == 0) return;
+
+        cardButtons.SetGridNavigation(CARDS_PER_PAGE_COLS, previousPageButton, nextPageButton);
+        SetupPageButtonNavigation(cardButtons);
+        SetupCloseButtonNavigation(cardButtons);
+    }
+
+    /// <summary>
+    /// ページ切り替えボタンとカードの連携を設定
+    /// </summary>
+    private void SetupPageButtonNavigation(List<Selectable> cardButtons)
+    {
+        // previousPageButton のナビゲーション（左側）
+        var prevNav = previousPageButton.navigation;
+        prevNav.mode = Navigation.Mode.Explicit;
+        prevNav.selectOnRight = cardButtons.Count > 0 ? cardButtons[0] : nextPageButton;
+        previousPageButton.navigation = prevNav;
+
+        // nextPageButton のナビゲーション（右側）
+        var nextNav = nextPageButton.navigation;
+        nextNav.mode = Navigation.Mode.Explicit;
+        nextNav.selectOnLeft = cardButtons.Count > 0 ? cardButtons[^1] : previousPageButton;
+        nextPageButton.navigation = nextNav;
+    }
+
+    /// <summary>
+    /// closeButton とカードの連携を設定
+    /// </summary>
+    private void SetupCloseButtonNavigation(List<Selectable> cardButtons)
+    {
+        var closeNav = closeButton.navigation;
+        closeNav.mode = Navigation.Mode.Explicit;
+        closeNav.selectOnUp = cardButtons[0];
+        closeButton.navigation = closeNav;
+
+        // 最後のrowのカードから closeButton へのナビゲーションを設定
+        foreach (var cardButton in cardButtons.Skip(cardButtons.Count - cardButtons.Count % CARDS_PER_PAGE_COLS))
+        {
+            var nav = cardButton.navigation;
+            nav.mode = Navigation.Mode.Explicit;
+            nav.selectOnDown = closeButton;
+            cardButton.navigation = nav;
+        }
     }
 
     /// <summary>
@@ -159,7 +222,7 @@ public class CardLibraryView : BaseWindowView
 
         _cardViews.Clear();
     }
-    
+
     protected override void OnDestroy()
     {
         base.OnDestroy();
