@@ -116,11 +116,6 @@ public class EnumSetting : SettingBase<string>
         }
         return default(T);
     }
-    
-    public override string GetSettingType()
-    {
-        return "Enum";
-    }
 }
 
 

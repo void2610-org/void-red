@@ -338,6 +338,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Advance",
+                    "type": "Button",
+                    "id": "83e8eb9e-0fa1-4bf6-b98f-83da8ee207fe",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -629,17 +638,6 @@
                 },
                 {
                     "name": "",
-                    "id": "9f12d293-b000-4340-bdc7-ff370c85eace",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Submit",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "82627dcc-3b13-4ba9-841d-e4b746d6553e",
                     "path": "*/{Cancel}",
                     "interactions": "",
@@ -824,6 +822,39 @@
                     "action": "Help",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "37c62c87-a313-4cfb-9d42-78af2f37c0a8",
+                    "path": "*/{Submit}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad;Touch;Joystick;XR;Keyboard&Mouse",
+                    "action": "Advance",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b7b1a72-b1dc-44ca-a0c4-953cb4e9f6d3",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Advance",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9935c37f-5cd7-45a1-849c-26052a295231",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Advance",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -844,15 +875,6 @@
                     "name": "Auto",
                     "type": "Button",
                     "id": "b62f820c-9946-47a3-aadc-1713711d63d4",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Advance",
-                    "type": "Button",
-                    "id": "7de935d0-bac9-430a-819c-e8d08a43cf06",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -901,39 +923,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Auto",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "535dfc46-26e8-4eea-86d6-143f25212660",
-                    "path": "*/{Submit}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Gamepad;Touch;Joystick;XR;Keyboard&Mouse",
-                    "action": "Advance",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "eb4f8e75-8251-46dc-83b7-23c1728d65f9",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Advance",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ec3430c2-d0ad-444c-901d-18c66a67698d",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Advance",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

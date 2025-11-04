@@ -115,11 +115,6 @@ public abstract class SettingBase<T> : ISettingBase
         _onSettingChanged.OnNext(Unit.Default);
     }
     
-    /// <summary>
-    /// 設定の種類を取得（デバッグ・UI表示用）
-    /// </summary>
-    public abstract string GetSettingType();
-    
     [System.Serializable]
     private class SerializableValue<TValue>
     {
@@ -133,11 +128,9 @@ public abstract class SettingBase<T> : ISettingBase
 public interface ISettingBase
 {
     string SettingName { get; }
-    string Description { get; }
     Observable<Unit> OnSettingChanged { get; }
     void ResetToDefault();
     string SerializeValue();
     void DeserializeValue(string json);
     void ApplyCurrentValue();
-    string GetSettingType();
 }

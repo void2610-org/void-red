@@ -40,7 +40,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         await BgmManager.Instance.DuckVolume();
         SeManager.Instance.PlaySe("ThemeAppearance", pitch:1f);
         _themeData = themeData;
-        themeText.TypewriterAnimation(themeData.Title, skipOnClick:false).Forget();
+        themeText.TypewriterAnimation(themeData.Title).Forget();
         await UniTask.Delay(4000);
         BgmManager.Instance.RestoreVolume().Forget();
 

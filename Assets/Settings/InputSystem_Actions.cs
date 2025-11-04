@@ -424,6 +424,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Advance"",
+                    ""type"": ""Button"",
+                    ""id"": ""83e8eb9e-0fa1-4bf6-b98f-83da8ee207fe"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -715,17 +724,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9f12d293-b000-4340-bdc7-ff370c85eace"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": ""Press"",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Submit"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""82627dcc-3b13-4ba9-841d-e4b746d6553e"",
                     ""path"": ""*/{Cancel}"",
                     ""interactions"": """",
@@ -910,6 +908,39 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Help"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""37c62c87-a313-4cfb-9d42-78af2f37c0a8"",
+                    ""path"": ""*/{Submit}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad;Touch;Joystick;XR;Keyboard&Mouse"",
+                    ""action"": ""Advance"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9b7b1a72-b1dc-44ca-a0c4-953cb4e9f6d3"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Advance"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9935c37f-5cd7-45a1-849c-26052a295231"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Advance"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -930,15 +961,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": ""Auto"",
                     ""type"": ""Button"",
                     ""id"": ""b62f820c-9946-47a3-aadc-1713711d63d4"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Advance"",
-                    ""type"": ""Button"",
-                    ""id"": ""7de935d0-bac9-430a-819c-e8d08a43cf06"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -987,39 +1009,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Auto"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""535dfc46-26e8-4eea-86d6-143f25212660"",
-                    ""path"": ""*/{Submit}"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad;Touch;Joystick;XR;Keyboard&Mouse"",
-                    ""action"": ""Advance"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""eb4f8e75-8251-46dc-83b7-23c1728d65f9"",
-                    ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Advance"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ec3430c2-d0ad-444c-901d-18c66a67698d"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Advance"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1112,11 +1101,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_Pause = m_UI.FindAction("Pause", throwIfNotFound: true);
         m_UI_Help = m_UI.FindAction("Help", throwIfNotFound: true);
+        m_UI_Advance = m_UI.FindAction("Advance", throwIfNotFound: true);
         // Novel
         m_Novel = asset.FindActionMap("Novel", throwIfNotFound: true);
         m_Novel_Skip = m_Novel.FindAction("Skip", throwIfNotFound: true);
         m_Novel_Auto = m_Novel.FindAction("Auto", throwIfNotFound: true);
-        m_Novel_Advance = m_Novel.FindAction("Advance", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1373,6 +1362,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_TrackedDeviceOrientation;
     private readonly InputAction m_UI_Pause;
     private readonly InputAction m_UI_Help;
+    private readonly InputAction m_UI_Advance;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1432,6 +1422,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Help".
         /// </summary>
         public InputAction @Help => m_Wrapper.m_UI_Help;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/Advance".
+        /// </summary>
+        public InputAction @Advance => m_Wrapper.m_UI_Advance;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1494,6 +1488,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Help.started += instance.OnHelp;
             @Help.performed += instance.OnHelp;
             @Help.canceled += instance.OnHelp;
+            @Advance.started += instance.OnAdvance;
+            @Advance.performed += instance.OnAdvance;
+            @Advance.canceled += instance.OnAdvance;
         }
 
         /// <summary>
@@ -1541,6 +1538,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Help.started -= instance.OnHelp;
             @Help.performed -= instance.OnHelp;
             @Help.canceled -= instance.OnHelp;
+            @Advance.started -= instance.OnAdvance;
+            @Advance.performed -= instance.OnAdvance;
+            @Advance.canceled -= instance.OnAdvance;
         }
 
         /// <summary>
@@ -1580,7 +1580,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<INovelActions> m_NovelActionsCallbackInterfaces = new List<INovelActions>();
     private readonly InputAction m_Novel_Skip;
     private readonly InputAction m_Novel_Auto;
-    private readonly InputAction m_Novel_Advance;
     /// <summary>
     /// Provides access to input actions defined in input action map "Novel".
     /// </summary>
@@ -1600,10 +1599,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Novel/Auto".
         /// </summary>
         public InputAction @Auto => m_Wrapper.m_Novel_Auto;
-        /// <summary>
-        /// Provides access to the underlying input action "Novel/Advance".
-        /// </summary>
-        public InputAction @Advance => m_Wrapper.m_Novel_Advance;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1636,9 +1631,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Auto.started += instance.OnAuto;
             @Auto.performed += instance.OnAuto;
             @Auto.canceled += instance.OnAuto;
-            @Advance.started += instance.OnAdvance;
-            @Advance.performed += instance.OnAdvance;
-            @Advance.canceled += instance.OnAdvance;
         }
 
         /// <summary>
@@ -1656,9 +1648,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Auto.started -= instance.OnAuto;
             @Auto.performed -= instance.OnAuto;
             @Auto.canceled -= instance.OnAuto;
-            @Advance.started -= instance.OnAdvance;
-            @Advance.performed -= instance.OnAdvance;
-            @Advance.canceled -= instance.OnAdvance;
         }
 
         /// <summary>
@@ -1905,6 +1894,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHelp(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Advance" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAdvance(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Novel" which allows adding and removing callbacks.
@@ -1927,12 +1923,5 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAuto(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Advance" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnAdvance(InputAction.CallbackContext context);
     }
 }
