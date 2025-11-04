@@ -35,7 +35,7 @@ public static class NovelKeyBindings
             .AddTo(disposables);
 
         // ダイアログ/アイテム取得演出を進める
-        inputActionsProvider.Novel.Advance.OnPerformedAsObservable()
+        inputActionsProvider.UI.Advance.OnPerformedAsObservable()
             .Subscribe(_ =>
             {
                 // マウスクリックの場合、UIボタン上かチェック
