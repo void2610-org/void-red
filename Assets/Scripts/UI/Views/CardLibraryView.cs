@@ -113,10 +113,13 @@ public class CardLibraryView : BaseWindowView
         var cardModel = new CardModel(cardData);
         cardView.Initialize(cardModel, isRevealed ? CardDisplayState.Normal : CardDisplayState.Veiled);
 
-        // カードクリックイベントを購読
-        cardView.OnCardClicked
-            .Subscribe(clickedCardData => _onCardClicked.OnNext(clickedCardData))
-            .AddTo(Disposables);
+        if (isRevealed)
+        {
+            // カードクリックイベントを購読
+            cardView.OnCardClicked
+                .Subscribe(clickedCardData => _onCardClicked.OnNext(clickedCardData))
+                .AddTo(Disposables);
+        }
 
         _cardViews.Add(cardView);
     }
@@ -151,10 +154,9 @@ public class CardLibraryView : BaseWindowView
     /// </summary>
     private void ClearCardViews()
     {
-        foreach (var cardView in _cardViews)
-        {
-            if (cardView) Destroy(cardView.gameObject);
-        }
+        foreach (var cardView in _cardViews.Where(cardView => cardView))
+            Destroy(cardView.gameObject);
+
         _cardViews.Clear();
     }
     
