@@ -19,7 +19,7 @@ public class SliderSettingItem : MonoBehaviour, ISettingItemNavigatable
     private float _minValue;
     private float _maxValue;
 
-    private const float NAVIGATION_STEP = 0.1f;
+    private const float NAVIGATION_STEP = 0.05f;
 
     public GameObject SelectableGameObject => _slider.gameObject;
     public Observable<(string settingName, object value)> OnValueChanged => _onValueChanged;
@@ -41,7 +41,9 @@ public class SliderSettingItem : MonoBehaviour, ISettingItemNavigatable
         _slider.value = currentValue;
 
         // スライダー変更イベントのリスニング
-        _slider.onValueChanged.AddListener(OnSliderValueChanged);
+        _slider.OnValueChangedAsObservable()
+            .Subscribe(v => _onValueChanged.OnNext((_settingName, v)))
+            .AddTo(this);
     }
 
     /// <summary>
@@ -54,20 +56,10 @@ public class SliderSettingItem : MonoBehaviour, ISettingItemNavigatable
         var newValue = _slider.value + (direction > 0 ? NAVIGATION_STEP : -NAVIGATION_STEP);
         _slider.value = Mathf.Clamp(newValue, _minValue, _maxValue);
     }
-
     public void OnSubmit() { }
-
-    /// <summary>
-    /// スライダー値変更時のハンドラー
-    /// </summary>
-    private void OnSliderValueChanged(float value)
-    {
-        _onValueChanged.OnNext((_settingName, value));
-    }
 
     private void OnDestroy()
     {
-        _slider.onValueChanged.RemoveListener(OnSliderValueChanged);
         _onValueChanged?.Dispose();
     }
 }
