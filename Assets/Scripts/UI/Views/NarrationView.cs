@@ -20,7 +20,6 @@ public class NarrationView : MonoBehaviour
     private const float FADE_DURATION = 0.3f;
 
     private CanvasGroup _canvasGroup;
-    private CancellationTokenSource _currentNarrationCts;
     private TextProgressController _textProgressController;
 
     /// <summary>
@@ -28,20 +27,6 @@ public class NarrationView : MonoBehaviour
     /// </summary>
     public async UniTask DisplayNarration(string message, float duration = 2f, bool autoAdvance = true)
     {
-        // 現在実行中のナレーションをキャンセル
-        _currentNarrationCts?.Cancel();
-        _currentNarrationCts?.Dispose();
-        
-        // 新しいキャンセレーショントークンを作成
-        _currentNarrationCts = new CancellationTokenSource();
-        
-        // アプリケーション終了時にもキャンセルされるようにする  
-        var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
-            _currentNarrationCts.Token,
-            this.GetCancellationTokenOnDestroy(), 
-            Application.exitCancellationToken
-        ).Token;
-        
         _canvasGroup.alpha = 1f;
         
         try
@@ -54,7 +39,7 @@ public class NarrationView : MonoBehaviour
             narrationText.SetAlpha(0f);
             
             // backgroundImageとテキストのフェードインを同時実行
-            backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
+            backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask().Forget();
             await narrationText.FadeIn(FADE_DURATION, Ease.OutQuart);
 
             // 1文字ずつ表示するアニメーション（BeginTyping()でSEループ用トークンも作成される）
@@ -89,7 +74,7 @@ public class NarrationView : MonoBehaviour
             }
 
             // backgroundImageとテキストのフェードアウトを同時実行
-            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
+            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask().Forget();
             await narrationText.FadeOut(FADE_DURATION, Ease.InQuart);
         }
         catch (System.OperationCanceledException) { }
@@ -109,22 +94,9 @@ public class NarrationView : MonoBehaviour
     /// </summary>
     public async UniTask HideNarration()
     {
-        // 現在実行中のナレーションをキャンセル
-        _currentNarrationCts?.Cancel();
-        _currentNarrationCts?.Dispose();
-        
-        // 新しいキャンセレーショントークンを作成
-        _currentNarrationCts = new CancellationTokenSource();
-        
-        var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
-            _currentNarrationCts.Token,
-            this.GetCancellationTokenOnDestroy(),
-            Application.exitCancellationToken
-        ).Token;
-        
         try
         {
-            await _canvasGroup.FadeOut(FADE_DURATION).ToUniTask(cancellationToken);
+            await _canvasGroup.FadeOut(FADE_DURATION).ToUniTask();
         }
         catch (System.OperationCanceledException) { }
         finally
@@ -151,10 +123,6 @@ public class NarrationView : MonoBehaviour
     
     private void OnDestroy()
     {
-        // ナレーションのキャンセレーショントークンをクリーンアップ
-        _currentNarrationCts?.Cancel();
-        _currentNarrationCts?.Dispose();
-
         // TextProgressControllerのクリーンアップ（SEループも含む）
         _textProgressController?.Dispose();
     }

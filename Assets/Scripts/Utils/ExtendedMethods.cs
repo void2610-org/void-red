@@ -365,7 +365,6 @@ namespace Void2610.UnityTemplate
             this TextMeshProUGUI text, 
             string message, 
             float charSpeed = 0.05f,
-            bool skipOnClick = true,
             CancellationToken cancellationToken = default
             )
         {
@@ -393,27 +392,8 @@ namespace Void2610.UnityTemplate
             
             try
             {
-                if (skipOnClick)
-                {
-                    // クリック検知タスクとアニメーションタスクを並行実行
-                    var animationTask = motion.ToUniTask(cancellationToken);
-                    var clickTask = UniTask.WaitUntil(() => Input.GetMouseButtonUp(0), cancellationToken: cancellationToken);
-                    
-                    // どちらかが完了したら処理を進める
-                    var winIndex = await UniTask.WhenAny(animationTask, clickTask);
-                    
-                    // クリックされた場合はアニメーションをキャンセル
-                    if (winIndex == 1) // clickTaskが完了
-                    {
-                        if (motion.IsActive())
-                            motion.Cancel();
-                    }
-                }
-                else
-                {
-                    // 通常のアニメーション実行
-                    await motion.ToUniTask(cancellationToken);
-                }
+                // 通常のアニメーション実行
+                await motion.ToUniTask(cancellationToken);
             }
             catch (OperationCanceledException)
             {
