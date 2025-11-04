@@ -75,16 +75,8 @@ public class SettingsPresenter : IStartable, IDisposable
         _inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
             .Select(_ => _inputActionsProvider.UI.Navigate.ReadValue<Vector2>())
             .Where(_ => _settingsView.IsShowing)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
             .Where(nav => Mathf.Abs(nav.x) > 0.1f)
             .Subscribe(nav => _settingsView.NavigateHorizontal(nav.x))
-            .AddTo(_disposables);
-
-        // Submit（決定）の購読
-        _inputActionsProvider.UI.Submit.OnPerformedAsObservable()
-            .Where(_ => _settingsView.IsShowing)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => _settingsView.SubmitCurrent())
             .AddTo(_disposables);
     }
 

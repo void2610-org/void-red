@@ -251,16 +251,6 @@ public class SettingsView : BaseWindowView
     }
 
     /// <summary>
-    /// 決定操作（現在フォーカス項目の実行）
-    /// </summary>
-    public void SubmitCurrent()
-    {
-        var currentSelected = SafeNavigationManager.GetCurrentSelected();
-        var settingItem = currentSelected?.GetComponent<ISettingItemNavigatable>();
-        settingItem?.OnSubmit();
-    }
-
-    /// <summary>
     /// 設定UIをクリア
     /// </summary>
     private void ClearSettingsUI()
