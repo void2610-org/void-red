@@ -20,6 +20,7 @@ public class SliderSettingItem : MonoBehaviour, ISettingItemNavigatable
 
     private const float NAVIGATION_STEP = 0.1f;
 
+    public GameObject SelectableGameObject => _slider.gameObject;
     public Observable<(string settingName, object value)> OnValueChanged => _onValueChanged;
 
     /// <summary>

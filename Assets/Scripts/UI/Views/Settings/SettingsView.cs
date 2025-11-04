@@ -81,6 +81,10 @@ public class SettingsView : BaseWindowView
             CreateSettingUI(settingData);
 
         _currentFocusIndex = 0;
+        if (_settingItems.Count > 0)
+        {
+            SafeNavigationManager.SetSelectedGameObjectSafe(_settingItems[0].SelectableGameObject);
+        }
     }
     
     /// <summary>
@@ -233,6 +237,10 @@ public class SettingsView : BaseWindowView
             _currentFocusIndex = (_currentFocusIndex - 1 + _settingItems.Count) % _settingItems.Count;
         else
             _currentFocusIndex = (_currentFocusIndex + 1) % _settingItems.Count;
+
+        // EventSystemで選択を変更
+        var selectedItem = _settingItems[_currentFocusIndex];
+        SafeNavigationManager.SetSelectedGameObjectSafe(selectedItem.SelectableGameObject);
     }
 
     /// <summary>
