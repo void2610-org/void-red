@@ -27,9 +27,6 @@ public class TutorialView : MonoBehaviour
     private MotionHandle _currentMaskPositionHandle;
     private MotionHandle _currentMaskSizeHandle;
     private Vector2 _currentMaskSize = Vector2.zero;
-    private bool _isTyping;
-
-    private readonly Subject<Unit> _onClickAdvance = new();
 
     public void NotifyAdvance()
     {
@@ -37,11 +34,6 @@ public class TutorialView : MonoBehaviour
         playerNarrationView.OnClick();
         enemyNarrationView.OnClick();
         simpleTutorialWindow.OnClick();
-
-        if (!_isTyping)
-        {
-            _onClickAdvance.OnNext(Unit.Default);
-        }
     }
 
     /// <summary>
@@ -90,9 +82,7 @@ public class TutorialView : MonoBehaviour
         if (!isBattleTutorial)
         {
             // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
-            _isTyping = true;
             await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
-            _isTyping = false;
             return;
         }
 
@@ -100,9 +90,7 @@ public class TutorialView : MonoBehaviour
         var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
         disableView.HideNarration().Forget();
 
-        _isTyping = true;
         await narrationView.DisplayNarration(message, autoAdvance: false);
-        _isTyping = false;
     }
     
     /// <summary>
@@ -168,8 +156,5 @@ public class TutorialView : MonoBehaviour
         _currentFadeHandle.TryCancel();
         _currentMaskPositionHandle.TryCancel();
         _currentMaskSizeHandle.TryCancel();
-
-        // Subjectのクリーンアップ
-        _onClickAdvance?.Dispose();
     }
 }
