@@ -95,7 +95,7 @@ public static class BattleKeyBindings
         
         // ナレーションをスキップする
         var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
-        inputActionsProvider.UI.Submit.OnPerformedAsObservable()
+        inputActionsProvider.UI.Advance.OnPerformedAsObservable()
             .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ =>
             {

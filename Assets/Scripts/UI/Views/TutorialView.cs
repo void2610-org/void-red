@@ -27,20 +27,11 @@ public class TutorialView : MonoBehaviour
     private MotionHandle _currentMaskPositionHandle;
     private MotionHandle _currentMaskSizeHandle;
     private Vector2 _currentMaskSize = Vector2.zero;
-    private bool _isTyping;
-
-    private readonly Subject<Unit> _onClickAdvance = new();
 
     public void NotifyAdvance()
     {
-        if (_isTyping)
-        {
-            playerNarrationView.SkipTyping();
-            enemyNarrationView.SkipTyping();
-            simpleTutorialWindow.SkipTyping();
-            return;
-        }
-        _onClickAdvance.OnNext(Unit.Default);
+        // 各Viewに対してクリックを通知（各Viewが自分の状態に応じて処理）
+        simpleTutorialWindow.OnClick();
     }
 
     /// <summary>
@@ -89,9 +80,7 @@ public class TutorialView : MonoBehaviour
         if (!isBattleTutorial)
         {
             // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
-            _isTyping = true;
             await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
-            _isTyping = false;
             return;
         }
 
@@ -99,9 +88,7 @@ public class TutorialView : MonoBehaviour
         var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
         disableView.HideNarration().Forget();
 
-        _isTyping = true;
         await narrationView.DisplayNarration(message, autoAdvance: false);
-        _isTyping = false;
     }
     
     /// <summary>
@@ -154,11 +141,6 @@ public class TutorialView : MonoBehaviour
         _canvasGroup.blocksRaycasts = false;
         maskArea.anchoredPosition = Vector2.zero;
         maskArea.sizeDelta = Vector2.zero;
-
-        // ボタンイベントを設定
-        clickAreaButton.OnClickAsObservable()
-            .Subscribe(_ => NotifyAdvance())
-            .AddTo(this);
     }
 
     private void OnDestroy()
@@ -167,8 +149,5 @@ public class TutorialView : MonoBehaviour
         _currentFadeHandle.TryCancel();
         _currentMaskPositionHandle.TryCancel();
         _currentMaskSizeHandle.TryCancel();
-
-        // Subjectのクリーンアップ
-        _onClickAdvance?.Dispose();
     }
 }
