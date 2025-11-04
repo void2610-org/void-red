@@ -2,6 +2,7 @@ using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using LitMotion;
 using LitMotion.Extensions;
 
@@ -10,7 +11,7 @@ using LitMotion.Extensions;
 /// 左右ナビゲーションでスライダー値を変更
 /// </summary>
 [RequireComponent(typeof(Slider))]
-public class SliderSettingItem : MonoBehaviour, ISettingItemNavigatable
+public class SliderSettingItem : MonoBehaviour, ISettingItemNavigatable, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
     private readonly Subject<(string settingName, object value)> _onValueChanged = new();
     private Slider _slider;
@@ -62,6 +63,38 @@ public class SliderSettingItem : MonoBehaviour, ISettingItemNavigatable
     private void OnSliderValueChanged(float value)
     {
         _onValueChanged.OnNext((_settingName, value));
+    }
+
+    // 左クリックをSubmit操作に統合しているため、左クリックでスライダーを操作するために、ミドルクリック判定を使用する
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Middle) return;
+        UpdateSliderValue(eventData);
+    }
+    
+    public void OnPointerUp(PointerEventData eventData) {
+        if (eventData.button != PointerEventData.InputButton.Middle) return;
+        UpdateSliderValue(eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Middle) return;
+        UpdateSliderValue(eventData);
+    }
+
+    /// <summary>
+    /// マウス位置からスライダー値を更新
+    /// </summary>
+    private void UpdateSliderValue(PointerEventData eventData)
+    {
+        var rectTransform = _slider.GetComponent<RectTransform>();
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out var localPoint))
+            return;
+        // ローカル座標から0-1の範囲に正規化
+        var normalizedValue = Mathf.InverseLerp(rectTransform.rect.xMin, rectTransform.rect.xMax, localPoint.x);
+        // スライダーの値を設定
+        _slider.value = Mathf.Lerp(_minValue, _maxValue, Mathf.Clamp01(normalizedValue));
     }
 
     private void OnDestroy()
