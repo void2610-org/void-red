@@ -26,24 +26,16 @@ public class SettingsView : BaseWindowView
     private readonly Subject<(string settingName, float value)> _onSliderChanged = new();
     private readonly Subject<(string settingName, string value)> _onEnumChanged = new();
     private readonly Subject<string> _onButtonClicked = new();
-    
+
     private readonly List<GameObject> _settingUIObjects = new();
-    
+    private readonly List<ISettingItemNavigatable> _settingItems = new();
+    private readonly CompositeDisposable _itemSubscriptions = new();
+
     private ConfirmationDialogService _confirmationDialogService;
+    private int _currentFocusIndex;
     
-    /// <summary>
-    /// スライダー設定値変更イベント
-    /// </summary>
     public Observable<(string settingName, float value)> OnSliderChanged => _onSliderChanged;
-    
-    /// <summary>
-    /// 列挙型設定値変更イベント  
-    /// </summary>
     public Observable<(string settingName, string value)> OnEnumChanged => _onEnumChanged;
-    
-    /// <summary>
-    /// ボタンクリックイベント
-    /// </summary>
     public Observable<string> OnButtonClicked => _onButtonClicked;
     
     /// <summary>
@@ -81,15 +73,14 @@ public class SettingsView : BaseWindowView
     public void SetSettings(SettingDisplayData[] settingsData, ConfirmationDialogService confirmationDialog)
     {
         _confirmationDialogService = confirmationDialog;
-        
-        // 既存のUI要素をクリア
+
         ClearSettingsUI();
-        
+
         // 各設定項目のUIを生成
         foreach (var settingData in settingsData)
-        {
             CreateSettingUI(settingData);
-        }
+
+        _currentFocusIndex = 0;
     }
     
     /// <summary>
@@ -99,7 +90,6 @@ public class SettingsView : BaseWindowView
     {
         // 設定項目のコンテナを作成（横並び用）
         var containerObject = Instantiate(settingsContentContainerPrefab, settingsContainer);
-        
         // タイトルテキストを作成（左側）
         CreateTitleText(containerObject.transform, settingData.displayName);
         
@@ -146,29 +136,21 @@ public class SettingsView : BaseWindowView
     private void CreateSliderUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(sliderSettingPrefab, parent);
-        
-        // レイアウト要素を追加して残り幅を使用
-        if (!uiObject.TryGetComponent<LayoutElement>(out var layoutElement))
-            layoutElement = uiObject.AddComponent<LayoutElement>();
-        layoutElement.flexibleWidth = 1f; // 残りの幅を使用
-        
-        // UIコンポーネントを取得
-        var slider = uiObject.GetComponentInChildren<Slider>();
-        var valueText = uiObject.transform.Find("ValueText")?.GetComponent<TextMeshProUGUI>();
-        
-        // スライダーの設定
-        slider.minValue = settingData.minValue;
-        slider.maxValue = settingData.maxValue;
-        slider.value = settingData.floatValue;
-        
-        // スライダー変更時のイベント - 外部に通知
-        slider.onValueChanged.AddListener(value => {
-            UpdateValueText(valueText, value);
-            _onSliderChanged.OnNext((settingData.name, value));
-        });
-        
-        // 値テキストの初期化
-        UpdateValueText(valueText, settingData.floatValue);
+
+        // SliderSettingItemコンポーネントを取得または追加
+        var settingItem = uiObject.GetComponent<SliderSettingItem>();
+        if (!settingItem) settingItem = uiObject.AddComponent<SliderSettingItem>();
+
+        // 初期化
+        settingItem.Initialize(settingData.name, settingData.minValue, settingData.maxValue, settingData.floatValue);
+
+        // イベントをSubscribe
+        settingItem.OnValueChanged
+            .Subscribe(data => _onSliderChanged.OnNext((data.settingName, (float)data.value)))
+            .AddTo(_itemSubscriptions);
+
+        // ナビゲーション用リストに追加
+        _settingItems.Add(settingItem);
     }
     
     /// <summary>
@@ -177,24 +159,26 @@ public class SettingsView : BaseWindowView
     private void CreateButtonUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(buttonSettingPrefab, parent);
-        
-        // レイアウト要素を追加して残り幅を使用
-        if (!uiObject.TryGetComponent<LayoutElement>(out var layoutElement))
-            layoutElement = uiObject.AddComponent<LayoutElement>();
-        layoutElement.flexibleWidth = 1f; // 残りの幅を使用
-        
-        var button = uiObject.GetComponentInChildren<Button>();
-        var buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
-        
-        buttonText.text = settingData.buttonText;
-        
-        // ボタンクリック時のイベント - 外部に通知
-        button.onClick.AddListener(() => {
-            if (settingData.requiresConfirmation)
-                ShowConfirmationDialog(settingData).Forget();
-            else
-                _onButtonClicked.OnNext(settingData.name);
-        });
+
+        // ButtonSettingItemコンポーネントを取得または追加
+        var settingItem = uiObject.GetComponent<ButtonSettingItem>();
+        if (!settingItem) settingItem = uiObject.AddComponent<ButtonSettingItem>();
+
+        // 初期化
+        settingItem.Initialize(settingData.name, settingData.buttonText);
+
+        // イベントをSubscribe
+        settingItem.OnValueChanged
+            .Subscribe(data => {
+                if (settingData.requiresConfirmation)
+                    ShowConfirmationDialog(settingData).Forget();
+                else
+                    _onButtonClicked.OnNext(data.settingName);
+            })
+            .AddTo(_itemSubscriptions);
+
+        // ナビゲーション用リストに追加
+        _settingItems.Add(settingItem);
     }
     
     /// <summary>
@@ -214,93 +198,82 @@ public class SettingsView : BaseWindowView
     }
     
     /// <summary>
-    /// 値テキストを更新
-    /// </summary>
-    private void UpdateValueText(TextMeshProUGUI valueText, float value)
-    {
-        if (valueText)
-        {
-            valueText.text = $"{value:F2}";
-        }
-    }
-    
-    /// <summary>
     /// Enum設定のUIを生成
     /// </summary>
     private void CreateEnumUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(enumSettingPrefab, parent);
 
-        // レイアウト要素を追加して残り幅を使用
-        if (!uiObject.TryGetComponent<LayoutElement>(out var layoutElement))
-            layoutElement = uiObject.AddComponent<LayoutElement>();
-        layoutElement.flexibleWidth = 1f; // 残りの幅を使用
+        // EnumSettingItemコンポーネントを取得または追加
+        var settingItem = uiObject.GetComponent<EnumSettingItem>();
+        if (!settingItem) settingItem = uiObject.AddComponent<EnumSettingItem>();
 
-        // RectTransformを取得して左マージンを追加
-        var rectTransform = uiObject.GetComponent<RectTransform>();
-        var offsetMin = rectTransform.offsetMin;
-        offsetMin.x += 140f;
-        rectTransform.offsetMin = offsetMin;
-        
-        // UIコンポーネントを取得
-        var prevButton = uiObject.transform.Find("PrevButton")?.GetComponent<Button>();
-        var nextButton = uiObject.transform.Find("NextButton")?.GetComponent<Button>();
-        var valueText = uiObject.transform.Find("ValueText")?.GetComponent<TextMeshProUGUI>();
-        
-        // 現在のインデックスを計算
-        int currentIndex = Array.IndexOf(settingData.options ?? Array.Empty<string>(), settingData.stringValue);
-        if (currentIndex < 0) currentIndex = 0;
-        
-        // ボタンの設定
-        prevButton.onClick.AddListener(() => {
-            if (settingData.options is { Length: > 0 })
-            {
-                currentIndex = (currentIndex - 1 + settingData.options.Length) % settingData.options.Length;
-                var newValue = settingData.options[currentIndex];
-                UpdateEnumValueText(valueText, settingData, currentIndex);
-                _onEnumChanged.OnNext((settingData.name, newValue));
-            }
-        });
-        
-        nextButton.onClick.AddListener(() => {
-            if (settingData.options is { Length: > 0 })
-            {
-                currentIndex = (currentIndex + 1) % settingData.options.Length;
-                var newValue = settingData.options[currentIndex];
-                UpdateEnumValueText(valueText, settingData, currentIndex);
-                _onEnumChanged.OnNext((settingData.name, newValue));
-            }
-        });
-        
-        // 値テキストの初期化
-        UpdateEnumValueText(valueText, settingData, currentIndex);
+        // 初期化
+        settingItem.Initialize(settingData.name, settingData.options, settingData.displayNames, settingData.stringValue);
+
+        // イベントをSubscribe
+        settingItem.OnValueChanged
+            .Subscribe(data => _onEnumChanged.OnNext((data.settingName, (string)data.value)))
+            .AddTo(_itemSubscriptions);
+
+        // ナビゲーション用リストに追加
+        _settingItems.Add(settingItem);
     }
     
     /// <summary>
-    /// Enumの値テキストを更新
+    /// 上下ナビゲーション（フォーカス移動）
     /// </summary>
-    private void UpdateEnumValueText(TextMeshProUGUI valueText, SettingDisplayData settingData, int index)
+    public void NavigateVertical(float direction)
     {
-        if (valueText && settingData.displayNames != null && index >= 0 && index < settingData.displayNames.Length)
-        {
-            valueText.text = settingData.displayNames[index];
-        }
-        else if (valueText && settingData.options != null && index >= 0 && index < settingData.options.Length)
-        {
-            valueText.text = settingData.options[index];
-        }
+        if (_settingItems.Count == 0) return;
+        if (Mathf.Abs(direction) < 0.1f) return;
+
+        // 方向に応じてフォーカスを移動
+        if (direction > 0)
+            _currentFocusIndex = (_currentFocusIndex - 1 + _settingItems.Count) % _settingItems.Count;
+        else
+            _currentFocusIndex = (_currentFocusIndex + 1) % _settingItems.Count;
     }
-    
+
+    /// <summary>
+    /// 左右ナビゲーション（現在フォーカス項目の操作）
+    /// </summary>
+    public void NavigateHorizontal(float direction)
+    {
+        if (_settingItems.Count == 0 || _currentFocusIndex < 0 || _currentFocusIndex >= _settingItems.Count)
+            return;
+
+        _settingItems[_currentFocusIndex].OnNavigateHorizontal(direction);
+    }
+
+    /// <summary>
+    /// 決定操作（現在フォーカス項目の実行）
+    /// </summary>
+    public void SubmitCurrent()
+    {
+        if (_settingItems.Count == 0 || _currentFocusIndex < 0 || _currentFocusIndex >= _settingItems.Count)
+            return;
+
+        _settingItems[_currentFocusIndex].OnSubmit();
+    }
+
     /// <summary>
     /// 設定UIをクリア
     /// </summary>
     private void ClearSettingsUI()
     {
+        _settingItems.Clear();
+
+        // Subscriptionをクリア
+        _itemSubscriptions.Clear();
+
+        // UI要素をDestroy
         foreach (var uiObject in _settingUIObjects)
         {
             if (uiObject) DestroyImmediate(uiObject);
         }
-        
         _settingUIObjects.Clear();
+
+        _currentFocusIndex = 0;
     }
 }

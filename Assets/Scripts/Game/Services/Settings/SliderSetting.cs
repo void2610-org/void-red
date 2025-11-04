@@ -47,11 +47,6 @@ public class SliderSetting : SettingBase<float>
         maxValue = 1f;
     }
     
-    public override string GetSettingType()
-    {
-        return "Slider";
-    }
-    
     /// <summary>
     /// 0-1の正規化された値を取得
     /// </summary>
