@@ -121,6 +121,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6144083992529528976}
   - component: {fileID: 5811142933630484517}
+  - component: {fileID: 1580568029842351036}
   m_Layer: 5
   m_Name: SettingSlider
   m_TagString: Untagged
@@ -200,6 +201,24 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1580568029842351036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7030880041223794483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e48217990dcf41d3a2a81d5d8ac66b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slider: {fileID: 5811142933630484517}
+  valueText: {fileID: 0}
+  backgroundImage: {fileID: 0}
+  navigationStep: 0.1
+  normalColor: {r: 1, g: 1, b: 1, a: 0.3}
+  focusedColor: {r: 1, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &7998272176042692877
 GameObject:
   m_ObjectHideFlags: 0

@@ -44,6 +44,9 @@ public class SettingsPresenter : IStartable, IDisposable
             _ => ShowSettings())
             .AddTo(_disposables);
 
+        // ナビゲーション入力の購読
+        SubscribeToNavigationInputs();
+
         SubscribeToViewEvents();
         RefreshSettingsView();
     }
@@ -57,13 +60,47 @@ public class SettingsPresenter : IStartable, IDisposable
     /// <summary>
     /// 設定画面を表示
     /// </summary>
-    public void ShowSettings()
+    private void ShowSettings()
     {
         RefreshSettingsView();
         _settingsView.Show();
     }
 
-    
+    /// <summary>
+    /// ナビゲーション入力イベントの購読
+    /// </summary>
+    private void SubscribeToNavigationInputs()
+    {
+        // Navigate（上下左右）の購読
+        _inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
+            .Subscribe(_ => {
+                if (!_settingsView.IsShowing) return;
+
+                var navigate = _inputActionsProvider.UI.Navigate.ReadValue<UnityEngine.Vector2>();
+
+                // 上下: フォーカス移動
+                if (Mathf.Abs(navigate.y) > 0.1f)
+                {
+                    _settingsView.NavigateVertical(navigate.y);
+                }
+
+                // 左右: 項目操作
+                if (Mathf.Abs(navigate.x) > 0.1f)
+                {
+                    _settingsView.NavigateHorizontal(navigate.x);
+                }
+            })
+            .AddTo(_disposables);
+
+        // Submit（決定）の購読
+        _inputActionsProvider.UI.Submit.OnPerformedAsObservable()
+            .Subscribe(_ => {
+                if (!_settingsView.IsShowing) return;
+                _settingsView.SubmitCurrent();
+            })
+            .AddTo(_disposables);
+    }
+
     /// <summary>
     /// ViewのイベントをSettingsManagerに接続
     /// </summary>

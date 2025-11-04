@@ -62,9 +62,4 @@ public class ButtonSetting : SettingBase<Unit>
             Debug.LogError($"ButtonSetting {settingName} のアクション実行中にエラー: {e.Message}");
         }
     }
-    
-    public override string GetSettingType()
-    {
-        return "Button";
-    }
 }
