@@ -81,9 +81,11 @@ public class CardChoiceView : BaseWindowView
             .Subscribe(_ => OnChoiceButtonClicked(0))
             .AddTo(Disposables);
 
-        choice2Button.OnClickAsObservable()
-            .Subscribe(_ => OnChoiceButtonClicked(1))
-            .AddTo(Disposables);
+        // FIXME: 現状では2つ目のボタンは無効化
+        choice2Button.interactable = false;
+        // choice2Button.OnClickAsObservable()
+        //     .Subscribe(_ => OnChoiceButtonClicked(1))
+        //     .AddTo(Disposables);
     }
 
     protected override void OnDestroy()

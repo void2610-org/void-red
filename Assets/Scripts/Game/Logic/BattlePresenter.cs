@@ -11,12 +11,10 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private readonly BattleUIPresenter _battleUIPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
-    private readonly CardNarrationService _cardNarrationService;
     private readonly GameProgressService _gameProgressService;
     private readonly PersonalityLogService _personalityLogService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
-    private readonly AllThemeData _allThemeData;
     private readonly DiscordService _discordService;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
@@ -48,23 +46,19 @@ public class BattlePresenter: IStartable, ISceneInitializable
         BattleUIPresenter battleUIPresenter,
         Player player,
         Enemy enemy,
-        CardNarrationService cardNarrationService,
         GameProgressService gameProgressService,
         PersonalityLogService personalityLogService,
         SceneTransitionManager sceneTransitionManager,
         AllEnemyData allEnemyData,
-        AllThemeData allThemeData,
         DiscordService discordService)
     {
         _battleUIPresenter = battleUIPresenter;
         _player = player;
         _enemy = enemy;
-        _cardNarrationService = cardNarrationService;
         _gameProgressService = gameProgressService;
         _personalityLogService = personalityLogService;
         _sceneTransitionManager = sceneTransitionManager;
         _allEnemyData = allEnemyData;
-        _allThemeData = allThemeData;
         _discordService = discordService;
 
         // 崩壊フラグを初期化
@@ -99,7 +93,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
     /// <param name="isInitialStart">ゲームの最初の起動かどうか</param>
     private async UniTask InitializeGame(bool isInitialStart)
     {
-        await _cardNarrationService.InitializeAsync();
         await UniTask.Delay(500);
         
         // 人格ログデータをセーブデータからロード
@@ -110,6 +103,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         if (currentNode is not BattleNode battleNode)
         {
             Debug.LogError("[GameManager] 現在のノードがBattleNodeではありません");
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
         
@@ -117,6 +111,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         if (!_currentEnemyData)
         {
             Debug.LogError("[GameManager] 敵データが見つかりません");
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
         
@@ -255,7 +250,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
             if (string.IsNullOrEmpty(dialogue.Message)) continue;
 
             if (dialogue.IsPlayer)
-                await _battleUIPresenter.ShowNarration(dialogue.Message, autoAdvance: true);
+                await _battleUIPresenter.ShowPlayerNarration(dialogue.Message, autoAdvance: true);
             else
                 await _battleUIPresenter.ShowEnemyNarration(dialogue.Message, autoAdvance: true);
         }
@@ -277,6 +272,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
             if (selectedCard == null) continue;
             // カードが選択されたらプレイボタンを有効化
             _battleUIPresenter.SetPlayButtonInteractable(true);
+            _battleUIPresenter.SetCardDetailButtonInteractable(true);
             break;
         }
 
@@ -292,6 +288,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
 
         _battleUIPresenter.SetPlayButtonInteractable(false);
+        _battleUIPresenter.SetCardDetailButtonInteractable(false);
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
         if (finalSelectedCard == null) return;
@@ -339,11 +336,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         
         // 人格ログ: 敵ムーブ記録
         _personalityLogService.LogEnemyMove(_enemyMove, _enemy.MentalPower.CurrentValue);
-        
-        // プレイヤーのカードプレイ前ナレーションを表示（実際の語り内容）
-        var narrationContent = _cardNarrationService.GetNarration(_playerMove.SelectedCard, NarrationType.PrePlay, _playerMove.PlayStyle);
-        var displayContent = string.IsNullOrEmpty(narrationContent) ? "..." : narrationContent;
-        await _battleUIPresenter.ShowNarration(displayContent, true);
         
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
@@ -452,18 +444,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // プレイヤー勝利時は現在のテーマを記録
         if (playerWon) _wonThemes.Add(_currentTheme);
         
-        // 勝敗確定後のナレーション（プレイヤーの勝敗に基づく）
-        var playerNarrationType = playerScore > npcScore ? NarrationType.PostBattleWin : NarrationType.PostBattleLose;
-        var postBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, playerNarrationType, _playerMove.PlayStyle);
-        var displayNarration = string.IsNullOrEmpty(postBattleNarration) ? "..." : postBattleNarration;
-        await _battleUIPresenter.ShowNarration(displayNarration, autoAdvance: true);
-        
-        // 敵の勝敗確定後のナレーション
-        var enemyNarrationType = playerScore > npcScore ? NarrationType.PostBattleLoseEnemy : NarrationType.PostBattleWinEnemy;
-        var enemyPostBattleNarration = _cardNarrationService.GetNarration(_playerMove.SelectedCard, enemyNarrationType, _playerMove.PlayStyle);
-        var enemyDisplayNarration = string.IsNullOrEmpty(enemyPostBattleNarration) ? "..." : enemyPostBattleNarration;
-        await _battleUIPresenter.ShowEnemyNarration(enemyDisplayNarration, true);
-        
         // ゲーム結果を統計に記録（進化チェック前に実行）
         _gameProgressService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
 
@@ -486,30 +466,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
         else
         {
-            // プレイヤーカードの進化処理
-            // var selectedCard = _player.SelectedCard.CurrentValue;
-            // var playerCardAfterEvolution = _gameProgressService.CheckPlayerCardEvolution(selectedCard.Data);
-            
-            // FIXME: 現段階では進化機能は無効化
-            // 元のカードと異なる場合は進化が発生
-            // if (playerCardAfterEvolution != selectedCard.Data)
-            // {
-            //     _player.ReplaceCard(selectedCard, playerCardAfterEvolution);
-            //     
-            //     // 人格ログ: プレイヤーカード進化イベント記録
-            //     _personalityLogService.LogCardEvolution("player", selectedCard.Data, playerCardAfterEvolution);
-            //     await _battleUIPresenter.ShowAnnouncement($"プレイヤーの {selectedCard.Data.CardName} が {playerCardAfterEvolution.CardName} に変化");
-            // }
-            
-            // FIXME: 現段階では共鳴機能も無効化
-            // 共鳴チェック
-            // if (_currentEnemyData && _currentEnemyData.ResonanceCard && selectedCard.Data == _currentEnemyData.ResonanceCard)
-            // {
-            //     // 人格ログ: 共鳴イベント記録
-            //     _personalityLogService.LogResonance("Player", selectedCard.Data);
-            //     await _battleUIPresenter.ShowAnnouncement($"共鳴発生: {selectedCard.Data.CardName}");
-            // }
-            
             // カードをプレイ（崩壊しない）
             _player.PlaySelectedCard(false);
         }

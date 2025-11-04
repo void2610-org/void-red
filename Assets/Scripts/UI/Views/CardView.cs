@@ -24,7 +24,7 @@ public class CardView : BaseCardView
     [SerializeField] private UIEffect edgeUIEffect;
 
     public CardData CardData { get; private set; }
-    public Observable<CardView> OnClicked => _onClicked;
+    public Observable<CardView> OnClicked { get; private set; }
 
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
@@ -34,8 +34,6 @@ public class CardView : BaseCardView
     protected override UIEffect BackUIEffect => backUIEffect;
     protected override UIEffect EdgeUIEffect => edgeUIEffect;
     protected override CardData GetCardData() => CardData;
-
-    private readonly Subject<CardView> _onClicked = new();
     private Vector2 _originalPosition;
     private RectTransform _rectTransform;
     private CardDisplayState _displayState = CardDisplayState.Normal;
@@ -62,7 +60,6 @@ public class CardView : BaseCardView
         CardData = cardData;
         _originalPosition = _rectTransform.anchoredPosition;
         UpdateDisplay();
-        cardButton.onClick.AddListener(OnCardClicked);
     }
     
     /// <summary>
@@ -89,15 +86,12 @@ public class CardView : BaseCardView
         if (isCollapse)
         {
             // 崩壊アニメーション：ランダムな方向に飛び散りながら回転
-            var randomDirection = new Vector2(
-                UnityEngine.Random.Range(-200f, 200f),
-                UnityEngine.Random.Range(100f, 300f)
-            );
+            var randomDirection = new Vector2(Random.Range(-200f, 200f), Random.Range(100f, 300f));
             var currentPos = _rectTransform.anchoredPosition;
             var targetPos = currentPos + randomDirection;
 
             var moveTask = _rectTransform.MoveToAnchored(targetPos, 0.5f, Ease.OutCubic);
-            var targetRotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-360f, 360f));
+            var targetRotation = Quaternion.Euler(0, 0, Random.Range(-360f, 360f));
             var rotateTask = _rectTransform.RotateTo(targetRotation, 0.5f, Ease.OutCubic);
             var scaleTask = _rectTransform.ScaleTo(Vector3.zero, 0.5f, Ease.InCubic);
                 
@@ -272,28 +266,19 @@ public class CardView : BaseCardView
         }
     }
     
-    /// <summary>
-    /// カードがクリックされた時の処理
-    /// </summary>
-    private void OnCardClicked()
-    {
-        _onClicked.OnNext(this);
-    }
-    
     private void Awake()
     {
-        _rectTransform = this.GetComponent<RectTransform>();
+        _rectTransform = GetComponent<RectTransform>();
+
+        // R3のOnClickAsObservableでボタンクリックを購読し、CardView自身を発行
+        OnClicked = cardButton.OnClickAsObservable().Select(_ => this);
     }
-    
+
     private void OnDestroy()
     {
         // Tweenのクリーンアップ
-        if (_backTransitionTween.IsActive()) _backTransitionTween.Cancel();
-        if (_edgeColorTween.IsActive()) _edgeColorTween.Cancel();
-        
-        _onClicked?.Dispose();
-        if (cardButton)
-            cardButton.onClick.RemoveListener(OnCardClicked);
+        _edgeColorTween.TryCancel();
+        _backTransitionTween.TryCancel();
     }
 
 }
