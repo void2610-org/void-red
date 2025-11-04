@@ -8,7 +8,7 @@ using R3;
 [RequireComponent(typeof(Button))]
 public class PersonalityLogButtonView : MonoBehaviour
 {
-    public Observable<Unit> OnButtonClicked {get; private set;}
+    public Observable<Unit> OnButtonClicked { get; private set; }
     private Button _logButton;
     
     private void Awake()
