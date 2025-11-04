@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 設定画面のUI表示を担当するViewクラス
@@ -32,7 +34,6 @@ public class SettingsView : BaseWindowView
     private readonly CompositeDisposable _itemSubscriptions = new();
 
     private ConfirmationDialogService _confirmationDialogService;
-    private int _currentFocusIndex;
     
     public Observable<(string settingName, float value)> OnSliderChanged => _onSliderChanged;
     public Observable<(string settingName, string value)> OnEnumChanged => _onEnumChanged;
@@ -80,11 +81,8 @@ public class SettingsView : BaseWindowView
         foreach (var settingData in settingsData)
             CreateSettingUI(settingData);
 
-        _currentFocusIndex = 0;
-        if (_settingItems.Count > 0)
-        {
-            SafeNavigationManager.SetSelectedGameObjectSafe(_settingItems[0].SelectableGameObject);
-        }
+        // Selectableのナビゲーションを設定
+        SetupNavigation();
     }
     
     /// <summary>
@@ -118,6 +116,19 @@ public class SettingsView : BaseWindowView
     }
     
     /// <summary>
+    /// 確認ダイアログを表示
+    /// </summary>
+    private async UniTaskVoid ShowConfirmationDialog(SettingDisplayData settingData)
+    {
+        var result = await _confirmationDialogService.ShowDialog(
+            settingData.confirmationMessage,
+            "実行"
+        );
+        
+        if (result) _onButtonClicked.OnNext(settingData.name);
+    }
+
+    /// <summary>
     /// タイトルテキストを作成
     /// </summary>
     private void CreateTitleText(Transform parent, string titleText)
@@ -140,20 +151,13 @@ public class SettingsView : BaseWindowView
     private void CreateSliderUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(sliderSettingPrefab, parent);
-
-        // SliderSettingItemコンポーネントを取得または追加
         var settingItem = uiObject.GetComponent<SliderSettingItem>();
-        if (!settingItem) settingItem = uiObject.AddComponent<SliderSettingItem>();
 
-        // 初期化
         settingItem.Initialize(settingData.name, settingData.minValue, settingData.maxValue, settingData.floatValue);
-
-        // イベントをSubscribe
         settingItem.OnValueChanged
             .Subscribe(data => _onSliderChanged.OnNext((data.settingName, (float)data.value)))
             .AddTo(_itemSubscriptions);
 
-        // ナビゲーション用リストに追加
         _settingItems.Add(settingItem);
     }
     
@@ -163,15 +167,9 @@ public class SettingsView : BaseWindowView
     private void CreateButtonUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(buttonSettingPrefab, parent);
-
-        // ButtonSettingItemコンポーネントを取得または追加
         var settingItem = uiObject.GetComponent<ButtonSettingItem>();
-        if (!settingItem) settingItem = uiObject.AddComponent<ButtonSettingItem>();
 
-        // 初期化
         settingItem.Initialize(settingData.name, settingData.buttonText);
-
-        // イベントをSubscribe
         settingItem.OnValueChanged
             .Subscribe(data => {
                 if (settingData.requiresConfirmation)
@@ -181,24 +179,7 @@ public class SettingsView : BaseWindowView
             })
             .AddTo(_itemSubscriptions);
 
-        // ナビゲーション用リストに追加
         _settingItems.Add(settingItem);
-    }
-    
-    /// <summary>
-    /// 確認ダイアログを表示
-    /// </summary>
-    private async UniTaskVoid ShowConfirmationDialog(SettingDisplayData settingData)
-    {
-        var result = await _confirmationDialogService.ShowDialog(
-            settingData.confirmationMessage,
-            "実行"
-        );
-        
-        if (result)
-        {
-            _onButtonClicked.OnNext(settingData.name);
-        }
     }
     
     /// <summary>
@@ -207,40 +188,56 @@ public class SettingsView : BaseWindowView
     private void CreateEnumUI(SettingDisplayData settingData, Transform parent)
     {
         var uiObject = Instantiate(enumSettingPrefab, parent);
-
-        // EnumSettingItemコンポーネントを取得または追加
         var settingItem = uiObject.GetComponent<EnumSettingItem>();
-        if (!settingItem) settingItem = uiObject.AddComponent<EnumSettingItem>();
 
-        // 初期化
         settingItem.Initialize(settingData.name, settingData.options, settingData.displayNames, settingData.stringValue);
-
-        // イベントをSubscribe
         settingItem.OnValueChanged
             .Subscribe(data => _onEnumChanged.OnNext((data.settingName, (string)data.value)))
             .AddTo(_itemSubscriptions);
 
-        // ナビゲーション用リストに追加
         _settingItems.Add(settingItem);
     }
     
     /// <summary>
-    /// 上下ナビゲーション（フォーカス移動）
+    /// Selectableのナビゲーションを設定
     /// </summary>
-    public void NavigateVertical(float direction)
+    private void SetupNavigation()
     {
-        if (_settingItems.Count == 0) return;
-        if (Mathf.Abs(direction) < 0.1f) return;
+        var selectables = _settingItems
+            .Select(item => item.SelectableGameObject.GetComponent<Selectable>())
+            .Where(s => s != null)
+            .ToList();
 
-        // 方向に応じてフォーカスを移動
-        if (direction > 0)
-            _currentFocusIndex = (_currentFocusIndex - 1 + _settingItems.Count) % _settingItems.Count;
-        else
-            _currentFocusIndex = (_currentFocusIndex + 1) % _settingItems.Count;
+        // 垂直ナビゲーションを設定（isHorizontal=false, wrapAround=false）
+        selectables.SetNavigation(isHorizontal: false, wrapAround: false);
 
-        // EventSystemで選択を変更
-        var selectedItem = _settingItems[_currentFocusIndex];
-        SafeNavigationManager.SetSelectedGameObjectSafe(selectedItem.SelectableGameObject);
+        // closeButtonの下ナビゲーション → 最初の設定項目
+        // closeButtonの上ナビゲーション → 最後の設定項目
+        var closeButtonNav = closeButton.navigation;
+        closeButtonNav.mode = Navigation.Mode.Explicit;
+        closeButtonNav.selectOnDown = selectables[0];
+        closeButtonNav.selectOnUp = selectables[^1];
+        closeButton.navigation = closeButtonNav;
+
+        // 最初の設定項目の上ナビゲーション → closeButton
+        var firstItemNav = selectables[0].navigation;
+        firstItemNav.selectOnUp = closeButton;
+        selectables[0].navigation = firstItemNav;
+        
+        // 最後の設定項目の下ナビゲーション → closeButton
+        var lastItemNav = selectables[^1].navigation;
+        lastItemNav.selectOnDown = closeButton;
+        selectables[^1].navigation = lastItemNav;
+    }
+
+    /// <summary>
+    /// ウィンドウ表示時の優先ナビゲーション対象（最初の設定項目）
+    /// </summary>
+    protected override GameObject GetPreferredNavigationTarget()
+    {
+        return _settingItems.Count > 0
+            ? _settingItems[0].SelectableGameObject
+            : base.GetPreferredNavigationTarget();
     }
 
     /// <summary>
@@ -248,10 +245,9 @@ public class SettingsView : BaseWindowView
     /// </summary>
     public void NavigateHorizontal(float direction)
     {
-        if (_settingItems.Count == 0 || _currentFocusIndex < 0 || _currentFocusIndex >= _settingItems.Count)
-            return;
-
-        _settingItems[_currentFocusIndex].OnNavigateHorizontal(direction);
+        var currentSelected = SafeNavigationManager.GetCurrentSelected();
+        var settingItem = currentSelected?.GetComponent<ISettingItemNavigatable>();
+        settingItem?.OnNavigateHorizontal(direction);
     }
 
     /// <summary>
@@ -259,10 +255,9 @@ public class SettingsView : BaseWindowView
     /// </summary>
     public void SubmitCurrent()
     {
-        if (_settingItems.Count == 0 || _currentFocusIndex < 0 || _currentFocusIndex >= _settingItems.Count)
-            return;
-
-        _settingItems[_currentFocusIndex].OnSubmit();
+        var currentSelected = SafeNavigationManager.GetCurrentSelected();
+        var settingItem = currentSelected?.GetComponent<ISettingItemNavigatable>();
+        settingItem?.OnSubmit();
     }
 
     /// <summary>
@@ -276,12 +271,8 @@ public class SettingsView : BaseWindowView
         _itemSubscriptions.Clear();
 
         // UI要素をDestroy
-        foreach (var uiObject in _settingUIObjects)
-        {
-            if (uiObject) DestroyImmediate(uiObject);
-        }
+        foreach (var uiObject in _settingUIObjects.Where(uiObject => uiObject))
+            DestroyImmediate(uiObject);
         _settingUIObjects.Clear();
-
-        _currentFocusIndex = 0;
     }
 }

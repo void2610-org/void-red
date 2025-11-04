@@ -71,33 +71,18 @@ public class SettingsPresenter : IStartable, IDisposable
     /// </summary>
     private void SubscribeToNavigationInputs()
     {
-        // Navigate（上下左右）の購読
+        // Navigate（左右のみ）の購読
         _inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
-            .Subscribe(_ => {
-                if (!_settingsView.IsShowing) return;
-
-                var navigate = _inputActionsProvider.UI.Navigate.ReadValue<UnityEngine.Vector2>();
-
-                // 上下: フォーカス移動
-                if (Mathf.Abs(navigate.y) > 0.1f)
-                {
-                    _settingsView.NavigateVertical(navigate.y);
-                }
-
-                // 左右: 項目操作
-                if (Mathf.Abs(navigate.x) > 0.1f)
-                {
-                    _settingsView.NavigateHorizontal(navigate.x);
-                }
-            })
+            .Select(_ => _inputActionsProvider.UI.Navigate.ReadValue<Vector2>())
+            .Where(_ => _settingsView.IsShowing)
+            .Where(nav => Mathf.Abs(nav.x) > 0.1f)
+            .Subscribe(nav => _settingsView.NavigateHorizontal(nav.x))
             .AddTo(_disposables);
 
         // Submit（決定）の購読
         _inputActionsProvider.UI.Submit.OnPerformedAsObservable()
-            .Subscribe(_ => {
-                if (!_settingsView.IsShowing) return;
-                _settingsView.SubmitCurrent();
-            })
+            .Where(_ => _settingsView.IsShowing)
+            .Subscribe(_ => _settingsView.SubmitCurrent())
             .AddTo(_disposables);
     }
 
