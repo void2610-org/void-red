@@ -236,10 +236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 5813258420573905695}
-  targetImage: {fileID: 7682182006361424895}
   selectedScale: 1.1
-  selectedColor: {r: 1, g: 1, b: 1, a: 1}
-  unselectedColor: {r: 1, g: 1, b: 1, a: 0.39215687}
 --- !u!114 &8587612312980743197 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8712856333045659218, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
