@@ -333,7 +333,7 @@ PlayerSettings:
   enableCrashReportAPI: 0
   cameraUsageDescription: No camera usage
   locationUsageDescription: 
-  microphoneUsageDescription: Use Microphone usage
+  microphoneUsageDescription: No Microphone usage
   bluetoothUsageDescription: No Bluethooth usage
   macOSTargetOSVersion: 11.0
   switchNMETAOverride: 
