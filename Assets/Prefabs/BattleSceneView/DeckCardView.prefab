@@ -120,6 +120,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9188815370780006730, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1019977483416546224}
+    - targetCorrespondingSourceObject: {fileID: 9188815370780006730, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 358667510513555720}
   m_SourcePrefab: {fileID: 100100000, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
 --- !u!114 &31008625205435812 stripped
 MonoBehaviour:
@@ -176,6 +179,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &5813258420573905695 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6875814594121904464, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  m_PrefabInstance: {fileID: 1136907436948329039}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &7682182006361424895 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7303585836931223984, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
@@ -215,6 +223,20 @@ MonoBehaviour:
   activeColor: {r: 1, g: 1, b: 1, a: 1}
   collapsedColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.7}
   veiledColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.9}
+--- !u!114 &358667510513555720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8089064917827832581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07cf96dbfbe44cf49b00285687827b2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 5813258420573905695}
+  selectedScale: 1.1
 --- !u!114 &8587612312980743197 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8712856333045659218, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}

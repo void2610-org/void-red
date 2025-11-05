@@ -30,23 +30,10 @@ public class SettingsPresenter : IStartable, IDisposable
 
     public void Start()
     {
-        // ビューの取得
         _settingsView = Object.FindFirstObjectByType<SettingsView>();
         _settingButtonView = Object.FindFirstObjectByType<SettingButtonView>();
 
-        // Pauseアクションの購読
-        _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
-            .Subscribe(_ => ToggleSettings())
-            .AddTo(_disposables);
-
-        // 設定ボタンのイベント設定
-        _settingButtonView.OnButtonClicked.Subscribe(
-            _ => ShowSettings())
-            .AddTo(_disposables);
-
-        // ナビゲーション入力の購読
-        SubscribeToNavigationInputs();
-
+        SubscribeInputEvents();
         SubscribeToViewEvents();
         RefreshSettingsView();
     }
@@ -69,8 +56,18 @@ public class SettingsPresenter : IStartable, IDisposable
     /// <summary>
     /// ナビゲーション入力イベントの購読
     /// </summary>
-    private void SubscribeToNavigationInputs()
+    private void SubscribeInputEvents()
     {
+        // Pauseアクションの購読
+        _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
+            .Subscribe(_ => ToggleSettings())
+            .AddTo(_disposables);
+
+        // 設定ボタンのイベント設定
+        _settingButtonView.OnButtonClicked.Subscribe(
+                _ => ShowSettings())
+            .AddTo(_disposables);
+        
         // Navigate（左右のみ）の購読
         _inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
             .Select(_ => _inputActionsProvider.UI.Navigate.ReadValue<Vector2>())

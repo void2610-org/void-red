@@ -26,30 +26,19 @@ public class ButtonSettingItem : MonoBehaviour, ISettingItemNavigatable
     {
         _settingName = settingName;
         _button = GetComponent<Button>();
-
-        // ボタンテキストの設定
-        var textComponent = _button.GetComponentInChildren<TextMeshProUGUI>();
-        textComponent.text = buttonText;
+        _button.GetComponentInChildren<TextMeshProUGUI>().text = buttonText;
 
         // ボタンのイベント設定
-        _button.onClick.AddListener(OnButtonClicked);
+        _button.OnClickAsObservable()
+            .Subscribe(_ => _onValueChanged.OnNext((_settingName, Unit.Default)))
+            .AddTo(this);
     }
 
     public void OnNavigateHorizontal(float direction) { }
-    public void OnSubmit() => OnButtonClicked();
-
-    /// <summary>
-    /// ボタンクリック時のハンドラー
-    /// </summary>
-    private void OnButtonClicked()
-    {
-        // クリックイベントを通知
-        _onValueChanged.OnNext((_settingName, Unit.Default));
-    }
+    public void OnSubmit() => _onValueChanged.OnNext((_settingName, Unit.Default));
 
     private void OnDestroy()
     {
-        _button.onClick.RemoveListener(OnButtonClicked);
         _onValueChanged?.Dispose();
     }
 }

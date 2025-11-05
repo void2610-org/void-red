@@ -129,6 +129,70 @@ namespace Void2610.UnityTemplate
         }
 
         /// <summary>
+        /// UI Selectableのリストにグリッド状のナビゲーションを設定
+        /// </summary>
+        /// <param name="selectables">対象のSelectableリスト</param>
+        /// <param name="columns">グリッドの列数</param>
+        /// <param name="leftBoundary">左端列の左側に配置するSelectable（オプション）</param>
+        /// <param name="rightBoundary">右端列の右側に配置するSelectable（オプション）</param>
+        public static void SetGridNavigation(
+            this List<Selectable> selectables,
+            int columns,
+            Selectable leftBoundary = null,
+            Selectable rightBoundary = null)
+        {
+            if (selectables == null || selectables.Count == 0 || columns <= 0)
+                return;
+
+            for (int i = 0; i < selectables.Count; i++)
+            {
+                var selectable = selectables[i];
+                if (selectable == null) continue;
+
+                var navigation = selectable.navigation;
+                navigation.mode = Navigation.Mode.Explicit;
+
+                // 列と行のインデックスを計算
+                var col = i % columns;
+                var row = i / columns;
+
+                // 左右のナビゲーション
+                if (col > 0) // 左列以外
+                {
+                    navigation.selectOnLeft = selectables[i - 1];
+                }
+                else if (leftBoundary != null) // 左端列
+                {
+                    navigation.selectOnLeft = leftBoundary;
+                }
+
+                if (col < columns - 1 && i + 1 < selectables.Count) // 右列以外
+                {
+                    navigation.selectOnRight = selectables[i + 1];
+                }
+                else if (col == columns - 1 && rightBoundary != null) // 右端列
+                {
+                    navigation.selectOnRight = rightBoundary;
+                }
+
+                // 上下のナビゲーション
+                if (row > 0) // 上に行がある
+                {
+                    var upIndex = i - columns;
+                    if (upIndex >= 0)
+                        navigation.selectOnUp = selectables[upIndex];
+                }
+
+                if (i + columns < selectables.Count) // 下に行がある
+                {
+                    navigation.selectOnDown = selectables[i + columns];
+                }
+
+                selectable.navigation = navigation;
+            }
+        }
+
+        /// <summary>
         /// GameObjectを安全に破棄（プレイモードとエディットモード両方に対応）
         /// </summary>
         public static void SafeDestroy(this GameObject gameObject)

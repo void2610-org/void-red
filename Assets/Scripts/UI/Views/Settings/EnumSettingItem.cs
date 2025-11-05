@@ -39,8 +39,12 @@ public class EnumSettingItem : MonoBehaviour, ISettingItemNavigatable
         if (_currentIndex < 0) _currentIndex = 0;
 
         // ボタンのイベント設定
-        prevButton.onClick.AddListener(MovePrevious);
-        nextButton.onClick.AddListener(MoveNext);
+        prevButton.OnClickAsObservable()
+            .Subscribe(_ => MovePrevious())
+            .AddTo(this);
+        nextButton.OnClickAsObservable()
+            .Subscribe(_ => MoveNext())
+            .AddTo(this);
 
         // 初期表示更新
         UpdateValueText();
@@ -113,8 +117,6 @@ public class EnumSettingItem : MonoBehaviour, ISettingItemNavigatable
 
     private void OnDestroy()
     {
-        prevButton.onClick.RemoveListener(MovePrevious);
-        nextButton.onClick.RemoveListener(MoveNext);
         _onValueChanged?.Dispose();
     }
 }
