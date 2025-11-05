@@ -78,6 +78,6 @@ public class CardDetailView : BaseWindowView
             return keyword;
         });
 
-        keywordsText.text = $"キーワード: {string.Join(", ", formattedKeywords)}";
+        keywordsText.text = $"キーワード: \n{string.Join(", ", formattedKeywords)}";
     }
 }

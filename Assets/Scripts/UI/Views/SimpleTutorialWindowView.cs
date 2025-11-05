@@ -1,19 +1,15 @@
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using LitMotion;
 using LitMotion.Extensions;
 using System.Threading;
-using System.Collections.Generic;
 using Void2610.UnityTemplate;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class SimpleTutorialWindowView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI tutorialText;
-    [SerializeField] private Image backgroundImage;
-
     private const float FADE_DURATION = 0.3f;
 
     private CanvasGroup _canvasGroup;
@@ -26,27 +22,25 @@ public class SimpleTutorialWindowView : MonoBehaviour
     public async UniTask DisplayText(string message, float duration = 2f, bool autoAdvance = true)
     {
         // 現在実行中のナレーションをキャンセル
-        _currentNarrationCts?.Cancel();
+        if (_currentNarrationCts != null && !_currentNarrationCts.IsCancellationRequested)
+            _currentNarrationCts.Cancel();
         _currentNarrationCts?.Dispose();
-        
+
         // 新しいキャンセレーショントークンを作成
         _currentNarrationCts = new CancellationTokenSource();
         var cancellationToken = _currentNarrationCts.Token;
-        
-        _canvasGroup.alpha = 1f;
-        
+
         try
         {
             // メッセージを空で初期化（後で1文字ずつ表示）
             tutorialText.text = "";
-            
+
             // 初期状態を設定
             tutorialText.gameObject.SetActive(true);
-            tutorialText.SetAlpha(0f);
-            
-            // backgroundImageとテキストのフェードインを同時実行
-            backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask(cancellationToken).Forget();
-            await tutorialText.FadeIn(FADE_DURATION, Ease.OutQuart);
+
+            // CanvasGroupをフェードイン
+            if (_canvasGroup.alpha < 1f)
+                await _canvasGroup.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask(cancellationToken);
 
             // 1文字ずつ表示するアニメーション（BeginTyping()でSEループ用トークンも作成される）
             var typingToken = _textProgressController.BeginTyping();
@@ -78,12 +72,11 @@ public class SimpleTutorialWindowView : MonoBehaviour
                 // 手動進行の場合はユーザー入力を待つ
                 await _textProgressController.WaitForNext();
             }
-
-            // backgroundImageとテキストのフェードアウトを同時実行
-            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-            await tutorialText.FadeOut(FADE_DURATION, Ease.InQuart);
         }
-        catch (System.OperationCanceledException) { }
+        catch (System.OperationCanceledException)
+        {
+            _canvasGroup.alpha = 0f;
+        }
     }
     
     /// <summary>
@@ -101,42 +94,23 @@ public class SimpleTutorialWindowView : MonoBehaviour
     public async UniTask HideNarration()
     {
         // 現在実行中のナレーションをキャンセル
-        _currentNarrationCts?.Cancel();
+        if (_currentNarrationCts != null && !_currentNarrationCts.IsCancellationRequested)
+            _currentNarrationCts.Cancel();
         _currentNarrationCts?.Dispose();
-        
-        // 新しいキャンセレーショントークンを作成
-        _currentNarrationCts = new CancellationTokenSource();
-        
-        var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
-            _currentNarrationCts.Token,
-            this.GetCancellationTokenOnDestroy(),
-            Application.exitCancellationToken
-        ).Token;
-        
-        try
-        {
-            // backgroundImageとテキストのフェードアウトを同時実行
-            backgroundImage.FadeOut(FADE_DURATION, Ease.InQuart).ToUniTask(cancellationToken).Forget();
-            await tutorialText.FadeOut(FADE_DURATION, Ease.InQuart);
-        }
-        catch (System.OperationCanceledException) { }
-        finally
-        {
-            _canvasGroup.alpha = 0f;
-            backgroundImage.SetAlpha(0f);
-            tutorialText.gameObject.SetActive(false);
-        }
+        _currentNarrationCts = null;
+
+        // CanvasGroupをフェードアウト
+        await _canvasGroup.FadeOut(FADE_DURATION, Ease.InQuart);
+
+        tutorialText.gameObject.SetActive(false);
     }
     
     private void Awake()
     {
         // 初期状態の設定
         _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;  // CanvasGroup全体を透明に初期化
+        _canvasGroup.alpha = 0f;
         tutorialText.gameObject.SetActive(false);
-
-        // backgroundImageの初期状態を透明に設定
-        backgroundImage.SetAlpha(0f);
 
         // TextProgressControllerの初期化
         _textProgressController = new TextProgressController();

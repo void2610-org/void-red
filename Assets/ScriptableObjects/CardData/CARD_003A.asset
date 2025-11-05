@@ -20,7 +20,10 @@ MonoBehaviour:
   collapseThreshold: 3
   color: {r: 0, g: 0.07855177, b: 1, a: 1}
   isTextColorBlack: 0
-  keywords: 010000000f00000008000000
+  keywords:
+  - "\u8F2A\u90ED\u306E\u306A\u3044\u672A\u6765"
+  - "\u9707\u3048"
+  - "\u63FA\u308C\u308B\u8DB3\u5143"
   evolutionConditionGroups:
   - conditions:
     - rid: 8005200165294309478
