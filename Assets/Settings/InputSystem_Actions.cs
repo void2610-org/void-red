@@ -154,6 +154,24 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SelectNextCard"",
+                    ""type"": ""Button"",
+                    ""id"": ""e7093284-16b6-4df7-9d68-ef0ed1fd08da"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SelectPrevCard"",
+                    ""type"": ""Button"",
+                    ""id"": ""b93a0d87-3309-4df8-8ba8-2e4fce1abf1e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -308,6 +326,94 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""PlayCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a2a5284d-2568-4c36-b2f3-65e373b16d2f"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectNextCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9d871538-8768-4a5e-8b19-5736882bc1e4"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectNextCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""83e0f605-612b-4913-ac38-7002a0305b2d"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectNextCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fe3c16cf-7e10-427a-9f10-4fc352c84502"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectNextCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""be23fcd3-8b71-48ec-b443-269f715ad39d"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectPrevCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""82d4cfbe-07fb-45e2-875a-f96c0a65a8c6"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectPrevCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""df5a5fe8-3ad8-43c3-9a3d-df0d1c8cdf37"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectPrevCard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a3dceb70-c785-4715-a1d2-238566a6d951"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectPrevCard"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1087,6 +1193,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Battle_PlusMentalBet = m_Battle.FindAction("PlusMentalBet", throwIfNotFound: true);
         m_Battle_ShowCardDetail = m_Battle.FindAction("ShowCardDetail", throwIfNotFound: true);
         m_Battle_PlayCard = m_Battle.FindAction("PlayCard", throwIfNotFound: true);
+        m_Battle_SelectNextCard = m_Battle.FindAction("SelectNextCard", throwIfNotFound: true);
+        m_Battle_SelectPrevCard = m_Battle.FindAction("SelectPrevCard", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1195,6 +1303,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Battle_PlusMentalBet;
     private readonly InputAction m_Battle_ShowCardDetail;
     private readonly InputAction m_Battle_PlayCard;
+    private readonly InputAction m_Battle_SelectNextCard;
+    private readonly InputAction m_Battle_SelectPrevCard;
     /// <summary>
     /// Provides access to input actions defined in input action map "Battle".
     /// </summary>
@@ -1234,6 +1344,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Battle/PlayCard".
         /// </summary>
         public InputAction @PlayCard => m_Wrapper.m_Battle_PlayCard;
+        /// <summary>
+        /// Provides access to the underlying input action "Battle/SelectNextCard".
+        /// </summary>
+        public InputAction @SelectNextCard => m_Wrapper.m_Battle_SelectNextCard;
+        /// <summary>
+        /// Provides access to the underlying input action "Battle/SelectPrevCard".
+        /// </summary>
+        public InputAction @SelectPrevCard => m_Wrapper.m_Battle_SelectPrevCard;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1281,6 +1399,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @PlayCard.started += instance.OnPlayCard;
             @PlayCard.performed += instance.OnPlayCard;
             @PlayCard.canceled += instance.OnPlayCard;
+            @SelectNextCard.started += instance.OnSelectNextCard;
+            @SelectNextCard.performed += instance.OnSelectNextCard;
+            @SelectNextCard.canceled += instance.OnSelectNextCard;
+            @SelectPrevCard.started += instance.OnSelectPrevCard;
+            @SelectPrevCard.performed += instance.OnSelectPrevCard;
+            @SelectPrevCard.canceled += instance.OnSelectPrevCard;
         }
 
         /// <summary>
@@ -1313,6 +1437,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @PlayCard.started -= instance.OnPlayCard;
             @PlayCard.performed -= instance.OnPlayCard;
             @PlayCard.canceled -= instance.OnPlayCard;
+            @SelectNextCard.started -= instance.OnSelectNextCard;
+            @SelectNextCard.performed -= instance.OnSelectNextCard;
+            @SelectNextCard.canceled -= instance.OnSelectNextCard;
+            @SelectPrevCard.started -= instance.OnSelectPrevCard;
+            @SelectPrevCard.performed -= instance.OnSelectPrevCard;
+            @SelectPrevCard.canceled -= instance.OnSelectPrevCard;
         }
 
         /// <summary>
@@ -1802,6 +1932,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPlayCard(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SelectNextCard" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSelectNextCard(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SelectPrevCard" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSelectPrevCard(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
