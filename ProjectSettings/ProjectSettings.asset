@@ -141,7 +141,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.6.0 2025/10/29 18:59:30 1cb71df
+  bundleVersion: 0.7.0
   preloadedAssets:
   - {fileID: 11400000, guid: e6e6740f12172464f8d19c7cc29a2a59, type: 2}
   - {fileID: 11400000, guid: d5f65f99c54eb4f2daf53aa1026cb7a4, type: 2}
@@ -331,10 +331,10 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: 
+  cameraUsageDescription: No camera usage
   locationUsageDescription: 
-  microphoneUsageDescription: 
-  bluetoothUsageDescription: 
+  microphoneUsageDescription: Use Microphone usage
+  bluetoothUsageDescription: No Bluethooth usage
   macOSTargetOSVersion: 11.0
   switchNMETAOverride: 
   switchNetLibKey: 
