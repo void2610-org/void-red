@@ -22,9 +22,10 @@ public class SimpleTutorialWindowView : MonoBehaviour
     public async UniTask DisplayText(string message, float duration = 2f, bool autoAdvance = true)
     {
         // 現在実行中のナレーションをキャンセル
-        _currentNarrationCts?.Cancel();
+        if (_currentNarrationCts != null && !_currentNarrationCts.IsCancellationRequested)
+            _currentNarrationCts.Cancel();
         _currentNarrationCts?.Dispose();
-        
+
         // 新しいキャンセレーショントークンを作成
         _currentNarrationCts = new CancellationTokenSource();
         var cancellationToken = _currentNarrationCts.Token;
@@ -93,8 +94,10 @@ public class SimpleTutorialWindowView : MonoBehaviour
     public async UniTask HideNarration()
     {
         // 現在実行中のナレーションをキャンセル
-        _currentNarrationCts?.Cancel();
+        if (_currentNarrationCts != null && !_currentNarrationCts.IsCancellationRequested)
+            _currentNarrationCts.Cancel();
         _currentNarrationCts?.Dispose();
+        _currentNarrationCts = null;
 
         // CanvasGroupをフェードアウト
         await _canvasGroup.FadeOut(FADE_DURATION, Ease.InQuart);
