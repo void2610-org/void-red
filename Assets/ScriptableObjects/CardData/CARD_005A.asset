@@ -21,10 +21,11 @@ MonoBehaviour:
   color: {r: 0.4740572, g: 0, b: 1, a: 1}
   isTextColorBlack: 0
   keywords:
-  - "\u6B20\u3051\u305F\u6708"
-  - "\u5D29\u308C\u305F\u8A18\u61B6"
-  - "\u7A7A\u767D\u306E\u624B"
-  - "\u6C88\u3080\u7D04\u675F"
+  - "\u623B\u308C\u306A\u3044\u5834\u6240"
+  - "\u6EF2\u3093\u3060\u771F\u5B9F"
+  - "\u7121\u306B\u5E30\u3059\u601D\u3044"
+  - "\u53D6\u308A\u623B\u305B\u306A\u3044\u6642\u9593"
+  - "\u5FC3\u306E\u7A7A\u767D"
   evolutionConditionGroups:
   - conditions:
     - rid: 8005200165294309483
