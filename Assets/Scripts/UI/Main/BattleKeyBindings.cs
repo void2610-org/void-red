@@ -73,24 +73,15 @@ public static class BattleKeyBindings
             .AddTo(disposables);
 
         // カードナビゲーション
-        inputActionsProvider.UI.Navigate.OnPerformedAsObservable()
-            .ThrottleFirst(TimeSpan.FromMilliseconds(200))
+        inputActionsProvider.Battle.SelectNextCard.OnPerformedAsObservable()
             .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
             .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ =>
-            {
-                var direction = inputActionsProvider.UI.Navigate.ReadValue<Vector2>();
-                if (direction.x > 0.5f)
-                {
-                    // 右方向：次のカード
-                    battleUIPresenter.NavigateToNextCard();
-                }
-                else if (direction.x < -0.5f)
-                {
-                    // 左方向：前のカード
-                    battleUIPresenter.NavigateToPreviousCard();
-                }
-            })
+            .Subscribe(_ => battleUIPresenter.NavigateToNextCard())
+            .AddTo(disposables);
+        inputActionsProvider.Battle.SelectPrevCard.OnPerformedAsObservable()
+            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+            .Where(_ => !BaseWindowView.HasActiveWindows)
+            .Subscribe(_ => battleUIPresenter.NavigateToPrevCard())
             .AddTo(disposables);
         
         // ナレーションをスキップする

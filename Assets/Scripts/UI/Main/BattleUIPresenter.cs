@@ -161,7 +161,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     /// <summary>
     /// 前のカードを選択（InputSystem用の公開メソッド）
     /// </summary>
-    public void NavigateToPreviousCard()
+    public void NavigateToPrevCard()
     {
         var currentIndex = _player.SelectedIndex.CurrentValue;
         var prevIndex = currentIndex - 1;
