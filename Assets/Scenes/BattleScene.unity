@@ -5723,12 +5723,12 @@ RectTransform:
   - {fileID: 2303062459983892612}
   - {fileID: 1277090506}
   - {fileID: 3049846448411684220}
-  - {fileID: 7340877632909031750}
   - {fileID: 1817069434}
   - {fileID: 1682575735}
   - {fileID: 3961447289890990789}
-  - {fileID: 1931349578711517344}
   - {fileID: 1195559813}
+  - {fileID: 7340877632909031750}
+  - {fileID: 1931349578711517344}
   - {fileID: 381149955}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
