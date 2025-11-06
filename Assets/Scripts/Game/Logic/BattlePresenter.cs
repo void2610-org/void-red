@@ -539,6 +539,9 @@ public class BattlePresenter: IStartable, ISceneInitializable
     {
         await UniTask.Delay(500);
         
+        // Volumeエフェクトを全てデフォルトに戻す
+        VolumeController.Instance.ResetToDefault();
+        
         // 3ターン終了後、勝利数が多い方が勝利（同数の場合はプレイヤー勝利）
         var playerWon = _playerWins >= _enemyWins;
 
@@ -563,9 +566,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // 現在のバトル結果を記録(ここでノード進行する)
         _gameProgressService.RecordBattleResultAndSave(playerWon);
         Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
-        
-        // Volumeエフェクトを全てデフォルトに戻す
-        VolumeController.Instance.ResetToDefault();
         
         // ノード設定に基づいてシーン遷移
         await UniTask.Delay(1000);

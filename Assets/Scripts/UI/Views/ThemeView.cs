@@ -24,7 +24,6 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private readonly List<Vector2> _keywordPositions = new();
 
     private ThemeData _themeData;
-    private MotionHandle _lensFlareMotionHandle;
     private bool _isKeywordsVisible;
 
     /// <summary>
@@ -75,12 +74,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         foreach (var view in _keywordViews.Values)
             view.FadeIn();
         
-        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
-
-        _lensFlareMotionHandle = LMotion.Create(0f, 1f, 0.3f)
-            .WithEase(Ease.OutCubic)
-            .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
-            .AddTo(this);
+        VolumeController.Instance.SetScreenSpaceLensFlareIntensity(1f);
     }
 
     /// <summary>
@@ -88,17 +82,10 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!_themeData) return;
-
         foreach (var view in _keywordViews.Values)
             view.FadeOut();
 
-        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
-
-        _lensFlareMotionHandle = LMotion.Create(1f, 0f, 0.3f)
-            .WithEase(Ease.OutCubic)
-            .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
-            .AddTo(this);
+        VolumeController.Instance.SetScreenSpaceLensFlareIntensity(0f);
     }
 
     /// <summary>
@@ -106,7 +93,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void ToggleKeywords()
     {
-        if (!_themeData) return;
+        if (!_isKeywordsVisible && !_themeData) return;
 
         _isKeywordsVisible = !_isKeywordsVisible;
 
@@ -168,6 +155,5 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private void OnDestroy()
     {
         ClearKeywords();
-        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
     }
 }
