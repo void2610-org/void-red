@@ -69,12 +69,13 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!_themeData) return;
+        if (_isKeywordsVisible || !_themeData) return;
         
         foreach (var view in _keywordViews.Values)
             view.FadeIn();
         
         VolumeController.Instance.SetScreenSpaceLensFlareIntensity(1f);
+        _isKeywordsVisible = true;
     }
 
     /// <summary>
@@ -82,10 +83,13 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!_isKeywordsVisible || !_themeData) return;
+        
         foreach (var view in _keywordViews.Values)
             view.FadeOut();
 
         VolumeController.Instance.SetScreenSpaceLensFlareIntensity(0f);
+        _isKeywordsVisible = false;
     }
 
     /// <summary>
@@ -95,12 +99,8 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if (!_isKeywordsVisible && !_themeData) return;
 
-        _isKeywordsVisible = !_isKeywordsVisible;
-
-        if (_isKeywordsVisible)
-            OnPointerEnter(null);
-        else
-            OnPointerExit(null);
+        if (!_isKeywordsVisible) OnPointerEnter(null);
+        else OnPointerExit(null);
     }
     
     /// <summary>
