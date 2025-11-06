@@ -7,6 +7,38 @@ using LitMotion;
 [RequireComponent(typeof(Volume))]
 public class VolumeController : SingletonMonoBehaviour<VolumeController>
 {
+    /// <summary>
+    /// Volumeエフェクトのカプセル化クラス
+    /// </summary>
+    private class VolumeEffect
+    {
+        private readonly VolumeParameter<float> _parameter;
+        private readonly Vector2 _range;
+        private readonly float _duration;
+        private readonly Component _addTo;
+        private MotionHandle _motionHandle;
+
+        public VolumeEffect(VolumeParameter<float> parameter, Vector2 range, float duration, Component addTo)
+        {
+            _parameter = parameter;
+            _range = range;
+            _duration = duration;
+            _addTo = addTo;
+        }
+
+        public void SetIntensity(float intensity)
+        {
+            _motionHandle.TryCancel();
+            
+            var target = Mathf.Lerp(_range.x, _range.y, intensity);
+            var start = _parameter.value;
+            _motionHandle = LMotion.Create(0f, 1f, _duration)
+                .WithEase(Ease.OutQuad)
+                .Bind(t => _parameter.value = Mathf.Lerp(start, target, t))
+                .AddTo(_addTo);
+        }
+    }
+
     [SerializeField] private Vector2 filmGrainIntensityRange = new(0f, 1f);
     [SerializeField] private Vector2 chromaticAberrationIntensityRange = new(0f, 1f);
     [SerializeField] private Vector2 vignetteIntensityRange = new(0f, 1f);
@@ -15,34 +47,23 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     [SerializeField] private float dizzyEffectDuration = 2f;
     [SerializeField] private float dizzyMinDistance = 1f;
     [SerializeField] private float dizzyMaxDistance = 10f;
+    
+    private const  float DURATION = 0.5f;
 
     private Volume _volume;
-    private FilmGrain _filmGrain;
-    private ChromaticAberration _chromaticAberration;
     private DepthOfField _depthOfField;
-    private Vignette _vignette;
-    private ScreenSpaceLensFlare _screenSpaceLensFlare;
     private MotionHandle _dizzyMotionHandle;
-    
-    public void SetFilmGrainIntensity(float intensity)
-    {
-        _filmGrain.intensity.value = Mathf.Lerp(filmGrainIntensityRange.x, filmGrainIntensityRange.y, intensity);
-    }
-    
-    public void SetChromaticAberrationIntensity(float intensity)
-    {
-        _chromaticAberration.intensity.value = Mathf.Lerp(chromaticAberrationIntensityRange.x, chromaticAberrationIntensityRange.y, intensity);
-    }
-    
-    public void SetVignetteIntensity(float intensity)
-    {
-        _vignette.intensity.value = Mathf.Lerp(vignetteIntensityRange.x, vignetteIntensityRange.y, intensity);
-    }
-    
-    public void SetScreenSpaceLensFlareIntensity(float intensity)
-    {
-        _screenSpaceLensFlare.intensity.value = Mathf.Lerp(screenSpaceLensFlareIntensityRange.x, screenSpaceLensFlareIntensityRange.y, intensity);
-    }
+
+    private VolumeEffect _filmGrainEffect;
+    private VolumeEffect _chromaticAberrationEffect;
+    private VolumeEffect _vignetteEffect;
+    private VolumeEffect _lensFlareEffect;
+    private VolumeEffect _depthOfFieldEffect;
+
+    public void SetFilmGrainIntensity(float intensity) => _filmGrainEffect.SetIntensity(intensity);
+    public void SetChromaticAberrationIntensity(float intensity) => _chromaticAberrationEffect.SetIntensity(intensity);
+    public void SetVignetteIntensity(float intensity) => _vignetteEffect.SetIntensity(intensity);
+    public void SetScreenSpaceLensFlareIntensity(float intensity) => _lensFlareEffect.SetIntensity(intensity);
 
     /// <summary>
     /// めまいエフェクトを開始（被写界深度の焦点距離を周期的に変化）
@@ -60,26 +81,25 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     }
 
     /// <summary>
-    /// めまいエフェクトを停止し、デフォルト値に戻す
+    /// めまいエフェクトを停止し、デフォルト値に滑らかに戻す
     /// </summary>
     public void StopDizzyEffect()
     {
         _dizzyMotionHandle.TryCancel();
-
-        // デフォルト値に戻す
-        _depthOfField.focalLength.value = defaultDepthOfFieldFocusDistance;
+        _depthOfFieldEffect.SetIntensity(1f);
     }
 
     /// <summary>
-    /// 全てのエフェクトをデフォルト値に戻す
+    /// 全てのエフェクトをデフォルト値に滑らかに戻す
     /// </summary>
     public void ResetToDefault()
     {
-        SetFilmGrainIntensity(0f);
-        SetChromaticAberrationIntensity(0f);
-        SetVignetteIntensity(0f);
-        SetScreenSpaceLensFlareIntensity(0f);
-        StopDizzyEffect();
+        _dizzyMotionHandle.TryCancel();
+        _filmGrainEffect.SetIntensity(0f);
+        _chromaticAberrationEffect.SetIntensity(0f);
+        _vignetteEffect.SetIntensity(0f);
+        _lensFlareEffect.SetIntensity(0f);
+        _depthOfFieldEffect.SetIntensity(1f);
     }
 
     protected override void Awake()
@@ -90,11 +110,17 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
         _ = destroyCancellationToken;
 
         _volume = this.GetComponent<Volume>();
-        
-        _volume.profile.TryGet(out _filmGrain);
-        _volume.profile.TryGet(out _chromaticAberration);
-        _volume.profile.TryGet(out _vignette);
-        _volume.profile.TryGet(out _screenSpaceLensFlare);
+
+        _volume.profile.TryGet(out FilmGrain filmGrain);
+        _volume.profile.TryGet(out ChromaticAberration chromaticAberration);
+        _volume.profile.TryGet(out Vignette vignette);
+        _volume.profile.TryGet(out ScreenSpaceLensFlare screenSpaceLensFlare);
         _volume.profile.TryGet(out _depthOfField);
+
+        _filmGrainEffect = new VolumeEffect(filmGrain.intensity, filmGrainIntensityRange, DURATION, this);
+        _chromaticAberrationEffect = new VolumeEffect(chromaticAberration.intensity, chromaticAberrationIntensityRange, DURATION, this);
+        _vignetteEffect = new VolumeEffect(vignette.intensity, vignetteIntensityRange, DURATION, this);
+        _lensFlareEffect = new VolumeEffect(screenSpaceLensFlare.intensity, screenSpaceLensFlareIntensityRange, DURATION, this);
+        _depthOfFieldEffect = new VolumeEffect(_depthOfField.focalLength, new Vector2(0f, defaultDepthOfFieldFocusDistance), DURATION, this);
     }
 }
