@@ -32,6 +32,9 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// <param name="themeData">テーマデータ</param>
     public async UniTask DisplayThemeWithKeywords(ThemeData themeData, bool isMainTheme)
     {
+        OnPointerExit(null);
+        await UniTask.Delay(500);
+        
         // メインテーマならVFX再生
         visualEffect.SetInt("Rate", isMainTheme ? 1 : 0);
         
