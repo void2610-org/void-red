@@ -428,7 +428,7 @@ namespace Void2610.UnityTemplate
         public static async UniTask TypewriterAnimation(
             this TextMeshProUGUI text, 
             string message, 
-            float charSpeed = 0.05f,
+            float charSpeed = 0.03f,
             CancellationToken cancellationToken = default
             )
         {

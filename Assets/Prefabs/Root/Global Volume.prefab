@@ -52,7 +52,7 @@ MonoBehaviour:
   defaultDepthOfFieldFocusDistance: 50
   dizzyEffectDuration: 1.5
   dizzyMinDistance: 50
-  dizzyMaxDistance: 120
+  dizzyMaxDistance: 110
 --- !u!114 &3178916904866382925
 MonoBehaviour:
   m_ObjectHideFlags: 0
