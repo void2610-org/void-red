@@ -34,7 +34,7 @@ public class ItemGetEffectView : MonoBehaviour
     /// <summary>
     /// 演出が表示されているか（クリック可能な状態か）
     /// </summary>
-    public bool IsShowing => effectPanelCanvasGroup.interactable;
+    public bool IsShowing => effectPanelCanvasGroup.blocksRaycasts;
 
     private void Awake()
     {
