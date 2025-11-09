@@ -24,7 +24,6 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private readonly List<Vector2> _keywordPositions = new();
 
     private ThemeData _themeData;
-    private MotionHandle _lensFlareMotionHandle;
     private bool _isKeywordsVisible;
 
     /// <summary>
@@ -33,6 +32,9 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// <param name="themeData">テーマデータ</param>
     public async UniTask DisplayThemeWithKeywords(ThemeData themeData, bool isMainTheme)
     {
+        OnPointerExit(null);
+        await UniTask.Delay(500);
+        
         // メインテーマならVFX再生
         visualEffect.SetInt("Rate", isMainTheme ? 1 : 0);
         
@@ -70,17 +72,13 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!_themeData) return;
+        if (_isKeywordsVisible || !_themeData) return;
         
         foreach (var view in _keywordViews.Values)
             view.FadeIn();
         
-        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
-
-        _lensFlareMotionHandle = LMotion.Create(0f, 1f, 0.3f)
-            .WithEase(Ease.OutCubic)
-            .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
-            .AddTo(this);
+        VolumeController.Instance.SetScreenSpaceLensFlareIntensity(1f);
+        _isKeywordsVisible = true;
     }
 
     /// <summary>
@@ -88,17 +86,13 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!_themeData) return;
-
+        if (!_isKeywordsVisible || !_themeData) return;
+        
         foreach (var view in _keywordViews.Values)
             view.FadeOut();
 
-        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
-
-        _lensFlareMotionHandle = LMotion.Create(1f, 0f, 0.3f)
-            .WithEase(Ease.OutCubic)
-            .Bind(v => VolumeController.Instance.SetScreenSpaceLensFlareIntensity(v))
-            .AddTo(this);
+        VolumeController.Instance.SetScreenSpaceLensFlareIntensity(0f);
+        _isKeywordsVisible = false;
     }
 
     /// <summary>
@@ -106,14 +100,10 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void ToggleKeywords()
     {
-        if (!_themeData) return;
+        if (!_isKeywordsVisible && !_themeData) return;
 
-        _isKeywordsVisible = !_isKeywordsVisible;
-
-        if (_isKeywordsVisible)
-            OnPointerEnter(null);
-        else
-            OnPointerExit(null);
+        if (!_isKeywordsVisible) OnPointerEnter(null);
+        else OnPointerExit(null);
     }
     
     /// <summary>
@@ -168,6 +158,5 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private void OnDestroy()
     {
         ClearKeywords();
-        if (_lensFlareMotionHandle.IsActive()) _lensFlareMotionHandle.Cancel();
     }
 }
