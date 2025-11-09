@@ -48,7 +48,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     [SerializeField] private float dizzyMinDistance = 1f;
     [SerializeField] private float dizzyMaxDistance = 10f;
     
-    private const  float DURATION = 0.5f;
+    private const float DURATION = 0.5f;
 
     private Volume _volume;
     private DepthOfField _depthOfField;
