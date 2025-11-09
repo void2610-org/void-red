@@ -20,7 +20,6 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private DeckCardView deckCardView; // カード表示用
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
-    [SerializeField] private Button clickAreaButton;
     [SerializeField] private ParticleSystem particle;
     
     [Header("アニメーション設定")]
@@ -57,9 +56,6 @@ public class ItemGetEffectView : MonoBehaviour
         
         particle.Stop();
         particle.Clear();
-        
-        // クリックイベントを購読
-        clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
     }
     
     /// <summary>
