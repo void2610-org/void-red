@@ -20,7 +20,6 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private DeckCardView deckCardView; // カード表示用
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
-    [SerializeField] private Button clickAreaButton;
     [SerializeField] private ParticleSystem particle;
     
     [Header("アニメーション設定")]
@@ -29,8 +28,8 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private Vector3 itemImageStartScale = Vector3.zero;
     [SerializeField] private Vector3 itemImageEndScale = Vector3.one;
     [SerializeField] private Color backgroundOverlayColor = new Color(0f, 0f, 0f, 0.7f);
-    
-    private bool _isWaitingForClick;
+
+    private readonly Subject<Unit> _clickSubject = new();
 
     /// <summary>
     /// 演出が表示されているか（クリック可能な状態か）
@@ -57,9 +56,6 @@ public class ItemGetEffectView : MonoBehaviour
         
         particle.Stop();
         particle.Clear();
-        
-        // クリックイベントを購読
-        clickAreaButton.OnClickAsObservable().Subscribe(_ => OnClick()).AddTo(this);
     }
     
     /// <summary>
@@ -198,10 +194,8 @@ public class ItemGetEffectView : MonoBehaviour
     /// </summary>
     private async UniTask WaitForUserInput()
     {
-        _isWaitingForClick = true;
-        
-        // クリックされるまで待機
-        await UniTask.WaitUntil(() => !_isWaitingForClick);
+        // R3のFirstAsync()でクリックイベントを待機
+        await _clickSubject.FirstAsync();
     }
     
     /// <summary>
@@ -219,9 +213,14 @@ public class ItemGetEffectView : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
-        if (!effectPanelCanvasGroup.interactable || !_isWaitingForClick) return;
-        
-        // 入力待ちを終了
-        _isWaitingForClick = false;
+        if (!effectPanelCanvasGroup.interactable) return;
+
+        // クリックイベントを発行
+        _clickSubject.OnNext(Unit.Default);
+    }
+
+    private void OnDestroy()
+    {
+        _clickSubject?.Dispose();
     }
 }

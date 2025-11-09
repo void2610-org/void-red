@@ -30,7 +30,7 @@ public class DialogView : MonoBehaviour
     [SerializeField] private Color autoButtonActiveColor = Color.yellow;
     
     [Header("文字送り設定")]
-    [SerializeField] private float defaultCharSpeed = 0.05f; // デフォルトの1文字表示間隔（秒）
+    [SerializeField] private float defaultCharSpeed = 0.03f; // デフォルトの1文字表示間隔（秒）
     [SerializeField] private float autoNextDelay = 3f; // 自動で次へ進むまでの待機時間（秒）
     
     private bool _isTyping;
