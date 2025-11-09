@@ -74,7 +74,7 @@ public class ItemGetEffectView : MonoBehaviour
         // 演出を開始
         await PlayShowAnimation();
         // ユーザーの入力待ち
-        await WaitForUserInput();
+        await _clickSubject.FirstAsync();
         // 演出を終了
         await PlayHideAnimation();
         
@@ -98,7 +98,7 @@ public class ItemGetEffectView : MonoBehaviour
         // 演出を開始
         await PlayShowAnimationForCard();
         // ユーザーの入力待ち
-        await WaitForUserInput();
+        await _clickSubject.FirstAsync();
         // 演出を終了
         await PlayHideAnimation();
         
@@ -189,14 +189,6 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.interactable = true;
     }
     
-    /// <summary>
-    /// ユーザーの入力を待つ
-    /// </summary>
-    private async UniTask WaitForUserInput()
-    {
-        // R3のFirstAsync()でクリックイベントを待機
-        await _clickSubject.FirstAsync();
-    }
     
     /// <summary>
     /// 非表示アニメーションを再生
@@ -213,8 +205,6 @@ public class ItemGetEffectView : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
-        if (!effectPanelCanvasGroup.interactable) return;
-
         // クリックイベントを発行
         _clickSubject.OnNext(Unit.Default);
     }
