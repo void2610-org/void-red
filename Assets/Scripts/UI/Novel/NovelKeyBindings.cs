@@ -19,8 +19,8 @@ public static class NovelKeyBindings
         NovelPresenter novelPresenter,
         CompositeDisposable disposables)
     {
-        var dialogView = UnityEngine.Object.FindAnyObjectByType<DialogView>();
-        var itemGetEffectView = UnityEngine.Object.FindAnyObjectByType<ItemGetEffectView>();
+        var dialogView = Object.FindAnyObjectByType<DialogView>();
+        var itemGetEffectView = Object.FindAnyObjectByType<ItemGetEffectView>();
 
         // オートモードをトグル
         inputActionsProvider.Novel.Auto.OnPerformedAsObservable()
@@ -42,7 +42,7 @@ public static class NovelKeyBindings
                 if (IsPointerOverUI()) return;
 
                 // アイテム取得演出が表示中ならそちらを優先
-                if (itemGetEffectView && itemGetEffectView.IsShowing)
+                if (itemGetEffectView.IsShowing)
                 {
                     itemGetEffectView.OnClick();
                 }

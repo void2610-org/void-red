@@ -31,17 +31,12 @@ public class ItemGetEffectView : MonoBehaviour
 
     private readonly Subject<Unit> _clickSubject = new();
 
-    /// <summary>
-    /// 演出が表示されているか（クリック可能な状態か）
-    /// </summary>
-    public bool IsShowing => effectPanelCanvasGroup.blocksRaycasts;
+    public bool IsShowing => effectPanelCanvasGroup.alpha > 0f;
+    public void OnClick() => _clickSubject.OnNext(Unit.Default);
 
     private void Awake()
     {
-        // EffectPanelの初期状態を設定
         effectPanelCanvasGroup.alpha = 0f;
-        effectPanelCanvasGroup.interactable = false;
-        effectPanelCanvasGroup.blocksRaycasts = false;
         
         backgroundOverlay.color = backgroundOverlayColor;
         itemImageBackground.color = Color.clear;
@@ -152,9 +147,6 @@ public class ItemGetEffectView : MonoBehaviour
     /// </summary>
     private async UniTask PlayShowAnimation()
     {
-        effectPanelCanvasGroup.interactable = false;
-        effectPanelCanvasGroup.blocksRaycasts = true;
-        
         await UniTask.Delay(350);
         particle.Play();
         await UniTask.Delay(150);
@@ -163,9 +155,6 @@ public class ItemGetEffectView : MonoBehaviour
         
         // アイテム画像のスケールアニメーション
         await itemImage.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
-        
-        // クリック可能にする
-        effectPanelCanvasGroup.interactable = true;
     }
 
     /// <summary>
@@ -173,9 +162,6 @@ public class ItemGetEffectView : MonoBehaviour
     /// </summary>
     private async UniTask PlayShowAnimationForCard()
     {
-        effectPanelCanvasGroup.interactable = false;
-        effectPanelCanvasGroup.blocksRaycasts = true;
-        
         await UniTask.Delay(350);
         particle.Play();
         await UniTask.Delay(150);
@@ -184,11 +170,7 @@ public class ItemGetEffectView : MonoBehaviour
         
         // DeckCardViewのスケールアニメーション
         await deckCardView.transform.ScaleTo(itemImageEndScale, itemScaleAnimationDuration, Ease.OutBack);
-        
-        // クリック可能にする
-        effectPanelCanvasGroup.interactable = true;
     }
-    
     
     /// <summary>
     /// 非表示アニメーションを再生
@@ -200,15 +182,6 @@ public class ItemGetEffectView : MonoBehaviour
         effectPanelCanvasGroup.blocksRaycasts = false;
     }
     
-    /// <summary>
-    /// クリック処理（InputActionからも呼び出し可能）
-    /// </summary>
-    public void OnClick()
-    {
-        // クリックイベントを発行
-        _clickSubject.OnNext(Unit.Default);
-    }
-
     private void OnDestroy()
     {
         _clickSubject?.Dispose();
