@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14a33cbb2e84d4741ae09b382decdefc, type: 3}
+  m_Name: CARD_005A
+  m_EditorClassIdentifier: 
+  cardId: CARD_005A
+  cardName: "\u540D\u524D\u3092\u547C\u3070\u306A\u304B\u3063\u305F\u65E5"
+  attribute: 4
+  image: {fileID: 21300000, guid: 70e4e4913c3e143268f67644613d2b57, type: 3}
+  scoreMultiplier: 1
+  collapseThreshold: 3
+  color: {r: 0.4740572, g: 0, b: 1, a: 1}
+  isTextColorBlack: 0
+  keywords:
+  - "\u623B\u308C\u306A\u3044\u5834\u6240"
+  - "\u6EF2\u3093\u3060\u771F\u5B9F"
+  - "\u7121\u306B\u5E30\u3059\u601D\u3044"
+  - "\u53D6\u308A\u623B\u305B\u306A\u3044\u6642\u9593"
+  - "\u5FC3\u306E\u7A7A\u767D"
+  evolutionConditionGroups:
+  - conditions:
+    - rid: 8005200165294309483
+  evolutionTarget: {fileID: 11400000, guid: 7837cafdc41164c51b9798d876501fcb, type: 2}
+  isTransformationTarget: 0
+  degradationConditionGroups:
+  - conditions:
+    - rid: 8005200165294309484
+  degradationTarget: {fileID: 11400000, guid: 49cdb945655a048a09f967ca7e3420b9, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 8005200165294309483
+      type: {class: PlayStyleWinCondition, ns: , asm: Assembly-CSharp}
+      data:
+        requiredPlayStyle: 2
+        requiredCount:
+          useRandomRange: 0
+          fixedValue: 1
+          minValue: 1
+          maxValue: 5
+    - rid: 8005200165294309484
+      type: {class: PlayStyleLoseCondition, ns: , asm: Assembly-CSharp}
+      data:
+        requiredPlayStyle: 0
+        requiredCount:
+          useRandomRange: 1
+          fixedValue: 3
+          minValue: 1
+          maxValue: 5

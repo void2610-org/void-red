@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
+  m_Name: BattleTutorial2
+  m_EditorClassIdentifier: 
+  tutorialId: Battle2
+  steps:
+  - message: "\u3042\u306A\u305F\u306E\u9078\u629E\u3057\u305F\u7CBE\u795E\u672D\u3068\u73FE\u5728\u306E\u30C6\u30FC\u30DE\u3067\u3001\n\u5408\u81F4\u3059\u308B\u30AD\u30FC\u30EF\u30FC\u30C9\u306E\u6570\u306B\u5FDC\u3058\u3066\u30B9\u30B3\u30A2\u304C\u5F97\u3089\u308C\u307E\u3059\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 260}
+    maskSize: {x: 475, y: 70}
+  - message: "\u9AD8\u30B9\u30B3\u30A2\u3092\u5F97\u308B\u306B\u306F\u30C6\u30FC\u30DE\u306E\u30AD\u30FC\u30EF\u30FC\u30C9\u3068\u5408\u81F4\u3059\u308B\n\u3082\u306E\u304C\u591A\u3044\u7CBE\u795E\u672D\u3092\u9078\u3076\u3068\u826F\u3044\u3067\u3057\u3087\u3046\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 260}
+    maskSize: {x: 475, y: 70}
+  - message: "\u6700\u7D42\u30B9\u30B3\u30A2\u304C\u9AD8\u3044\u307B\u3046\u304C\u52DD\u5229\u3057\u3001\n\u5546\u54C1\u30C6\u30FC\u30DE\u3068\u306A\u3063\u305F\u8A18\u61B6\u3092\u7372\u5F97\u3067\u304D\u307E\u3059\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 260}
+    maskSize: {x: 475, y: 70}
+  - message: "\u3055\u304D\u307B\u3069\u914D\u3089\u308C\u305F\u672D\u306F\u300C\u7CBE\u795E\u672D\u300D\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 240, y: -110}
+    maskSize: {x: 425, y: 250}
+  - message: "\u3053\u308C\u3092\u5DEE\u3057\u51FA\u3059\u3053\u3068\u3067\u3001\n\u3042\u306A\u305F\u306E\u611F\u60C5\u3092\u8CED\u3051\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 240, y: -110}
+    maskSize: {x: 425, y: 250}
+  - message: "\u672D\u3092\u9078\u3073\u3001\u3053\u3061\u3089\u306E\u30DC\u30BF\u30F3\u304B\u3089\u300C\u8A73\u7D30\u300D\u3092\u958B\u304F\u3053\u3068\u3067\u3001\n\u305D\u306E\u672D\u306E\u7279\u6027\u3092\u898B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 425, y: 90}
+    maskSize: {x: 175, y: 65}
+  - message: "\u8A66\u3057\u306B\u3053\u306E\u672D\u3092\u898B\u3066\u307F\u307E\u3057\u3087\u3046\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 425, y: 90}
+    maskSize: {x: 175, y: 65}

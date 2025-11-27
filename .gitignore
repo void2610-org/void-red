@@ -99,3 +99,7 @@ Assets/Resources/PerformanceTestRunInfo.json.meta
 Assets/Resources/PerformanceTestRunSettings.json
 Assets/Resources/PerformanceTestRunSettings.json.meta
 /Screenshots
+
+# IDE
+.idea/
+.serena/

@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3451508683690145921
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1869986080454804606}
+  - component: {fileID: 2473017120573771212}
+  m_Layer: 0
+  m_Name: SEManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1869986080454804606
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3451508683690145921}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2473017120573771212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3451508683690145921}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e269267125da74c4da6cae5ce777e353, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  seMixerGroup: {fileID: 4853160000716173571, guid: b2ecbb207e05140658f87e606166d8f5, type: 2}
+  soundData:
+  - name: CardSelect
+    audioClip: {fileID: 8300000, guid: 0ad91a6b8ec084af486d7f9ca0f75982, type: 3}
+    volume: 1
+  - name: CardDraw
+    audioClip: {fileID: 8300000, guid: 0ad91a6b8ec084af486d7f9ca0f75982, type: 3}
+    volume: 1
+  - name: Gavel
+    audioClip: {fileID: 8300000, guid: 69491017449d44c06b29425b44cce3ed, type: 3}
+    volume: 1
+  - name: ScoreOpen
+    audioClip: {fileID: 8300000, guid: ea0af777a6bbd41879afe8eabde6bd7a, type: 3}
+    volume: 1
+  - name: WheelOfPlayStyle
+    audioClip: {fileID: 8300000, guid: 991c8c361b37644128d6a4855cff9f34, type: 3}
+    volume: 1
+  - name: Decision
+    audioClip: {fileID: 8300000, guid: 29dfd37bc306841e08a076788055dcb5, type: 3}
+    volume: 1
+  - name: Start
+    audioClip: {fileID: 8300000, guid: a364758702fb148cea6d309a5f18378f, type: 3}
+    volume: 1
+  - name: Dialog
+    audioClip: {fileID: 8300000, guid: 13a7612a17581481faca59bf4f12ad56, type: 3}
+    volume: 0.2
+  - name: Dialog2
+    audioClip: {fileID: 8300000, guid: 72547479258c2447297409140b8191c0, type: 3}
+    volume: 0.2
+  - name: ThemeAppearance
+    audioClip: {fileID: 8300000, guid: 33de1d472fba848b880c6c42fdd1b300, type: 3}
+    volume: 0.3
