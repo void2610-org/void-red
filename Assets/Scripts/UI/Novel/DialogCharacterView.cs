@@ -35,8 +35,9 @@ public class DialogCharacterView : MonoBehaviour
         // アルヴだけ別サイズにする
         if (isAlv)
         {
-            transform.localPosition = new Vector3(0f, -30f, 0f);
-            transform.localScale = Vector3.one * 0.265f;
+            transform.localPosition = new Vector3(0f, -130f, 0f);
+            
+            transform.localScale = Vector3.one * 0.375f;
         }
         else
         {

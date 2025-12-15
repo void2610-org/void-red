@@ -75,6 +75,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 282e67a314e1f49c991a33b21650ea2f
+    m_Address: Assets/Sprites/Character/Alv/Alv_Normal.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2a70d861cc344489b998ed488d1d9a51
     m_Address: Assets/Sprites/Input/keyboard/escape.png
     m_ReadOnly: 0
@@ -347,6 +352,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b92dfd407e702475ea16e832de851460
     m_Address: Assets/Sprites/Input/keyboard/o.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b99907c1ff5694e0db0aa21c848c6aae
+    m_Address: Assets/Sprites/Character/Alv/Alv_kamenn1.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
