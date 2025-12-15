@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4939305253589568464}
   - component: {fileID: 1528704412222517414}
-  - component: {fileID: 632498973183041215}
+  - component: {fileID: 7787766691977199850}
   m_Layer: 5
   m_Name: SettingsPanel
   m_TagString: Untagged
@@ -51,7 +51,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &632498973183041215
+--- !u!114 &7787766691977199850
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,16 +60,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5847666016692125845}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 747fd87d3aa86459b8cf9d9a47dedd0a, type: 3}
+  m_Script: {fileID: 11500000, guid: 17c7f5cd1052048adb4eb08f34e9e637, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   closeButton: {fileID: 8529637836098131723}
-  settingsContainer: {fileID: 5747753833711844342}
-  settingsContentContainerPrefab: {fileID: 7225325487053053027, guid: 900fe155ca4c242cbb5e4864027fad36, type: 3}
-  titleTextPrefab: {fileID: 4424128005466119772, guid: 8d8b7750925fd4f768c86fb8130c0b1f, type: 3}
-  sliderSettingPrefab: {fileID: 7030880041223794483, guid: fadfad5c893fa4c0bac5fc50324f17c3, type: 3}
-  buttonSettingPrefab: {fileID: 7659710375484100912, guid: 6ae0454ad07344b7d9a712c6f8d8e15c, type: 3}
-  enumSettingPrefab: {fileID: 7336120262016937810, guid: 06fbcdcc90c844d1caad0f52ad5db100, type: 3}
+  settingsView: {fileID: 6162799750796626889}
 --- !u!1 &6388258395651070082
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,6 +364,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5747753833711844342}
   - component: {fileID: 6874213347821649217}
+  - component: {fileID: 6162799750796626889}
   m_Layer: 5
   m_Name: SettingsContainer
   m_TagString: Untagged
@@ -421,6 +417,25 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &6162799750796626889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8687911351705096379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 747fd87d3aa86459b8cf9d9a47dedd0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settingsContainer: {fileID: 5747753833711844342}
+  closeButton: {fileID: 8529637836098131723}
+  settingsContentContainerPrefab: {fileID: 7225325487053053027, guid: 900fe155ca4c242cbb5e4864027fad36, type: 3}
+  titleTextPrefab: {fileID: 4424128005466119772, guid: 8d8b7750925fd4f768c86fb8130c0b1f, type: 3}
+  sliderSettingPrefab: {fileID: 7030880041223794483, guid: fadfad5c893fa4c0bac5fc50324f17c3, type: 3}
+  buttonSettingPrefab: {fileID: 7659710375484100912, guid: 6ae0454ad07344b7d9a712c6f8d8e15c, type: 3}
+  enumSettingPrefab: {fileID: 7336120262016937810, guid: 06fbcdcc90c844d1caad0f52ad5db100, type: 3}
 --- !u!1001 &13656284126701277
 PrefabInstance:
   m_ObjectHideFlags: 0

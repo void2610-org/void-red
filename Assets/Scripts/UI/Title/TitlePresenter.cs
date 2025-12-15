@@ -3,6 +3,7 @@ using UnityEngine;
 using R3;
 using VContainer.Unity;
 using Cysharp.Threading.Tasks;
+using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -14,7 +15,7 @@ public class TitlePresenter : IStartable, IDisposable
     private readonly TitleView _titleView;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly GameProgressService _gameProgressService;
-    private readonly ConfirmationDialogService _confirmationDialogService;
+    private readonly IConfirmationDialog _confirmationDialogService;
     private readonly SteamService _steamService;
 
     private readonly CompositeDisposable _disposables = new();
@@ -26,7 +27,7 @@ public class TitlePresenter : IStartable, IDisposable
         TitleView titleView,
         SceneTransitionManager sceneTransitionManager,
         GameProgressService gameProgressService,
-        ConfirmationDialogService confirmationDialogService,
+        IConfirmationDialog confirmationDialogService,
         SteamService steamService)
     {
         _titleView = titleView;

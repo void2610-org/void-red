@@ -3,6 +3,7 @@ using UnityEngine;
 using R3;
 using VContainer.Unity;
 using Cysharp.Threading.Tasks;
+using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -15,7 +16,7 @@ public class HomePresenter : IStartable, IDisposable
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllCardData _allCardData;
-    private readonly ConfirmationDialogService _confirmationDialogService;
+    private readonly IConfirmationDialog _confirmationDialogService;
 
     private StoryNode _currentNode;
     private readonly CompositeDisposable _disposables = new();
@@ -28,7 +29,7 @@ public class HomePresenter : IStartable, IDisposable
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
         AllCardData allCardData,
-        ConfirmationDialogService confirmationDialogService)
+        IConfirmationDialog confirmationDialogService)
     {
         _homeView = homeView;
         _gameProgressService = gameProgressService;
