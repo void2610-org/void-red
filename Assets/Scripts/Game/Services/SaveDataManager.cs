@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Void2610.SettingsSystem;
 
 /// <summary>
 /// セーブデータの管理を行うサービスクラス

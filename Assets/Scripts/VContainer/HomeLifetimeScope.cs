@@ -1,6 +1,7 @@
 using VContainer;
 using VContainer.Unity;
 using UnityEngine;
+using Void2610.SettingsSystem;
 
 /// <summary>
 /// ホームシーン用のLifetimeScope
@@ -16,8 +17,7 @@ public class HomeLifetimeScope : LifetimeScope
         builder.RegisterInstance(allCardData);
         builder.Register<CardPoolService>(Lifetime.Singleton);
 
-        // 設定機能
-        builder.RegisterEntryPoint<SettingsPresenter>();
+        builder.RegisterSettingsFeature();
         builder.RegisterEntryPoint<HelpPresenter>();
 
         // ホームPresenter

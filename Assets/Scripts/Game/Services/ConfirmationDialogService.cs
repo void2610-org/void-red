@@ -1,8 +1,12 @@
-
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Void2610.SettingsSystem;
 
-public class ConfirmationDialogService
+/// <summary>
+/// 確認ダイアログサービスの実装
+/// IConfirmationDialogインターフェースを実装
+/// </summary>
+public class ConfirmationDialogService : IConfirmationDialog
 {
     private readonly ConfirmationDialogView _confirmationDialogViewPrefab;
     private ConfirmationDialogView _dialogInstance;

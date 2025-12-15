@@ -4,6 +4,7 @@ using VContainer;
 using Cysharp.Threading.Tasks;
 using R3;
 using VContainer.Unity;
+using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -16,7 +17,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     private SceneTransitionManager _sceneTransitionManager;
     private NovelDialogService _novelDialogService;
     private AddressableImageLoader _addressableImageLoader;
-    private ConfirmationDialogService _confirmationDialogService;
+    private IConfirmationDialog _confirmationDialogService;
     private SettingsManager _settingsManager;
     private CardPoolService _cardPoolService;
     private InputActionsProvider _inputActionsProvider;
@@ -57,7 +58,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         NovelSeManager novelSeManager,
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
-        ConfirmationDialogService confirmationDialogService,
+        IConfirmationDialog confirmationDialogService,
         SettingsManager settingsManager,
         CardPoolService cardPoolService,
         InputActionsProvider inputActionsProvider)

@@ -1,0 +1,163 @@
+name: Steam Deploy 🎮
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-version:
+    name: Generate Version 🔢
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.buildVersion }}
+    steps:
+      - name: Checkout repository 📥
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate version string 🔢
+        id: version
+        run: |
+          BASE_VERSION=$(git tag --sort=-version:refname | head -n 1 || echo "0.0.0")
+          DATE_JST=$(TZ=Asia/Tokyo date '+%Y/%m/%d %H:%M:%S')
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          FULL_VERSION="${BASE_VERSION} ${DATE_JST} ${SHORT_SHA}"
+          echo "buildVersion=${FULL_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Generated version: ${FULL_VERSION}"
+
+  build-windows:
+    name: Build Windows 🪟
+    runs-on: ubuntu-latest
+    needs: generate-version
+    steps:
+      - name: Free up disk space 🧹
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo apt-get clean
+          docker system prune --all --force
+          df -h
+
+      - name: Checkout repository 📥
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library 📦
+        uses: actions/cache@v4
+        with:
+          path: |
+            Library
+            Temp/UnityLockfile
+          key: Library-Windows-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Windows-${{ runner.os }}-
+            Library-${{ runner.os }}-
+
+      - name: Build Windows project 🏗️
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL:   ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneWindows64
+          unityVersion:   6000.0.30f1
+          allowDirtyBuild: true
+          buildsPath:     builds
+          buildName:      void-red
+          versioning:     Custom
+          version:        ${{ needs.generate-version.outputs.version }}
+
+      - name: Upload Windows build artifact 📤
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: builds/StandaloneWindows64
+          retention-days: 1
+
+  build-mac:
+    name: Build Mac 🍎
+    runs-on: macos-latest
+    needs: generate-version
+    steps:
+      - name: Checkout repository 📥
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library 📦
+        uses: actions/cache@v4
+        with:
+          path: |
+            Library
+            Temp/UnityLockfile
+          key: Library-Mac-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Mac-${{ runner.os }}-
+            Library-${{ runner.os }}-
+
+      - name: Build Mac project 🏗️
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL:   ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneOSX
+          unityVersion:   6000.0.30f1
+          allowDirtyBuild: true
+          buildsPath:     builds
+          buildName:      void-red
+          versioning:     Custom
+          version:        ${{ needs.generate-version.outputs.version }}
+
+      - name: Upload Mac build artifact 📤
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-build
+          path: builds/StandaloneOSX
+          retention-days: 1
+
+  deploy-steam:
+    name: Deploy to Steam 🚀
+    needs: [build-windows, build-mac]
+    runs-on: ubuntu-latest
+    environment:
+      name: steam-production
+    
+    steps:
+      - name: Download Windows build 📥
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: builds/StandaloneWindows64
+
+      - name: Download Mac build 📥
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-build
+          path: builds/StandaloneOSX
+
+      - name: Get short SHA 🔢
+        id: short_sha
+        run: echo "sha_short=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+      
+      - name: Deploy to Steam 🎮
+        id: steam_deploy
+        continue-on-error: true
+        uses: game-ci/steam-deploy@v3
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          appId: ${{ secrets.STEAM_APP_ID }}
+          buildDescription: auto deploy via github actions (${{ steps.short_sha.outputs.sha_short }})
+          rootPath: builds
+          depot1Path: StandaloneWindows64
+          depot2Path: StandaloneOSX
+          releaseBranch: test

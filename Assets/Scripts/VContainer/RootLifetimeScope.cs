@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -48,10 +49,13 @@ public class RootLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<MouseHoverUISelector>();
         builder.RegisterEntryPoint<SafeNavigationManager>();
 
-        // その他の設定管理
+        // SettingsSystem用のバインド
+        builder.Register<ISettingsDefinition, GameSettingsDefinition>(Lifetime.Singleton);
+        builder.Register<ISettingsInputProvider, SettingsInputProvider>(Lifetime.Singleton);
+        builder.Register<ConfirmationDialogService>(Lifetime.Singleton).WithParameter(confirmationDialogView).As<IConfirmationDialog>();
+
+        // 設定管理（ISettingsDefinitionに依存）
         builder.RegisterEntryPoint<SettingsManager>().AsSelf();
-        builder.Register<ConfirmationDialogService>(Lifetime.Singleton)
-            .WithParameter(confirmationDialogView);
 
         // Steam統合サービス
         builder.RegisterEntryPoint<SteamService>().AsSelf();
