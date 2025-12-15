@@ -1,0 +1,3 @@
+[submodule "my-unity-settings"]
+	path = my-unity-settings
+	url = https://github.com/void2610/my-unity-settings.git
