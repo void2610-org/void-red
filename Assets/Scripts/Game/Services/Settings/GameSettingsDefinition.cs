@@ -1,13 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using R3;
 using UnityEngine;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 
-/// <summary>
-/// ゲーム固有の設定定義
-/// BGM/SE音量、セーブデータ削除などのプロジェクト固有設定を管理
-/// </summary>
 public class GameSettingsDefinition : ISettingsDefinition
 {
     private readonly GameProgressService _gameProgressService;
@@ -17,52 +14,57 @@ public class GameSettingsDefinition : ISettingsDefinition
         _gameProgressService = gameProgressService;
     }
 
-    /// <summary>
-    /// 設定項目を作成して返す
-    /// </summary>
-    public IEnumerable<ISettingBase> CreateSettings()
+    public IEnumerable<SettingsCategory> CreateCategories()
     {
-        yield return new SliderSetting(
-            name: "BGM音量",
-            desc: "BGMの音量を設定します",
-            defaultVal: BgmManager.Instance?.BgmVolume ?? 0.5f,
-            min: 0f,
-            max: 1f
-        );
-        yield return new SliderSetting(
-            name: "SE音量",
-            desc: "効果音の音量を設定します",
-            defaultVal: SeManager.Instance?.SeVolume ?? 0.5f,
-            min: 0f,
-            max: 1f
-        );
-        yield return new ButtonSetting(
-            name: "SE音量テスト",
-            desc: "現在のSE音量で効果音を再生します",
-            btnText: "再生"
-        );
-        yield return new EnumSetting(
-            name: "フルスクリーン",
-            desc: "フルスクリーン表示の切り替え",
-            opts: new[] { "false", "true" },
-            defaultValue: Screen.fullScreen ? "true" : "false",
-            displayNames: new[] { "オフ", "オン" }
-        );
-        yield return new ButtonSetting(
-            name: "セーブデータ削除",
-            desc: "セーブデータを削除して初期状態に戻します",
-            btnText: "削除",
-            needsConfirmation: true,
-            confirmMsg: "セーブデータを削除しますか？\nこの操作は取り消せません。"
-        );
+        yield return new SettingsCategory("オーディオ", new ISettingBase[]
+        {
+            new SliderSetting(
+                name: "BGM音量",
+                desc: "BGMの音量を設定します",
+                defaultVal: BgmManager.Instance.BgmVolume,
+                min: 0f,
+                max: 1f
+            ),
+            new SliderSetting(
+                name: "SE音量",
+                desc: "効果音の音量を設定します",
+                defaultVal: SeManager.Instance.SeVolume,
+                min: 0f,
+                max: 1f
+            ),
+            new ButtonSetting(
+                name: "SE音量テスト",
+                desc: "現在のSE音量で効果音を再生します",
+                btnText: "再生"
+            )
+        });
+
+        yield return new SettingsCategory("グラフィック", new ISettingBase[]
+        {
+            new EnumSetting(
+                name: "フルスクリーン",
+                desc: "フルスクリーン表示の切り替え",
+                opts: new[] { "false", "true" },
+                defaultValue: Screen.fullScreen ? "true" : "false",
+                displayNames: new[] { "オフ", "オン" }
+            )
+        });
+
+        yield return new SettingsCategory("データ", new ISettingBase[]
+        {
+            new ButtonSetting(
+                name: "セーブデータ削除",
+                desc: "セーブデータを削除して初期状態に戻します",
+                btnText: "削除",
+                needsConfirmation: true,
+                confirmMsg: "セーブデータを削除しますか？\nこの操作は取り消せません。"
+            )
+        });
     }
 
-    /// <summary>
-    /// 設定値の変更をシステムに反映するバインディングを設定
-    /// </summary>
-    public void BindSettingActions(IReadOnlyList<ISettingBase> settings, CompositeDisposable disposables)
+    public void BindSettingActions(IReadOnlyList<SettingsCategory> categories, CompositeDisposable disposables)
     {
-        foreach (var setting in settings)
+        foreach (var setting in categories.SelectMany(c => c.Settings))
         {
             switch (setting)
             {
@@ -77,7 +79,9 @@ public class GameSettingsDefinition : ISettingsDefinition
                         .AddTo(disposables);
                     break;
                 case ButtonSetting { SettingName: "SE音量テスト" } buttonSetting:
-                    buttonSetting.ButtonAction = () => SeManager.Instance.PlaySe("CardSelect");
+                    buttonSetting.OnButtonClicked
+                        .Subscribe(_ => SeManager.Instance.PlaySe("CardSelect"))
+                        .AddTo(disposables);
                     break;
                 case EnumSetting { SettingName: "フルスクリーン" } enumSetting:
                     enumSetting.OnValueChanged
@@ -85,7 +89,9 @@ public class GameSettingsDefinition : ISettingsDefinition
                         .AddTo(disposables);
                     break;
                 case ButtonSetting { SettingName: "セーブデータ削除" } buttonSetting:
-                    buttonSetting.ButtonAction = () => _gameProgressService?.ResetToDefaultData();
+                    buttonSetting.OnButtonClicked
+                        .Subscribe(_ => _gameProgressService.ResetToDefaultData())
+                        .AddTo(disposables);
                     break;
             }
         }
