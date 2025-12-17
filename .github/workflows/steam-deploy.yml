@@ -47,6 +47,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
+          submodules: recursive
+
+      - name: Fix symlink for my-unity-settings 🔗
+        run: |
+          rm -rf Assets/Scripts/SettingsSystem
+          cp -r my-unity-settings Assets/Scripts/SettingsSystem
 
       - name: Cache Unity Library 📦
         uses: actions/cache@v4
@@ -90,6 +96,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
+          submodules: recursive
+
+      - name: Fix symlink for my-unity-settings 🔗
+        run: |
+          rm -rf Assets/Scripts/SettingsSystem
+          cp -r my-unity-settings Assets/Scripts/SettingsSystem
 
       - name: Cache Unity Library 📦
         uses: actions/cache@v4

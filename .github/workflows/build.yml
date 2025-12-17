@@ -47,8 +47,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
+          submodules: recursive
           # 高速化のため shallow clone を使用
           fetch-depth: 1
+
+      - name: Fix symlink for my-unity-settings 🔗
+        run: |
+          # シンボリックリンクを実ファイルに置換（Docker内での互換性のため）
+          rm -rf Assets/Scripts/SettingsSystem
+          cp -r my-unity-settings Assets/Scripts/SettingsSystem
 
       - name: Optimize WebGL Build Settings 🔧
         run: |
