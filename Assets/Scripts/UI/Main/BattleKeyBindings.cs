@@ -19,7 +19,6 @@ public static class BattleKeyBindings
         CompositeDisposable disposables)
     {
         // ViewをシーンからFind
-        var personalityLogView = Object.FindFirstObjectByType<PersonalityLogView>();
         var playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
         
         // テーマのキーワードをトグル表示
@@ -30,11 +29,11 @@ public static class BattleKeyBindings
             .AddTo(disposables);
         
         // 人格ログを開く
-        inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => personalityLogView.Show())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => personalityLogView.Show())
+        //     .AddTo(disposables);
 
         // プレイスタイルを切り替え
         inputActionsProvider.Battle.ChangePlayStyle.OnPerformedAsObservable()

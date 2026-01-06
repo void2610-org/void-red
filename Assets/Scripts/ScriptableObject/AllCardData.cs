@@ -14,9 +14,7 @@ public class AllCardData : ScriptableObject
 {
     [SerializeField] private List<CardData> cardList = new ();
     
-    // プロパティ
     public List<CardData> CardList => cardList;
-    public int Count => cardList.Count;
     
     /// <summary>
     /// 同じディレクトリ内の全てのCardDataを自動的に登録

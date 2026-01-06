@@ -1,6 +1,3 @@
-using System.Linq;
-using Void2610.UnityTemplate;
-
 /// <summary>
 /// NPCクラス
 /// AIによって制御される対戦相手を表す

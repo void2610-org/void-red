@@ -33,7 +33,6 @@ public static class InputActionExtensions
         ).Select(_ => Unit.Default);
     }
     
-    
     /// <summary>
     /// InputAction.canceledイベントをR3のObservableに変換
     /// </summary>
