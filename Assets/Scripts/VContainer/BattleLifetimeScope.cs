@@ -23,8 +23,6 @@ public class BattleLifetimeScope : LifetimeScope
         _enemy = new Enemy(gameProgressService); // 最大手札数3
         builder.RegisterInstance(_enemy).AsSelf();
         
-        builder.Register<PersonalityLogService>(Lifetime.Singleton);
-        
         builder.RegisterEntryPoint<BattlePresenter>().AsSelf().As<ISceneInitializable>();
         builder.RegisterEntryPoint<BattleUIPresenter>().AsSelf();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();

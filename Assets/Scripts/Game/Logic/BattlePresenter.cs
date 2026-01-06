@@ -12,7 +12,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private readonly Player _player;
     private readonly Enemy _enemy;
     private readonly GameProgressService _gameProgressService;
-    private readonly PersonalityLogService _personalityLogService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllEnemyData _allEnemyData;
     private readonly DiscordService _discordService;
@@ -21,8 +20,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
 
     private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
-    private PlayerMove _playerMove;
-    private PlayerMove _enemyMove;
     
     private int _playerWins;
     private int _enemyWins;
@@ -45,7 +42,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         Player player,
         Enemy enemy,
         GameProgressService gameProgressService,
-        PersonalityLogService personalityLogService,
         SceneTransitionManager sceneTransitionManager,
         AllEnemyData allEnemyData,
         DiscordService discordService)
@@ -54,7 +50,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _player = player;
         _enemy = enemy;
         _gameProgressService = gameProgressService;
-        _personalityLogService = personalityLogService;
         _sceneTransitionManager = sceneTransitionManager;
         _allEnemyData = allEnemyData;
         _discordService = discordService;
@@ -90,9 +85,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
     {
         await UniTask.Delay(500);
         
-        // 人格ログデータをセーブデータからロード
-        _personalityLogService.SetPersonalityLogData(_gameProgressService.GetPersonalityLogData());
-        
         // GameProgressServiceから敵データを取得
         var currentNode = _gameProgressService.GetCurrentNode();
         if (currentNode is not BattleNode battleNode)
@@ -112,9 +104,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         
         // Discord Rich Presence更新（バトル開始）
         _discordService?.SetState("対戦相手", _currentEnemyData.EnemyName);
-        
-        // 人格ログ: チャプター開始
-        _personalityLogService.StartChapter(_currentEnemyData);
         
         // 敵を初期化して表示
         _enemy.SetEnemyData(_currentEnemyData);
@@ -178,9 +167,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private async UniTask HandleThemeAnnouncement()
     {
         _currentTurnNumber++;
-
-        // 人格ログ: ターン開始
-        _personalityLogService.StartTurn();
 
         // ターン番号に基づいてテーマを順番に選択（1ターン目 = index 0, 2ターン目 = index 1, 3ターン目 = index 2）
         // _currentTheme = _currentEnemyData.Themes[_currentTurnNumber - 1];
@@ -269,9 +255,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // 選択されたカードを閲覧済みとして記録
         // _gameProgressService.RecordCardView(finalSelectedCard.Data);
         
-        // 人格ログ: プレイヤームーブ記録
-        _personalityLogService.LogPlayerMove(_playerMove, _player.MentalPower.CurrentValue);
-        
         await UniTask.Delay(500);
         ChangeState(GameState.EnemyCardSelection).Forget();
     }
@@ -296,9 +279,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // 敵のカードも閲覧済みとして記録
         // _gameProgressService.RecordCardView(npcCard.Data);
         
-        // 人格ログ: 敵ムーブ記録
-        _personalityLogService.LogEnemyMove(_enemyMove, _enemy.MentalPower.CurrentValue);
-        
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
         // 結果表示の背景を表示
@@ -313,12 +293,8 @@ public class BattlePresenter: IStartable, ISceneInitializable
     /// </summary>
     private async UniTask HandleEvaluation()
     {
-        // スコアを計算（テーマ倍率 × 精神ベット × PlayStyle相性）
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _enemyMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_enemyMove, _playerMove, _currentTheme);
-        
         // 評価結果をスコア専用Viewで同時表示
-        await _battleUIPresenter.ShowScores(playerScore, npcScore);
+        // await _battleUIPresenter.ShowScores(playerScore, npcScore);
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
@@ -330,35 +306,13 @@ public class BattlePresenter: IStartable, ISceneInitializable
     /// </summary>
     private async UniTask HandleResultDisplay()
     {
-        var playerScore = ScoreCalculator.CalculateScore(_playerMove, _enemyMove, _currentTheme);
-        var npcScore = ScoreCalculator.CalculateScore(_enemyMove, _playerMove, _currentTheme);
 
-        // 崩壊結果を考慮した勝敗決定
-        string result;
-        bool playerWon;
-
-        {
-            // 崩壊がない場合は従来のスコア比較
-            if (playerScore > npcScore)
-            {
-                result = "あなたの勝利";
-                playerWon = true;
-            }
-            else if (npcScore > playerScore)
-            {
-                result = "相手の勝利";
-                playerWon = false;
-            }
-            else
-            {
-                // スコア引き分けもランダム決着
-                playerWon = UnityEngine.Random.Range(0, 2) == 0;
-                result = playerWon ? "あなたの勝利\n（引き分け→ランダム決着）" : "相手の勝利\n（引き分け→ランダム決着）";
-            }
-        }
+        // スコア引き分けもランダム決着
+        var playerWon = UnityEngine.Random.Range(0, 2) == 0;
+        var result = playerWon ? "あなたの勝利\n（引き分け→ランダム決着）" : "相手の勝利\n（引き分け→ランダム決着）";
 
         // 結果を表示（スコアと内訳付き）
-        await _battleUIPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _enemyMove, _currentTheme);
+        // await _battleUIPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _enemyMove, _currentTheme);
         await UniTask.Delay(500);
         await _battleUIPresenter.HideBlackOverlay();
 
@@ -390,9 +344,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
-        
-        // 人格ログ: ターン終了
-        _personalityLogService.EndTurn();
         
         // ゲームオーバー条件をチェック
         ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement).Forget();
@@ -444,10 +395,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         
         await _battleUIPresenter.WaitForBattleResultClose();
         
-        // 人格ログ: チャプター完了
-        _personalityLogService.CompleteChapter();
-        // 人格ログデータをGameProgressServiceに更新（セーブのため）
-        _gameProgressService.UpdatePersonalityLogData(_personalityLogService.GetPersonalityLogData());
         // プレイヤーのデッキ変更をセーブ（バトル終了時のみ）
         // _player.SaveDeckChanges();
         

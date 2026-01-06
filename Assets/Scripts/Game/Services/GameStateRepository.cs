@@ -1,6 +1,5 @@
 using R3;
 using UnityEngine;
-using Game.PersonalityLog;
 
 /// <summary>
 /// ゲーム状態データの保持とI/Oを担当するリポジトリ
@@ -11,7 +10,6 @@ public class GameStateRepository
     public StoryProgressData StoryProgress { get; } = new();
     public PlayerProgressData PlayerProgress { get; } = new();
     public NovelProgressData NovelProgress { get; } = new();
-    public PersonalityLogData PersonalityLogData { get; } = new();
 
     // 依存サービス
     private readonly SaveDataManager _saveDataManager;
@@ -73,9 +71,6 @@ public class GameStateRepository
         // ノベル進行データのロード
         NovelProgress.LoadFrom(loadedData.GetAllChoiceResults());
 
-        // 人格ログのロード
-        PersonalityLogData.LoadFrom(loadedData.PersonalityLog);
-
         // 新規データかどうかを判定
         var isNewData = StoryProgress.CurrentStep == 0 && StoryProgress.BattleResults.Count == 0;
         var dataType = isNewData ? "新規データ" : "既存データ";
@@ -108,9 +103,6 @@ public class GameStateRepository
             saveData.AddNovelChoiceResult(choiceResult);
         }
 
-        // 人格ログデータを設定
-        saveData.UpdatePersonalityLog(PersonalityLogData);
-
         return saveData;
     }
 
@@ -131,7 +123,6 @@ public class GameStateRepository
         StoryProgress.Reset();
         PlayerProgress.Reset();
         NovelProgress.Reset();
-        PersonalityLogData.Reset();
 
         SaveAll();
 
