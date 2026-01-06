@@ -12,11 +12,6 @@ public class PlayerProgressData
     public List<SavedCard> Deck { get; set; }
 
     /// <summary>
-    /// プレイヤーの進化統計データ
-    /// </summary>
-    public EvolutionStatsData EvolutionStats { get; set; }
-
-    /// <summary>
     /// 閲覧済みカードID
     /// </summary>
     public HashSet<string> ViewedCardIds { get; set; }
@@ -27,7 +22,6 @@ public class PlayerProgressData
     public PlayerProgressData()
     {
         Deck = new List<SavedCard>();
-        EvolutionStats = new EvolutionStatsData();
         ViewedCardIds = new HashSet<string>();
     }
 
@@ -59,7 +53,6 @@ public class PlayerProgressData
     public void Reset()
     {
         Deck.Clear();
-        EvolutionStats = new EvolutionStatsData();
         ViewedCardIds.Clear();
     }
 }

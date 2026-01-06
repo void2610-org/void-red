@@ -42,9 +42,6 @@ public class GameSaveData
     [SerializeField] private List<string> resultKeys = new();
     [SerializeField] private List<bool> resultValues = new();
     
-    [Header("統計・進化データ")]
-    [SerializeField] private EvolutionStatsData evolutionStats = new();
-    
     [Header("人格ログデータ")]
     [SerializeField] private PersonalityLogData personalityLog = new();
     
@@ -57,7 +54,6 @@ public class GameSaveData
     // プロパティ
     public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
-    public EvolutionStatsData EvolutionStats => evolutionStats;
     public PersonalityLogData PersonalityLog => personalityLog;
     public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
     
@@ -85,14 +81,6 @@ public class GameSaveData
             resultKeys.Add(result.Key);
             resultValues.Add(result.Value);
         }
-    }
-    
-    /// <summary>
-    /// 進化統計データを更新
-    /// </summary>
-    public void UpdateEvolutionStats(EvolutionStatsData evolutionStatsData)
-    {
-        evolutionStats = evolutionStatsData ?? new EvolutionStatsData();
     }
     
     /// <summary>

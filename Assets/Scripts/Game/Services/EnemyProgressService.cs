@@ -1,5 +1,3 @@
-using UnityEngine;
-
 /// <summary>
 /// 敵の進行を管理するサービスクラス
 /// VContainerによりシングルトンとして管理される

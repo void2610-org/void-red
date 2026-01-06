@@ -88,19 +88,7 @@ public class PersonalityLogService
         var resonanceEvent = new ResonanceEvent(actorId, resonanceCard);
         _currentEvents.Add(resonanceEvent);
     }
-    
-    /// <summary>
-    /// カード進化イベントを記録
-    /// </summary>
-    /// <param name="actorId">アクターID（"player"または"enemy"）</param>
-    /// <param name="fromCard">進化前のカード</param>
-    /// <param name="toCard">進化後のカード</param>
-    public void LogCardEvolution(string actorId, CardData fromCard, CardData toCard)
-    {
-        var evolutionEvent = new CardEvolutionEvent(actorId, fromCard, toCard);
-        _currentEvents.Add(evolutionEvent);
-    }
-    
+
     /// <summary>
     /// カード崩壊イベントを記録
     /// </summary>

@@ -3,8 +3,6 @@ using TMPro;
 using UnityEngine.UI;
 using System.Text;
 using Game.PersonalityLog;
-using Cysharp.Threading.Tasks;
-using R3;
 
 /// <summary>
 /// 人格ログを表示するViewコンポーネント
@@ -135,10 +133,7 @@ public class PersonalityLogView : BaseWindowView
         {
             case ResonanceEvent resonance:
                 return $"共鳴: {resonance.resonanceCard?.CardName ?? "不明なカード"}";
-                
-            case CardEvolutionEvent evolution:
-                return $"進化 ({evolution.actorId}): {evolution.fromCard?.CardName ?? "不明"} → {evolution.toCard?.CardName ?? "不明"}";
-                
+
             case CardCollapseEvent collapse:
                 return $"崩壊 ({collapse.actorId}): {collapse.collapseCard?.CardName ?? "不明なカード"}";
                 

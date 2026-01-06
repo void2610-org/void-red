@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using Cysharp.Threading.Tasks;
-using R3;
 using LitMotion;
 using Void2610.UnityTemplate;
 

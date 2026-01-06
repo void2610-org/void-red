@@ -1,5 +1,3 @@
-using UnityEngine;
-
 /// <summary>
 /// プレイヤーの手（カード選択、プレイスタイル、精神ベット）をまとめたクラス
 /// </summary>

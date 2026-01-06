@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// ヘルプ画面を表示するViewクラス

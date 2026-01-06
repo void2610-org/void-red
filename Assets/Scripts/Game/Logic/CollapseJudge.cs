@@ -32,11 +32,8 @@ public static class CollapseJudge
     {
         if (move == null || !move.SelectedCard) return 0f;
 
-        var threshold = move.SelectedCard.CollapseThreshold;
-        if (move.MentalBet < threshold) return 0f; // 閾値未満では崩壊しない
-
         // 基本崩壊確率を計算
-        var baseChance = (move.MentalBet - threshold) * 0.2f;
+        var baseChance = (move.MentalBet) * 0.2f;
 
         // プレイスタイルによる倍率を適用
         var playStyleMultiplier = move.PlayStyle.GetCollapseMultiplier();

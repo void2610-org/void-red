@@ -30,23 +30,7 @@ namespace Game.PersonalityLog
             this.resonanceCard = resonanceCard;
         }
     }
-    
-    /// <summary>
-    /// カード進化イベント
-    /// </summary>
-    [Serializable]
-    public class CardEvolutionEvent : TurnEvent
-    {
-        [SerializeField] public CardData fromCard;
-        [SerializeField] public CardData toCard;
-        
-        public CardEvolutionEvent(string actorId, CardData fromCard, CardData toCard) : base(actorId)
-        {
-            this.fromCard = fromCard;
-            this.toCard = toCard;
-        }
-    }
-    
+
     /// <summary>
     /// カード崩壊イベント
     /// </summary>

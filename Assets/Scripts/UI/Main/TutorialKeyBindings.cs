@@ -1,5 +1,4 @@
 using R3;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// チュートリアルのキーバインド設定

@@ -3,8 +3,6 @@ using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
 using R3;
-using LitMotion;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// カード風選択肢表示を担当するViewクラス

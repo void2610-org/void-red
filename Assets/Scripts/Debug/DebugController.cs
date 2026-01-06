@@ -1,5 +1,4 @@
 using UnityEngine;
-using R3;
 using VContainer;
 
 /// <summary>
