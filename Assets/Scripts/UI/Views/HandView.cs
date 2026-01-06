@@ -29,24 +29,24 @@ public class HandView : MonoBehaviour
     private readonly CompositeDisposable _modelBindings = new();
     private CardViewFactory _cardViewFactory;
     
-    /// <summary>
-    /// HandModelをバインド
-    /// </summary>
-    public void BindModel(HandModel model)
-    {
-        // 既存のバインディングをクリア
-        _modelBindings.Clear();
-        
-        // カードリストの変更を監視
-        model.Cards
-            .Subscribe(cards => UpdateCardViews(cards).Forget())
-            .AddTo(_modelBindings);
-            
-        // 選択状態の変更を監視
-        model.SelectedIndex
-            .Subscribe(UpdateSelection)
-            .AddTo(_modelBindings);
-    }
+    // /// <summary>
+    // /// HandModelをバインド
+    // /// </summary>
+    // public void BindModel(HandModel model)
+    // {
+    //     // 既存のバインディングをクリア
+    //     _modelBindings.Clear();
+    //     
+    //     // カードリストの変更を監視
+    //     model.Cards
+    //         .Subscribe(cards => UpdateCardViews(cards).Forget())
+    //         .AddTo(_modelBindings);
+    //         
+    //     // 選択状態の変更を監視
+    //     model.SelectedIndex
+    //         .Subscribe(UpdateSelection)
+    //         .AddTo(_modelBindings);
+    // }
     
     
     /// <summary>

@@ -46,11 +46,11 @@ public class TutorialPresenter : IDisposable
         
         // 手札の最初のカード（インデックス0）を自動選択
         await UniTask.Delay(500);
-        _player.SelectCardAt(0);
+        // _player.SelectCardAt(0);
         await UniTask.Delay(1000);
 
         // カード詳細ウィンドウを開く
-        _cardDetailView.ShowCardDetail(_player.SelectedCard.CurrentValue.Data, true);
+        // _cardDetailView.ShowCardDetail(_player.SelectedCard.CurrentValue.Data, true);
         SafeNavigationManager.SelectRootForceSelectable().Forget();
         await UniTask.Delay(500);
 

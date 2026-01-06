@@ -86,9 +86,6 @@ public class DeckView : BaseWindowView
         // 表示するカードリストを決定
         var displayCards = _currentMode switch
         {
-            DeckDisplayMode.All => _cardModels,
-            DeckDisplayMode.Active => _cardModels.Where(cm => !cm.IsCollapsed).ToList(),
-            DeckDisplayMode.Collapsed => _cardModels.Where(cm => cm.IsCollapsed).ToList(),
             _ => _cardModels
         };
         
@@ -106,7 +103,7 @@ public class DeckView : BaseWindowView
     private void CreateCardView(CardModel cardModel)
     {
         var cardView = Instantiate(cardPrefab, contentContainer);
-        cardView.Initialize(cardModel, cardModel.IsCollapsed ? CardDisplayState.Collapsed : CardDisplayState.Normal);
+        cardView.Initialize(cardModel);
 
         // カードクリックイベントを購読
         cardView.OnCardClicked
@@ -142,12 +139,10 @@ public class DeckView : BaseWindowView
         }
 
         var totalCount = _cardModels.Count;
-        var activeCount = _cardModels.Count(cm => !cm.IsCollapsed);
-        var collapsedCount = _cardModels.Count(cm => cm.IsCollapsed);
 
         totalCardsText.text = $"全カード: {totalCount}枚";
-        activeCardsText.text = $"使用可能: {activeCount}枚";
-        collapsedCardsText.text = $"崩壊: {collapsedCount}枚";
+        activeCardsText.text = $"使用可能: 枚";
+        collapsedCardsText.text = $"崩壊: 枚";
     }
 
     /// <summary>

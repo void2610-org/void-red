@@ -13,18 +13,16 @@ public class SavedCard
     public string instanceId;   // インスタンスID
     public bool isCollapsed;    // 崩壊状態
     
-    public SavedCard(string cardId, string instanceId, bool isCollapsed)
+    public SavedCard(string cardId, string instanceId)
     {
         this.cardId = cardId;
         this.instanceId = instanceId;
-        this.isCollapsed = isCollapsed;
     }
     
     public SavedCard(CardModel cardModel)
     {
         cardId = cardModel.Data.CardId;
         instanceId = cardModel.InstanceId;
-        isCollapsed = cardModel.IsCollapsed;
     }
 }
 
