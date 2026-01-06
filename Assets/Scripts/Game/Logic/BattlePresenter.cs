@@ -244,9 +244,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         
         // _battleUIPresenter.UpdateEnemySprite(finalSelectedCard.Data.Attribute).Forget();
         
-        // プレイヤーの手を作成
-        var playStyle = _battleUIPresenter.GetSelectedPlayStyle();
-        
         // 精神力を消費
         var mentalBet = _battleUIPresenter.GetMentalBetValue();
         _player.ConsumeMentalPower(mentalBet);
@@ -269,7 +266,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // AIでカードを選択
         // _enemy.SelectCard(npcCard);
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
-        var npcPlayStyle = _enemy.DecidePlayStyle();
         var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, _enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
         
         // NPCの精神力を消費

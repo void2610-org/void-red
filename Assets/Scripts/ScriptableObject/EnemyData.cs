@@ -19,7 +19,6 @@ public class EnemyData : ScriptableObject
     
     [Header("属性別画像")]
     [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
-    [SerializeField] private SerializableDictionary<PlayStyle, float> playstyleWeights = new ();
 
     // プロパティ
     public string EnemyId => enemyId;
@@ -27,7 +26,6 @@ public class EnemyData : ScriptableObject
     public Sprite DefaultSprite => defaultSprite;
     public Sprite IconSprite => iconSprite;
     public Sprite FrameSprite => frameSprite;
-    public SerializableDictionary<PlayStyle, float> PlaystyleWeights => playstyleWeights;
     
     /// <summary>
     /// 指定された属性に対応するSpriteを取得

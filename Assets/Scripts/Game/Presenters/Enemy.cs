@@ -12,10 +12,4 @@ public class Enemy : PlayerPresenter
     public Enemy(GameProgressService gameProgressService = null) : base(gameProgressService) { }
     
     public void SetEnemyData(EnemyData data) => _data = data;
-
-    public PlayStyle DecidePlayStyle()
-    {
-        var all = _data.PlaystyleWeights.Keys.ToList();
-        return all.ChooseByWeight(p => _data.PlaystyleWeights[p]);
-    }
 }

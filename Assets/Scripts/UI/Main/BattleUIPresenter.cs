@@ -40,7 +40,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly CardDetailView _cardDetailView;
     private readonly ThemeDetailView _themeDetailView;
     private readonly BattleResultView _battleResultView;
-    private PlayStyle _selectedPlayStyle = PlayStyle.Impulse;
     private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
     private readonly Player _player;
@@ -80,7 +79,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
     public void SetCardDetailButtonInteractable(bool interactable) => _cardDetailButtonView.SetInteractable(interactable);
     public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
-    public PlayStyle GetSelectedPlayStyle() => _selectedPlayStyle;
     public int GetMentalBetValue() => _mentalBetValue;
 
     public void InitializeEnemy(EnemyData enemyData)
@@ -162,11 +160,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
     }
     
-    private void OnPlayStyleSelected(PlayStyle playStyle)
-    {
-        _selectedPlayStyle = playStyle;
-    }
-    
     private void OnMentalBetChanged(int delta)
     {
         var newValue = _mentalBetValue + delta;
@@ -213,8 +206,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     
     private void SetupViewEvents()
     {
-        // プレイスタイル選択イベント
-        _playStyleView.PlayStyleSelected.Subscribe(OnPlayStyleSelected).AddTo(_disposables);
         // 精神ベット変更イベント
         _mentalBetView.MentalBetChanged.Subscribe(OnMentalBetChanged).AddTo(_disposables);
         // プレイヤーの精神力変化を監視
@@ -249,7 +240,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         SetUpButtonEvents();
 
         // 初期表示の更新
-        OnPlayStyleSelected(_selectedPlayStyle);
         UpdateMentalBetDisplay();
 
         // ルートボタンを初期選択
