@@ -150,8 +150,7 @@ public class GameStateRepository
             {
                 PlayerProgress.Deck.Add(new SavedCard(
                     cardModel.Data.CardId,
-                    cardModel.InstanceId,
-                    cardModel.IsCollapsed
+                    cardModel.InstanceId
                 ));
             }
         }
@@ -168,7 +167,7 @@ public class GameStateRepository
             var cardData = _cardPoolService.GetCardById(savedCard.cardId);
             if (cardData)
             {
-                var cardModel = new CardModel(cardData, savedCard.instanceId, savedCard.isCollapsed);
+                var cardModel = new CardModel(cardData, savedCard.instanceId);
                 cardModels.Add(cardModel);
             }
             else

@@ -155,14 +155,10 @@ public class GameProgressService
     /// <summary>
     /// デッキ表示用の詳細情報を取得
     /// </summary>
-    public (List<CardData> allCards, List<CardData> activeCards, List<CardData> collapsedCards) GetDeckDisplayData()
+    public List<CardData> GetDeckDisplayData()
     {
         var cardModels = ConvertDeckToCardModels();
-        var allCards = cardModels.Select(cm => cm.Data).ToList();
-        var activeCards = cardModels.Where(cm => !cm.IsCollapsed).Select(cm => cm.Data).ToList();
-        var collapsedCards = cardModels.Where(cm => cm.IsCollapsed).Select(cm => cm.Data).ToList();
-
-        return (allCards, activeCards, collapsedCards);
+        return cardModels.Select(cm => cm.Data).ToList();
     }
 
     /// <summary>

@@ -114,18 +114,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
     
     /// <summary>
-    /// 選択されたカードの詳細を表示（InputSystem用の公開メソッド）
-    /// </summary>
-    public void ShowSelectedCardDetail()
-    {
-        var selectedCard = _player.SelectedCard.CurrentValue;
-        if (selectedCard?.Data != null)
-        {
-            _cardDetailView.ShowCardDetail(selectedCard.Data, true, _currentTheme);
-        }
-    }
-
-    /// <summary>
     /// 精神ベットを増やす（InputSystem用の公開メソッド）
     /// </summary>
     public void IncrementMentalBet() => OnMentalBetChanged(1);
@@ -134,43 +122,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     /// 精神ベットを減らす（InputSystem用の公開メソッド）
     /// </summary>
     public void DecrementMentalBet() => OnMentalBetChanged(-1);
-
-    /// <summary>
-    /// カードをプレイ（InputSystem用の公開メソッド）
-    /// </summary>
-    public void TryPlayCard()
-    {
-        if (_player.SelectedCard.CurrentValue != null)
-        {
-            _playButtonView.SimulateClick();
-        }
-    }
-
-    /// <summary>
-    /// 次のカードを選択（InputSystem用の公開メソッド）
-    /// </summary>
-    public void NavigateToNextCard()
-    {
-        var currentIndex = _player.SelectedIndex.CurrentValue;
-        var nextIndex = currentIndex + 1;
-
-        if (nextIndex < _player.HandCount)
-            _player.SelectCardAt(nextIndex);
-    }
-
-    /// <summary>
-    /// 前のカードを選択（InputSystem用の公開メソッド）
-    /// </summary>
-    public void NavigateToPrevCard()
-    {
-        var currentIndex = _player.SelectedIndex.CurrentValue;
-        var prevIndex = currentIndex - 1;
-
-        if (prevIndex >= 0)
-            _player.SelectCardAt(prevIndex);
-        else if (_player.HandCount > 0)
-            _player.SelectCardAt(0);
-    }
 
     public BattleUIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
     {
@@ -238,31 +189,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
         // MentalBetViewに表示を委譲
         _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, GameConstants.MIN_MENTAL_BET, GameConstants.MAX_MENTAL_BET);
-
         // MentalPowerViewに精神力表示を委譲
         _playerMentalPowerView.UpdateDisplay(currentMentalPower, GameConstants.MAX_MENTAL_POWER);
-
-        // 選択中のカードのビジュアルを更新
-        UpdateSelectedCardVisual();
     }
 
-    /// <summary>
-    /// 選択中のカードのビジュアルを更新
-    /// </summary>
-    private void UpdateSelectedCardVisual()
-    {
-        ResetAllCardCollapseVisuals();
-        var card = _player.SelectedCard.CurrentValue;
-        var index = _player.SelectedIndex.CurrentValue;
-        if (card != null && index >= 0 && _currentTheme != null)
-        {
-            // PlayerMoveを作成してスコアを計算
-            var move = new PlayerMove(card.Data, _selectedPlayStyle, _mentalBetValue);
-            var score = ScoreCalculator.CalculateScoreWithoutEnemy(move, _currentTheme);
-            UpdateCardVisual(card, index, score);
-        }
-    }
-    
     /// <summary>
     /// 選択されたカードのUIEffectsを更新
     /// </summary>
@@ -270,12 +200,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         if (_currentTheme == null) return;
         
-        // 崩壊確率を計算
-        var move = new PlayerMove(cardModel.Data, _selectedPlayStyle, _mentalBetValue);
-        var collapseChance = CollapseJudge.CalculateCollapseChance(move);
-        
         // HandViewのメソッドを使用して色を更新
-        _playerHandView.UpdateCardVisual(selectedIndex, collapseChance, score);
+        // _playerHandView.UpdateCardVisual(selectedIndex, collapseChance, score);
     }
     
     /// <summary>
@@ -298,25 +224,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemy.MentalPower.Subscribe(mentalPower =>
             _enemyMentalPowerView.UpdateDisplay(mentalPower, GameConstants.MAX_MENTAL_POWER)
         ).AddTo(_disposables);
-        // プレイヤーのカード選択を監視して敵のSpriteを更新
-        _player.SelectedCard.Subscribe(cardModel =>
-        {
-            // 手動制御モード中は自動更新をスキップ
-            if (_isEnemySpriteManualMode) return;
-            if (cardModel != null && cardModel.Data) _enemyView.UpdateSpriteForAttribute(cardModel.Data.Attribute).Forget();
-            else _enemyView.ResetToDefaultSprite().Forget();
-        }).AddTo(_disposables);
-
-        // 崩壊ビジュアル更新に関する全てのイベントを統合
-        var cardSelectionChange = _player.SelectedCard.Select(_ => Unit.Default);
-        var cardIndexChange = _player.SelectedIndex.Select(_ => Unit.Default);
-        var playStyleChange = _playStyleView.PlayStyleSelected.Select(_ => Unit.Default);
-        var mentalBetChange = _mentalBetView.MentalBetChanged.Select(_ => Unit.Default);
-
-        // 全ての変更イベントをマージして崩壊ビジュアルを更新
-        Observable.Merge(cardSelectionChange, cardIndexChange, playStyleChange, mentalBetChange)
-            .Subscribe(_ => UpdateSelectedCardVisual())
-            .AddTo(_disposables);
     }
     
     private void SetUpButtonEvents()
@@ -329,9 +236,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
             .AddTo(_disposables);
         _gameOverView.OnTitleClicked.Subscribe(
                 _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget())
-            .AddTo(_disposables);
-        _cardDetailButtonView?.DetailButtonClicked.Subscribe(
-                _ => ShowSelectedCardDetail())
             .AddTo(_disposables);
     }
     

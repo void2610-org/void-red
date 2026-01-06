@@ -58,30 +58,30 @@ public static class BattleKeyBindings
             .AddTo(disposables);
 
         // カード詳細を表示
-        inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => battleUIPresenter.ShowSelectedCardDetail())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => battleUIPresenter.ShowSelectedCardDetail())
+        //     .AddTo(disposables);
 
         // カードをプレイ
-        inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => battleUIPresenter.TryPlayCard())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.PlayCard.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => battleUIPresenter.TryPlayCard())
+        //     .AddTo(disposables);
 
         // カードナビゲーション
-        inputActionsProvider.Battle.SelectNextCard.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => battleUIPresenter.NavigateToNextCard())
-            .AddTo(disposables);
-        inputActionsProvider.Battle.SelectPrevCard.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => battleUIPresenter.NavigateToPrevCard())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.SelectNextCard.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => battleUIPresenter.NavigateToNextCard())
+        //     .AddTo(disposables);
+        // inputActionsProvider.Battle.SelectPrevCard.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => battleUIPresenter.NavigateToPrevCard())
+        //     .AddTo(disposables);
         
         // ナレーションをスキップする
         var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);

@@ -18,11 +18,6 @@ public class CardModel
     public CardData Data { get; }
     
     /// <summary>
-    /// 崩壊しているかどうか
-    /// </summary>
-    public bool IsCollapsed { get; set; }
-    
-    /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="data">カードの定義データ</param>
@@ -30,7 +25,6 @@ public class CardModel
     {
         InstanceId = Guid.NewGuid().ToString();
         Data = data;
-        IsCollapsed = false;
     }
     
     /// <summary>
@@ -38,12 +32,10 @@ public class CardModel
     /// </summary>
     /// <param name="data">カードの定義データ</param>
     /// <param name="instanceId">インスタンスID</param>
-    /// <param name="isCollapsed">崩壊状態</param>
-    public CardModel(CardData data, string instanceId, bool isCollapsed)
+    public CardModel(CardData data, string instanceId)
     {
         InstanceId = instanceId;
         Data = data;
-        IsCollapsed = isCollapsed;
     }
     
     /// <summary>
@@ -51,6 +43,6 @@ public class CardModel
     /// </summary>
     public override string ToString()
     {
-        return $"{Data?.CardName ?? "Unknown"} [{InstanceId.Substring(0, 8)}] {(IsCollapsed ? "(崩壊)" : "")}";
+        return $"{Data?.CardName ?? "Unknown"} [{InstanceId.Substring(0, 8)}]";
     }
 }
