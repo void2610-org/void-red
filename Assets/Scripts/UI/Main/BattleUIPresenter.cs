@@ -29,9 +29,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly MentalBetView _mentalBetView;
     private readonly MentalPowerView _playerMentalPowerView;
     private readonly MentalPowerView _enemyMentalPowerView;
-    private readonly GameOverView _gameOverView;
     private EnemyView _enemyView;
-    private readonly PersonalityLogView _personalityLogView;
     private readonly PersonalityLogButtonView _personalityLogButtonView;
     private readonly ScoreView _scoreView;
     private readonly ScoreResultView _scoreResultView;
@@ -78,7 +76,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
     public void SetCardDetailButtonInteractable(bool interactable) => _cardDetailButtonView.SetInteractable(interactable);
-    public void ShowGameOverScreen(string reason) => _gameOverView.ShowGameOverScreen(reason);
     public int GetMentalBetValue() => _mentalBetValue;
 
     public void InitializeEnemy(EnemyData enemyData)
@@ -132,9 +129,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _playButtonView = Object.FindFirstObjectByType<PlayButtonView>();
         _playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = Object.FindFirstObjectByType<MentalBetView>();
-        _gameOverView = Object.FindFirstObjectByType<GameOverView>();
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
-        _personalityLogView = Object.FindFirstObjectByType<PersonalityLogView>();
         _personalityLogButtonView = Object.FindFirstObjectByType<PersonalityLogButtonView>();
         _scoreView = Object.FindFirstObjectByType<ScoreView>();
         _scoreResultView = Object.FindFirstObjectByType<ScoreResultView>();
@@ -216,28 +211,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         ).AddTo(_disposables);
     }
     
-    private void SetUpButtonEvents()
-    {
-        _personalityLogButtonView?.OnButtonClicked.Subscribe(
-            _ => _personalityLogView.Show())
-            .AddTo(_disposables);
-        _gameOverView.OnRetryClicked.Subscribe(
-                _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle).Forget())
-            .AddTo(_disposables);
-        _gameOverView.OnTitleClicked.Subscribe(
-                _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget())
-            .AddTo(_disposables);
-    }
-    
     public void Start()
     {
-        // PersonalityLogViewを初期化
-        _personalityLogView.Initialize(_gameProgressService);
-
         // Viewイベントの設定
         SetupViewEvents();
-        // ボタンのイベント設定
-        SetUpButtonEvents();
 
         // 初期表示の更新
         UpdateMentalBetDisplay();

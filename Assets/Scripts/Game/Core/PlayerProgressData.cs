@@ -26,16 +26,6 @@ public class PlayerProgressData
     }
 
     /// <summary>
-    /// デッキを更新
-    /// </summary>
-    /// <param name="deck">新しいデッキデータ</param>
-    public void UpdateDeck(List<SavedCard> deck)
-    {
-        Deck.Clear();
-        Deck.AddRange(deck);
-    }
-
-    /// <summary>
     /// カード閲覧を記録
     /// </summary>
     /// <param name="cardId">カードID</param>

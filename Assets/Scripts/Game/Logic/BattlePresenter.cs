@@ -155,9 +155,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
             case GameState.BattleEnd:
                 await HandleBattleEnd();
                 break;
-            case GameState.GameOver:
-                HandleGameOver();
-                break;
         }
     }
     
@@ -191,7 +188,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
     /// </summary>
     private async UniTask ShowThemeDialoguesAsync()
     {
-        if (_currentTheme == null || _currentTheme.Dialogues == null)
+        if (!_currentTheme)
         {
             await UniTask.Delay(300);
             ChangeState(GameState.PlayerCardSelection).Forget();
@@ -199,15 +196,15 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
 
         // 各会話を順次表示
-        foreach (var dialogue in _currentTheme.Dialogues)
-        {
-            if (string.IsNullOrEmpty(dialogue.Message)) continue;
-
-            if (dialogue.IsPlayer)
-                await _battleUIPresenter.ShowPlayerNarration(dialogue.Message, autoAdvance: true);
-            else
-                await _battleUIPresenter.ShowEnemyNarration(dialogue.Message, autoAdvance: true);
-        }
+        // foreach (var dialogue in _currentTheme.Dialogues)
+        // {
+        //     if (string.IsNullOrEmpty(dialogue.Message)) continue;
+        //
+        //     if (dialogue.IsPlayer)
+        //         await _battleUIPresenter.ShowPlayerNarration(dialogue.Message, autoAdvance: true);
+        //     else
+        //         await _battleUIPresenter.ShowEnemyNarration(dialogue.Message, autoAdvance: true);
+        // }
 
         await UniTask.Delay(300);
     }
@@ -340,23 +337,9 @@ public class BattlePresenter: IStartable, ISceneInitializable
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);
-        
-        // ゲームオーバー条件をチェック
-        ChangeState(CheckGameOverConditions() ? GameState.GameOver : GameState.ThemeAnnouncement).Forget();
+        ChangeState(GameState.ThemeAnnouncement).Forget();
     }
     
-    /// <summary>
-    /// ゲームオーバー条件をチェック
-    /// </summary>
-    /// <returns>ゲームオーバー条件を満たしているかどうか</returns>
-    private bool CheckGameOverConditions()
-    {
-        // プレイヤーの精神力が0になったか
-        if (_player.MentalPower.CurrentValue <= 0) return true;
-        
-        return false;
-    }
-
     /// <summary>
     /// 勝利数を更新してバトル終了をチェック
     /// </summary>
@@ -414,19 +397,5 @@ public class BattlePresenter: IStartable, ISceneInitializable
             var nextScene = _gameProgressService.GetNextSceneType();
             await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
         }
-    }
-    
-    /// <summary>
-    /// ゲームオーバーフェーズ
-    /// </summary>
-    private void HandleGameOver()
-    {
-        // ゲームオーバーの理由を判定
-        var gameOverReason = "";
-        if (_player.MentalPower.CurrentValue <= 0)
-            gameOverReason = "精神力が0になりました";
-
-        // ゲームオーバー画面を表示
-        _battleUIPresenter.ShowGameOverScreen(gameOverReason);
     }
 }
