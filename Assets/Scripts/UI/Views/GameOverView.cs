@@ -2,11 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
-using System;
-using LitMotion;
-using LitMotion.Extensions;
-using Cysharp.Threading.Tasks;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// ゲームオーバー画面を管理するViewクラス

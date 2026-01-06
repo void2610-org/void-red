@@ -443,9 +443,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
 
         // プレイヤー勝利時は現在のテーマを記録
         if (playerWon) _wonThemes.Add(_currentTheme);
-        
-        // ゲーム結果を統計に記録（進化チェック前に実行）
-        _gameProgressService.RecordPlayerGameResult(playerWon, _playerMove, _playerCollapse);
 
         // すべての場合で勝利数をカウントするように変更
         if (UpdateWinsAndCheckBattleEnd(playerWon))

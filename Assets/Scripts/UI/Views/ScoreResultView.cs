@@ -2,7 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
-using System.Linq;
 using LitMotion;
 using Void2610.UnityTemplate;
 
@@ -73,14 +72,6 @@ public class ScoreResultView : MonoBehaviour
     private string BuildScoreBreakdown(PlayerMove playerMove, PlayerMove enemyMove, ThemeData theme)
     {
         var breakdown = "";
-
-        // キーワード一致情報（プレイヤー）
-        var matchedKeywords = ScoreCalculator.GetMatchedKeywords(playerMove.SelectedCard, theme);
-        if (matchedKeywords.Count > 0)
-        {
-            var keywordNames = string.Join(", ", matchedKeywords);
-            breakdown += $"・一致キーワード: {keywordNames}\n";
-        }
 
         // PlayStyle相性情報
         var playerPlayStyle = playerMove.PlayStyle;

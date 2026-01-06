@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 
 /// <summary>

@@ -1,5 +1,4 @@
 using System;
-using VContainer.Unity;
 
 /// <summary>
 /// InputSystem_Actionsのシングルトンプロバイダー

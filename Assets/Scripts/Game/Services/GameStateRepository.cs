@@ -62,7 +62,6 @@ public class GameStateRepository
         // プレイヤー進行データのロード
         PlayerProgress.Deck.Clear();
         PlayerProgress.Deck.AddRange(loadedData.SavedDeck);
-        PlayerProgress.EvolutionStats = loadedData.EvolutionStats ?? new EvolutionStatsData();
 
         PlayerProgress.ViewedCardIds.Clear();
         var viewedIds = loadedData.GetViewedCardIds();
@@ -96,7 +95,6 @@ public class GameStateRepository
 
         // プレイヤー進行データを設定
         saveData.UpdateDeck(PlayerProgress.Deck);
-        saveData.UpdateEvolutionStats(PlayerProgress.EvolutionStats);
 
         // 閲覧済みカードをセーブデータに追加
         foreach (var cardId in PlayerProgress.ViewedCardIds)

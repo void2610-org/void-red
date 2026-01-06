@@ -1,6 +1,5 @@
 using VContainer;
 using VContainer.Unity;
-using Void2610.SettingsSystem;
 
 /// <summary>
 /// タイトルシーン用のLifetimeScope

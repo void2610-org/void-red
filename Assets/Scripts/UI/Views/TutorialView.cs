@@ -4,7 +4,6 @@ using System;
 using LitMotion;
 using Void2610.UnityTemplate;
 using UnityEngine.UI;
-using R3;
 
 /// <summary>
 /// チュートリアル表示を管理するViewクラス

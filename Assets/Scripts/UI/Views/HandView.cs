@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
-using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>

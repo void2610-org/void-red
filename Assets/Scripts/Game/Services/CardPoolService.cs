@@ -8,9 +8,6 @@ using System.Linq;
 /// </summary>
 public class CardPoolService
 {
-    public int AvailableCardCount => _availableCards.Count;
-    public int TotalCardCount => _allCardData.Count;
-    
     private readonly AllCardData _allCardData;
     private readonly List<CardData> _availableCards;
     
@@ -21,10 +18,7 @@ public class CardPoolService
     public CardPoolService(AllCardData allCardData)
     {
         _allCardData = allCardData;
-        // 進化・劣化先カードを除外して利用可能カードリストを作成
-        _availableCards = _allCardData.CardList
-            .Where(card => !card.IsTransformationTarget)
-            .ToList();
+        _availableCards = _allCardData.CardList.ToList();
     }
     
     /// <summary>

@@ -1,9 +1,5 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
-using System.Text;
-using Game.PersonalityLog;
-using Cysharp.Threading.Tasks;
 using R3;
 
 /// <summary>

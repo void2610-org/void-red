@@ -3,7 +3,6 @@ using R3;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Linq;
-using UnityEngine;
 
 /// <summary>
 /// プレイヤーとNPCの基底プレゼンタークラス（Presenter Layer）

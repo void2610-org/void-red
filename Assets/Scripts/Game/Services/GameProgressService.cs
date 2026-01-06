@@ -208,32 +208,6 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// ゲーム結果を記録（プレイヤー分）
-    /// </summary>
-    public void RecordPlayerGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
-    {
-        _repository.PlayerProgress.EvolutionStats.RecordGameResult(playerWon, playerMove, playerCollapsed);
-    }
-
-    /// <summary>
-    /// カード進化チェック（プレイヤー分）
-    /// </summary>
-    public CardData CheckPlayerCardEvolution(CardData card)
-    {
-        if (_repository.PlayerProgress.EvolutionStats.CheckAllEvolutionConditions(card))
-        {
-            return card.EvolutionTarget;
-        }
-
-        if (_repository.PlayerProgress.EvolutionStats.CheckAllDegradationConditions(card))
-        {
-            return card.DegradationTarget;
-        }
-
-        return card;
-    }
-
-    /// <summary>
     /// 人格ログデータを更新（PersonalityLogServiceから取得してセーブ用に保持）
     /// </summary>
     public void UpdatePersonalityLogData(PersonalityLogData personalityLogData)

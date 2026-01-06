@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
 
 /// <summary>
 /// Googleスプレッドシートからカードのナレーション内容を管理するサービス

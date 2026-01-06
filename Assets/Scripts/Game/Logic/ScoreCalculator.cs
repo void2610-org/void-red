@@ -1,7 +1,3 @@
-using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-
 /// <summary>
 /// スコア計算を担当する静的クラス
 /// ゲームルールに関するスコア計算ロジックを集約
@@ -25,46 +21,6 @@ public static class ScoreCalculator
         };
     }
 
-    /// <summary>
-    /// キーワード一致数を取得
-    /// </summary>
-    /// <param name="card">カードデータ</param>
-    /// <param name="theme">テーマデータ</param>
-    /// <returns>一致したキーワード数</returns>
-    public static int GetKeywordMatchCount(CardData card, ThemeData theme)
-    {
-        if (card.Keywords == null || theme.Keywords == null)
-            return 0;
-
-        return card.Keywords.Intersect(theme.Keywords).Count();
-    }
-
-    /// <summary>
-    /// 一致したキーワードのリストを取得
-    /// </summary>
-    /// <param name="card">カードデータ</param>
-    /// <param name="theme">テーマデータ</param>
-    /// <returns>一致したキーワードのリスト</returns>
-    public static List<string> GetMatchedKeywords(CardData card, ThemeData theme)
-    {
-        if (card.Keywords == null || theme.Keywords == null)
-            return new List<string>();
-
-        return card.Keywords.Intersect(theme.Keywords).ToList();
-    }
-
-    /// <summary>
-    /// キーワード一致によるボーナス倍率を取得
-    /// </summary>
-    /// <param name="card">カードデータ</param>
-    /// <param name="theme">テーマデータ</param>
-    /// <returns>キーワードボーナス倍率</returns>
-    private static float GetKeywordMatchBonus(CardData card, ThemeData theme)
-    {
-        var matchCount = GetKeywordMatchCount(card, theme);
-        return 1 + (matchCount * 0.1f);
-    }
-
     public static float CalculateScoreWithoutEnemy(PlayerMove playerMove, ThemeData theme)
     {
         // テーマから該当属性の倍率を取得
@@ -76,11 +32,8 @@ public static class ScoreCalculator
         // ベット額によるスコア補正倍率を取得
         var betScoreMultiplier = GetBetScoreMultiplier(playerMove.MentalBet);
 
-        // キーワード一致によるボーナス倍率を取得
-        var keywordBonus = GetKeywordMatchBonus(playerMove.SelectedCard, theme);
-
-        // スコア = 属性倍率 × 精神ベット × カード固有の倍率 × プレイスタイル倍率 × ベット補正倍率 × キーワードボーナス
-        return attributeMultiplier * playerMove.MentalBet * playerMove.SelectedCard.ScoreMultiplier * playStyleMultiplier * betScoreMultiplier * keywordBonus;
+        // スコア = 属性倍率 × 精神ベット × 固有の倍率 × プレイスタイル倍率 × ベット補正倍率
+        return attributeMultiplier * playerMove.MentalBet * playStyleMultiplier * betScoreMultiplier;
     }
 
     /// <summary>

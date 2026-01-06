@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 
 /// <summary>

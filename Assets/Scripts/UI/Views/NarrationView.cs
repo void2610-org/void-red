@@ -3,9 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using LitMotion;
-using LitMotion.Extensions;
-using System.Threading;
-using System.Collections.Generic;
 using Void2610.UnityTemplate;
 
 /// <summary>

@@ -1,9 +1,5 @@
 using TMPro;
 using UnityEngine;
-using LitMotion;
-using LitMotion.Extensions;
-using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine.EventSystems;
 using UnityEngine.VFX;
@@ -16,12 +12,8 @@ using Void2610.UnityTemplate;
 public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private TextMeshProUGUI themeText;
-    [SerializeField] private KeywordTextView keywordTextPrefab;
     [SerializeField] private Transform keywordContainer;
     [SerializeField] private VisualEffect visualEffect;
-
-    private readonly Dictionary<string, KeywordTextView> _keywordViews = new();
-    private readonly List<Vector2> _keywordPositions = new();
 
     private ThemeData _themeData;
     private bool _isKeywordsVisible;
@@ -45,26 +37,6 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         themeText.TypewriterAnimation(themeData.Title).Forget();
         await UniTask.Delay(4000);
         BgmManager.Instance.RestoreVolume().Forget();
-
-        // 既存のキーワードViewをクリア
-        ClearKeywords();
-
-        // キーワードViewを生成（最遠点配置）
-        foreach (var keyword in themeData.Keywords)
-        {
-            var keywordView = Instantiate(keywordTextPrefab, keywordContainer);
-            var pos = GetFarthestPosition(220f, 30);
-            keywordView.transform.localPosition = new Vector3(pos.x, pos.y, 0);
-            keywordView.SetKeyword(keyword);
-            _keywordViews.Add(keyword, keywordView);
-            _keywordPositions.Add(pos);
-        }
-    }
-
-    public void UpdateKeywordHighlight(CardData cardData)
-    {
-        foreach (var pair in _keywordViews)
-            pair.Value.SetHighlight(cardData.Keywords.Contains(pair.Key));
     }
 
     /// <summary>
@@ -73,9 +45,6 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (_isKeywordsVisible || !_themeData) return;
-        
-        foreach (var view in _keywordViews.Values)
-            view.FadeIn();
         
         VolumeController.Instance.SetScreenSpaceLensFlareIntensity(1f);
         _isKeywordsVisible = true;
@@ -88,9 +57,6 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if (!_isKeywordsVisible || !_themeData) return;
         
-        foreach (var view in _keywordViews.Values)
-            view.FadeOut();
-
         VolumeController.Instance.SetScreenSpaceLensFlareIntensity(0f);
         _isKeywordsVisible = false;
     }
@@ -106,57 +72,8 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         else OnPointerExit(null);
     }
     
-    /// <summary>
-    /// キーワードViewをクリア
-    /// </summary>
-    private void ClearKeywords()
-    {
-        foreach (var view in _keywordViews.Values)
-            if (view) Destroy(view.gameObject);
-        _keywordViews.Clear();
-        _keywordPositions.Clear();
-    }
-    
-    /// <summary>
-    /// 既存のキーワードから最も離れた位置を取得
-    /// </summary>
-    private Vector2 GetFarthestPosition(float placementRadius, int attempts)
-    {
-        // 最初のキーワードはランダムな位置
-        if (_keywordPositions.Count == 0)
-            return Random.insideUnitCircle * placementRadius;
-
-        var bestPosition = Vector2.zero;
-        var maxMinDistance = 0f;
-
-        // 複数の候補位置を試す
-        for (var i = 0; i < attempts; i++)
-        {
-            var candidatePos = Random.insideUnitCircle * placementRadius;
-
-            // 既存の全キーワードとの最小距離を計算
-            var minDistance = _keywordPositions
-                .Select(existingPos => Vector2.Distance(candidatePos, existingPos))
-                .Prepend(float.MaxValue).Min();
-
-            // 最小距離が最大になる候補を選択
-            if (minDistance > maxMinDistance)
-            {
-                maxMinDistance = minDistance;
-                bestPosition = candidatePos;
-            }
-        }
-
-        return bestPosition;
-    }
-
     private void Awake()
     {
         visualEffect.SetInt("Rate", 0);
-    }
-
-    private void OnDestroy()
-    {
-        ClearKeywords();
     }
 }

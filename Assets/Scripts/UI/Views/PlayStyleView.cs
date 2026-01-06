@@ -1,7 +1,5 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 using R3;
 using LitMotion;
 using LitMotion.Extensions;

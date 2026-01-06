@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
-using LitMotion;
 using R3;
 using Void2610.UnityTemplate;
 
