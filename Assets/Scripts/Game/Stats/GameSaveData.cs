@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.PersonalityLog;
 
 /// <summary>
 /// セーブ用カードデータ
@@ -40,9 +39,6 @@ public class GameSaveData
     [SerializeField] private List<string> resultKeys = new();
     [SerializeField] private List<bool> resultValues = new();
     
-    [Header("人格ログデータ")]
-    [SerializeField] private PersonalityLogData personalityLog = new();
-    
     [Header("カード閲覧履歴")]
     [SerializeField] private List<string> viewedCardIds = new();
     
@@ -52,7 +48,6 @@ public class GameSaveData
     // プロパティ
     public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
-    public PersonalityLogData PersonalityLog => personalityLog;
     public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
     
     /// <summary>
@@ -79,14 +74,6 @@ public class GameSaveData
             resultKeys.Add(result.Key);
             resultValues.Add(result.Value);
         }
-    }
-    
-    /// <summary>
-    /// 人格ログデータを更新
-    /// </summary>
-    public void UpdatePersonalityLog(PersonalityLogData personalityLogData)
-    {
-        personalityLog = personalityLogData ?? new PersonalityLogData();
     }
     
     /// <summary>

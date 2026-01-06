@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Game.PersonalityLog;
 using R3;
 
 /// <summary>
@@ -201,22 +200,6 @@ public class GameProgressService
     public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
     {
         return _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-    }
-
-    /// <summary>
-    /// 人格ログデータを更新（PersonalityLogServiceから取得してセーブ用に保持）
-    /// </summary>
-    public void UpdatePersonalityLogData(PersonalityLogData personalityLogData)
-    {
-        _repository.PersonalityLogData.LoadFrom(personalityLogData);
-    }
-
-    /// <summary>
-    /// 人格ログデータを取得（PersonalityLogServiceの初期化用）
-    /// </summary>
-    public PersonalityLogData GetPersonalityLogData()
-    {
-        return _repository.PersonalityLogData;
     }
 
     /// <summary>
