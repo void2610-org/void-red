@@ -450,8 +450,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rewardInfoText: {fileID: 6667516010175715011}
-  cardDisplayDuration: 1.5
-  rewardCountDuration: 1
+  cardDisplayDuration: 3
+  rewardCountDuration: 5
 --- !u!1 &8192268624342431843
 GameObject:
   m_ObjectHideFlags: 0

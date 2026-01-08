@@ -400,8 +400,8 @@ public class AuctionView : MonoBehaviour
         var currentEmotionBid = emotionBids.TryGetValue(_currentEmotion, out var bid) ? bid : 0;
         if (currentEmotionBid <= 0) return;
 
-        // 現在の感情での入札を減少
-        _playerBids.AddBid(_selectedCardModel, _currentEmotion, -1);
+        // 現在の感情での入札を減少（SetBidで新しい値を設定）
+        _playerBids.SetBid(_selectedCardModel, _currentEmotion, currentEmotionBid - 1);
         var used = _usedResources.TryGetValue(_currentEmotion, out var u) ? u : 0;
         _usedResources[_currentEmotion] = Math.Max(0, used - 1);
 

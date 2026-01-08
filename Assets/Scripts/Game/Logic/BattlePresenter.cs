@@ -181,8 +181,8 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // オークションデータからテーマを取得
         _currentTheme = _currentAuctionData.Theme;
 
-        // TODO: 記憶テーマの公開演出
-        // TODO: テーマ情報の表示
+        // 記憶テーマを表示
+        await _battleUIPresenter.SetTheme(_currentTheme, isMainTheme: true);
 
         // 敵がアルヴならチュートリアルを表示
         // if (_currentEnemyData.EnemyId == "alv")
