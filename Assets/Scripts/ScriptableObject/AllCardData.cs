@@ -4,7 +4,6 @@ using System.Linq;
 using Void2610.UnityTemplate;
 
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 /// <summary>
@@ -15,9 +14,7 @@ public class AllCardData : ScriptableObject
 {
     [SerializeField] private List<CardData> cardList = new ();
     
-    // プロパティ
     public List<CardData> CardList => cardList;
-    public int Count => cardList.Count;
     
     /// <summary>
     /// 同じディレクトリ内の全てのCardDataを自動的に登録

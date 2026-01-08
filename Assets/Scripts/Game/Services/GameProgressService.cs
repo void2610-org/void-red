@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Game.PersonalityLog;
 using R3;
 
 /// <summary>
@@ -155,14 +154,10 @@ public class GameProgressService
     /// <summary>
     /// デッキ表示用の詳細情報を取得
     /// </summary>
-    public (List<CardData> allCards, List<CardData> activeCards, List<CardData> collapsedCards) GetDeckDisplayData()
+    public List<CardData> GetDeckDisplayData()
     {
         var cardModels = ConvertDeckToCardModels();
-        var allCards = cardModels.Select(cm => cm.Data).ToList();
-        var activeCards = cardModels.Where(cm => !cm.IsCollapsed).Select(cm => cm.Data).ToList();
-        var collapsedCards = cardModels.Where(cm => cm.IsCollapsed).Select(cm => cm.Data).ToList();
-
-        return (allCards, activeCards, collapsedCards);
+        return cardModels.Select(cm => cm.Data).ToList();
     }
 
     /// <summary>
@@ -205,48 +200,6 @@ public class GameProgressService
     public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
     {
         return _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-    }
-
-    /// <summary>
-    /// ゲーム結果を記録（プレイヤー分）
-    /// </summary>
-    public void RecordPlayerGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
-    {
-        _repository.PlayerProgress.EvolutionStats.RecordGameResult(playerWon, playerMove, playerCollapsed);
-    }
-
-    /// <summary>
-    /// カード進化チェック（プレイヤー分）
-    /// </summary>
-    public CardData CheckPlayerCardEvolution(CardData card)
-    {
-        if (_repository.PlayerProgress.EvolutionStats.CheckAllEvolutionConditions(card))
-        {
-            return card.EvolutionTarget;
-        }
-
-        if (_repository.PlayerProgress.EvolutionStats.CheckAllDegradationConditions(card))
-        {
-            return card.DegradationTarget;
-        }
-
-        return card;
-    }
-
-    /// <summary>
-    /// 人格ログデータを更新（PersonalityLogServiceから取得してセーブ用に保持）
-    /// </summary>
-    public void UpdatePersonalityLogData(PersonalityLogData personalityLogData)
-    {
-        _repository.PersonalityLogData.LoadFrom(personalityLogData);
-    }
-
-    /// <summary>
-    /// 人格ログデータを取得（PersonalityLogServiceの初期化用）
-    /// </summary>
-    public PersonalityLogData GetPersonalityLogData()
-    {
-        return _repository.PersonalityLogData;
     }
 
     /// <summary>

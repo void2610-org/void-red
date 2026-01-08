@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.PersonalityLog;
 
 /// <summary>
 /// セーブ用カードデータ
@@ -13,18 +12,16 @@ public class SavedCard
     public string instanceId;   // インスタンスID
     public bool isCollapsed;    // 崩壊状態
     
-    public SavedCard(string cardId, string instanceId, bool isCollapsed)
+    public SavedCard(string cardId, string instanceId)
     {
         this.cardId = cardId;
         this.instanceId = instanceId;
-        this.isCollapsed = isCollapsed;
     }
     
     public SavedCard(CardModel cardModel)
     {
         cardId = cardModel.Data.CardId;
         instanceId = cardModel.InstanceId;
-        isCollapsed = cardModel.IsCollapsed;
     }
 }
 
@@ -42,12 +39,6 @@ public class GameSaveData
     [SerializeField] private List<string> resultKeys = new();
     [SerializeField] private List<bool> resultValues = new();
     
-    [Header("統計・進化データ")]
-    [SerializeField] private EvolutionStatsData evolutionStats = new();
-    
-    [Header("人格ログデータ")]
-    [SerializeField] private PersonalityLogData personalityLog = new();
-    
     [Header("カード閲覧履歴")]
     [SerializeField] private List<string> viewedCardIds = new();
     
@@ -57,8 +48,6 @@ public class GameSaveData
     // プロパティ
     public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
-    public EvolutionStatsData EvolutionStats => evolutionStats;
-    public PersonalityLogData PersonalityLog => personalityLog;
     public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
     
     /// <summary>
@@ -85,22 +74,6 @@ public class GameSaveData
             resultKeys.Add(result.Key);
             resultValues.Add(result.Value);
         }
-    }
-    
-    /// <summary>
-    /// 進化統計データを更新
-    /// </summary>
-    public void UpdateEvolutionStats(EvolutionStatsData evolutionStatsData)
-    {
-        evolutionStats = evolutionStatsData ?? new EvolutionStatsData();
-    }
-    
-    /// <summary>
-    /// 人格ログデータを更新
-    /// </summary>
-    public void UpdatePersonalityLog(PersonalityLogData personalityLogData)
-    {
-        personalityLog = personalityLogData ?? new PersonalityLogData();
     }
     
     /// <summary>

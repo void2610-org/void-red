@@ -2,7 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
-using System.Linq;
 using LitMotion;
 using Void2610.UnityTemplate;
 
@@ -34,10 +33,8 @@ public class ScoreResultView : MonoBehaviour
     /// <param name="isPlayerWin">プレイヤーの勝利か</param>
     /// <param name="playerScore">プレイヤーのスコア</param>
     /// <param name="enemyScore">敵のスコア</param>
-    /// <param name="playerMove">プレイヤーの手</param>
-    /// <param name="enemyMove">敵の手</param>
     /// <param name="theme">テーマデータ</param>
-    public async UniTask ShowWinLoseResult(string result, bool isPlayerWin, float playerScore, float enemyScore, PlayerMove playerMove, PlayerMove enemyMove, ThemeData theme)
+    public async UniTask ShowWinLoseResult(string result, bool isPlayerWin, float playerScore, float enemyScore, ThemeData theme)
     {
         await _canvasGroup.FadeIn(0.3f);
 
@@ -53,8 +50,8 @@ public class ScoreResultView : MonoBehaviour
         scoreText.text = $"{playerScore:F1} vs {enemyScore:F1}";
 
         // 内訳を生成して表示
-        var breakdown = BuildScoreBreakdown(playerMove, enemyMove, theme);
-        breakdownText.text = breakdown;
+        // var breakdown = BuildScoreBreakdown(playerMove, enemyMove, theme);
+        // breakdownText.text = breakdown;
 
         await textsCanvasGroup.FadeIn(0.5f);
         await UniTask.Delay(5000);
@@ -65,41 +62,6 @@ public class ScoreResultView : MonoBehaviour
         textsCanvasGroup.alpha = 0f;
         scoreText.text = "";
         breakdownText.text = "";
-    }
-
-    /// <summary>
-    /// スコアの内訳文字列を生成
-    /// </summary>
-    private string BuildScoreBreakdown(PlayerMove playerMove, PlayerMove enemyMove, ThemeData theme)
-    {
-        var breakdown = "";
-
-        // キーワード一致情報（プレイヤー）
-        var matchedKeywords = ScoreCalculator.GetMatchedKeywords(playerMove.SelectedCard, theme);
-        if (matchedKeywords.Count > 0)
-        {
-            var keywordNames = string.Join(", ", matchedKeywords);
-            breakdown += $"・一致キーワード: {keywordNames}\n";
-        }
-
-        // PlayStyle相性情報
-        var playerPlayStyle = playerMove.PlayStyle;
-        var enemyPlayStyle = enemyMove.PlayStyle;
-
-        if (playerPlayStyle.IsStrongAgainst(enemyPlayStyle))
-        {
-            breakdown += "・PlayStyle相性: 勝利\n";
-        }
-        else if (enemyPlayStyle.IsStrongAgainst(playerPlayStyle))
-        {
-            breakdown += "・PlayStyle相性: 敗北\n";
-        }
-        else
-        {
-            breakdown += "・PlayStyle相性: 引き分け\n";
-        }
-
-        return breakdown.TrimEnd('\n');
     }
 
     private void Awake()

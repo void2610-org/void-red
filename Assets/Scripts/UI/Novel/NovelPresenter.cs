@@ -289,11 +289,9 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         }
         
         var cardModel =  new CardModel(cardData);
-        // カード詳細な説明を生成
-        var cardDescription = cardData.GetCardDescription();
 
         // ItemGetDataとしてカード獲得演出データを作成
-        var cardGetData = new ItemGetData("", cardData.CardName, cardDescription);
+        var cardGetData = new ItemGetData("", cardData.CardName, "");
         
         // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);

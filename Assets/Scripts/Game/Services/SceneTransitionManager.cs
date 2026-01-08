@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 using DelayType = Cysharp.Threading.Tasks.DelayType;
 

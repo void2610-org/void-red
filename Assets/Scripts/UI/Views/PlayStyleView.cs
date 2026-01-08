@@ -1,7 +1,5 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 using R3;
 using LitMotion;
 using LitMotion.Extensions;
@@ -26,16 +24,7 @@ public class PlayStyleView : MonoBehaviour
     private const float ROTATION_DURATION = 1f;
     private const Ease ROTATION_EASE = Ease.OutBack;
     
-    public Observable<PlayStyle> PlayStyleSelected => _playStyleSelected;
     
-    private readonly Subject<PlayStyle> _playStyleSelected = new();
-    private readonly (PlayStyle style, float angle)[] _styleConfigs = 
-    {
-        (PlayStyle.Impulse, 0f),
-        (PlayStyle.Hesitation, 45f),
-        (PlayStyle.Conviction, -45f)
-    };
-    private PlayStyle _currentPlayStyle = PlayStyle.Impulse;
     private bool _isRotating;
     private int _currentIndex;
     
@@ -51,14 +40,14 @@ public class PlayStyleView : MonoBehaviour
         _isRotating = true;
         var previousIndex = _currentIndex;
         _currentIndex = (_currentIndex + 1) % PLAYSTYLE_COUNT;
-        _currentPlayStyle = _styleConfigs[_currentIndex].style;
+        // _currentPlayStyle = _styleConfigs[_currentIndex].style;
         UpdateImageHighlight();
         
         // 車輪を回転
-        var currentAngle = _styleConfigs[previousIndex].angle;
-        var targetAngle = _styleConfigs[_currentIndex].angle;
+        // var currentAngle = _styleConfigs[previousIndex].angle;
+        // var targetAngle = _styleConfigs[_currentIndex].angle;
         
-        LMotion.Create(currentAngle, targetAngle, ROTATION_DURATION)
+        LMotion.Create(0f, 90f, ROTATION_DURATION)
             .WithEase(ROTATION_EASE)
             .BindToLocalEulerAnglesZ(wheelContainer)
             .AddTo(gameObject)
@@ -66,7 +55,7 @@ public class PlayStyleView : MonoBehaviour
             .ContinueWith(() =>
             {
                 _isRotating = false;
-                _playStyleSelected.OnNext(_currentPlayStyle);
+                // _playStyleSelected.OnNext(_currentPlayStyle);
             }).Forget();
     }
     
@@ -81,21 +70,7 @@ public class PlayStyleView : MonoBehaviour
         SetImageAlpha(convictionImage, false);
         
         // 選択中の画像を不透明に
-        SetImageAlpha(GetImageForPlayStyle(_currentPlayStyle),true);
-    }
-    
-    /// <summary>
-    /// プレイスタイルに対応する画像を取得
-    /// </summary>
-    private Image GetImageForPlayStyle(PlayStyle playStyle)
-    {
-        return playStyle switch
-        {
-            PlayStyle.Hesitation => hesitationImage,
-            PlayStyle.Impulse => impulseImage,
-            PlayStyle.Conviction => convictionImage,
-            _ => impulseImage
-        };
+        // SetImageAlpha(GetImageForPlayStyle(_currentPlayStyle),true);
     }
     
     /// <summary>
@@ -118,11 +93,11 @@ public class PlayStyleView : MonoBehaviour
         
         // 初期状態を設定
         UpdateImageHighlight();
-        wheelContainer.localRotation = Quaternion.Euler(0, 0, _styleConfigs[0].angle);
+        // wheelContainer.localRotation = Quaternion.Euler(0, 0, _styleConfigs[0].angle);
     }
     
     private void OnDestroy()
     {
-        _playStyleSelected?.Dispose();
+        // _playStyleSelected?.Dispose();
     }
 }

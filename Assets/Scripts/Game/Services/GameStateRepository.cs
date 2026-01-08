@@ -1,6 +1,5 @@
 using R3;
 using UnityEngine;
-using Game.PersonalityLog;
 
 /// <summary>
 /// ゲーム状態データの保持とI/Oを担当するリポジトリ
@@ -11,7 +10,6 @@ public class GameStateRepository
     public StoryProgressData StoryProgress { get; } = new();
     public PlayerProgressData PlayerProgress { get; } = new();
     public NovelProgressData NovelProgress { get; } = new();
-    public PersonalityLogData PersonalityLogData { get; } = new();
 
     // 依存サービス
     private readonly SaveDataManager _saveDataManager;
@@ -62,7 +60,6 @@ public class GameStateRepository
         // プレイヤー進行データのロード
         PlayerProgress.Deck.Clear();
         PlayerProgress.Deck.AddRange(loadedData.SavedDeck);
-        PlayerProgress.EvolutionStats = loadedData.EvolutionStats ?? new EvolutionStatsData();
 
         PlayerProgress.ViewedCardIds.Clear();
         var viewedIds = loadedData.GetViewedCardIds();
@@ -73,9 +70,6 @@ public class GameStateRepository
 
         // ノベル進行データのロード
         NovelProgress.LoadFrom(loadedData.GetAllChoiceResults());
-
-        // 人格ログのロード
-        PersonalityLogData.LoadFrom(loadedData.PersonalityLog);
 
         // 新規データかどうかを判定
         var isNewData = StoryProgress.CurrentStep == 0 && StoryProgress.BattleResults.Count == 0;
@@ -96,7 +90,6 @@ public class GameStateRepository
 
         // プレイヤー進行データを設定
         saveData.UpdateDeck(PlayerProgress.Deck);
-        saveData.UpdateEvolutionStats(PlayerProgress.EvolutionStats);
 
         // 閲覧済みカードをセーブデータに追加
         foreach (var cardId in PlayerProgress.ViewedCardIds)
@@ -109,9 +102,6 @@ public class GameStateRepository
         {
             saveData.AddNovelChoiceResult(choiceResult);
         }
-
-        // 人格ログデータを設定
-        saveData.UpdatePersonalityLog(PersonalityLogData);
 
         return saveData;
     }
@@ -133,7 +123,6 @@ public class GameStateRepository
         StoryProgress.Reset();
         PlayerProgress.Reset();
         NovelProgress.Reset();
-        PersonalityLogData.Reset();
 
         SaveAll();
 
@@ -152,8 +141,7 @@ public class GameStateRepository
             {
                 PlayerProgress.Deck.Add(new SavedCard(
                     cardModel.Data.CardId,
-                    cardModel.InstanceId,
-                    cardModel.IsCollapsed
+                    cardModel.InstanceId
                 ));
             }
         }
@@ -170,7 +158,7 @@ public class GameStateRepository
             var cardData = _cardPoolService.GetCardById(savedCard.cardId);
             if (cardData)
             {
-                var cardModel = new CardModel(cardData, savedCard.instanceId, savedCard.isCollapsed);
+                var cardModel = new CardModel(cardData, savedCard.instanceId);
                 cardModels.Add(cardModel);
             }
             else

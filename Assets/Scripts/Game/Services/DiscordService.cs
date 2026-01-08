@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 #if !UNITY_WEBGL || UNITY_EDITOR
 using Discord.Sdk;

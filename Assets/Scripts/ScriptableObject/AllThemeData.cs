@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 using Void2610.UnityTemplate;
 
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 /// <summary>

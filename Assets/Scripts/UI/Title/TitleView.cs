@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using R3;
 using TMPro;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// タイトル画面のView

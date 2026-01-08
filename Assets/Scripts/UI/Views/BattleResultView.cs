@@ -4,9 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
-using LitMotion;
-using LitMotion.Extensions;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// バトル全体の結果を表示するViewクラス（3勝到達後の最終結果）

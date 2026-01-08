@@ -19,17 +19,6 @@ public class EnemyData : ScriptableObject
     
     [Header("属性別画像")]
     [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
-    
-    [SerializeField] private SerializableDictionary<PlayStyle, float> playstyleWeights = new ();
-    
-    [Header("デッキ構成")]
-    [SerializeField] private List<CardData> initialDeck = new ();
-    
-    [Header("共鳴システム")]
-    [SerializeField] private CardData resonanceCard;
-
-    [Header("テーマ設定")]
-    [SerializeField] private List<ThemeData> themes = new(); // 各ターンのテーマ（3つ固定）
 
     // プロパティ
     public string EnemyId => enemyId;
@@ -37,10 +26,6 @@ public class EnemyData : ScriptableObject
     public Sprite DefaultSprite => defaultSprite;
     public Sprite IconSprite => iconSprite;
     public Sprite FrameSprite => frameSprite;
-    public SerializableDictionary<PlayStyle, float> PlaystyleWeights => playstyleWeights;
-    public List<CardData> InitialDeck => initialDeck;
-    public CardData ResonanceCard => resonanceCard;
-    public List<ThemeData> Themes => themes;
     
     /// <summary>
     /// 指定された属性に対応するSpriteを取得
@@ -48,10 +33,6 @@ public class EnemyData : ScriptableObject
     /// </summary>
     public Sprite GetSpriteForAttribute(CardAttribute attribute)
     {
-        if (attributeSprites.TryGetValue(attribute, out var sprite))
-        {
-            return sprite;
-        }
-        return null;
+        return attributeSprites.GetValueOrDefault(attribute);
     }
 }
