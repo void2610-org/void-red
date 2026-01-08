@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 
@@ -65,6 +67,22 @@ public class CardBidInfoView : MonoBehaviour
         playerBidText.text = playerBid > 0 ? $"{playerBid}" : "";
         // 相手が入札していれば?、していなければ非表示
         enemyBidText.text = enemyHasBid ? "?" : "";
+    }
+
+    // 感情別入札を表示（主要感情の色で合計値を表示）
+    public void ShowPlayerBidsWithEmotion(Dictionary<EmotionType, int> bids)
+    {
+        var totalBid = bids.Values.Sum();
+        if (totalBid == 0)
+        {
+            playerBidText.text = "";
+            return;
+        }
+
+        // 最も入札額が多い感情の色を使用
+        var primaryEmotion = bids.OrderByDescending(kv => kv.Value).First().Key;
+        playerBidText.text = $"{totalBid}";
+        playerBidText.color = primaryEmotion.GetColor();
     }
 
     // 結果を表示（WIN/LOSE）

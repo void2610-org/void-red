@@ -259,14 +259,13 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _enemy.DecideBids(_auctionCards, EmotionType.Joy);
         Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
 
-        // プレイヤーの入札UI表示・待機
-        var availableResource = _player.GetEmotionAmount(EmotionType.Joy);
+        // プレイヤーの入札UI表示・待機（8種類の感情リソースを渡す）
         await _battleUIPresenter.WaitForBiddingAsync(
             _player.Cards,
             _enemy.Cards,
             _player.Bids,
             EmotionType.Joy,
-            availableResource);
+            _player.EmotionResources);
 
         Debug.Log($"[BattlePresenter] プレイヤーの入札完了: 合計{_player.Bids.GetTotalBidAmount()}リソース");
 
