@@ -27,6 +27,7 @@ public class AuctionView : MonoBehaviour
     private readonly List<CardView> _cardViews = new();
     private readonly Dictionary<CardView, CardModel> _cardViewToModel = new();
     private readonly Dictionary<CardView, CardBidInfoView> _cardBidInfoViews = new();
+    private readonly HashSet<CardModel> _playerCardModels = new();
     private readonly Subject<Unit> _onBiddingComplete = new();
     private CompositeDisposable _disposables = new();
 
@@ -54,17 +55,18 @@ public class AuctionView : MonoBehaviour
 
             _cardViewToModel[cardView] = card;
             _cardViews.Add(cardView);
+            _playerCardModels.Add(card);
 
             // 入札情報Viewを生成
             var bidInfoView = Instantiate(cardBidInfoPrefab, cardView.transform);
             if (playerRanking != null)
             {
                 var rank = playerRanking.GetRanking(card);
-                bidInfoView.ShowPlayerRankOnly(rank);
+                bidInfoView.ShowRank(rank, true);
             }
             else
             {
-                bidInfoView.HideRanks();
+                bidInfoView.HideRank();
             }
             bidInfoView.ShowPlayerBidOnly(0);
             bidInfoView.HideResult();
@@ -86,11 +88,11 @@ public class AuctionView : MonoBehaviour
             if (playerRanking != null)
             {
                 var rank = playerRanking.GetRanking(card);
-                bidInfoView.ShowPlayerRankOnly(rank);
+                bidInfoView.ShowRank(rank, false);
             }
             else
             {
-                bidInfoView.HideRanks();
+                bidInfoView.HideRank();
             }
             bidInfoView.ShowPlayerBidOnly(0);
             bidInfoView.HideResult();
@@ -269,10 +271,10 @@ public class AuctionView : MonoBehaviour
             // 既存のCardBidInfoViewを取得
             if (!_cardBidInfoViews.TryGetValue(targetCardView, out var bidInfoView)) continue;
 
-            // 価値順位を公開
-            var playerRank = playerRanking.GetRanking(result.Card);
-            var enemyRank = enemyRanking.GetRanking(result.Card);
-            bidInfoView.ShowRanks(playerRank, enemyRank);
+            // 価値順位を公開（プレイヤーカードか敵カードかで色を変える）
+            var isPlayerCard = _playerCardModels.Contains(result.Card);
+            var rank = isPlayerCard ? playerRanking.GetRanking(result.Card) : enemyRanking.GetRanking(result.Card);
+            bidInfoView.ShowRank(rank, isPlayerCard);
 
             // 入札額を公開
             bidInfoView.ShowBidAmounts(result.PlayerBid, result.EnemyBid);
@@ -337,6 +339,7 @@ public class AuctionView : MonoBehaviour
         }
         _cardViews.Clear();
         _cardViewToModel.Clear();
+        _playerCardModels.Clear();
 
         _playerBids = null;
     }
