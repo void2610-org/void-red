@@ -1,5 +1,4 @@
 using R3;
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using VContainer.Unity;
@@ -13,50 +12,53 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private readonly Enemy _enemy;
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
-    private readonly AllEnemyData _allEnemyData;
     private readonly DiscordService _discordService;
+    private readonly AllAuctionData _allAuctionData;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
 
     private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
-    
-    private int _playerWins;
-    private int _enemyWins;
-    private int _currentTurnNumber;
-    private readonly List<ThemeData> _wonThemes = new();
+    private AuctionData _currentAuctionData;
+
+    // 場に並んだ全カード（8枚）
+    private readonly List<CardModel> _auctionCards = new();
+
     private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
-    
+
     public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
 
-    /// <summary>
-    /// シーンの初期化完了を待つ（ISceneInitializable実装）
-    /// </summary>
     public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
 
-    /// <summary>
-    /// コンストラクタ（依存性注入）
-    /// </summary>
     public BattlePresenter(
         BattleUIPresenter battleUIPresenter,
         Player player,
         Enemy enemy,
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
-        AllEnemyData allEnemyData,
-        DiscordService discordService)
+        DiscordService discordService,
+        AllAuctionData allAuctionData)
     {
         _battleUIPresenter = battleUIPresenter;
         _player = player;
         _enemy = enemy;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _allEnemyData = allEnemyData;
         _discordService = discordService;
+        _allAuctionData = allAuctionData;
 
-        _currentTurnNumber = 0;
+        InitializeAuctionData();
     }
-    
+
+    private void InitializeAuctionData()
+    {
+        _auctionCards.Clear();
+
+        // Player/Enemyの状態をリセット
+        _player.ResetPlayerState();
+        _enemy.ResetPlayerState();
+    }
+
     public void Start()
     {
         // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
@@ -66,334 +68,399 @@ public class BattlePresenter: IStartable, ISceneInitializable
         BgmManager.Instance.PlayBGMBySceneType(BgmType.Battle);
     }
 
-    /// <summary>
-    /// ゲーム初期化（非同期）
-    /// 完了後にSceneReadyNotifierに通知
-    /// </summary>
     private async UniTaskVoid InitializeGameAsync()
     {
-        await InitializeGame(true);
+        await InitializeGame();
         _initializationComplete.TrySetResult();
         await StartGame();
     }
-    
-    /// <summary>
-    /// ゲームを初期化
-    /// </summary>
-    /// <param name="isInitialStart">ゲームの最初の起動かどうか</param>
-    private async UniTask InitializeGame(bool isInitialStart)
+
+    private async UniTask InitializeGame()
     {
         await UniTask.Delay(500);
-        
-        // GameProgressServiceから敵データを取得
+
+        // GameProgressServiceからノード情報を取得
         var currentNode = _gameProgressService.GetCurrentNode();
         if (currentNode is not BattleNode battleNode)
         {
-            Debug.LogError("[GameManager] 現在のノードがBattleNodeではありません");
+            Debug.LogError("[BattlePresenter] 現在のノードがBattleNodeではありません");
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
-        
-        _currentEnemyData = _allEnemyData.GetEnemyById(battleNode.EnemyId);
+
+        // オークションデータを取得
+        _currentAuctionData = _allAuctionData.GetAuctionById(battleNode.AuctionId);
+        if (!_currentAuctionData)
+        {
+            Debug.LogError("[BattlePresenter] オークションデータが見つかりません");
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+            return;
+        }
+
+        // オークションデータから敵データを取得
+        _currentEnemyData = _currentAuctionData.Enemy;
         if (!_currentEnemyData)
         {
-            Debug.LogError("[GameManager] 敵データが見つかりません");
+            Debug.LogError("[BattlePresenter] 敵データが見つかりません");
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
-        
+
         // Discord Rich Presence更新（バトル開始）
         _discordService?.SetState("対戦相手", _currentEnemyData.EnemyName);
-        
+
         // 敵を初期化して表示
         _enemy.SetEnemyData(_currentEnemyData);
         _battleUIPresenter.InitializeEnemy(_currentEnemyData);
         await _battleUIPresenter.ShowEnemy();
-        
+
         // 敵情報をアナウンス
         await _battleUIPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
-        
     }
 
     private async UniTask StartGame()
     {
         await UniTask.Delay(1000);
-        
-        // _player.DrawCardsWithDelay(3, 300).Forget();
-        await UniTask.Delay(200);
-        // await _enemy.DrawCardsWithDelay(3, 300);
 
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement).Forget();
     }
-    
-    /// <summary>
-    /// ステートを変更
-    /// </summary>
+
     private async UniTask ChangeState(GameState newState)
     {
         _currentGameState.Value = newState;
-        
+
         switch (newState)
         {
+            // 1. 出品者フェーズ
             case GameState.ThemeAnnouncement:
                 _battleUIPresenter.ResetEnemyToDefault().Forget();
                 await HandleThemeAnnouncement();
                 break;
-            case GameState.PlayerCardSelection:
-                HandlePlayerCardSelection().Forget();
+            case GameState.CardDistribution:
+                await HandleCardDistribution();
                 break;
-            case GameState.EnemyCardSelection:
-                await HandleEnemyCardSelection();
+            case GameState.ValueRanking:
+                await HandleValueRanking();
                 break;
-            case GameState.Evaluation:
-                await HandleEvaluation();
+            case GameState.CardReveal:
+                await HandleCardReveal();
                 break;
-            case GameState.ResultDisplay:
-                await HandleResultDisplay();
+            // 2. 入札者フェーズ
+            case GameState.BiddingPhase:
+                await HandleBiddingPhase();
                 break;
+            // 3. 対話フェーズ
+            case GameState.DialoguePhase:
+                await HandleDialoguePhase();
+                break;
+            // 4. 落札者判定フェーズ
+            case GameState.AuctionResult:
+                await HandleAuctionResult();
+                break;
+            // 5. 報酬フェーズ
+            case GameState.RewardPhase:
+                await HandleRewardPhase();
+                break;
+            // 6. 記憶育成フェーズ
+            case GameState.MemoryGrowth:
+                await HandleMemoryGrowth();
+                break;
+            // 終了
             case GameState.BattleEnd:
                 await HandleBattleEnd();
                 break;
         }
     }
-    
-    /// <summary>
-    /// お題発表フェーズ
-    /// </summary>
+
+    // === 1. 出品者フェーズ ===
+
+    // 記憶テーマを公開する
     private async UniTask HandleThemeAnnouncement()
     {
-        _currentTurnNumber++;
+        // オークションデータからテーマを取得
+        _currentTheme = _currentAuctionData.Theme;
 
-        // ターン番号に基づいてテーマを順番に選択（1ターン目 = index 0, 2ターン目 = index 1, 3ターン目 = index 2）
-        // _currentTheme = _currentEnemyData.Themes[_currentTurnNumber - 1];
+        // TODO: 記憶テーマの公開演出
+        // TODO: テーマ情報の表示
 
-        await _battleUIPresenter.SetTheme(_currentTheme, _currentTurnNumber == 3);
+        // 敵がアルヴならチュートリアルを表示
+        // if (_currentEnemyData.EnemyId == "alv")
+        //     await _battleUIPresenter.StartBattleTutorial();
 
-        // 初回ターン かつ 敵がアルヴならチュートリアルを表示
-        if (_currentTurnNumber == 1 && _currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartBattleTutorial();
-
-        // テーマ詳細を表示して閉じられるまで待機
-        await _battleUIPresenter.ShowThemeDetailAndWait();
-
-        // 会話シーケンスを表示してからカード選択へ
-        await ShowThemeDialoguesAsync();
-
-        ChangeState(GameState.PlayerCardSelection).Forget();
+        await ChangeState(GameState.CardDistribution);
     }
 
-    /// <summary>
-    /// テーマ会話を順次表示
-    /// </summary>
-    private async UniTask ShowThemeDialoguesAsync()
+    // カードを配布する（主4枚 + 相4枚）
+    private async UniTask HandleCardDistribution()
     {
-        if (!_currentTheme)
-        {
-            await UniTask.Delay(300);
-            ChangeState(GameState.PlayerCardSelection).Forget();
-            return;
-        }
+        // Player/Enemyにカードを設定
+        _player.SetCards(_currentAuctionData.PlayerCards);
+        _enemy.SetCards(_currentAuctionData.EnemyCards);
 
-        // 各会話を順次表示
-        // foreach (var dialogue in _currentTheme.Dialogues)
-        // {
-        //     if (string.IsNullOrEmpty(dialogue.Message)) continue;
-        //
-        //     if (dialogue.IsPlayer)
-        //         await _battleUIPresenter.ShowPlayerNarration(dialogue.Message, autoAdvance: true);
-        //     else
-        //         await _battleUIPresenter.ShowEnemyNarration(dialogue.Message, autoAdvance: true);
-        // }
+        Debug.Log($"[BattlePresenter] カード配布完了: プレイヤー{_player.Cards.Count}枚、敵{_enemy.Cards.Count}枚");
 
-        await UniTask.Delay(300);
-    }
-    
-    /// <summary>
-    /// プレイヤーカード選択フェーズ
-    /// </summary>
-    private async UniTask HandlePlayerCardSelection()
-    {
-        // カード選択を待つ
-        while (true)
-        {
-            await UniTask.Yield();
-            
-            // カードが選択されたらプレイボタンを有効化
-            _battleUIPresenter.SetPlayButtonInteractable(true);
-            _battleUIPresenter.SetCardDetailButtonInteractable(true);
-            break;
-        }
+        // TODO: 配布アニメーション（UIPresenter経由）
 
-        // プレイボタンが押されるのを待つ
-        try
-        {
-            await _battleUIPresenter.PlayButtonClicked.FirstAsync();
-        }
-        catch (InvalidOperationException)
-        {
-            // PlayButtonが破棄された場合は処理を中断
-            return;
-        }
-
-        _battleUIPresenter.SetPlayButtonInteractable(false);
-        _battleUIPresenter.SetCardDetailButtonInteractable(false);
-        
-        // _battleUIPresenter.UpdateEnemySprite(finalSelectedCard.Data.Attribute).Forget();
-        
-        // 精神力を消費
-        var mentalBet = _battleUIPresenter.GetMentalBetValue();
-        _player.ConsumeMentalPower(mentalBet);
-        // _playerMove = new PlayerMove(finalSelectedCard.Data, playStyle, mentalBet);
-        
-        // 選択されたカードを閲覧済みとして記録
-        // _gameProgressService.RecordCardView(finalSelectedCard.Data);
-        
         await UniTask.Delay(500);
-        ChangeState(GameState.EnemyCardSelection).Forget();
+        await ChangeState(GameState.ValueRanking);
     }
-    
-    /// <summary>
-    /// 敵カード選択フェーズ
-    /// </summary>
-    private async UniTask HandleEnemyCardSelection()
+
+    // 価値順位を設定する（1〜4）
+    private async UniTask HandleValueRanking()
     {
+        Debug.Log("[BattlePresenter] 価値順位設定フェーズ開始");
+
+        // 敵AIで順位をランダム設定
+        _enemy.DecideValueRankings();
+        Debug.Log("[BattlePresenter] 敵の価値順位を設定完了");
+
+        // プレイヤーの価値順位設定（UI経由）
+        var rankedCards = await _battleUIPresenter.WaitForValueRankingAsync(_player.Cards);
+
+        // 結果をPlayerのValueRankingに反映
+        for (var i = 0; i < rankedCards.Count; i++)
+        {
+            _player.ValueRanking.TrySetRanking(rankedCards[i], i + 1);
+        }
+        Debug.Log("[BattlePresenter] プレイヤーの価値順位設定完了");
+
+        await UniTask.Delay(500);
+        await ChangeState(GameState.CardReveal);
+    }
+
+    // カードを公開する
+    private async UniTask HandleCardReveal()
+    {
+        Debug.Log("[BattlePresenter] カード公開フェーズ開始");
+
+        // 8枚を場に並べる
+        _auctionCards.Clear();
+        _auctionCards.AddRange(_player.Cards);
+        _auctionCards.AddRange(_enemy.Cards);
+
+        Debug.Log($"[BattlePresenter] オークション対象カード: {_auctionCards.Count}枚");
+
+        // UIでカードを表示（プレイヤーの価値順位も渡す）
+        _battleUIPresenter.ShowAuctionCards(_player.Cards, _enemy.Cards, _player.ValueRanking);
+
+        await UniTask.Delay(1500);
+        await ChangeState(GameState.BiddingPhase);
+    }
+
+    // === 2. 入札者フェーズ ===
+
+    // 感情リソースで入札する
+    private async UniTask HandleBiddingPhase()
+    {
+        Debug.Log("[BattlePresenter] 入札フェーズ開始");
+
+        // 敵AIで入札を決定
+        _enemy.DecideBids(_auctionCards, EmotionType.Joy);
+        Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
+
+        // プレイヤーの入札UI表示・待機
+        var availableResource = _player.GetEmotionAmount(EmotionType.Joy);
+        await _battleUIPresenter.WaitForBiddingAsync(
+            _player.Cards,
+            _enemy.Cards,
+            _player.Bids,
+            EmotionType.Joy,
+            availableResource);
+
+        Debug.Log($"[BattlePresenter] プレイヤーの入札完了: 合計{_player.Bids.GetTotalBidAmount()}リソース");
+
+        // 入札対象カード公開演出（投入リソースは非公開、入札なしカードは順位非表示）
+        await _battleUIPresenter.ShowBidTargetsAsync(_player.Bids, _enemy.Bids, 2f);
+
+        await ChangeState(GameState.DialoguePhase);
+    }
+
+    // === 3. 対話フェーズ ===
+
+    // 対話による揺さぶり
+    private async UniTask HandleDialoguePhase()
+    {
+        Debug.Log("[BattlePresenter] 対話フェーズ開始");
+
+        // AuctionViewを非表示にする
+        _battleUIPresenter.HideAuctionView();
+
+        // プレイヤーの選択を待機（固定の選択肢）
+        var selectedIndex = await _battleUIPresenter.WaitForDialogueChoiceAsync("挑発", "説得");
+        Debug.Log($"[BattlePresenter] 選択: {(selectedIndex == 0 ? "挑発" : "説得")}");
+
+        // 効果を適用（敵の入札に影響）
+        ApplyDialogueEffect(selectedIndex, _enemy);
+
+        await UniTask.Delay(500);
+        await ChangeState(GameState.AuctionResult);
+    }
+
+    // 対話効果を適用
+    private void ApplyDialogueEffect(int selectedIndex, PlayerPresenter target)
+    {
+        var bidTargets = target.Bids.GetBidTargets();
+        if (bidTargets.Count == 0) return;
+
+        // ランダムな入札対象を選択
+        var randomCard = bidTargets[Random.Range(0, bidTargets.Count)];
+        var currentBid = target.Bids.GetTotalBid(randomCard);
+
+        // 選択肢による効果（0: 挑発=入札増加、1: 説得=入札減少）
+        if (selectedIndex == 0)
+        {
+            // 挑発: 敵の入札を増加
+            var newBid = currentBid + 2;
+            target.Bids.SetBid(randomCard, EmotionType.Joy, newBid);
+            Debug.Log($"[BattlePresenter] 敵の入札増加: {randomCard.Data.CardName} ({currentBid} -> {newBid})");
+        }
+        else
+        {
+            // 説得: 敵の入札を減少
+            var newBid = Mathf.Max(0, currentBid - 2);
+            target.Bids.SetBid(randomCard, EmotionType.Joy, newBid);
+            Debug.Log($"[BattlePresenter] 敵の入札減少: {randomCard.Data.CardName} ({currentBid} -> {newBid})");
+        }
+    }
+
+    // === 4. 落札者判定フェーズ ===
+
+    // 入札結果を開示し落札者を決定する
+    private async UniTask HandleAuctionResult()
+    {
+        Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
+
+        // AuctionViewを再表示（カードは既に存在する）
+        _battleUIPresenter.ShowAuctionView();
+
+        // 全カードの落札者を判定
+        var results = AuctionJudge.JudgeAll(_auctionCards, _player.Bids, _enemy.Bids);
+
+        // 結果を格納
+        _player.ClearWonCards();
+        _enemy.ClearWonCards();
+
+        foreach (var result in results)
+        {
+            if (result.NoBids)
+            {
+                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 入札なし");
+                continue;
+            }
+
+            if (result.IsPlayerWon)
+            {
+                _player.AddWonCard(result.Card);
+                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: プレイヤー落札（{result.PlayerBid} vs {result.EnemyBid}）");
+            }
+            else
+            {
+                _enemy.AddWonCard(result.Card);
+                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 敵落札（{result.PlayerBid} vs {result.EnemyBid}）");
+            }
+        }
+
+        Debug.Log($"[BattlePresenter] 落札結果: プレイヤー{_player.WonCards.Count}枚、敵{_enemy.WonCards.Count}枚");
+
+        // 順次演出で結果を表示（価値順位も公開）
+        await _battleUIPresenter.ShowAuctionResultsSequentialAsync(results, _player.ValueRanking, _enemy.ValueRanking);
+
         await UniTask.Delay(1000);
-        
-        // AIでカードを選択
-        // _enemy.SelectCard(npcCard);
-        // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
-        var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, _enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
-        
-        // NPCの精神力を消費
-        _enemy.ConsumeMentalPower(npcMentalBet);
-        // _enemyMove = new PlayerMove(npcCard.Data, npcPlayStyle, npcMentalBet);
-        
-        // 敵のカードも閲覧済みとして記録
-        // _gameProgressService.RecordCardView(npcCard.Data);
-        
-        // 少し間を置いてから評価フェーズに移行
-        await UniTask.Delay(500);
-        // 結果表示の背景を表示
-        await _battleUIPresenter.ShowBlackOverlay();
-        
-        // 評価フェーズへ
-        ChangeState(GameState.Evaluation).Forget();
+        // オークション完全終了時にクリア
+        _battleUIPresenter.ClearAuctionView();
+        await ChangeState(GameState.RewardPhase);
     }
-    
-    /// <summary>
-    /// 評価フェーズ
-    /// </summary>
-    private async UniTask HandleEvaluation()
+
+    // === 5. 報酬フェーズ ===
+
+    // 報酬ポイントを算出し感情リソースを獲得する
+    private async UniTask HandleRewardPhase()
     {
-        // 評価結果をスコア専用Viewで同時表示
-        // await _battleUIPresenter.ShowScores(playerScore, npcScore);
-        
-        // 結果表示フェーズに移行
-        await UniTask.Delay(500);
-        ChangeState(GameState.ResultDisplay).Forget();
-    }
-    
-    /// <summary>
-    /// 勝敗表示フェーズ
-    /// </summary>
-    private async UniTask HandleResultDisplay()
-    {
+        Debug.Log("[BattlePresenter] 報酬フェーズ開始");
 
-        // スコア引き分けもランダム決着
-        var playerWon = UnityEngine.Random.Range(0, 2) == 0;
-        var result = playerWon ? "あなたの勝利\n（引き分け→ランダム決着）" : "相手の勝利\n（引き分け→ランダム決着）";
+        // プレイヤーの報酬を計算
+        var rewardResults = RewardCalculator.CalculateAll(
+            _player.WonCards,
+            _player.ValueRanking,
+            _enemy.ValueRanking,
+            _player.Bids,
+            _player.Cards);
 
-        // 結果を表示（スコアと内訳付き）
-        // await _battleUIPresenter.ShowWinLoseResult(result, playerWon, playerScore, npcScore, _playerMove, _enemyMove, _currentTheme);
-        await UniTask.Delay(500);
-        await _battleUIPresenter.HideBlackOverlay();
+        var totalReward = RewardCalculator.CalculateTotalReward(rewardResults);
 
-        // プレイヤー勝利時は現在のテーマを記録
-        if (playerWon) _wonThemes.Add(_currentTheme);
-
-        // すべての場合で勝利数をカウントするように変更
-        if (UpdateWinsAndCheckBattleEnd(playerWon))
+        // 報酬を感情リソースとして付与（一旦Joyに加算）
+        if (totalReward > 0)
         {
-            // 3勝に達した場合、カード処理をスキップしてバトル終了へ
-            ChangeState(GameState.BattleEnd).Forget();
-            return;
+            _player.AddEmotion(EmotionType.Joy, totalReward);
+            Debug.Log($"[BattlePresenter] プレイヤーに報酬付与: {totalReward}リソース");
         }
-        
-        // カードをプレイ（崩壊しない）
-        // _player.PlaySelectedCard(false);
-        // カードをプレイ（崩壊しない）
-        // _enemy.PlaySelectedCard(false);
-        
-        // カード使用後の処理完了を待つ
-        await UniTask.Delay(1000);
-        
-        // 両プレイヤーの手札をデッキに戻す
-        // await UniTask.WhenAll(_player.ReturnHandToDeck(), _enemy.ReturnHandToDeck());
-        
-        // _player.DrawCardsWithDelay(3, 300).Forget();
-        await UniTask.Delay(200);
-        // await _enemy.DrawCardsWithDelay(3, 300);
-        
-        // 新しいラウンドの準備時間
-        await UniTask.Delay(1000);
-        ChangeState(GameState.ThemeAnnouncement).Forget();
-    }
-    
-    /// <summary>
-    /// 勝利数を更新してバトル終了をチェック
-    /// </summary>
-    /// <param name="isPlayerWon"></param>
-    /// <returns>バトルが終了したかどうか</returns>
-    private bool UpdateWinsAndCheckBattleEnd(bool isPlayerWon)
-    {
-        if (isPlayerWon) _playerWins++;
-        else _enemyWins++;
 
-        return _currentTurnNumber >= GameConstants.BATTLE_TURNS;
+        // 各カードの報酬詳細をログ出力
+        foreach (var (card, result) in rewardResults)
+        {
+            var ownCardText = result.IsOwnCard ? " [自カード+2]" : "";
+            Debug.Log($"[BattlePresenter] {card.Data.CardName}: 基本{result.BaseReward} + 相対{result.RelativeReward}{ownCardText} = 合計{result.TotalReward}");
+        }
+
+        // 報酬演出表示
+        await _battleUIPresenter.ShowRewardsAsync(rewardResults);
+
+        await UniTask.Delay(2000);
+        _battleUIPresenter.HideRewardView();
+
+        await ChangeState(GameState.MemoryGrowth);
     }
-    
-    /// <summary>
-    /// バトル終了フェーズ
-    /// </summary>
+
+    // === 6. 記憶育成フェーズ ===
+
+    // 記憶テーマを構成しキャラクターを表示する
+    private async UniTask HandleMemoryGrowth()
+    {
+        Debug.Log("[BattlePresenter] 記憶育成フェーズ（未実装）");
+
+        // TODO: 記憶テーマの変化演出
+        // TODO: キャラクター表示
+        // TODO: 感情リソース反映
+
+        await UniTask.Delay(500);
+        await ChangeState(GameState.BattleEnd);
+    }
+
+    // === 終了 ===
+
+    // バトル終了フェーズ
     private async UniTask HandleBattleEnd()
     {
         await UniTask.Delay(500);
-        
+
         // Volumeエフェクトを全てデフォルトに戻す
         VolumeController.Instance.ResetToDefault();
-        
-        // 3ターン終了後、勝利数が多い方が勝利（同数の場合はプレイヤー勝利）
-        var playerWon = _playerWins >= _enemyWins;
 
-        _battleUIPresenter.ShowBattleResult(playerWon, _playerWins, _enemyWins, _wonThemes);
-        
+        // TODO: バトル結果表示（落札したカード・獲得した記憶テーマを表示）
+        // _battleUIPresenter.ShowBattleResult(_player.WonCards, _currentTheme);
+
         // 敵がアルヴならチュートリアルを表示
-        if (_currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartResultTutorial();
-        
-        await _battleUIPresenter.WaitForBattleResultClose();
-        
-        // プレイヤーのデッキ変更をセーブ（バトル終了時のみ）
-        // _player.SaveDeckChanges();
-        
+        // if (_currentEnemyData.EnemyId == "alv")
+        //     await _battleUIPresenter.StartResultTutorial();
+
+        // TODO: 結果表示の完了待機
+        // await _battleUIPresenter.WaitForBattleResultClose();
+
         // 現在のノード情報を一旦キャッシュ
         var currentNode = _gameProgressService.GetCurrentNode();
-        
-        // 現在のバトル結果を記録(ここでノード進行する)
-        _gameProgressService.RecordBattleResultAndSave(playerWon);
-        Debug.Log($"[GameManager] バトル完了: {(playerWon ? "勝利" : "敗北")} - ストーリー進行");
-        
+
+        // バトル完了を記録（勝敗なし）
+        _gameProgressService.RecordNovelResultAndSave();
+
         // ノード設定に基づいてシーン遷移
         await UniTask.Delay(1000);
         if (currentNode.ReturnToHome)
         {
-            // ホームに戻る
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
         }
         else
         {
-            // 次のノードへ直接遷移
             var nextScene = _gameProgressService.GetNextSceneType();
             await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
         }

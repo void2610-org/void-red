@@ -18,15 +18,12 @@ public static class BattleKeyBindings
         ReadOnlyReactiveProperty<GameState> currentGameState,
         CompositeDisposable disposables)
     {
-        // ViewをシーンからFind
-        var playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
-        
         // テーマのキーワードをトグル表示
-        inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => themeView.ToggleKeywords())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.FocusOnTheme.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => themeView.ToggleKeywords())
+        //     .AddTo(disposables);
         
         // 人格ログを開く
         // inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
@@ -36,25 +33,25 @@ public static class BattleKeyBindings
         //     .AddTo(disposables);
 
         // プレイスタイルを切り替え
-        inputActionsProvider.Battle.ChangePlayStyle.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => playStyleView.RotateWheel())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.ChangePlayStyle.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => playStyleView.RotateWheel())
+        //     .AddTo(disposables);
 
         // 精神ベットを減らす
-        inputActionsProvider.Battle.MinusMentalBet.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => battleUIPresenter.DecrementMentalBet())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.MinusMentalBet.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => battleUIPresenter.DecrementMentalBet())
+        //     .AddTo(disposables);
 
         // 精神ベットを増やす
-        inputActionsProvider.Battle.PlusMentalBet.OnPerformedAsObservable()
-            .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
-            .Where(_ => !BaseWindowView.HasActiveWindows)
-            .Subscribe(_ => battleUIPresenter.IncrementMentalBet())
-            .AddTo(disposables);
+        // inputActionsProvider.Battle.PlusMentalBet.OnPerformedAsObservable()
+        //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
+        //     .Where(_ => !BaseWindowView.HasActiveWindows)
+        //     .Subscribe(_ => battleUIPresenter.IncrementMentalBet())
+        //     .AddTo(disposables);
 
         // カード詳細を表示
         // inputActionsProvider.Battle.ShowCardDetail.OnPerformedAsObservable()
