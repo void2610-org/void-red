@@ -161,13 +161,26 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask<int> WaitForDialogueChoiceAsync(string label1, string label2)
     {
         _dialoguePhaseView.Setup(label1, label2);
+        _dialoguePhaseView.ShowChoices();
         _dialoguePhaseView.Show();
 
         var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
 
-        _dialoguePhaseView.Hide();
+        _dialoguePhaseView.HideChoices();
 
         return selectedIndex;
+    }
+
+    // 対話フェーズ：結果を表示
+    public void ShowDialogueResult(string message)
+    {
+        _dialoguePhaseView.ShowResult(message);
+    }
+
+    // 対話フェーズ：Viewを非表示
+    public void HideDialogueView()
+    {
+        _dialoguePhaseView.Hide();
     }
 
     // 報酬フェーズ：報酬計算結果を表示
