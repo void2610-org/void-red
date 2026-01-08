@@ -105,7 +105,7 @@ public class HomePresenter : IStartable, IDisposable
     /// </summary>
     private async UniTask StartBattleNode(BattleNode battleNode)
     {
-        Debug.Log($"[HomePresenter] バトル開始: 敵ID {battleNode.EnemyId}");
+        Debug.Log($"[HomePresenter] バトル開始: オークションID {battleNode.AuctionId}");
 
         // 単純にBattleSceneに遷移（敵情報はGameProgressServiceから取得）
         await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle);

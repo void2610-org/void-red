@@ -17,17 +17,17 @@ public abstract class StoryNode
 /// </summary>
 public class BattleNode : StoryNode
 {
-    public string EnemyId { get; }
-    
+    public string AuctionId { get; }
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="enemyId">敵ID</param>
+    /// <param name="auctionId">オークションID</param>
     /// <param name="returnToHome">このノード終了後にホームに戻るか（デフォルト: true）</param>
-    public BattleNode(string enemyId, bool returnToHome = true)
+    public BattleNode(string auctionId, bool returnToHome = true)
     {
-        NodeId = enemyId;
-        EnemyId = enemyId;
+        NodeId = auctionId;
+        AuctionId = auctionId;
         ReturnToHome = returnToHome;
     }
 }

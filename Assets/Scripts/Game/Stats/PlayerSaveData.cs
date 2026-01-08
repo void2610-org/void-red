@@ -1,35 +1,92 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// プレイヤー固有のセーブデータ（統計データ + 将来の章クリア状況等）
+/// 感情リソースのセーブデータ（シリアライズ用）
+/// </summary>
+[Serializable]
+public class EmotionResourceData
+{
+    public EmotionType emotionType;
+    public int amount;
+
+    public EmotionResourceData(EmotionType type, int value)
+    {
+        emotionType = type;
+        amount = value;
+    }
+}
+
+/// <summary>
+/// プレイヤー固有のセーブデータ（感情リソース + 将来の章クリア状況等）
 /// </summary>
 [Serializable]
 public class PlayerSaveData
 {
     [Header("ゲーム進行データ")]
-    [SerializeField] private int currentChapter = 0;
-    
-    [Header("プレイヤー関連データ")]
-    [SerializeField] private int currentMentalPower = GameConstants.MAX_MENTAL_POWER;
-    
+    [SerializeField] private int currentChapter;
+
+    [Header("感情リソースデータ")]
+    [SerializeField] private List<EmotionResourceData> emotionResources = new();
+
     public int CurrentChapter => currentChapter;
-    public int CurrentMentalPower => currentMentalPower;
-    
-    /// <summary>
-    /// 現在の精神力を更新
-    /// </summary>
-    /// <param name="mentalPower">新しい精神力の値</param>
-    public void UpdateMentalPower(int mentalPower)
+
+    public PlayerSaveData()
     {
-        currentMentalPower = Mathf.Clamp(mentalPower, 0, GameConstants.MAX_MENTAL_POWER);
+        InitializeEmotionResources();
     }
-    
+
+    private void InitializeEmotionResources()
+    {
+        emotionResources.Clear();
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            emotionResources.Add(new EmotionResourceData(emotion, GameConstants.DEFAULT_EMOTION_VALUE));
+        }
+    }
+
+    /// <summary>
+    /// 感情リソースを更新
+    /// </summary>
+    public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources)
+    {
+        emotionResources.Clear();
+        foreach (var kvp in resources)
+        {
+            emotionResources.Add(new EmotionResourceData(kvp.Key, kvp.Value));
+        }
+    }
+
+    /// <summary>
+    /// 感情リソースをDictionary形式で取得
+    /// </summary>
+    public Dictionary<EmotionType, int> GetEmotionResources()
+    {
+        var result = new Dictionary<EmotionType, int>();
+        foreach (var data in emotionResources)
+        {
+            result[data.emotionType] = data.amount;
+        }
+
+        // 不足している感情タイプがあればデフォルト値で補完
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            if (!result.ContainsKey(emotion))
+            {
+                result[emotion] = GameConstants.DEFAULT_EMOTION_VALUE;
+            }
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// デバッグ用：統計情報を文字列で取得
     /// </summary>
     public string GetStatsString()
     {
-        return $"Chapter: {currentChapter}, MentalPower: {currentMentalPower}";
+        var emotionStr = string.Join(", ", emotionResources.ConvertAll(e => $"{e.emotionType}:{e.amount}"));
+        return $"Chapter: {currentChapter}, Emotions: [{emotionStr}]";
     }
 }
