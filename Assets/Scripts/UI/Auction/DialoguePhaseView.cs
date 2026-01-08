@@ -15,6 +15,9 @@ public class DialoguePhaseView : MonoBehaviour
     [SerializeField] private Button choice2Button;
     [SerializeField] private TextMeshProUGUI choice2Label;
 
+    [Header("結果表示")]
+    [SerializeField] private TextMeshProUGUI resultText;
+
     public Observable<int> OnChoiceSelected => _onChoiceSelected;
 
     private readonly Subject<int> _onChoiceSelected = new();
@@ -28,6 +31,7 @@ public class DialoguePhaseView : MonoBehaviour
 
         choice1Label.text = label1;
         choice2Label.text = label2;
+        HideResult();
 
         choice1Button.OnClickAsObservable()
             .Subscribe(_ => _onChoiceSelected.OnNext(0))
@@ -36,6 +40,32 @@ public class DialoguePhaseView : MonoBehaviour
         choice2Button.OnClickAsObservable()
             .Subscribe(_ => _onChoiceSelected.OnNext(1))
             .AddTo(_disposables);
+    }
+
+    // 結果テキストを表示
+    public void ShowResult(string message)
+    {
+        if (resultText) resultText.text = message;
+    }
+
+    // 結果テキストを非表示
+    public void HideResult()
+    {
+        if (resultText) resultText.text = "";
+    }
+
+    // 選択肢ボタンを非表示（結果表示中）
+    public void HideChoices()
+    {
+        choice1Button.gameObject.SetActive(false);
+        choice2Button.gameObject.SetActive(false);
+    }
+
+    // 選択肢ボタンを表示
+    public void ShowChoices()
+    {
+        choice1Button.gameObject.SetActive(true);
+        choice2Button.gameObject.SetActive(true);
     }
 
     public void Show() => gameObject.SetActive(true);
