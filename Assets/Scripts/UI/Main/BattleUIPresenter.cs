@@ -108,11 +108,11 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         IReadOnlyList<CardModel> playerCards,
         IReadOnlyList<CardModel> enemyCards,
         BidModel playerBids,
-        EmotionType emotion,
-        int availableResource)
+        EmotionType initialEmotion,
+        IReadOnlyDictionary<EmotionType, int> emotionResources)
     {
         _auctionView.Show();
-        _auctionView.StartBidding(playerCards, enemyCards, playerBids, emotion, availableResource);
+        _auctionView.StartBidding(playerCards, enemyCards, playerBids, initialEmotion, emotionResources);
 
         await _auctionView.OnBiddingComplete.FirstAsync();
     }

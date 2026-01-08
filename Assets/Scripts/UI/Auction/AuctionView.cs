@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using R3;
@@ -15,6 +16,9 @@ public class AuctionView : MonoBehaviour
     [Header("入札UI")]
     [SerializeField] private BidPanelView bidPanelView;
 
+    [Header("感情リソース表示")]
+    [SerializeField] private EmotionResourceDisplayView emotionResourceDisplayView;
+
     [Header("結果表示")]
     [SerializeField] private CardBidInfoView cardBidInfoPrefab;
 
@@ -30,7 +34,8 @@ public class AuctionView : MonoBehaviour
     private CardModel _selectedCardModel;
     private BidModel _playerBids;
     private EmotionType _currentEmotion;
-    private int _totalAvailableResource;
+    private IReadOnlyDictionary<EmotionType, int> _emotionResources;
+    private Dictionary<EmotionType, int> _usedResources = new();
 
     // カード表示のみ（CardReveal用）
     public void ShowCards(
@@ -91,8 +96,6 @@ public class AuctionView : MonoBehaviour
             bidInfoView.HideResult();
             _cardBidInfoViews[cardView] = bidInfoView;
         }
-
-        bidPanelView.Hide();
     }
 
     // 入札フェーズ開始
@@ -100,8 +103,8 @@ public class AuctionView : MonoBehaviour
         IReadOnlyList<CardModel> playerCards,
         IReadOnlyList<CardModel> enemyCards,
         BidModel playerBids,
-        EmotionType emotion,
-        int availableResource)
+        EmotionType initialEmotion,
+        IReadOnlyDictionary<EmotionType, int> emotionResources)
     {
         // カードが未表示なら表示
         if (_cardViews.Count == 0)
@@ -119,12 +122,24 @@ public class AuctionView : MonoBehaviour
         }
 
         _playerBids = playerBids;
-        _currentEmotion = emotion;
-        _totalAvailableResource = availableResource;
+        _currentEmotion = initialEmotion;
+        _emotionResources = emotionResources;
 
-        // 入札パネルを表示
-        bidPanelView.Show();
-        bidPanelView.UpdateRemainingResource(availableResource);
+        // 使用リソース初期化
+        _usedResources.Clear();
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            _usedResources[emotion] = 0;
+        }
+
+        // 感情リソース表示を初期化
+        emotionResourceDisplayView.Initialize();
+        emotionResourceDisplayView.UpdateResources(emotionResources);
+        emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
+
+        // 入札パネルを初期化
+        bidPanelView.UpdateCurrentEmotion(_currentEmotion);
+        UpdateRemainingResourceDisplay();
 
         bidPanelView.OnIncrease
             .Subscribe(_ => OnIncreaseBid())
@@ -137,13 +152,16 @@ public class AuctionView : MonoBehaviour
         bidPanelView.OnConfirm
             .Subscribe(_ => OnConfirmBidding())
             .AddTo(_disposables);
+
+        bidPanelView.OnEmotionCycle
+            .Subscribe(_ => OnCycleEmotion())
+            .AddTo(_disposables);
     }
 
     // 入札対象カード公開演出（入札されたカードのみ表示）
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f)
     {
         DeselectCard();
-        bidPanelView.Hide();
 
         // 各カードの入札状態を入札額表示で表現
         foreach (var cardView in _cardViews)
@@ -188,7 +206,6 @@ public class AuctionView : MonoBehaviour
         }
 
         DeselectCard();
-        bidPanelView.Hide();
 
         // 結果を表示
         foreach (var result in results)
@@ -242,7 +259,6 @@ public class AuctionView : MonoBehaviour
         }
 
         DeselectCard();
-        bidPanelView.Hide();
 
         foreach (var result in results)
         {
@@ -362,35 +378,43 @@ public class AuctionView : MonoBehaviour
     {
         if (_selectedCardModel == null) return;
 
-        // 残りリソースをチェック
-        var usedResource = _playerBids.GetTotalBidAmount();
-        if (usedResource >= _totalAvailableResource) return;
+        // 現在の感情のリソース残量をチェック
+        var available = _emotionResources.TryGetValue(_currentEmotion, out var total) ? total : 0;
+        var used = _usedResources.TryGetValue(_currentEmotion, out var u) ? u : 0;
+        if (used >= available) return;
 
-        var currentBid = _playerBids.GetTotalBid(_selectedCardModel);
-        _playerBids.SetBid(_selectedCardModel, _currentEmotion, currentBid + 1);
+        // 現在の感情での入札を増加（複数感情対応のためAddBidを使用）
+        _playerBids.AddBid(_selectedCardModel, _currentEmotion, 1);
+        _usedResources[_currentEmotion] = used + 1;
 
         UpdateRemainingResourceDisplay();
-        UpdateCardBidInfoDisplay(_selectedCard, currentBid + 1);
+        UpdateCardBidInfoDisplay(_selectedCard);
     }
 
     private void OnDecreaseBid()
     {
         if (_selectedCardModel == null) return;
 
-        var currentBid = _playerBids.GetTotalBid(_selectedCardModel);
-        if (currentBid <= 0) return;
+        // 現在の感情での入札量を取得
+        var emotionBids = _playerBids.GetBidsByEmotion(_selectedCardModel);
+        var currentEmotionBid = emotionBids.TryGetValue(_currentEmotion, out var bid) ? bid : 0;
+        if (currentEmotionBid <= 0) return;
 
-        _playerBids.SetBid(_selectedCardModel, _currentEmotion, currentBid - 1);
+        // 現在の感情での入札を減少
+        _playerBids.AddBid(_selectedCardModel, _currentEmotion, -1);
+        var used = _usedResources.TryGetValue(_currentEmotion, out var u) ? u : 0;
+        _usedResources[_currentEmotion] = Math.Max(0, used - 1);
 
         UpdateRemainingResourceDisplay();
-        UpdateCardBidInfoDisplay(_selectedCard, currentBid - 1);
+        UpdateCardBidInfoDisplay(_selectedCard);
     }
 
-    private void UpdateCardBidInfoDisplay(CardView cardView, int playerBid)
+    private void UpdateCardBidInfoDisplay(CardView cardView)
     {
         if (_cardBidInfoViews.TryGetValue(cardView, out var bidInfoView))
         {
-            bidInfoView.ShowPlayerBidOnly(playerBid);
+            var emotionBids = _playerBids.GetBidsByEmotion(_cardViewToModel[cardView]);
+            bidInfoView.ShowPlayerBidsWithEmotion(emotionBids);
         }
     }
 
@@ -399,11 +423,37 @@ public class AuctionView : MonoBehaviour
         _onBiddingComplete.OnNext(Unit.Default);
     }
 
+    private void OnCycleEmotion()
+    {
+        _currentEmotion = GetNextEmotion(_currentEmotion);
+        bidPanelView.UpdateCurrentEmotion(_currentEmotion);
+        emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
+        UpdateRemainingResourceDisplay();
+    }
+
+    private EmotionType GetNextEmotion(EmotionType current)
+    {
+        var values = (EmotionType[])Enum.GetValues(typeof(EmotionType));
+        var currentIndex = Array.IndexOf(values, current);
+        return values[(currentIndex + 1) % values.Length];
+    }
+
     private void UpdateRemainingResourceDisplay()
     {
-        var usedResource = _playerBids.GetTotalBidAmount();
-        var remaining = _totalAvailableResource - usedResource;
+        // 現在の感情のリソース残量を計算
+        var available = _emotionResources.TryGetValue(_currentEmotion, out var total) ? total : 0;
+        var used = _usedResources.TryGetValue(_currentEmotion, out var u) ? u : 0;
+        var remaining = available - used;
         bidPanelView.UpdateRemainingResource(remaining);
+
+        // 全感情のリソース残量を更新
+        var currentResources = new Dictionary<EmotionType, int>();
+        foreach (var (emotion, originalAmount) in _emotionResources)
+        {
+            var usedAmount = _usedResources.TryGetValue(emotion, out var uAmount) ? uAmount : 0;
+            currentResources[emotion] = originalAmount - usedAmount;
+        }
+        emotionResourceDisplayView.UpdateResources(currentResources);
     }
 
     private void OnDestroy()
