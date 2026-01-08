@@ -71,4 +71,18 @@ public static class EmotionTypeExtensions
         EmotionType.Anticipation => "期待",
         _ => "不明"
     };
+
+    // 感情タイプに対応する薄い色調を取得（キャラクター染色用）
+    public static UnityEngine.Color GetTintColor(this EmotionType emotion) => emotion switch
+    {
+        EmotionType.Joy => new UnityEngine.Color(1f, 1f, 0.8f),
+        EmotionType.Trust => new UnityEngine.Color(0.8f, 1f, 0.8f),
+        EmotionType.Fear => new UnityEngine.Color(0.7f, 0.8f, 0.7f),
+        EmotionType.Surprise => new UnityEngine.Color(0.8f, 1f, 1f),
+        EmotionType.Sadness => new UnityEngine.Color(0.8f, 0.8f, 1f),
+        EmotionType.Disgust => new UnityEngine.Color(0.9f, 0.8f, 1f),
+        EmotionType.Anger => new UnityEngine.Color(1f, 0.8f, 0.8f),
+        EmotionType.Anticipation => new UnityEngine.Color(1f, 0.9f, 0.8f),
+        _ => UnityEngine.Color.white
+    };
 }
