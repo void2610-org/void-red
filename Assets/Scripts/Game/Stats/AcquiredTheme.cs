@@ -101,10 +101,9 @@ public class AcquiredTheme
     public IReadOnlyList<CardModel> AcquiredCards { get; }
 
     /// <summary>
-    /// 支配的な感情タイプ（勝利カードの入札から計算）
+    /// 支配的感情の計算結果（複合感情も考慮）
     /// </summary>
-    public EmotionType DominantEmotion =>
-        MemoryEmotionCalculator.CalculateFromCardInfoList(AllCardInfoList);
+    public DominantEmotionResult DominantEmotionResult => MemoryEmotionCalculator.CalculateWithCompoundFromCardInfoList(AllCardInfoList);
 
     /// <summary>
     /// 使用した感情リソース
@@ -122,10 +121,9 @@ public class AcquiredTheme
     public int LostCount => AllCardInfoList.Count - WonCount;
 
     /// <summary>
-    /// 獲得カード枚数に基づくテーマ名
-    /// カード枚数に応じて表示が変化する
+    /// テーマ名
     /// </summary>
-    public string ThemeName => GetThemeNameByCardCount();
+    public string ThemeName => Theme.Title;
 
     /// <summary>
     /// コンストラクタ
@@ -174,28 +172,5 @@ public class AcquiredTheme
             }
         }
         return result;
-    }
-
-    /// <summary>
-    /// カード枚数に応じたテーマ名を取得
-    /// 0枚: 「???」
-    /// 1枚: 「断片的な〇〇」
-    /// 2枚: 「曖昧な〇〇」
-    /// 3枚: 「鮮明な〇〇」
-    /// 4枚: 「完全な〇〇」
-    /// </summary>
-    private string GetThemeNameByCardCount()
-    {
-        var cardCount = AcquiredCards.Count;
-        var baseTitle = Theme?.Title ?? "記憶";
-
-        return cardCount switch
-        {
-            0 => "???",
-            1 => $"断片的な{baseTitle}",
-            2 => $"曖昧な{baseTitle}",
-            3 => $"鮮明な{baseTitle}",
-            _ => $"完全な{baseTitle}"
-        };
     }
 }

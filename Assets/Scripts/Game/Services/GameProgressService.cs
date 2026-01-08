@@ -228,6 +228,6 @@ public class GameProgressService
     {
         _repository.MemoryProgress.AddAcquiredTheme(theme);
         _repository.SaveAll();
-        Debug.Log($"[GameProgressService] 獲得テーマを記録: {theme.ThemeName} ({theme.AcquiredCards.Count}枚, 感情: {theme.DominantEmotion})");
+        Debug.Log($"[GameProgressService] 獲得テーマを記録: {theme.ThemeName} ({theme.AcquiredCards.Count}枚, 感情: {theme.DominantEmotionResult})");
     }
 }

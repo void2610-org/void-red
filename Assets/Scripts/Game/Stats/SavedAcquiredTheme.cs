@@ -50,6 +50,12 @@ public class SavedAcquiredTheme
         MemoryEmotionCalculator.CalculateFromSavedCardInfoList(cardInfoList);
 
     /// <summary>
+    /// 支配的感情の計算結果（複合感情も考慮）
+    /// </summary>
+    public DominantEmotionResult DominantEmotionResult =>
+        MemoryEmotionCalculator.CalculateWithCompoundFromSavedCardInfoList(cardInfoList);
+
+    /// <summary>
     /// 獲得したカードIDのリスト（互換性用）
     /// </summary>
     public IReadOnlyList<string> CardIds => cardInfoList

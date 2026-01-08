@@ -1,6 +1,8 @@
-using R3;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using R3;
 using VContainer.Unity;
 using UnityEngine;
 using Void2610.UnityTemplate;
@@ -310,7 +312,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         }
 
         // ランダムな入札対象を選択
-        var randomCard = bidTargets[Random.Range(0, bidTargets.Count)];
+        var randomCard = bidTargets[UnityEngine.Random.Range(0, bidTargets.Count)];
         var currentBid = target.Bids.GetTotalBid(randomCard);
         var cardName = randomCard.Data.CardName;
 
@@ -426,14 +428,99 @@ public class BattlePresenter: IStartable, ISceneInitializable
     // 記憶テーマを構成しキャラクターを表示する
     private async UniTask HandleMemoryGrowth()
     {
-        Debug.Log("[BattlePresenter] 記憶育成フェーズ（未実装）");
+        Debug.Log("[BattlePresenter] 記憶育成フェーズ開始");
 
-        // TODO: 記憶テーマの変化演出
-        // TODO: キャラクター表示
-        // TODO: 感情リソース反映
+        // 全カードの獲得情報を構築（入札がないカードは除外）
+        var allCardInfoList = BuildCardAcquisitionInfoList();
 
-        await UniTask.Delay(500);
+        // 入札されたカードがない場合はスキップ
+        if (allCardInfoList.Count == 0)
+        {
+            Debug.Log("[BattlePresenter] 入札カードなし - 記憶育成フェーズをスキップ");
+            await ChangeState(GameState.BattleEnd);
+            return;
+        }
+
+        // 使用した感情リソースを計算（プレイヤーの全入札から集計）
+        var usedEmotions = CalculateUsedEmotions();
+
+        // 獲得テーマを作成（全カード情報を含む、支配的感情は自動計算）
+        var acquiredTheme = new AcquiredTheme(
+            _currentTheme,
+            allCardInfoList,
+            usedEmotions);
+
+        Debug.Log($"[BattlePresenter] 支配的感情: {acquiredTheme.DominantEmotionResult}");
+
+        Debug.Log($"[BattlePresenter] 獲得テーマ作成: {acquiredTheme.ThemeName}");
+        Debug.Log($"[BattlePresenter] 勝利{acquiredTheme.WonCount}枚、敗北{acquiredTheme.LostCount}枚");
+
+        // セーブデータに記録
+        _gameProgressService.RecordAcquiredThemeAndSave(acquiredTheme);
+
+        // 全獲得テーマを取得
+        var allThemes = _gameProgressService.GetAcquiredThemes();
+        Debug.Log($"[BattlePresenter] 全獲得テーマ数: {allThemes.Count}");
+
+        // UIで記憶育成フェーズを表示
+        await _battleUIPresenter.ShowMemoryGrowthAsync(allThemes);
+
         await ChangeState(GameState.BattleEnd);
+    }
+
+    /// <summary>
+    /// 全カードの獲得情報リストを構築
+    /// </summary>
+    private List<CardAcquisitionInfo> BuildCardAcquisitionInfoList()
+    {
+        var result = new List<CardAcquisitionInfo>();
+
+        foreach (var card in _auctionCards)
+        {
+            var playerBids = _player.Bids.GetBidsByEmotion(card);
+            var enemyBids = _enemy.Bids.GetBidsByEmotion(card);
+
+            // どちらも入札していないカードは除外
+            if (playerBids.Count == 0 && enemyBids.Count == 0)
+                continue;
+
+            var playerValueRank = _player.ValueRanking.GetRanking(card);
+            var enemyValueRank = _enemy.ValueRanking.GetRanking(card);
+            var playerWon = _player.WonCards.Contains(card);
+
+            var cardInfo = new CardAcquisitionInfo(
+                card,
+                playerBids,
+                enemyBids,
+                playerValueRank,
+                enemyValueRank,
+                playerWon
+            );
+            result.Add(cardInfo);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 使用した感情リソースを計算（プレイヤーの全入札から集計）
+    /// </summary>
+    private Dictionary<EmotionType, int> CalculateUsedEmotions()
+    {
+        var result = new Dictionary<EmotionType, int>();
+
+        foreach (var card in _auctionCards)
+        {
+            var bidsByEmotion = _player.Bids.GetBidsByEmotion(card);
+            foreach (var kvp in bidsByEmotion)
+            {
+                if (!result.ContainsKey(kvp.Key))
+                    result[kvp.Key] = 0;
+                result[kvp.Key] += kvp.Value;
+            }
+        }
+
+        return result;
     }
 
     // === 終了 ===

@@ -61,8 +61,10 @@ public class MemoryThemeListItemView : MonoBehaviour
     {
         if (Theme == null) return;
 
+        // 複合感情も考慮した感情結果を取得
+        var emotionResult = Theme.DominantEmotionResult;
         themeText.text = $"{Theme.ThemeName}: {Theme.AcquiredCards.Count}枚";
-        emotionIcon.color = Theme.DominantEmotion.GetColor();
+        emotionIcon.color = emotionResult.GetColor();
     }
 
     private void Awake()
