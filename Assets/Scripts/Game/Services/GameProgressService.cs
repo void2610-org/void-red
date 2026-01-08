@@ -136,39 +136,6 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// デッキ情報を更新（CardModelから変換）
-    /// </summary>
-    public void UpdateDeckFromCardModels(IReadOnlyList<CardModel> cardModels)
-    {
-        _repository.UpdateDeckFromCardModels(cardModels);
-    }
-
-    /// <summary>
-    /// CardIdのリストからCardModelのリストに変換
-    /// </summary>
-    public List<CardModel> ConvertDeckToCardModels()
-    {
-        return _repository.ConvertDeckToCardModels();
-    }
-
-    /// <summary>
-    /// デッキ表示用の詳細情報を取得
-    /// </summary>
-    public List<CardData> GetDeckDisplayData()
-    {
-        var cardModels = ConvertDeckToCardModels();
-        return cardModels.Select(cm => cm.Data).ToList();
-    }
-
-    /// <summary>
-    /// デッキ表示用のCardModelリストを取得
-    /// </summary>
-    public List<CardModel> GetDeckCardModels()
-    {
-        return ConvertDeckToCardModels();
-    }
-
-    /// <summary>
     /// カード閲覧をリストで記録
     /// </summary>
     public void RecordCardViews(List<CardData> cardDataList)
@@ -200,15 +167,6 @@ public class GameProgressService
     public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
     {
         return _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-    }
-
-    /// <summary>
-    /// 新しいカードをプレイヤーのデッキに追加
-    /// </summary>
-    public void AddCardToDeck(CardModel cardModel)
-    {
-        _repository.PlayerProgress.Deck.Add(new SavedCard(cardModel));
-        Debug.Log($"[GameProgressService] カードをデッキに追加: {cardModel.Data.CardName}");
     }
 
     /// <summary>

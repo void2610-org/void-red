@@ -3,37 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// セーブ用カードデータ
-/// </summary>
-[Serializable]
-public class SavedCard
-{
-    public string cardId;      // CardDataのID
-    public string instanceId;   // インスタンスID
-    public bool isCollapsed;    // 崩壊状態
-    
-    public SavedCard(string cardId, string instanceId)
-    {
-        this.cardId = cardId;
-        this.instanceId = instanceId;
-    }
-    
-    public SavedCard(CardModel cardModel)
-    {
-        cardId = cardModel.Data.CardId;
-        instanceId = cardModel.InstanceId;
-    }
-}
-
-/// <summary>
 /// 全ゲーム情報を統合したセーブデータクラス
 /// </summary>
 [Serializable]
 public class GameSaveData
 {
-    [Header("基礎ゲームデータ")]
-    [SerializeField] private List<SavedCard> savedDeck = new();
-    
     [Header("ゲーム進行データ")]
     [SerializeField] private int currentStep = 0;
     [SerializeField] private List<string> resultKeys = new();
@@ -49,20 +23,10 @@ public class GameSaveData
     [SerializeField] private List<SavedAcquiredTheme> acquiredThemes = new();
 
     // プロパティ
-    public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
     public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
     public IReadOnlyList<SavedAcquiredTheme> AcquiredThemes => acquiredThemes;
-    
-    /// <summary>
-    /// デッキ情報を更新
-    /// </summary>
-    public void UpdateDeck(List<SavedCard> deck)
-    {
-        savedDeck.Clear();
-        savedDeck.AddRange(deck);
-    }
-    
+
     /// <summary>
     /// ゲーム進行情報を更新
     /// </summary>
@@ -176,6 +140,6 @@ public class GameSaveData
     /// </summary>
     public string GetDebugInfo()
     {
-        return $"Step: {currentStep}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
+        return $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
     }
 }

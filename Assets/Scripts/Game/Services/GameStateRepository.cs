@@ -64,9 +64,6 @@ public class GameStateRepository
         }
 
         // プレイヤー進行データのロード
-        PlayerProgress.Deck.Clear();
-        PlayerProgress.Deck.AddRange(loadedData.SavedDeck);
-
         PlayerProgress.ViewedCardIds.Clear();
         var viewedIds = loadedData.GetViewedCardIds();
         foreach (var id in viewedIds)
@@ -104,9 +101,6 @@ public class GameStateRepository
 
         // ストーリー進行データを設定
         saveData.UpdateGameProgress(StoryProgress.CurrentStep, StoryProgress.BattleResults);
-
-        // プレイヤー進行データを設定
-        saveData.UpdateDeck(PlayerProgress.Deck);
 
         // 閲覧済みカードをセーブデータに追加
         foreach (var cardId in PlayerProgress.ViewedCardIds)
@@ -149,46 +143,6 @@ public class GameStateRepository
         SaveAll();
 
         Debug.Log("[GameStateRepository] 全データを初期状態にリセット完了");
-    }
-
-    /// <summary>
-    /// CardModelsからデッキを更新
-    /// </summary>
-    public void UpdateDeckFromCardModels(IReadOnlyList<CardModel> cardModels)
-    {
-        PlayerProgress.Deck.Clear();
-        foreach (var cardModel in cardModels)
-        {
-            if (cardModel?.Data)
-            {
-                PlayerProgress.Deck.Add(new SavedCard(
-                    cardModel.Data.CardId,
-                    cardModel.InstanceId
-                ));
-            }
-        }
-    }
-
-    /// <summary>
-    /// デッキをCardModelsに変換
-    /// </summary>
-    public List<CardModel> ConvertDeckToCardModels()
-    {
-        var cardModels = new List<CardModel>();
-        foreach (var savedCard in PlayerProgress.Deck)
-        {
-            var cardData = _cardPoolService.GetCardById(savedCard.cardId);
-            if (cardData)
-            {
-                var cardModel = new CardModel(cardData, savedCard.instanceId);
-                cardModels.Add(cardModel);
-            }
-            else
-            {
-                Debug.LogWarning($"[GameStateRepository] カードID '{savedCard.cardId}' が見つかりませんでした");
-            }
-        }
-        return cardModels;
     }
 
     /// <summary>
