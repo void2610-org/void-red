@@ -22,13 +22,14 @@ public class MentalPowerEffectController : IStartable, IDisposable
     }
 
     /// <summary>
-    /// 初期化処理（精神力の購読開始）
+    /// 初期化処理
     /// </summary>
     public void Start()
     {
-        _player.MentalPower
-            .Subscribe(OnMentalPowerChanged)
-            .AddTo(_disposables);
+        // TODO: 感情リソースシステムに移行後、エフェクト制御を更新する
+        // _player.MentalPower
+        //     .Subscribe(OnMentalPowerChanged)
+        //     .AddTo(_disposables);
     }
 
     /// <summary>
@@ -37,7 +38,7 @@ public class MentalPowerEffectController : IStartable, IDisposable
     private void OnMentalPowerChanged(int mentalPower)
     {
         // 精神力割合を計算（0.0～1.0）
-        var ratio = mentalPower / (float)GameConstants.MAX_MENTAL_POWER;
+        var ratio = mentalPower / 7f;
         if (ratio > 0.7) return;
         
         var inverseRatio = 1f - ratio; // 精神力が低いほど大きい値
