@@ -7363,6 +7363,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 595253103}
     m_Modifications:
+    - target: {fileID: 3690083444705993025, guid: dd94d077750e543d98675192ad022861, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 4065174414166173868, guid: dd94d077750e543d98675192ad022861, type: 3}
       propertyPath: m_Name
       value: AuctionView
@@ -7446,6 +7450,10 @@ PrefabInstance:
     - target: {fileID: 6846512103505280209, guid: dd94d077750e543d98675192ad022861, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8918312952511633238, guid: dd94d077750e543d98675192ad022861, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 200
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

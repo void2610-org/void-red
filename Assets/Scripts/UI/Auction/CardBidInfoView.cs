@@ -69,20 +69,29 @@ public class CardBidInfoView : MonoBehaviour
         enemyBidText.text = enemyHasBid ? "?" : "";
     }
 
-    // 感情別入札を表示（主要感情の色で合計値を表示）
+    // 感情別入札を表示（TextMeshProのリッチテキストで色分け表示）
     public void ShowPlayerBidsWithEmotion(Dictionary<EmotionType, int> bids)
     {
-        var totalBid = bids.Values.Sum();
-        if (totalBid == 0)
+        var activeBids = bids.Where(kv => kv.Value > 0).ToList();
+
+        if (activeBids.Count == 0)
         {
             playerBidText.text = "";
             return;
         }
 
-        // 最も入札額が多い感情の色を使用
-        var primaryEmotion = bids.OrderByDescending(kv => kv.Value).First().Key;
-        playerBidText.text = $"{totalBid}";
-        playerBidText.color = primaryEmotion.GetColor();
+        // 入札量の多い順にソート
+        activeBids = activeBids.OrderByDescending(kv => kv.Value).ToList();
+
+        // リッチテキストで各感情の入札を色分け表示
+        var textParts = new List<string>();
+        foreach (var (emotion, amount) in activeBids)
+        {
+            var colorHex = ColorUtility.ToHtmlStringRGB(emotion.GetColor());
+            textParts.Add($"<color=#{colorHex}>{amount}</color>");
+        }
+
+        playerBidText.text = string.Join("+", textParts);
     }
 
     // 結果を表示（WIN/LOSE）
