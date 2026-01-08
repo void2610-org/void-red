@@ -15,38 +15,19 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     [Inject] private readonly GameProgressService _gameProgressService;
     [Inject] private readonly InputActionsProvider _inputActionsProvider;
     
-    public Observable<Unit> PlayButtonClicked => Observable.Merge(
-        _playButtonView.PlayButtonClicked,
-        _cardDetailView.PlayButtonClicked.Do(_ => _cardDetailView.Hide())
-    );
-    
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
     private readonly NarrationView _playerNarrationView;
     private readonly NarrationView _enemyNarrationView;
-    private readonly PlayButtonView _playButtonView;
-    private readonly PlayStyleView _playStyleView;
-    private readonly MentalBetView _mentalBetView;
-    private readonly MentalPowerView _playerMentalPowerView;
-    private readonly MentalPowerView _enemyMentalPowerView;
     private EnemyView _enemyView;
-    private readonly PersonalityLogButtonView _personalityLogButtonView;
-    private readonly ScoreView _scoreView;
-    private readonly ScoreResultView _scoreResultView;
     private readonly BlackOverlayView _blackOverlayView;
-    private readonly CardDetailButtonView _cardDetailButtonView;
-    private readonly CardDetailView _cardDetailView;
-    private readonly ThemeDetailView _themeDetailView;
-    private readonly BattleResultView _battleResultView;
-    private int _mentalBetValue = 1;
     private readonly CompositeDisposable _disposables = new ();
-    private readonly Player _player;
-    private readonly Enemy _enemy;
-    private bool _isEnemySpriteManualMode;
     private readonly TutorialPresenter _tutorialPresenter;
-    private readonly SceneTransitionManager _sceneTransitionManager;
     private ThemeData _currentTheme;
-    private readonly HandView _playerHandView;
+    private readonly ValueRankingView _valueRankingView;
+    private readonly AuctionView _auctionView;
+    private readonly DialoguePhaseView _dialoguePhaseView;
+    private readonly RewardPhaseView _rewardPhaseView;
     private BattlePresenter _battlePresenter;
 
     /// <summary>
@@ -64,80 +45,150 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _currentTheme = theme;
         await _themeView.DisplayThemeWithKeywords(theme, isMainTheme);
     }
-    
-    public async UniTask ShowThemeDetailAndWait()
-    {
-        _themeDetailView.ShowThemeDetail(_currentTheme);
-        await _themeDetailView.WaitForClose();
-    }
-
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
-    public void SetPlayButtonInteractable(bool interactable) => _playButtonView.SetInteractable(interactable);
-    public void SetCardDetailButtonInteractable(bool interactable) => _cardDetailButtonView.SetInteractable(interactable);
-    public int GetMentalBetValue() => _mentalBetValue;
 
     public void InitializeEnemy(EnemyData enemyData)
     {
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
-        _enemyMentalPowerView.SetCharacterIcon(enemyData.IconSprite, enemyData.FrameSprite);
     }
 
     public async UniTask ShowEnemy() => await _enemyView.Show();
     public async UniTask HideEnemy() => await _enemyView.Hide();
     public async UniTask ResetEnemyToDefault() 
     {
-        _isEnemySpriteManualMode = false; // 自動監視モードに戻す
         await _enemyView.ResetToDefaultSprite();
     }
     
     public async UniTask UpdateEnemySprite(CardAttribute attribute) 
     {
-        _isEnemySpriteManualMode = true; // 手動制御モードに切り替え
         await _enemyView.UpdateSpriteForAttribute(attribute);
     }
     
-    public async UniTask ShowScores(float playerScore, float enemyScore) => await _scoreView.ShowScores(playerScore, enemyScore);
-    public void ShowBattleResult(bool playerWon, int playerWins, int enemyWins, List<ThemeData> wonThemes) => _battleResultView.ShowBattleResult(playerWon, playerWins, enemyWins, wonThemes);
-    public async UniTask WaitForBattleResultClose() => await _battleResultView.WaitForUntilClose();
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
     public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
     public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
-    
-    /// <summary>
-    /// 精神ベットを増やす（InputSystem用の公開メソッド）
-    /// </summary>
-    public void IncrementMentalBet() => OnMentalBetChanged(1);
 
-    /// <summary>
-    /// 精神ベットを減らす（InputSystem用の公開メソッド）
-    /// </summary>
-    public void DecrementMentalBet() => OnMentalBetChanged(-1);
-
-    public BattleUIPresenter(Player player, Enemy enemy, AllTutorialData allTutorialData, SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
+    // 価値順位設定UIを表示し、完了を待機
+    public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync(IReadOnlyList<CardModel> cards)
     {
-        _player = player;
-        _enemy = enemy;
-        _sceneTransitionManager = sceneTransitionManager;
+        _valueRankingView.Show();
+        _valueRankingView.StartRanking(cards);
 
+        // 完了を待機
+        await _valueRankingView.OnRankingComplete.FirstAsync();
+
+        var result = _valueRankingView.GetRankedCards();
+        _valueRankingView.Hide();
+
+        return result;
+    }
+
+    // カード公開（CardRevealフェーズ）
+    public void ShowAuctionCards(
+        IReadOnlyList<CardModel> playerCards,
+        IReadOnlyList<CardModel> enemyCards,
+        ValueRankingModel playerRanking = null)
+    {
+        _auctionView.Show();
+        _auctionView.ShowCards(playerCards, enemyCards, playerRanking);
+    }
+
+    // AuctionViewを表示（カードは再生成しない）
+    public void ShowAuctionView()
+    {
+        _auctionView.Show();
+    }
+
+    // 入札待機（BiddingPhaseフェーズ）
+    public async UniTask WaitForBiddingAsync(
+        IReadOnlyList<CardModel> playerCards,
+        IReadOnlyList<CardModel> enemyCards,
+        BidModel playerBids,
+        EmotionType emotion,
+        int availableResource)
+    {
+        _auctionView.Show();
+        _auctionView.StartBidding(playerCards, enemyCards, playerBids, emotion, availableResource);
+
+        await _auctionView.OnBiddingComplete.FirstAsync();
+    }
+
+    // 結果表示（AuctionResultフェーズ）
+    public void ShowAuctionResults(IReadOnlyList<AuctionJudge.AuctionResultEntry> results)
+    {
+        _auctionView.ShowResults(results);
+    }
+
+    // 順次結果表示（各カードごとにアニメーション付き）
+    public async UniTask ShowAuctionResultsSequentialAsync(
+        IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
+        ValueRankingModel playerRanking,
+        ValueRankingModel enemyRanking)
+    {
+        await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking);
+    }
+
+    // 入札対象カード公開演出
+    public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f)
+    {
+        await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
+    }
+
+    // 全カードを再表示
+    public void ShowAllAuctionCards()
+    {
+        _auctionView.ShowAllCards();
+    }
+
+    // オークションView非表示
+    public void HideAuctionView()
+    {
+        _auctionView.Hide();
+    }
+
+    // AuctionViewをクリアして非表示
+    public void ClearAuctionView()
+    {
+        _auctionView.Clear();
+        _auctionView.Hide();
+    }
+
+    // 対話フェーズ：選択肢を表示し、選択を待機（0 or 1を返す）
+    public async UniTask<int> WaitForDialogueChoiceAsync(string label1, string label2)
+    {
+        _dialoguePhaseView.Setup(label1, label2);
+        _dialoguePhaseView.Show();
+
+        var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
+
+        _dialoguePhaseView.Hide();
+
+        return selectedIndex;
+    }
+
+    // 報酬フェーズ：報酬計算結果を表示
+    public async UniTask ShowRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results)
+    {
+        await _rewardPhaseView.ShowRewardsAsync(results);
+    }
+
+    // 報酬フェーズを非表示
+    public void HideRewardView()
+    {
+        _rewardPhaseView.Hide();
+    }
+
+    public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
+    {
         // 初期化
         _themeView = Object.FindFirstObjectByType<ThemeView>();
         _announcementView = Object.FindFirstObjectByType<AnnouncementView>();
-        _playButtonView = Object.FindFirstObjectByType<PlayButtonView>();
-        _playStyleView = Object.FindFirstObjectByType<PlayStyleView>();
-        _mentalBetView = Object.FindFirstObjectByType<MentalBetView>();
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
-        _personalityLogButtonView = Object.FindFirstObjectByType<PersonalityLogButtonView>();
-        _scoreView = Object.FindFirstObjectByType<ScoreView>();
-        _scoreResultView = Object.FindFirstObjectByType<ScoreResultView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
-        _cardDetailButtonView = Object.FindFirstObjectByType<CardDetailButtonView>();
-        _cardDetailView = Object.FindFirstObjectByType<CardDetailView>();
-        _themeDetailView = Object.FindFirstObjectByType<ThemeDetailView>();
-        _battleResultView = Object.FindFirstObjectByType<BattleResultView>();
 
         // 複数のViewを取得して、プレイヤー用と敵用を区別
         // Y座標が低い方をプレイヤー、高い方を敵とする
@@ -145,80 +196,23 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _playerNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
         _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
 
-        var mentalPowerViews = Object.FindObjectsByType<MentalPowerView>(FindObjectsSortMode.None);
-        _playerMentalPowerView = mentalPowerViews[0].transform.position.y < mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
-        _enemyMentalPowerView = mentalPowerViews[0].transform.position.y > mentalPowerViews[1].transform.position.y ? mentalPowerViews[0] : mentalPowerViews[1];
-        
-        var handViews = Object.FindObjectsByType<HandView>(FindObjectsSortMode.None);
-        _playerHandView = handViews[0].transform.position.y < handViews[1].transform.position.y ? handViews[0] : handViews[1];
+        _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
+        _valueRankingView.Hide();
 
-        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, _player);
-    }
-    
-    private void OnMentalBetChanged(int delta)
-    {
-        var newValue = _mentalBetValue + delta;
-        // 範囲チェック
-        if (newValue < GameConstants.MIN_MENTAL_BET || newValue > GameConstants.MAX_MENTAL_BET) return;
-        _mentalBetValue = newValue;
-        UpdateMentalBetDisplay();
-    }
-    
-    private void UpdateMentalBetDisplay()
-    {
-        var currentMentalPower = _player.MentalPower.CurrentValue;
+        _auctionView = Object.FindFirstObjectByType<AuctionView>();
+        _auctionView.Hide();
 
-        // 現在のベット値が精神力を超えている場合や最小値を下回る場合は調整
-        if (_mentalBetValue > currentMentalPower)
-            _mentalBetValue = currentMentalPower;
-        if (_mentalBetValue < GameConstants.MIN_MENTAL_BET)
-            _mentalBetValue = GameConstants.MIN_MENTAL_BET;
+        _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>();
+        _dialoguePhaseView.Hide();
 
-        // MentalBetViewに表示を委譲
-        _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, GameConstants.MIN_MENTAL_BET, GameConstants.MAX_MENTAL_BET);
-        // MentalPowerViewに精神力表示を委譲
-        _playerMentalPowerView.UpdateDisplay(currentMentalPower, GameConstants.MAX_MENTAL_POWER);
-    }
+        _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
+        _rewardPhaseView.Hide();
 
-    /// <summary>
-    /// 選択されたカードのUIEffectsを更新
-    /// </summary>
-    private void UpdateCardVisual(CardModel cardModel, int selectedIndex, float score)
-    {
-        if (_currentTheme == null) return;
-        
-        // HandViewのメソッドを使用して色を更新
-        // _playerHandView.UpdateCardVisual(selectedIndex, collapseChance, score);
-    }
-    
-    /// <summary>
-    /// 全カードの崩壊ビジュアルをリセット
-    /// </summary>
-    private void ResetAllCardCollapseVisuals()
-    {
-        _playerHandView.ResetAllCardVisuals();
-    }
-    
-    private void SetupViewEvents()
-    {
-        // 精神ベット変更イベント
-        _mentalBetView.MentalBetChanged.Subscribe(OnMentalBetChanged).AddTo(_disposables);
-        // プレイヤーの精神力変化を監視
-        _player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(_disposables);
-        // 敵の精神力変化を監視
-        _enemy.MentalPower.Subscribe(mentalPower =>
-            _enemyMentalPowerView.UpdateDisplay(mentalPower, GameConstants.MAX_MENTAL_POWER)
-        ).AddTo(_disposables);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
     }
     
     public void Start()
     {
-        // Viewイベントの設定
-        SetupViewEvents();
-
-        // 初期表示の更新
-        UpdateMentalBetDisplay();
-
         // ルートボタンを初期選択
         SafeNavigationManager.SelectRootForceSelectable().Forget();
     }

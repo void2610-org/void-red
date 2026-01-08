@@ -1,70 +1,80 @@
-using R3;
 using System;
+using System.Collections.Generic;
 
 /// <summary>
-/// プレイヤーとNPCの基底プレゼンタークラス（Presenter Layer）
-/// カード管理・UI制御・ゲームロジックを統合
+/// プレイヤーとNPCの基底プレゼンタークラス
+/// 感情リソース管理とオークション関連データを統合
 /// </summary>
 public abstract class PlayerPresenter : IDisposable
 {
-    // 公開プロパティ
-    public ReadOnlyReactiveProperty<int> MentalPower => _playerModel.MentalPower;
-    
-    // プライベートフィールド
+    // === 公開プロパティ ===
+
+    public IReadOnlyDictionary<EmotionType, int> EmotionResources => _playerModel.EmotionResources;
+    public IReadOnlyList<CardModel> Cards => _cards;
+    public ValueRankingModel ValueRanking => _valueRanking;
+    public BidModel Bids => _bids;
+    public IReadOnlyList<CardModel> WonCards => _wonCards;
+
+    // === プライベートフィールド ===
+
     private readonly PlayerModel _playerModel;
     private readonly GameProgressService _gameProgressService;
-    
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="gameProgressService">ゲーム進行サービス（オプショナル）</param>
+
+    private readonly List<CardModel> _cards = new();
+    private readonly ValueRankingModel _valueRanking = new();
+    private readonly BidModel _bids = new();
+    private readonly List<CardModel> _wonCards = new();
+
     protected PlayerPresenter(GameProgressService gameProgressService = null)
     {
         _playerModel = new PlayerModel();
         _gameProgressService = gameProgressService;
     }
-    
-    // === 精神力管理 ===
-    
-    /// <summary>
-    /// 精神力を消費
-    /// </summary>
-    /// <param name="amount">消費量</param>
-    /// <returns>消費に成功したかどうか</returns>
-    public bool ConsumeMentalPower(int amount) => _playerModel.TryConsumeMentalPower(amount);
-    
-    /// <summary>
-    /// 精神力を回復
-    /// </summary>
-    /// <param name="amount">回復量</param>
-    public void RestoreMentalPower(int amount) => _playerModel.RestoreMentalPower(amount);
-    
-    /// <summary>
-    /// 精神力が足りるかチェック
-    /// </summary>
-    /// <param name="requiredAmount">必要な精神力</param>
-    /// <returns>足りるかどうか</returns>
-    public bool HasEnoughMentalPower(int requiredAmount) => _playerModel.MentalPower.CurrentValue >= requiredAmount;
-    
-    /// <summary>
-    /// 精神力を設定
-    /// </summary>
-    /// <param name="value">設定する精神力</param>
-    public void SetMentalPower(int value) => _playerModel.SetMentalPower(value);
-    
-    /// <summary>
-    /// プレイヤーの状態をリセット
-    /// </summary>
+
+    // === 感情リソース管理 ===
+
+    public bool TryConsumeEmotion(EmotionType emotion, int amount)
+        => _playerModel.TryConsumeEmotion(emotion, amount);
+
+    public void AddEmotion(EmotionType emotion, int amount)
+        => _playerModel.AddEmotion(emotion, amount);
+
+    public int GetEmotionAmount(EmotionType emotion)
+        => _playerModel.GetEmotionAmount(emotion);
+
+    // === カード管理 ===
+
+    public void SetCards(IEnumerable<CardData> cardDataList)
+    {
+        _cards.Clear();
+        foreach (var cardData in cardDataList)
+        {
+            _cards.Add(new CardModel(cardData));
+        }
+    }
+
+    public void AddWonCard(CardModel card) => _wonCards.Add(card);
+
+    public void ClearWonCards() => _wonCards.Clear();
+
+    // === 状態管理 ===
+
+    public virtual void InitializeAuctionData()
+    {
+        _cards.Clear();
+        _valueRanking.Clear();
+        _bids.Clear();
+        _wonCards.Clear();
+    }
+
     public void ResetPlayerState()
     {
-        _playerModel.SetMentalPower(GameConstants.MAX_MENTAL_POWER);
+        _playerModel.ResetEmotionResources();
+        InitializeAuctionData();
     }
-    
-    /// <summary>
-    /// リソースの解放
-    /// </summary>
+
     public virtual void Dispose()
     {
-        _playerModel?.Dispose();
+        _playerModel.Dispose();
     }
 }
