@@ -7,8 +7,14 @@ using UnityEngine;
 public class ThemeData : ScriptableObject
 {
     [Header("テーマ情報")]
+    [SerializeField] private string themeId;
     [SerializeField] private string title;
     [TextArea(2, 4)] [SerializeField] private string description;
+
+    /// <summary>
+    /// テーマの一意ID
+    /// </summary>
+    public string ThemeId => themeId;
 
     public string Title => title;
     public string Description => description;

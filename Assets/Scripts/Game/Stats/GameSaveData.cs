@@ -44,11 +44,15 @@ public class GameSaveData
     
     [Header("ノベル選択結果")]
     [SerializeField] private List<NovelChoiceResult> novelChoiceResults = new();
-    
+
+    [Header("獲得記憶テーマ")]
+    [SerializeField] private List<SavedAcquiredTheme> acquiredThemes = new();
+
     // プロパティ
     public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
     public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
+    public IReadOnlyList<SavedAcquiredTheme> AcquiredThemes => acquiredThemes;
     
     /// <summary>
     /// デッキ情報を更新
@@ -147,12 +151,31 @@ public class GameSaveData
     {
         return new List<NovelChoiceResult>(novelChoiceResults);
     }
-    
+
+    /// <summary>
+    /// 獲得テーマを追加
+    /// </summary>
+    /// <param name="theme">追加する獲得テーマ</param>
+    public void AddAcquiredTheme(SavedAcquiredTheme theme)
+    {
+        acquiredThemes.Add(theme);
+    }
+
+    /// <summary>
+    /// 獲得テーマリストを更新
+    /// </summary>
+    /// <param name="themes">獲得テーマリスト</param>
+    public void UpdateAcquiredThemes(IEnumerable<SavedAcquiredTheme> themes)
+    {
+        acquiredThemes.Clear();
+        acquiredThemes.AddRange(themes);
+    }
+
     /// <summary>
     /// デバッグ用情報文字列
     /// </summary>
     public string GetDebugInfo()
     {
-        return $"Step: {currentStep}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}";
+        return $"Step: {currentStep}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
     }
 }
