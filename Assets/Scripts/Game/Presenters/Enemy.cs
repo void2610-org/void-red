@@ -37,41 +37,18 @@ public class Enemy : PlayerPresenter
         var totalResource = GetEmotionAmount(emotion);
         if (auctionCards.Count == 0 || totalResource <= 0) return;
 
-        // 価値順位に応じて配分（順位1に最も多く、順位4に最も少なく）
-        var totalWeight = 0;
-        var weights = new Dictionary<CardModel, int>();
-
-        foreach (var card in auctionCards)
-        {
-            var rank = ValueRanking.GetRanking(card);
-            if (rank == 0) continue;
-
-            var weight = GameConstants.CARDS_PER_PLAYER - rank + 1;
-            weights[card] = weight;
-            totalWeight += weight;
-        }
-
-        if (totalWeight == 0) return;
-
-        // 重みに応じてリソースを配分
+        // 8枚のカードからランダムに選んで入札
+        var shuffledCards = auctionCards.OrderBy(_ => UnityEngine.Random.value).ToList();
         var remaining = totalResource;
-        var cardList = weights.Keys.ToList();
 
-        for (var i = 0; i < cardList.Count; i++)
+        foreach (var card in shuffledCards)
         {
-            var card = cardList[i];
-            var weight = weights[card];
+            if (remaining <= 0) break;
 
-            int amount;
-            if (i == cardList.Count - 1)
-            {
-                amount = remaining;
-            }
-            else
-            {
-                amount = (int)((float)totalResource * weight / totalWeight);
-                amount = System.Math.Min(amount, remaining);
-            }
+            // ランダムな入札額（1〜残りリソースの半分程度）
+            var maxBid = System.Math.Max(1, remaining / 2);
+            var amount = UnityEngine.Random.Range(1, maxBid + 1);
+            amount = System.Math.Min(amount, remaining);
 
             if (amount > 0)
             {
