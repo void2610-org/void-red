@@ -82,6 +82,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         await _valueRankingView.OnRankingComplete.FirstAsync();
 
         var result = _valueRankingView.GetRankedCards();
+
+        // 少し待ってから次のフェーズへ
+        await UniTask.Delay(1000);
+
         _valueRankingView.Hide();
 
         return result;
