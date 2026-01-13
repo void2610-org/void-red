@@ -209,6 +209,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results)
     {
         await _rewardPhaseView.ShowRewardsAsync(results);
+        await _rewardPhaseView.WaitForNextAsync();
     }
 
     // 報酬フェーズを非表示
