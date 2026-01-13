@@ -162,12 +162,29 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _auctionView.Hide();
     }
 
-    // 対話フェーズ：選択肢を表示し、選択を待機（0 or 1を返す）
-    public async UniTask<int> WaitForDialogueChoiceAsync(string label1, string label2)
+    public async UniTask<DialogueChoiceType> WaitForFourChoiceAsync()
     {
-        _dialoguePhaseView.Setup(label1, label2);
-        _dialoguePhaseView.ShowChoices();
+        var labels = new List<string>
+        {
+            DialogueChoiceType.Provoke.ToJapaneseName(),
+            DialogueChoiceType.Empathize.ToJapaneseName(),
+            DialogueChoiceType.Persuade.ToJapaneseName(),
+            DialogueChoiceType.Silence.ToJapaneseName()
+        };
+
+        _dialoguePhaseView.SetupChoices(labels);
         _dialoguePhaseView.Show();
+
+        var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
+
+        _dialoguePhaseView.HideChoices();
+
+        return (DialogueChoiceType)selectedIndex;
+    }
+
+    public async UniTask<int> WaitForThreeResponseAsync(List<string> options)
+    {
+        _dialoguePhaseView.SetupChoices(options);
 
         var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
 
@@ -176,15 +193,15 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         return selectedIndex;
     }
 
-    // 対話フェーズ：結果を表示
-    public void ShowDialogueResult(string message)
-    {
-        _dialoguePhaseView.ShowResult(message);
-    }
+    public void ShowEnemyDialogue(string text) => _dialoguePhaseView.ShowDialogueText(text);
+    public void HideEnemyDialogue() => _dialoguePhaseView.HideDialogueText();
+    public void ShowDialogueResult(string message) => _dialoguePhaseView.ShowResult(message);
+    public void HideDialogueResult() => _dialoguePhaseView.HideResult();
+    public void ShowDialogueView() => _dialoguePhaseView.Show();
 
-    // 対話フェーズ：Viewを非表示
     public void HideDialogueView()
     {
+        _dialoguePhaseView.HideAll();
         _dialoguePhaseView.Hide();
     }
 

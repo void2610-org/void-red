@@ -20,15 +20,11 @@ public class EnemyData : ScriptableObject
     [Header("属性別画像")]
     [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
 
-    [Header("対話データ")]
-    [SerializeField] private EnemyDialogueData dialogueData;
-
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
     public Sprite DefaultSprite => defaultSprite;
     public Sprite IconSprite => iconSprite;
     public Sprite FrameSprite => frameSprite;
-    public EnemyDialogueData DialogueData => dialogueData;
     
     /// <summary>
     /// 指定された属性に対応するSpriteを取得

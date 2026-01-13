@@ -22,8 +22,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
     private AuctionData _currentAuctionData;
-
-    // 場に並んだ全カード（8枚）
     private readonly List<CardModel> _auctionCards = new();
 
     private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
@@ -279,60 +277,55 @@ public class BattlePresenter: IStartable, ISceneInitializable
 
     // === 3. 対話フェーズ ===
 
-    // 対話による揺さぶり
     private async UniTask HandleDialoguePhase()
     {
-        Debug.Log("[BattlePresenter] 対話フェーズ開始");
-
-        // AuctionViewを非表示にする
         _battleUIPresenter.HideAuctionView();
 
-        // プレイヤーの選択を待機（固定の選択肢）
-        var selectedIndex = await _battleUIPresenter.WaitForDialogueChoiceAsync("挑発", "説得");
-        Debug.Log($"[BattlePresenter] 選択: {(selectedIndex == 0 ? "挑発" : "説得")}");
+        var dialogueData = _currentAuctionData.DialogueData;
 
-        // 効果を適用（敵の入札に影響）し、結果メッセージを取得
-        var resultMessage = ApplyDialogueEffect(selectedIndex, _enemy);
+        var playerFirstChoice = await HandlePlayerFirstTurn(dialogueData);
+        await UniTask.Delay(1500);
+        _battleUIPresenter.HideDialogueResult();
 
-        // 結果を表示
-        _battleUIPresenter.ShowDialogueResult(resultMessage);
+        await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
 
         await UniTask.Delay(2000);
         _battleUIPresenter.HideDialogueView();
         await ChangeState(GameState.AuctionResult);
     }
 
-    // 対話効果を適用し、結果メッセージを返す
-    private string ApplyDialogueEffect(int selectedIndex, PlayerPresenter target)
+    private async UniTask<DialogueChoiceType> HandlePlayerFirstTurn(EnemyDialogueData dialogueData)
     {
-        var bidTargets = target.Bids.GetBidTargets();
-        if (bidTargets.Count == 0)
-        {
-            return "相手は入札していない...";
-        }
+        _battleUIPresenter.ShowDialogueView();
+        var playerChoice = await _battleUIPresenter.WaitForFourChoiceAsync();
 
-        // ランダムな入札対象を選択
-        var randomCard = bidTargets[UnityEngine.Random.Range(0, bidTargets.Count)];
-        var currentBid = target.Bids.GetTotalBid(randomCard);
-        var cardName = randomCard.Data.CardName;
+        var response = dialogueData.GetResponse(playerChoice);
+        _battleUIPresenter.ShowEnemyDialogue(response.DialogueText);
+        await UniTask.Delay(1000);
 
-        // 選択肢による効果（0: 挑発=入札増加、1: 説得=入札減少）
-        if (selectedIndex == 0)
-        {
-            // 挑発: 敵の入札を増加
-            var newBid = currentBid + 2;
-            target.Bids.SetBid(randomCard, EmotionType.Joy, newBid);
-            Debug.Log($"[BattlePresenter] 敵の入札増加: {cardName} ({currentBid} -> {newBid})");
-            return $"相手は挑発に乗った！\n「{cardName}」への入札が {currentBid} → {newBid} に増加";
-        }
-        else
-        {
-            // 説得: 敵の入札を減少
-            var newBid = Mathf.Max(0, currentBid - 2);
-            target.Bids.SetBid(randomCard, EmotionType.Joy, newBid);
-            Debug.Log($"[BattlePresenter] 敵の入札減少: {cardName} ({currentBid} -> {newBid})");
-            return $"説得が効いた！\n「{cardName}」への入札が {currentBid} → {newBid} に減少";
-        }
+        var resultMessage = DialogueEffectApplier.ApplyEffect(response.Effect, _enemy, _auctionCards);
+        _battleUIPresenter.ShowDialogueResult(resultMessage);
+
+        return playerChoice;
+    }
+
+    private async UniTask HandleEnemyFirstTurn(EnemyDialogueData dialogueData, DialogueChoiceType playerFirstChoice)
+    {
+        var initiation = dialogueData.GetInitiation(playerFirstChoice);
+
+        _battleUIPresenter.HideEnemyDialogue();
+        _battleUIPresenter.HideDialogueResult();
+        await UniTask.Delay(500);
+
+        _battleUIPresenter.ShowEnemyDialogue(initiation.EnemyDialogueText);
+        await UniTask.Delay(1000);
+
+        var options = initiation.PlayerOptions.Select(o => o.OptionText).ToList();
+        var selectedIndex = await _battleUIPresenter.WaitForThreeResponseAsync(options);
+
+        var selectedOption = initiation.PlayerOptions[selectedIndex];
+        var resultMessage = DialogueEffectApplier.ApplyEffect(selectedOption.Effect, _player, _auctionCards);
+        _battleUIPresenter.ShowDialogueResult(selectedOption.ResultText + "\n" + resultMessage);
     }
 
     // === 4. 落札者判定フェーズ ===
