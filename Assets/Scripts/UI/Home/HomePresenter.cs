@@ -51,10 +51,6 @@ public class HomePresenter : IStartable, IDisposable
             .Subscribe(_ => StartCurrentNodeAsync().Forget())
             .AddTo(_disposables);
 
-        _homeView.DeckButtonClicked
-            .Subscribe(_ => ShowDeckData())
-            .AddTo(_disposables);
-
         _homeView.LibraryButtonClicked
             .Subscribe(_ => ShowCardLibrary())
             .AddTo(_disposables);
@@ -120,15 +116,6 @@ public class HomePresenter : IStartable, IDisposable
 
         // ノベルシーンに遷移（シナリオ情報はGameProgressServiceから取得）
         await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Novel);
-    }
-
-    /// <summary>
-    /// デッキデータを表示
-    /// </summary>
-    private void ShowDeckData()
-    {
-        var cardModels = _gameProgressService.GetDeckCardModels();
-        _homeView.ShowDeckData(cardModels);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Void2610.UnityTemplate;
 
@@ -12,10 +13,20 @@ using Void2610.UnityTemplate;
 public class AllThemeData : ScriptableObject
 {
     [SerializeField] private List<ThemeData> themeList = new ();
-    
+
     // プロパティ
     public List<ThemeData> ThemeList => themeList;
-    
+
+    /// <summary>
+    /// IDからテーマを取得
+    /// </summary>
+    /// <param name="themeId">テーマID</param>
+    /// <returns>該当するThemeData、見つからない場合はnull</returns>
+    public ThemeData GetThemeById(string themeId)
+    {
+        return themeList.FirstOrDefault(theme => theme.ThemeId == themeId);
+    }
+
     /// <summary>
     /// 同じディレクトリ内の全てのThemeDataを自動的に登録
     /// </summary>

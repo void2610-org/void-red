@@ -28,6 +28,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly AuctionView _auctionView;
     private readonly DialoguePhaseView _dialoguePhaseView;
     private readonly RewardPhaseView _rewardPhaseView;
+    private readonly MemoryGrowthView _memoryGrowthView;
     private BattlePresenter _battlePresenter;
 
     /// <summary>
@@ -82,6 +83,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         await _valueRankingView.OnRankingComplete.FirstAsync();
 
         var result = _valueRankingView.GetRankedCards();
+
+        // 少し待ってから次のフェーズへ
+        await UniTask.Delay(1000);
+
         _valueRankingView.Hide();
 
         return result;
@@ -221,6 +226,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
         _rewardPhaseView.Hide();
 
+        _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
+        _memoryGrowthView?.Hide();
+
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
     }
     
@@ -228,6 +236,17 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         // ルートボタンを初期選択
         SafeNavigationManager.SelectRootForceSelectable().Forget();
+    }
+
+    /// <summary>
+    /// 記憶育成フェーズを表示
+    /// </summary>
+    /// <param name="allThemes">全獲得テーマリスト</param>
+    public async UniTask ShowMemoryGrowthAsync(IReadOnlyList<AcquiredTheme> allThemes)
+    {
+        _memoryGrowthView.ShowMemoryGrowth(allThemes);
+        await _memoryGrowthView.WaitForContinueAsync();
+        _memoryGrowthView.Hide();
     }
 
     public void Dispose()

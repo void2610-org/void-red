@@ -296,9 +296,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
         await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
-
-        // カードをデッキに追加（セーブはシナリオ完了時にまとめて実行）
-        _gameProgressService.AddCardToDeck(cardModel);
     }
 
     /// <summary>
@@ -410,13 +407,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     private async UniTask OnDialogCompleted()
     {
         // プロローグ終了後に初期デッキを受け取る
-        if (_currentScenarioId == "prologue1")
-        {
-            var deck = _cardPoolService.GetRandomCards(5);
-            foreach (var card in deck)
-                _gameProgressService.AddCardToDeck(new CardModel(card));
-        }
-        
         // エンディング終了後にSteamストアページを開く
         if (_currentScenarioId == "ending")
             Application.OpenURL("https://store.steampowered.com/app/3997140/");

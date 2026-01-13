@@ -3,37 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// セーブ用カードデータ
-/// </summary>
-[Serializable]
-public class SavedCard
-{
-    public string cardId;      // CardDataのID
-    public string instanceId;   // インスタンスID
-    public bool isCollapsed;    // 崩壊状態
-    
-    public SavedCard(string cardId, string instanceId)
-    {
-        this.cardId = cardId;
-        this.instanceId = instanceId;
-    }
-    
-    public SavedCard(CardModel cardModel)
-    {
-        cardId = cardModel.Data.CardId;
-        instanceId = cardModel.InstanceId;
-    }
-}
-
-/// <summary>
 /// 全ゲーム情報を統合したセーブデータクラス
 /// </summary>
 [Serializable]
 public class GameSaveData
 {
-    [Header("基礎ゲームデータ")]
-    [SerializeField] private List<SavedCard> savedDeck = new();
-    
     [Header("ゲーム進行データ")]
     [SerializeField] private int currentStep = 0;
     [SerializeField] private List<string> resultKeys = new();
@@ -44,21 +18,15 @@ public class GameSaveData
     
     [Header("ノベル選択結果")]
     [SerializeField] private List<NovelChoiceResult> novelChoiceResults = new();
-    
+
+    [Header("獲得記憶テーマ")]
+    [SerializeField] private List<SavedAcquiredTheme> acquiredThemes = new();
+
     // プロパティ
-    public List<SavedCard> SavedDeck => savedDeck;
     public int CurrentStep => currentStep;
     public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
-    
-    /// <summary>
-    /// デッキ情報を更新
-    /// </summary>
-    public void UpdateDeck(List<SavedCard> deck)
-    {
-        savedDeck.Clear();
-        savedDeck.AddRange(deck);
-    }
-    
+    public IReadOnlyList<SavedAcquiredTheme> AcquiredThemes => acquiredThemes;
+
     /// <summary>
     /// ゲーム進行情報を更新
     /// </summary>
@@ -147,12 +115,31 @@ public class GameSaveData
     {
         return new List<NovelChoiceResult>(novelChoiceResults);
     }
-    
+
+    /// <summary>
+    /// 獲得テーマを追加
+    /// </summary>
+    /// <param name="theme">追加する獲得テーマ</param>
+    public void AddAcquiredTheme(SavedAcquiredTheme theme)
+    {
+        acquiredThemes.Add(theme);
+    }
+
+    /// <summary>
+    /// 獲得テーマリストを更新
+    /// </summary>
+    /// <param name="themes">獲得テーマリスト</param>
+    public void UpdateAcquiredThemes(IEnumerable<SavedAcquiredTheme> themes)
+    {
+        acquiredThemes.Clear();
+        acquiredThemes.AddRange(themes);
+    }
+
     /// <summary>
     /// デバッグ用情報文字列
     /// </summary>
     public string GetDebugInfo()
     {
-        return $"Step: {currentStep}, Deck: {savedDeck.Count}cards, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}";
+        return $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
     }
 }

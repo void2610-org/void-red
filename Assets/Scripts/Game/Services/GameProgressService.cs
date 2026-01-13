@@ -16,9 +16,9 @@ public class GameProgressService
     /// </summary>
     public Observable<Unit> OnDataSaved => _repository.OnDataSaved;
 
-    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService)
+    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, AllThemeData allThemeData)
     {
-        _repository = new GameStateRepository(saveDataManager, cardPoolService);
+        _repository = new GameStateRepository(saveDataManager, cardPoolService, allThemeData);
 
         // 現在のノードを初期化
         _repository.StoryProgress.CurrentNode = GetNextNode();
@@ -136,39 +136,6 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// デッキ情報を更新（CardModelから変換）
-    /// </summary>
-    public void UpdateDeckFromCardModels(IReadOnlyList<CardModel> cardModels)
-    {
-        _repository.UpdateDeckFromCardModels(cardModels);
-    }
-
-    /// <summary>
-    /// CardIdのリストからCardModelのリストに変換
-    /// </summary>
-    public List<CardModel> ConvertDeckToCardModels()
-    {
-        return _repository.ConvertDeckToCardModels();
-    }
-
-    /// <summary>
-    /// デッキ表示用の詳細情報を取得
-    /// </summary>
-    public List<CardData> GetDeckDisplayData()
-    {
-        var cardModels = ConvertDeckToCardModels();
-        return cardModels.Select(cm => cm.Data).ToList();
-    }
-
-    /// <summary>
-    /// デッキ表示用のCardModelリストを取得
-    /// </summary>
-    public List<CardModel> GetDeckCardModels()
-    {
-        return ConvertDeckToCardModels();
-    }
-
-    /// <summary>
     /// カード閲覧をリストで記録
     /// </summary>
     public void RecordCardViews(List<CardData> cardDataList)
@@ -203,11 +170,22 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// 新しいカードをプレイヤーのデッキに追加
+    /// 獲得済みテーマリストを取得
     /// </summary>
-    public void AddCardToDeck(CardModel cardModel)
+    /// <returns>獲得済みテーマのリスト</returns>
+    public IReadOnlyList<AcquiredTheme> GetAcquiredThemes()
     {
-        _repository.PlayerProgress.Deck.Add(new SavedCard(cardModel));
-        Debug.Log($"[GameProgressService] カードをデッキに追加: {cardModel.Data.CardName}");
+        return _repository.MemoryProgress.AcquiredThemes;
+    }
+
+    /// <summary>
+    /// 獲得テーマを記録して保存
+    /// </summary>
+    /// <param name="theme">獲得したテーマ</param>
+    public void RecordAcquiredThemeAndSave(AcquiredTheme theme)
+    {
+        _repository.MemoryProgress.AddAcquiredTheme(theme);
+        _repository.SaveAll();
+        Debug.Log($"[GameProgressService] 獲得テーマを記録: {theme.ThemeName} ({theme.AcquiredCards.Count}枚, 感情: {theme.DominantEmotionResult})");
     }
 }
