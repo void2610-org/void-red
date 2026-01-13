@@ -20,7 +20,6 @@ public class EnemyData : ScriptableObject
     [Header("属性別画像")]
     [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
 
-    // プロパティ
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
     public Sprite DefaultSprite => defaultSprite;

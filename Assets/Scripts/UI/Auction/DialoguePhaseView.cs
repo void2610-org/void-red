@@ -1,79 +1,52 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using R3;
 
-// 対話フェーズのUI
-// 2つの選択肢ボタンを表示
 public class DialoguePhaseView : MonoBehaviour
 {
-    [Header("選択肢1")]
-    [SerializeField] private Button choice1Button;
-    [SerializeField] private TextMeshProUGUI choice1Label;
+    [Header("選択肢View")]
+    [SerializeField] private DialogueChoicesView choicesView;
 
-    [Header("選択肢2")]
-    [SerializeField] private Button choice2Button;
-    [SerializeField] private TextMeshProUGUI choice2Label;
+    [Header("敵セリフ表示")]
+    [SerializeField] private TextMeshProUGUI dialogueText;
 
     [Header("結果表示")]
     [SerializeField] private TextMeshProUGUI resultText;
 
-    public Observable<int> OnChoiceSelected => _onChoiceSelected;
+    public Observable<int> OnChoiceSelected => choicesView.OnChoiceSelected;
 
-    private readonly Subject<int> _onChoiceSelected = new();
-    private CompositeDisposable _disposables = new();
+    public void SetupChoices(List<string> labels) => choicesView.Setup(labels);
 
-    // 選択肢をセットアップ
-    public void Setup(string label1, string label2)
+    public void HideChoices() => choicesView.Hide();
+
+    public void ShowDialogueText(string text)
     {
-        _disposables.Dispose();
-        _disposables = new CompositeDisposable();
-
-        choice1Label.text = label1;
-        choice2Label.text = label2;
-        HideResult();
-
-        choice1Button.OnClickAsObservable()
-            .Subscribe(_ => _onChoiceSelected.OnNext(0))
-            .AddTo(_disposables);
-
-        choice2Button.OnClickAsObservable()
-            .Subscribe(_ => _onChoiceSelected.OnNext(1))
-            .AddTo(_disposables);
+        dialogueText.text = text;
+        dialogueText.gameObject.SetActive(true);
     }
 
-    // 結果テキストを表示
+    public void HideDialogueText() => dialogueText.gameObject.SetActive(false);
+
     public void ShowResult(string message)
     {
-        if (resultText) resultText.text = message;
+        resultText.text = message;
+        resultText.gameObject.SetActive(true);
     }
 
-    // 結果テキストを非表示
     public void HideResult()
     {
-        if (resultText) resultText.text = "";
+        resultText.text = "";
+        resultText.gameObject.SetActive(false);
     }
 
-    // 選択肢ボタンを非表示（結果表示中）
-    public void HideChoices()
+    public void HideAll()
     {
-        choice1Button.gameObject.SetActive(false);
-        choice2Button.gameObject.SetActive(false);
-    }
-
-    // 選択肢ボタンを表示
-    public void ShowChoices()
-    {
-        choice1Button.gameObject.SetActive(true);
-        choice2Button.gameObject.SetActive(true);
+        HideChoices();
+        HideDialogueText();
+        HideResult();
     }
 
     public void Show() => gameObject.SetActive(true);
     public void Hide() => gameObject.SetActive(false);
-
-    private void OnDestroy()
-    {
-        _disposables.Dispose();
-        _onChoiceSelected.Dispose();
-    }
 }

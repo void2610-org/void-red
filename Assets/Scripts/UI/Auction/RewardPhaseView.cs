@@ -1,46 +1,37 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
-using LitMotion;
+using R3;
 
-/// <summary>
-/// 報酬フェーズの表示を管理するView
-/// </summary>
 public class RewardPhaseView : MonoBehaviour
 {
     [Header("表示")]
     [SerializeField] private TextMeshProUGUI rewardInfoText;
 
-    [Header("演出設定")]
-    [SerializeField] private float cardDisplayDuration = 1.5f;
-    [SerializeField] private float rewardCountDuration = 1f;
+    [Header("次へボタン")]
+    [SerializeField] private Button nextButton;
 
+    private readonly Subject<Unit> _onNextButtonClicked = new();
     private int _totalReward;
 
-    /// <summary>
-    /// 報酬フェーズの表示を開始
-    /// </summary>
     public async UniTask ShowRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results)
     {
         gameObject.SetActive(true);
         _totalReward = 0;
 
-        // 各カードの報酬を順次表示
         foreach (var (card, result) in results)
         {
             _totalReward += result.TotalReward;
             ShowCardReward(card, result);
-            await UniTask.Delay((int)(cardDisplayDuration * 1000));
+            await _onNextButtonClicked.FirstAsync();
         }
 
-        // 合計報酬表示
-        await PlayCountUpAsync(0, _totalReward, rewardCountDuration);
+        rewardInfoText.text = $"【報酬確定】\n\n合計報酬: {_totalReward}";
+        await _onNextButtonClicked.FirstAsync();
     }
 
-    /// <summary>
-    /// 個別カードの報酬情報を表示
-    /// </summary>
     private void ShowCardReward(CardModel card, RewardCalculator.RewardResult result)
     {
         var relativeSign = result.RelativeReward >= 0 ? "+" : "";
@@ -55,22 +46,17 @@ public class RewardPhaseView : MonoBehaviour
                               $"合計: {_totalReward}";
     }
 
-    /// <summary>
-    /// カウントアップアニメーション
-    /// </summary>
-    private async UniTask PlayCountUpAsync(int from, int to, float duration)
+    public void Hide() => gameObject.SetActive(false);
+
+    private void Awake()
     {
-        await LMotion.Create(from, to, duration)
-            .WithEase(Ease.OutCubic)
-            .Bind(value => rewardInfoText.text = $"【報酬確定】\n\n合計報酬: {value}")
-            .ToUniTask();
+        nextButton.OnClickAsObservable()
+            .Subscribe(_ => _onNextButtonClicked.OnNext(Unit.Default))
+            .AddTo(this);
     }
 
-    /// <summary>
-    /// 非表示
-    /// </summary>
-    public void Hide()
+    private void OnDestroy()
     {
-        gameObject.SetActive(false);
+        _onNextButtonClicked.Dispose();
     }
 }
