@@ -23,6 +23,17 @@ public abstract class BaseWindowView : MonoBehaviour
     private CanvasGroup _canvasGroup;
     private MotionHandle _currentFadeHandle;
     private readonly Subject<Unit> _onClosed = new();
+    private bool _isInitialized;
+
+    private void EnsureInitialized()
+    {
+        if (_isInitialized) return;
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.alpha = 0f;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
+        _isInitialized = true;
+    }
 
     // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
     private static readonly List<BaseWindowView> _activeWindows = new();
@@ -42,7 +53,14 @@ public abstract class BaseWindowView : MonoBehaviour
     /// <summary>
     /// ウィンドウの表示状態
     /// </summary>
-    public bool IsShowing => _canvasGroup.interactable;
+    public bool IsShowing
+    {
+        get
+        {
+            EnsureInitialized();
+            return _canvasGroup.interactable;
+        }
+    }
 
     /// <summary>
     /// このウィンドウが再アクティブになったときに選択すべきGameObject
@@ -79,6 +97,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
     private async UniTaskVoid ShowWithAnimation()
     {
+        EnsureInitialized();
         _currentFadeHandle.TryCancel();
 
         _canvasGroup.interactable = true;
@@ -98,6 +117,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
     private async UniTaskVoid HideWithAnimation()
     {
+        EnsureInitialized();
         _currentFadeHandle.TryCancel();
 
         _canvasGroup.interactable = false;
@@ -133,10 +153,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
     protected virtual void Awake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
+        EnsureInitialized();
 
         if (closeButton)
         {
