@@ -139,7 +139,6 @@ public class AuctionView : MonoBehaviour
         emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
 
         // 入札パネルを初期化
-        bidPanelView.UpdateCurrentEmotion(_currentEmotion);
         UpdateRemainingResourceDisplay();
 
         bidPanelView.OnIncrease
@@ -154,8 +153,9 @@ public class AuctionView : MonoBehaviour
             .Subscribe(_ => OnConfirmBidding())
             .AddTo(_disposables);
 
-        bidPanelView.OnEmotionCycle
-            .Subscribe(_ => OnCycleEmotion())
+        // 車輪UIからの感情選択
+        emotionResourceDisplayView.OnEmotionSelected
+            .Subscribe(OnEmotionChanged)
             .AddTo(_disposables);
     }
 
@@ -425,34 +425,19 @@ public class AuctionView : MonoBehaviour
         _onBiddingComplete.OnNext(Unit.Default);
     }
 
-    private void OnCycleEmotion()
+    private void OnEmotionChanged(EmotionType emotion)
     {
-        _currentEmotion = GetNextEmotion(_currentEmotion);
-        bidPanelView.UpdateCurrentEmotion(_currentEmotion);
-        emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
+        _currentEmotion = emotion;
         UpdateRemainingResourceDisplay();
-    }
-
-    private EmotionType GetNextEmotion(EmotionType current)
-    {
-        var values = (EmotionType[])Enum.GetValues(typeof(EmotionType));
-        var currentIndex = Array.IndexOf(values, current);
-        return values[(currentIndex + 1) % values.Length];
     }
 
     private void UpdateRemainingResourceDisplay()
     {
-        // 現在の感情のリソース残量を計算
-        var available = _emotionResources.TryGetValue(_currentEmotion, out var total) ? total : 0;
-        var used = _usedResources.TryGetValue(_currentEmotion, out var u) ? u : 0;
-        var remaining = available - used;
-        bidPanelView.UpdateRemainingResource(remaining);
-
         // 全感情のリソース残量を更新
         var currentResources = new Dictionary<EmotionType, int>();
         foreach (var (emotion, originalAmount) in _emotionResources)
         {
-            var usedAmount = _usedResources.TryGetValue(emotion, out var uAmount) ? uAmount : 0;
+            var usedAmount = _usedResources.GetValueOrDefault(emotion, 0);
             currentResources[emotion] = originalAmount - usedAmount;
         }
         emotionResourceDisplayView.UpdateResources(currentResources);
