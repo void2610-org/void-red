@@ -27,6 +27,7 @@ public class ValueRankingView : MonoBehaviour
     private readonly List<CardModel> _rankedCards = new();
     private readonly Subject<Unit> _onRankingComplete = new();
     private CompositeDisposable _disposables = new();
+    private bool _wasDroppedToSlot;
 
     /// <summary>
     /// カードを表示して順位選択を開始
@@ -110,6 +111,8 @@ public class ValueRankingView : MonoBehaviour
 
     private void OnCardDragStarted(DraggableCardView card)
     {
+        _wasDroppedToSlot = false;
+
         foreach (var slot in slots)
         {
             slot.SetDragActive(true);
@@ -123,14 +126,23 @@ public class ValueRankingView : MonoBehaviour
             slot.SetDragActive(false);
         }
 
-        if (!card.IsPlaced)
+        // スロットにドロップされた場合はOnCardDroppedToSlotで処理済み
+        if (_wasDroppedToSlot) return;
+
+        // スロット外にドロップされた場合、元のスロットから外して手札に戻す
+        if (card.IsPlaced)
         {
-            card.PlayReturnToHandAsync(handContainer).Forget();
+            card.CurrentSlot.RemoveCard();
+            UpdateConfirmButtonState();
         }
+
+        card.PlayReturnToHandAsync(handContainer).Forget();
     }
 
     private void OnCardDroppedToSlot(RankingSlotView slot, DraggableCardView droppedCard)
     {
+        _wasDroppedToSlot = true;
+
         var previousSlot = droppedCard.CurrentSlot;
         if (previousSlot != null)
         {

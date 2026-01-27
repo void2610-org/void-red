@@ -35,7 +35,6 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private CanvasGroup _canvasGroup;
     private Transform _originalParent;
     private Vector2 _originalPosition;
-    private Vector2 _handPosition;
     private Canvas _rootCanvas;
     private bool _isDragging;
     private MotionHandle _moveTween;
@@ -49,19 +48,6 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         CardModel = cardModel;
         cardView.Initialize(cardModel.Data);
         cardView.SetInteractable(false);
-        _handPosition = _rectTransform.anchoredPosition;
-    }
-
-    /// <summary>
-    /// 手札位置を設定
-    /// </summary>
-    public void SetHandPosition(Vector2 position)
-    {
-        _handPosition = position;
-        if (!IsPlaced)
-        {
-            _rectTransform.anchoredPosition = position;
-        }
     }
 
     /// <summary>
@@ -169,16 +155,31 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     /// </summary>
     public async UniTask PlayReturnToHandAsync(Transform handParent)
     {
+        // 現在のワールド位置を保存（アニメーション開始位置）
+        var startWorldPos = _rectTransform.position;
+
+        // 親を変更
         transform.SetParent(handParent);
-        
-        // スケールとアンカーをリセット
         transform.localScale = Vector3.one;
+
+        // アンカーとピボットを設定
         _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         _rectTransform.pivot = new Vector2(0.5f, 0.5f);
 
+        // LayoutGroupにレイアウトを再計算させる
+        LayoutRebuilder.ForceRebuildLayoutImmediate(handParent as RectTransform);
+
+        // LayoutGroupが計算した目標位置を取得
+        var targetPosition = _rectTransform.anchoredPosition;
+
+        // ワールド座標からローカル座標へ変換（アニメーション開始位置）
+        _rectTransform.position = startWorldPos;
+        var startPosition = _rectTransform.anchoredPosition;
+
+        // 開始位置から目標位置へアニメーション
         _moveTween.TryCancel();
-        await LMotion.Create(_rectTransform.anchoredPosition, _handPosition, RETURN_DURATION)
+        await LMotion.Create(startPosition, targetPosition, RETURN_DURATION)
             .WithEase(Ease.OutBack)
             .BindToAnchoredPosition(_rectTransform)
             .ToUniTask();
