@@ -52,6 +52,9 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     public async UniTask PlaySnapToSlotAsync(Transform targetParent, Vector2 targetPosition)
     {
+        // 現在のワールド位置を保存
+        var startWorldPos = _rectTransform.position;
+
         transform.SetParent(targetParent);
         transform.localScale = Vector3.one;
 
@@ -59,8 +62,12 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         _rectTransform.pivot = new Vector2(0.5f, 0.5f);
 
+        // ワールド座標からローカル座標へ変換して開始位置を取得
+        _rectTransform.position = startWorldPos;
+        var startPosition = _rectTransform.anchoredPosition;
+
         _moveTween.TryCancel();
-        _moveTween = _rectTransform.MoveToAnchored(targetPosition, SNAP_DURATION, Ease.OutCubic);
+        _moveTween = _rectTransform.MoveToAnchoredFrom(startPosition, targetPosition, SNAP_DURATION, Ease.OutCubic);
         await _moveTween.ToUniTask();
     }
 

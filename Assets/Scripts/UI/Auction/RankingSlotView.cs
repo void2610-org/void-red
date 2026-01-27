@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using TMPro;
 using R3;
+using LitMotion;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 順位スロットView
@@ -20,7 +21,10 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
     public Transform CardAnchor => this.transform;
     public Observable<(RankingSlotView slot, DraggableCardView card)> OnCardDropped => _onCardDropped;
 
+    private const float FADE_DURATION = 0.15f;
+
     private readonly Subject<(RankingSlotView slot, DraggableCardView card)> _onCardDropped = new();
+    private MotionHandle _fadeTween;
 
     /// <summary>
     /// スロットにカードがドロップされた時の処理
@@ -58,21 +62,22 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
         return card;
     }
 
-    /// <summary>
-    /// ハイライト表示設定
-    /// </summary>
     private void SetHighlight(bool highlight)
     {
-        highlightImage.gameObject.SetActive(highlight);
+        _fadeTween.TryCancel();
+        _fadeTween = highlight
+            ? highlightImage.FadeIn(FADE_DURATION, Ease.OutQuad)
+            : highlightImage.FadeOut(FADE_DURATION, Ease.OutQuad);
     }
 
     private void Awake()
     {
-        highlightImage.gameObject.SetActive(false);
+        highlightImage.SetAlpha(0f);
     }
 
     private void OnDestroy()
     {
+        _fadeTween.TryCancel();
         _onCardDropped.Dispose();
     }
 }
