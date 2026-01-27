@@ -1,108 +1,181 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 using R3;
+using Cysharp.Threading.Tasks;
 
-// 価値順位設定UI
-// プレイヤーがカードをクリックした順に順位1-4を割り当てる
+/// <summary>
+/// 価値順位設定UI
+/// プレイヤーがカードをドラッグ&ドロップして順位1-4を設定する
+/// </summary>
 public class ValueRankingView : MonoBehaviour
 {
-    [SerializeField] private Transform cardContainer;
-    [SerializeField] private CardView cardPrefab;
+    [Header("スロット")]
+    [SerializeField] private List<RankingSlotView> slots;
 
-    [Header("順位表示")]
-    [SerializeField] private TextMeshProUGUI rankTextPrefab;
+    [Header("手札エリア")]
+    [SerializeField] private Transform handContainer;
+    [SerializeField] private DraggableCardView draggableCardPrefab;
 
-    private readonly List<CardView> _cardViews = new();
-    private readonly List<CardModel> _rankedCards = new();
-    private readonly Dictionary<CardView, CardModel> _cardViewToModel = new();
-    private readonly Dictionary<CardView, TextMeshProUGUI> _rankTexts = new();
-    private readonly Subject<Unit> _onRankingComplete = new();
-    private CompositeDisposable _disposables = new();
+    [Header("UI")]
+    [SerializeField] private Button confirmButton;
 
     public Observable<Unit> OnRankingComplete => _onRankingComplete;
 
-    // カードを表示して順位選択を開始
+    private readonly List<DraggableCardView> _handCards = new();
+    private readonly List<CardModel> _rankedCards = new();
+    private readonly Subject<Unit> _onRankingComplete = new();
+    private CompositeDisposable _disposables = new();
+    private bool _wasDroppedToSlot;
+
+    public void Show() => gameObject.SetActive(true);
+    public void Hide() => gameObject.SetActive(false);
+
     public void StartRanking(IReadOnlyList<CardModel> cards)
     {
         Clear();
 
         foreach (var card in cards)
         {
-            var cardView = Instantiate(cardPrefab, cardContainer);
-            cardView.Initialize(card.Data);
-            cardView.SetInteractable(true);
+            var draggableCard = Instantiate(draggableCardPrefab, handContainer);
+            draggableCard.Initialize(card);
 
-            // CardViewとCardModelの対応を保存
-            _cardViewToModel[cardView] = card;
+            draggableCard.OnDragStarted
+                .Subscribe(OnCardDragStarted)
+                .AddTo(_disposables);
 
-            // クリックイベント購読
-            cardView.OnClicked
+            draggableCard.OnDragEnded
+                .Subscribe(OnCardDragEnded)
+                .AddTo(_disposables);
+
+            draggableCard.OnClicked
                 .Subscribe(OnCardClicked)
                 .AddTo(_disposables);
 
-            _cardViews.Add(cardView);
+            _handCards.Add(draggableCard);
         }
-    }
 
-    private void OnCardClicked(CardView cardView)
-    {
-        // CardViewからCardModelを取得
-        if (!_cardViewToModel.TryGetValue(cardView, out var cardModel)) return;
-
-        // 既に順位設定済みなら無視
-        if (_rankedCards.Contains(cardModel)) return;
-
-        // 順位を設定（クリック順）
-        var rank = _rankedCards.Count + 1;
-        _rankedCards.Add(cardModel);
-        ShowRankText(cardView, rank);
-        cardView.SetInteractable(false);
-
-        // 全て設定完了したら通知
-        if (_rankedCards.Count == _cardViews.Count)
+        foreach (var slot in slots)
         {
-            _onRankingComplete.OnNext(Unit.Default);
+            slot.OnCardDropped
+                .Subscribe(tuple => OnCardDroppedToSlot(tuple.slot, tuple.card))
+                .AddTo(_disposables);
         }
+
+        confirmButton.OnClickAsObservable()
+            .Subscribe(_ => OnConfirmClicked())
+            .AddTo(_disposables);
+
+        UpdateConfirmButtonState();
     }
 
-    // カード上に順位テキストを表示
-    private void ShowRankText(CardView cardView, int rank)
+    public IReadOnlyList<CardModel> GetRankedCards()
     {
-        var rankText = Instantiate(rankTextPrefab, cardView.transform);
-        rankText.rectTransform.anchoredPosition = Vector2.zero;
-        rankText.text = rank.ToString();
+        _rankedCards.Clear();
 
-        _rankTexts[cardView] = rankText;
+        foreach (var slot in slots.OrderBy(s => s.Rank).Where(s => s.IsOccupied))
+        {
+            _rankedCards.Add(slot.PlacedCard.CardModel);
+        }
+
+        return _rankedCards;
     }
-
-    // 設定結果を取得（順位順のカードリスト）
-    public IReadOnlyList<CardModel> GetRankedCards() => _rankedCards;
 
     public void Clear()
     {
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
 
-        // 順位テキストを削除
-        foreach (var rankText in _rankTexts.Values)
+        foreach (var slot in slots)
         {
-            Destroy(rankText.gameObject);
+            slot.RemoveCard();
         }
-        _rankTexts.Clear();
 
-        // カードViewを削除
-        foreach (var cardView in _cardViews)
+        foreach (var card in _handCards)
         {
-            Destroy(cardView.gameObject);
+            Destroy(card.gameObject);
         }
-        _cardViews.Clear();
+        _handCards.Clear();
         _rankedCards.Clear();
-        _cardViewToModel.Clear();
     }
 
-    public void Show() => gameObject.SetActive(true);
-    public void Hide() => gameObject.SetActive(false);
+    private void OnCardDragStarted(DraggableCardView card)
+    {
+        _wasDroppedToSlot = false;
+    }
+
+    private void OnCardDragEnded(DraggableCardView card)
+    {
+        // スロットにドロップされた場合はOnCardDroppedToSlotで処理済み
+        if (_wasDroppedToSlot) return;
+
+        // スロット外にドロップされた場合、元のスロットから外して手札に戻す
+        if (card.IsPlaced)
+        {
+            card.CurrentSlot.RemoveCard();
+            UpdateConfirmButtonState();
+        }
+
+        card.PlayReturnToHandAsync(handContainer).Forget();
+    }
+
+    private void OnCardDroppedToSlot(RankingSlotView slot, DraggableCardView droppedCard)
+    {
+        _wasDroppedToSlot = true;
+
+        var previousSlot = droppedCard.CurrentSlot;
+        previousSlot?.RemoveCard();
+
+        if (slot.IsOccupied)
+        {
+            var existingCard = slot.RemoveCard();
+
+            if (previousSlot != null)
+            {
+                previousSlot.PlaceCard(existingCard);
+                existingCard.PlaySnapToSlotAsync(previousSlot.CardAnchor, Vector2.zero).Forget();
+            }
+            else
+            {
+                existingCard.PlayReturnToHandAsync(handContainer).Forget();
+            }
+        }
+
+        slot.PlaceCard(droppedCard);
+        droppedCard.PlaySnapToSlotAsync(slot.CardAnchor, Vector2.zero).Forget();
+
+        UpdateConfirmButtonState();
+    }
+
+    private void OnCardClicked(DraggableCardView card)
+    {
+        if (!card.IsPlaced) return;
+
+        var slot = card.CurrentSlot;
+        slot.RemoveCard();
+
+        card.PlayReturnToHandAsync(handContainer).Forget();
+
+        UpdateConfirmButtonState();
+    }
+
+    private void OnConfirmClicked()
+    {
+        if (!IsAllSlotsOccupied()) return;
+
+        _onRankingComplete.OnNext(Unit.Default);
+    }
+
+    private void UpdateConfirmButtonState()
+    {
+        confirmButton.interactable = IsAllSlotsOccupied();
+    }
+
+    private bool IsAllSlotsOccupied()
+    {
+        return slots.All(s => s.IsOccupied);
+    }
 
     private void OnDestroy()
     {
