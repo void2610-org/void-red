@@ -134,8 +134,7 @@ public class AuctionView : MonoBehaviour
             _usedResources[emotion] = 0;
         }
 
-        // 感情リソース表示を初期化
-        emotionResourceDisplayView.Initialize();
+        // 感情リソース表示を更新
         emotionResourceDisplayView.UpdateResources(emotionResources);
         emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
 
