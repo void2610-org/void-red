@@ -65,7 +65,7 @@ public class EmotionResourceDisplayView : MonoBehaviour
         _currentAngle += ANGLE_PER_ITEM;
 
         // 車輪回転SE再生
-        SeManager.Instance.PlaySe("CardSelect");
+        SeManager.Instance.PlaySe("Wheel");
 
         LMotion.Create(previousAngle, _currentAngle, ROTATION_DURATION)
             .WithEase(Ease.OutBack)
