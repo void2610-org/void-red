@@ -1,31 +1,47 @@
-using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using LitMotion;
+using R3;
 using UnityEngine;
+using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
-// 8種類の感情リソースを表示するView
-// 各感情の色付きインジケーターと残量を横並びで表示
+// 8種類の感情リソースを車輪UIで表示するView
+// クリックで回転し、選択中の感情タイプを変更
 public class EmotionResourceDisplayView : MonoBehaviour
 {
-    [SerializeField] private EmotionResourceItemView itemPrefab;
-    [SerializeField] private Transform container;
+    [Header("車輪UI")]
+    [SerializeField] private Transform wheelContainer;
+    [SerializeField] private Button wheelButton;
+    [SerializeField] private float rotationOffset; // 選択位置の角度オフセット
 
-    private readonly Dictionary<EmotionType, EmotionResourceItemView> _items = new();
+    [Header("感情リソースアイテム（事前配置）")]
+    [SerializeField] private List<EmotionResourceItemView> items;
 
-    public void Initialize()
+    public Observable<EmotionType> OnEmotionSelected => _onEmotionSelected;
+
+    private const int EMOTION_COUNT = 8;
+    private const float ANGLE_PER_ITEM = 360f / EMOTION_COUNT; // 45度
+    private const float ROTATION_DURATION = 0.3f;
+
+    private readonly Subject<EmotionType> _onEmotionSelected = new();
+    private Dictionary<EmotionType, EmotionResourceItemView> _itemDict = new();
+    private int _currentIndex;
+    private float _currentAngle;
+    private bool _isRotating;
+
+    public void SetSelectedEmotion(EmotionType emotion)
     {
-        // 既存のアイテムをクリア
-        foreach (Transform child in container)
+        // emotionに対応するindexを見つけて即座に設定
+        for (var i = 0; i < items.Count; i++)
         {
-            Destroy(child.gameObject);
-        }
-        _items.Clear();
-
-        // 8種類の感情タイプ分のアイテムを生成
-        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
-        {
-            var item = Instantiate(itemPrefab, container);
-            item.Initialize(emotion);
-            _items[emotion] = item;
+            if (items[i].Emotion == emotion)
+            {
+                _currentIndex = i;
+                _currentAngle = i * ANGLE_PER_ITEM;
+                ApplyRotation(_currentAngle);
+                return;
+            }
         }
     }
 
@@ -33,26 +49,72 @@ public class EmotionResourceDisplayView : MonoBehaviour
     {
         foreach (var (emotion, amount) in resources)
         {
-            if (_items.TryGetValue(emotion, out var item))
+            if (_itemDict.TryGetValue(emotion, out var item))
             {
                 item.UpdateAmount(amount);
             }
         }
     }
 
-    public void UpdateResource(EmotionType emotion, int amount)
+    private void RotateWheel()
     {
-        if (_items.TryGetValue(emotion, out var item))
+        if (_isRotating) return;
+
+        _isRotating = true;
+        var previousAngle = _currentAngle;
+        _currentIndex = (_currentIndex + 1) % EMOTION_COUNT;
+        _currentAngle += ANGLE_PER_ITEM;
+
+        // 車輪回転SE再生
+        SeManager.Instance.PlaySe("Wheel");
+
+        LMotion.Create(previousAngle, _currentAngle, ROTATION_DURATION)
+            .WithEase(Ease.OutBack)
+            .Bind(angle =>
+            {
+                var angleWithOffset = angle + rotationOffset;
+                wheelContainer.localEulerAngles = new Vector3(0, 0, angleWithOffset);
+                // 各アイテムを逆回転させてテキストを正立に保つ
+                foreach (var item in items)
+                {
+                    item.transform.localEulerAngles = new Vector3(0, 0, -angleWithOffset);
+                }
+            })
+            .AddTo(gameObject)
+            .ToUniTask()
+            .ContinueWith(() =>
+            {
+                _isRotating = false;
+                _onEmotionSelected.OnNext(items[_currentIndex].Emotion);
+            }).Forget();
+    }
+
+    private void ApplyRotation(float angle)
+    {
+        var angleWithOffset = angle + rotationOffset;
+        wheelContainer.localEulerAngles = new Vector3(0, 0, angleWithOffset);
+        foreach (var item in items)
         {
-            item.UpdateAmount(amount);
+            item.transform.localEulerAngles = new Vector3(0, 0, -angleWithOffset);
         }
     }
 
-    public void SetSelectedEmotion(EmotionType emotion)
+    private void Awake()
     {
-        foreach (var (type, item) in _items)
+        // アイテムの初期化
+        _itemDict.Clear();
+        for (var i = 0; i < items.Count; i++)
         {
-            item.SetSelected(type == emotion);
+            var emotion = (EmotionType)i;
+            items[i].Initialize(emotion);
+            _itemDict[emotion] = items[i];
         }
+
+        wheelButton.OnClickAsObservable().Subscribe(_ => RotateWheel()).AddTo(this);
+    }
+
+    private void OnDestroy()
+    {
+        _onEmotionSelected.Dispose();
     }
 }

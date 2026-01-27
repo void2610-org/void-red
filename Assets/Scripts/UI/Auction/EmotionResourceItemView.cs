@@ -8,24 +8,14 @@ public class EmotionResourceItemView : MonoBehaviour
 {
     [SerializeField] private Image colorIndicator;
     [SerializeField] private TextMeshProUGUI amountText;
-    [SerializeField] private Image selectionBorder;
 
-    private EmotionType _emotion;
+    public EmotionType Emotion { get; private set; }
+    
+    public void UpdateAmount(int amount) => amountText.text = amount.ToString();
 
     public void Initialize(EmotionType emotion)
     {
-        _emotion = emotion;
+        Emotion = emotion;
         colorIndicator.color = emotion.GetColor();
-        selectionBorder.gameObject.SetActive(false);
-    }
-
-    public void UpdateAmount(int amount)
-    {
-        amountText.text = amount.ToString();
-    }
-
-    public void SetSelected(bool selected)
-    {
-        selectionBorder.gameObject.SetActive(selected);
     }
 }

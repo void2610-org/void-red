@@ -58,7 +58,7 @@ MonoBehaviour:
   - name: ScoreOpen
     audioClip: {fileID: 8300000, guid: ea0af777a6bbd41879afe8eabde6bd7a, type: 3}
     volume: 1
-  - name: WheelOfPlayStyle
+  - name: Wheel
     audioClip: {fileID: 8300000, guid: 991c8c361b37644128d6a4855cff9f34, type: 3}
     volume: 1
   - name: Decision
