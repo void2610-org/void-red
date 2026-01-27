@@ -5,6 +5,7 @@ using R3;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// ドラッグ可能なカードView
@@ -40,9 +41,8 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private MotionHandle _moveTween;
     private MotionHandle _scaleTween;
 
-    /// <summary>
-    /// カードモデルで初期化
-    /// </summary>
+    public void SetSlot(RankingSlotView slot) => CurrentSlot = slot;
+
     public void Initialize(CardModel cardModel)
     {
         CardModel = cardModel;
@@ -50,17 +50,59 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         cardView.SetInteractable(false);
     }
 
-    /// <summary>
-    /// スロット参照を設定
-    /// </summary>
-    public void SetSlot(RankingSlotView slot)
+    public async UniTask PlaySnapToSlotAsync(Transform targetParent, Vector2 targetPosition)
     {
-        CurrentSlot = slot;
+        transform.SetParent(targetParent);
+        transform.localScale = Vector3.one;
+
+        _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        _rectTransform.pivot = new Vector2(0.5f, 0.5f);
+
+        _moveTween.TryCancel();
+        _moveTween = _rectTransform.MoveToAnchored(targetPosition, SNAP_DURATION, Ease.OutCubic);
+        await _moveTween.ToUniTask();
     }
 
-    /// <summary>
-    /// ドラッグ開始
-    /// </summary>
+    public async UniTask PlayReturnToHandAsync(Transform handParent)
+    {
+        var startWorldPos = _rectTransform.position;
+
+        transform.SetParent(handParent);
+        transform.localScale = Vector3.one;
+
+        _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        _rectTransform.pivot = new Vector2(0.5f, 0.5f);
+
+        // LayoutGroupにレイアウトを再計算させる
+        LayoutRebuilder.ForceRebuildLayoutImmediate(handParent as RectTransform);
+
+        var targetPosition = _rectTransform.anchoredPosition;
+
+        // ワールド座標からローカル座標へ変換
+        _rectTransform.position = startWorldPos;
+        var startPosition = _rectTransform.anchoredPosition;
+
+        _moveTween.TryCancel();
+        _moveTween = _rectTransform.MoveToAnchoredFrom(startPosition, targetPosition, RETURN_DURATION, Ease.OutBack);
+        await _moveTween.ToUniTask();
+    }
+
+    public async UniTask PlayReturnToOriginalAsync()
+    {
+        transform.SetParent(_originalParent);
+        transform.localScale = Vector3.one;
+
+        _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        _rectTransform.pivot = new Vector2(0.5f, 0.5f);
+
+        _moveTween.TryCancel();
+        _moveTween = _rectTransform.MoveToAnchored(_originalPosition, RETURN_DURATION, Ease.OutBack);
+        await _moveTween.ToUniTask();
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         _isDragging = true;
@@ -74,17 +116,11 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _canvasGroup.blocksRaycasts = false;
 
         _scaleTween.TryCancel();
-        _scaleTween = LMotion.Create(transform.localScale, Vector3.one * dragScale, 0.1f)
-            .WithEase(Ease.OutQuad)
-            .BindToLocalScale(transform)
-            .AddTo(gameObject);
+        _scaleTween = transform.ScaleTo(Vector3.one * dragScale, 0.1f, Ease.OutQuad);
 
         _onDragStarted.OnNext(this);
     }
 
-    /// <summary>
-    /// ドラッグ中（位置追従）
-    /// </summary>
     public void OnDrag(PointerEventData eventData)
     {
         if (!_isDragging) return;
@@ -99,9 +135,6 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         }
     }
 
-    /// <summary>
-    /// ドラッグ終了
-    /// </summary>
     public void OnEndDrag(PointerEventData eventData)
     {
         _isDragging = false;
@@ -110,99 +143,19 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _canvasGroup.blocksRaycasts = true;
 
         _scaleTween.TryCancel();
-        _scaleTween = LMotion.Create(transform.localScale, Vector3.one, 0.1f)
-            .WithEase(Ease.OutQuad)
-            .BindToLocalScale(transform)
-            .AddTo(gameObject);
+        _scaleTween = transform.ScaleTo(Vector3.one, 0.1f, Ease.OutQuad);
 
         _onDragEnded.OnNext(this);
     }
 
     /// <summary>
-    /// クリック時（配置済みカードの取り外し用）
+    /// 配置済みカードの取り外し用
     /// </summary>
     public void OnPointerClick(PointerEventData eventData)
     {
         if (_isDragging) return;
 
         _onClicked.OnNext(this);
-    }
-
-    /// <summary>
-    /// スロットへスナップするアニメーション
-    /// </summary>
-    public async UniTask PlaySnapToSlotAsync(Transform targetParent, Vector2 targetPosition)
-    {
-        transform.SetParent(targetParent);
-        
-        // 親のスケールに影響されないようにローカルスケールをリセット
-        transform.localScale = Vector3.one;
-        
-        // アンカーとピボットを中央に設定
-        _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-        _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-        _rectTransform.pivot = new Vector2(0.5f, 0.5f);
-
-        _moveTween.TryCancel();
-        await LMotion.Create(_rectTransform.anchoredPosition, targetPosition, SNAP_DURATION)
-            .WithEase(Ease.OutCubic)
-            .BindToAnchoredPosition(_rectTransform)
-            .ToUniTask();
-    }
-
-    /// <summary>
-    /// 手札に戻るアニメーション
-    /// </summary>
-    public async UniTask PlayReturnToHandAsync(Transform handParent)
-    {
-        // 現在のワールド位置を保存（アニメーション開始位置）
-        var startWorldPos = _rectTransform.position;
-
-        // 親を変更
-        transform.SetParent(handParent);
-        transform.localScale = Vector3.one;
-
-        // アンカーとピボットを設定
-        _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-        _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-        _rectTransform.pivot = new Vector2(0.5f, 0.5f);
-
-        // LayoutGroupにレイアウトを再計算させる
-        LayoutRebuilder.ForceRebuildLayoutImmediate(handParent as RectTransform);
-
-        // LayoutGroupが計算した目標位置を取得
-        var targetPosition = _rectTransform.anchoredPosition;
-
-        // ワールド座標からローカル座標へ変換（アニメーション開始位置）
-        _rectTransform.position = startWorldPos;
-        var startPosition = _rectTransform.anchoredPosition;
-
-        // 開始位置から目標位置へアニメーション
-        _moveTween.TryCancel();
-        await LMotion.Create(startPosition, targetPosition, RETURN_DURATION)
-            .WithEase(Ease.OutBack)
-            .BindToAnchoredPosition(_rectTransform)
-            .ToUniTask();
-    }
-
-    /// <summary>
-    /// 元の位置（ドラッグ開始前）に戻る
-    /// </summary>
-    public async UniTask PlayReturnToOriginalAsync()
-    {
-        transform.SetParent(_originalParent);
-        
-        // スケールとアンカーをリセット
-        transform.localScale = Vector3.one;
-        _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-        _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-        _rectTransform.pivot = new Vector2(0.5f, 0.5f);
-
-        _moveTween.TryCancel();
-        await LMotion.Create(_rectTransform.anchoredPosition, _originalPosition, RETURN_DURATION)
-            .WithEase(Ease.OutBack)
-            .BindToAnchoredPosition(_rectTransform)
-            .ToUniTask();
     }
 
     private void Awake()

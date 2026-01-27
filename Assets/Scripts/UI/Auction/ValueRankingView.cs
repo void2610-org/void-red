@@ -29,9 +29,9 @@ public class ValueRankingView : MonoBehaviour
     private CompositeDisposable _disposables = new();
     private bool _wasDroppedToSlot;
 
-    /// <summary>
-    /// カードを表示して順位選択を開始
-    /// </summary>
+    public void Show() => gameObject.SetActive(true);
+    public void Hide() => gameObject.SetActive(false);
+
     public void StartRanking(IReadOnlyList<CardModel> cards)
     {
         Clear();
@@ -70,19 +70,13 @@ public class ValueRankingView : MonoBehaviour
         UpdateConfirmButtonState();
     }
 
-    /// <summary>
-    /// 設定結果を取得（順位順のカードリスト）
-    /// </summary>
     public IReadOnlyList<CardModel> GetRankedCards()
     {
         _rankedCards.Clear();
 
-        foreach (var slot in slots.OrderBy(s => s.Rank))
+        foreach (var slot in slots.OrderBy(s => s.Rank).Where(s => s.IsOccupied))
         {
-            if (slot.PlacedCard)
-            {
-                _rankedCards.Add(slot.PlacedCard.CardModel);
-            }
+            _rankedCards.Add(slot.PlacedCard.CardModel);
         }
 
         return _rankedCards;
@@ -106,26 +100,13 @@ public class ValueRankingView : MonoBehaviour
         _rankedCards.Clear();
     }
 
-    public void Show() => gameObject.SetActive(true);
-    public void Hide() => gameObject.SetActive(false);
-
     private void OnCardDragStarted(DraggableCardView card)
     {
         _wasDroppedToSlot = false;
-
-        foreach (var slot in slots)
-        {
-            slot.SetDragActive(true);
-        }
     }
 
     private void OnCardDragEnded(DraggableCardView card)
     {
-        foreach (var slot in slots)
-        {
-            slot.SetDragActive(false);
-        }
-
         // スロットにドロップされた場合はOnCardDroppedToSlotで処理済み
         if (_wasDroppedToSlot) return;
 
@@ -144,10 +125,7 @@ public class ValueRankingView : MonoBehaviour
         _wasDroppedToSlot = true;
 
         var previousSlot = droppedCard.CurrentSlot;
-        if (previousSlot != null)
-        {
-            previousSlot.RemoveCard();
-        }
+        previousSlot?.RemoveCard();
 
         if (slot.IsOccupied)
         {

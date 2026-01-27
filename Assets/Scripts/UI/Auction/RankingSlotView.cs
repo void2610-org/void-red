@@ -9,7 +9,7 @@ using R3;
 /// ドラッグされたカードを受け入れるドロップ先
 /// </summary>
 [RequireComponent(typeof(RectTransform))]
-public class RankingSlotView : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
+public class RankingSlotView : MonoBehaviour, IDropHandler
 {
     [SerializeField] private int rank;
     [SerializeField] private Image highlightImage;
@@ -21,7 +21,6 @@ public class RankingSlotView : MonoBehaviour, IDropHandler, IPointerEnterHandler
     public Observable<(RankingSlotView slot, DraggableCardView card)> OnCardDropped => _onCardDropped;
 
     private readonly Subject<(RankingSlotView slot, DraggableCardView card)> _onCardDropped = new();
-    private bool _isDragActive;
 
     /// <summary>
     /// スロットにカードがドロップされた時の処理
@@ -35,41 +34,13 @@ public class RankingSlotView : MonoBehaviour, IDropHandler, IPointerEnterHandler
     }
 
     /// <summary>
-    /// ポインターがスロット上に入った時
-    /// </summary>
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (!_isDragActive) return;
-        SetHighlight(true);
-    }
-
-    /// <summary>
-    /// ポインターがスロットから離れた時
-    /// </summary>
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        SetHighlight(false);
-    }
-
-    /// <summary>
-    /// ドラッグ状態を設定（ドラッグ中のみハイライト可能にする）
-    /// </summary>
-    public void SetDragActive(bool active)
-    {
-        _isDragActive = active;
-        if (!active)
-        {
-            SetHighlight(false);
-        }
-    }
-
-    /// <summary>
     /// スロットにカードを配置
     /// </summary>
     public void PlaceCard(DraggableCardView card)
     {
         PlacedCard = card;
         card.SetSlot(this);
+        SetHighlight(true);
     }
 
     /// <summary>
@@ -83,6 +54,7 @@ public class RankingSlotView : MonoBehaviour, IDropHandler, IPointerEnterHandler
             PlacedCard.SetSlot(null);
         }
         PlacedCard = null;
+        SetHighlight(false);
         return card;
     }
 
