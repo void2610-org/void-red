@@ -13,6 +13,7 @@ public class EmotionResourceDisplayView : MonoBehaviour
     [Header("車輪UI")]
     [SerializeField] private Transform wheelContainer;
     [SerializeField] private Button wheelButton;
+    [SerializeField] private float rotationOffset; // 選択位置の角度オフセット
 
     [Header("感情リソースアイテム（事前配置）")]
     [SerializeField] private List<EmotionResourceItemView> items;
@@ -71,11 +72,12 @@ public class EmotionResourceDisplayView : MonoBehaviour
             .WithEase(Ease.OutBack)
             .Bind(angle =>
             {
-                wheelContainer.localEulerAngles = new Vector3(0, 0, angle);
+                var angleWithOffset = angle + rotationOffset;
+                wheelContainer.localEulerAngles = new Vector3(0, 0, angleWithOffset);
                 // 各アイテムを逆回転させてテキストを正立に保つ
                 foreach (var item in items)
                 {
-                    item.transform.localEulerAngles = new Vector3(0, 0, -angle);
+                    item.transform.localEulerAngles = new Vector3(0, 0, -angleWithOffset);
                 }
             })
             .AddTo(gameObject)
@@ -89,10 +91,11 @@ public class EmotionResourceDisplayView : MonoBehaviour
 
     private void ApplyRotation(float angle)
     {
-        wheelContainer.localEulerAngles = new Vector3(0, 0, angle);
+        var angleWithOffset = angle + rotationOffset;
+        wheelContainer.localEulerAngles = new Vector3(0, 0, angleWithOffset);
         foreach (var item in items)
         {
-            item.transform.localEulerAngles = new Vector3(0, 0, -angle);
+            item.transform.localEulerAngles = new Vector3(0, 0, -angleWithOffset);
         }
     }
 

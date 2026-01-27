@@ -224,6 +224,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wheelContainer: {fileID: 7035162719102219846}
   wheelButton: {fileID: 6662775057241348995}
+  rotationOffset: 27.5
   items:
   - {fileID: 850032110698978125}
   - {fileID: 8950085415009478612}

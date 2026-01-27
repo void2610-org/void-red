@@ -137,7 +137,6 @@ MonoBehaviour:
   increaseButton: {fileID: 4463648673881199671}
   decreaseButton: {fileID: 3627273719105879386}
   confirmButton: {fileID: 5434003292134148686}
-  remainingResourceText: {fileID: 0}
 --- !u!1 &7582302635571098096
 GameObject:
   m_ObjectHideFlags: 0
