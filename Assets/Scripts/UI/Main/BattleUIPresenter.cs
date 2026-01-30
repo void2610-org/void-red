@@ -109,10 +109,13 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void ShowAuctionCards(
         IReadOnlyList<CardModel> playerCards,
         IReadOnlyList<CardModel> enemyCards,
+        IReadOnlyDictionary<EmotionType, int> emotionResources,
         ValueRankingModel playerRanking = null)
     {
         _auctionView.Show();
         _auctionView.ShowCards(playerCards, enemyCards, playerRanking);
+        _auctionView.UpdateEmotionResources(emotionResources);
+        _auctionView.SetSelectedEmotion(EmotionType.Joy);
     }
 
     // AuctionViewを表示（カードは再生成しない）
