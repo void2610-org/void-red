@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using R3;
 
 /// <summary>
 /// プレイヤーとNPCの基底プレゼンタークラス
@@ -14,6 +15,8 @@ public abstract class PlayerPresenter : IDisposable
     public ValueRankingModel ValueRanking => _valueRanking;
     public BidModel Bids => _bids;
     public IReadOnlyList<CardModel> WonCards => _wonCards;
+    public ReadOnlyReactiveProperty<float> PainLevel => _painLevel;
+    public ReadOnlyReactiveProperty<float> DilutionLevel => _dilutionLevel;
 
     // === プライベートフィールド ===
 
@@ -24,6 +27,8 @@ public abstract class PlayerPresenter : IDisposable
     private readonly ValueRankingModel _valueRanking = new();
     private readonly BidModel _bids = new();
     private readonly List<CardModel> _wonCards = new();
+    private readonly ReactiveProperty<float> _painLevel = new(0f);
+    private readonly ReactiveProperty<float> _dilutionLevel = new(0f);
 
     protected PlayerPresenter(GameProgressService gameProgressService = null)
     {
@@ -73,8 +78,14 @@ public abstract class PlayerPresenter : IDisposable
         InitializeAuctionData();
     }
 
+    // === 状態ゲージ管理 ===
+    public void SetPainLevel(float value) => _painLevel.Value = UnityEngine.Mathf.Clamp01(value);
+    public void SetDilutionLevel(float value) => _dilutionLevel.Value = UnityEngine.Mathf.Clamp01(value);
+
     public virtual void Dispose()
     {
         _playerModel.Dispose();
+        _painLevel.Dispose();
+        _dilutionLevel.Dispose();
     }
 }

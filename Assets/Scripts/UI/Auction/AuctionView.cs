@@ -100,6 +100,12 @@ public class AuctionView : MonoBehaviour
         }
     }
 
+
+    public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
+
+
+    public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
+
     // 入札フェーズ開始
     public void StartBidding(
         IReadOnlyList<CardModel> playerCards,

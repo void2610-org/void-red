@@ -21,6 +21,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly NarrationView _enemyNarrationView;
     private EnemyView _enemyView;
     private readonly BlackOverlayView _blackOverlayView;
+
+    private readonly EyeBlinkTransitionView _eyeBlinkTransitionView;
     private readonly CompositeDisposable _disposables = new ();
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
@@ -29,11 +31,27 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly DialoguePhaseView _dialoguePhaseView;
     private readonly RewardPhaseView _rewardPhaseView;
     private readonly MemoryGrowthView _memoryGrowthView;
+    private readonly PlayerFaceView _playerFaceView;
+    private readonly EnemyFaceView _enemyFaceView;
     private BattlePresenter _battlePresenter;
 
-    /// <summary>
-    /// BattlePresenterを設定（循環依存を避けるため後から設定）
-    /// </summary>
+    public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
+    public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
+    public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
+    public void InitializeEnemyFace(EnemyData enemyData) => _enemyFaceView.Initialize(enemyData);
+    public void UpdatePlayerPainGauge(float value) => _playerFaceView.UpdatePainGauge(value);
+    public void UpdatePlayerDilutionGauge(float value) => _playerFaceView.UpdateDilutionGauge(value);
+    public async UniTask ShowEnemy() => await _enemyView.Show();
+    public async UniTask HideEnemy() => await _enemyView.Hide();
+    public async UniTask ResetEnemyToDefault() => await _enemyView.ResetToDefaultSprite();
+    public async UniTask UpdateEnemySprite(CardAttribute attribute) => await _enemyView.UpdateSpriteForAttribute(attribute);
+    public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
+    public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
+    public async UniTask PlayPhaseTransitionAsync() => await _eyeBlinkTransitionView.PlayTransitionAsync();
+    public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
+    public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
+    public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
+
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {
         _battlePresenter = battlePresenter;
@@ -46,33 +64,13 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _currentTheme = theme;
         await _themeView.DisplayThemeWithKeywords(theme, isMainTheme);
     }
-    public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
-    public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
-    public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
-
+    
     public void InitializeEnemy(EnemyData enemyData)
     {
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
     }
-
-    public async UniTask ShowEnemy() => await _enemyView.Show();
-    public async UniTask HideEnemy() => await _enemyView.Hide();
-    public async UniTask ResetEnemyToDefault() 
-    {
-        await _enemyView.ResetToDefaultSprite();
-    }
     
-    public async UniTask UpdateEnemySprite(CardAttribute attribute) 
-    {
-        await _enemyView.UpdateSpriteForAttribute(attribute);
-    }
-    
-    public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
-    public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
-    public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
-    public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
-
     // 価値順位設定UIを表示し、完了を待機
     public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync(IReadOnlyList<CardModel> cards)
     {
@@ -87,6 +85,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         // 少し待ってから次のフェーズへ
         await UniTask.Delay(1000);
 
+        // トランジション：閉じる（黒フェードで画面を覆う）
+        await _eyeBlinkTransitionView.PlayCloseAsync();
+
         _valueRankingView.Hide();
 
         return result;
@@ -96,10 +97,13 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void ShowAuctionCards(
         IReadOnlyList<CardModel> playerCards,
         IReadOnlyList<CardModel> enemyCards,
+        IReadOnlyDictionary<EmotionType, int> emotionResources,
         ValueRankingModel playerRanking = null)
     {
         _auctionView.Show();
         _auctionView.ShowCards(playerCards, enemyCards, playerRanking);
+        _auctionView.UpdateEmotionResources(emotionResources);
+        _auctionView.SetSelectedEmotion(EmotionType.Joy);
     }
 
     // AuctionViewを表示（カードは再生成しない）
@@ -224,6 +228,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _announcementView = Object.FindFirstObjectByType<AnnouncementView>();
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
+        _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
 
         // 複数のViewを取得して、プレイヤー用と敵用を区別
         // Y座標が低い方をプレイヤー、高い方を敵とする
@@ -245,6 +250,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
         _memoryGrowthView?.Hide();
+
+        _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
+        _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
     }
