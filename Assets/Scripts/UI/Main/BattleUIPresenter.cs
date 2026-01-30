@@ -21,6 +21,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly NarrationView _enemyNarrationView;
     private EnemyView _enemyView;
     private readonly BlackOverlayView _blackOverlayView;
+
+    private readonly EyeBlinkTransitionView _eyeBlinkTransitionView;
     private readonly CompositeDisposable _disposables = new ();
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
@@ -70,6 +72,14 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     
     public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
     public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
+
+
+    /// <summary>
+    /// フェーズ遷移時の瞬きトランジションを再生
+    /// </summary>
+    public async UniTask PlayPhaseTransitionAsync() => await _eyeBlinkTransitionView.PlayTransitionAsync();
+
+    public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
     public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
     public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
 
@@ -86,6 +96,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
         // 少し待ってから次のフェーズへ
         await UniTask.Delay(1000);
+
+        // トランジション：閉じる（黒フェードで画面を覆う）
+        await _eyeBlinkTransitionView.PlayCloseAsync();
 
         _valueRankingView.Hide();
 
@@ -224,6 +237,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _announcementView = Object.FindFirstObjectByType<AnnouncementView>();
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
+        _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
 
         // 複数のViewを取得して、プレイヤー用と敵用を区別
         // Y座標が低い方をプレイヤー、高い方を敵とする

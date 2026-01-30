@@ -241,8 +241,11 @@ public class BattlePresenter: IStartable, ISceneInitializable
 
         Debug.Log($"[BattlePresenter] オークション対象カード: {_auctionCards.Count}枚");
 
-        // UIでカードを表示（プレイヤーの価値順位も渡す）
+        // 黒画面の裏でカードを表示（プレイヤーの価値順位も渡す）
         _battleUIPresenter.ShowAuctionCards(_player.Cards, _enemy.Cards, _player.ValueRanking);
+
+        // トランジション：開く（黒フェードから復帰）
+        await _battleUIPresenter.PlayPhaseTransitionOpenAsync();
 
         await UniTask.Delay(1500);
         await ChangeState(GameState.BiddingPhase);
