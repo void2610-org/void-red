@@ -11,7 +11,6 @@ public class MemoryThemeListItemView : MonoBehaviour
 {
     [SerializeField] private Button button;
     [SerializeField] private TextMeshProUGUI themeText;
-    [SerializeField] private Image emotionIcon;
 
     public AcquiredTheme Theme { get; private set; }
     
@@ -40,7 +39,6 @@ public class MemoryThemeListItemView : MonoBehaviour
     {
         Theme = null;
         themeText.text = "???";
-        emotionIcon.color = Color.gray;
         button.interactable = false;
     }
 
@@ -60,11 +58,7 @@ public class MemoryThemeListItemView : MonoBehaviour
     private void UpdateDisplay()
     {
         if (Theme == null) return;
-
-        // 複合感情も考慮した感情結果を取得
-        var emotionResult = Theme.DominantEmotionResult;
         themeText.text = $"{Theme.ThemeName}: {Theme.AcquiredCards.Count}枚";
-        emotionIcon.color = emotionResult.GetColor();
     }
 
     private void Awake()

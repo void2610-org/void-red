@@ -5,20 +5,33 @@ using TMPro;
 using Cysharp.Threading.Tasks;
 using R3;
 
+[RequireComponent(typeof(CanvasGroup))]
 public class RewardPhaseView : MonoBehaviour
 {
-    [Header("表示")]
     [SerializeField] private TextMeshProUGUI rewardInfoText;
-
-    [Header("次へボタン")]
+    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button nextButton;
 
     private readonly Subject<Unit> _onNextButtonClicked = new();
     private int _totalReward;
 
+    public void Hide()
+    {
+        // CanvasGroupを無効化して非表示
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+        gameObject.SetActive(false);
+    }
+
     public async UniTask ShowRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results)
     {
+        // CanvasGroupを有効化して表示
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
         gameObject.SetActive(true);
+
         _totalReward = 0;
 
         foreach (var (card, result) in results)
@@ -45,8 +58,6 @@ public class RewardPhaseView : MonoBehaviour
                               $"= {result.TotalReward}\n\n" +
                               $"合計: {_totalReward}";
     }
-
-    public void Hide() => gameObject.SetActive(false);
 
     private void Awake()
     {
