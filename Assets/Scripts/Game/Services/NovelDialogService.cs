@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Void2610.UnityTemplate.Google;
 
 /// <summary>
 /// ノベルダイアログデータを取得・管理するサービス
@@ -8,14 +9,15 @@ using UnityEngine;
 /// </summary>
 public class NovelDialogService
 {
+    private const string GOOGLE_KEY_FILE_NAME = "void-red-c7ec6e87a6c6.json";
     private const string SPREADSHEET_ID = "1cPwaMiTwriP5eGhxYqIYvdpjJ81xsnwDdBtULMlP82I";
     private readonly bool _useLocalExcel; // trueでローカルExcel、falseでスプレッドシート
-    
+
     public NovelDialogService(bool useLocalExcel)
     {
         _useLocalExcel = useLocalExcel;
     }
-    
+
     /// <summary>
     /// シナリオIDに対応するダイアログデータを取得
     /// </summary>
@@ -27,7 +29,7 @@ public class NovelDialogService
             return await GetDialogDataFromExcel(scenarioId);
         return await GetDialogDataFromSpreadsheet(scenarioId);
     }
-    
+
     /// <summary>
     /// ローカルExcelファイルからダイアログデータを取得
     /// </summary>
@@ -38,40 +40,40 @@ public class NovelDialogService
         #endif
         var excelDialogLoader = new ExcelDialogLoader();
         var dialogData = await excelDialogLoader.LoadDialogDataAsync(scenarioId);
-        
+
         if (dialogData == null)
         {
             Debug.LogError($"[NovelDialogService] ローカルExcelからシナリオ '{scenarioId}' のデータを取得できませんでした");
             return null;
         }
-        
+
         return dialogData;
     }
-    
+
     /// <summary>
     /// Googleスプレッドシートからダイアログデータを取得
     /// </summary>
     private async UniTask<List<DialogData>> GetDialogDataFromSpreadsheet(string scenarioId)
     {
         // スプレッドシートからデータを取得
-        var sheetData = await GoogleSpreadSheetService.GetSheet(SPREADSHEET_ID, scenarioId);
-        
+        var sheetData = await GoogleSpreadSheetService.GetSheet(GOOGLE_KEY_FILE_NAME, SPREADSHEET_ID, scenarioId);
+
         if (sheetData == null)
         {
             Debug.LogError($"[NovelDialogService] スプレッドシートからシナリオ '{scenarioId}' のデータを取得できませんでした");
             return null;
         }
-        
+
         if (sheetData.Count <= 1)
         {
             Debug.LogError($"[NovelDialogService] シナリオ '{scenarioId}' にデータが存在しません（ヘッダー行のみまたは空）");
             return null;
         }
-        
+
         // スプレッドシートデータをDialogDataに変換
         return ConvertSheetToDialogData(sheetData);
     }
-    
+
     /// <summary>
     /// スプレッドシートデータをDialogDataのリストに変換
     /// 列構成: SpeakerName | DialogText | パラメータタイプ | パラメータ値 | パラメータタイプ | パラメータ値 ...
@@ -79,23 +81,23 @@ public class NovelDialogService
     private List<DialogData> ConvertSheetToDialogData(IList<IList<object>> sheetData)
     {
         var dialogList = new List<DialogData>();
-        
+
         // ヘッダー行をスキップ（1行目）
         for (var i = 1; i < sheetData.Count; i++)
         {
             var row = sheetData[i];
-            
+
             // 空行をスキップ
             if (row.Count == 0 || IsEmptyRow(row))
                 continue;
-            
+
             var dialogData = CreateDialogDataFromRow(row);
             if (dialogData != null) dialogList.Add(dialogData);
         }
-        
+
         return dialogList;
     }
-    
+
     /// <summary>
     /// スプレッドシートの1行からDialogDataを作成
     /// 基本情報（SpeakerName, DialogText）の後、動的パラメータを解析
@@ -103,21 +105,21 @@ public class NovelDialogService
     private DialogData CreateDialogDataFromRow(IList<object> row)
     {
         if (row.Count < 2) return null;
-        
+
         // 基本情報（必須）
         var speakerName = GetStringValue(row, 0);
         var dialogText = GetStringValue(row, 1);
-        
+
         // セリフが空の場合はスキップ
         if (string.IsNullOrEmpty(dialogText)) return null;
-        
+
         // 動的パラメータを解析（3列目以降）
         var parameters = ParseDynamicParameters(row, 2);
-        
+
         // DialogDataを作成
         return new DialogData(speakerName, dialogText, parameters);
     }
-    
+
     /// <summary>
     /// 動的パラメータを解析してDictionaryを作成
     /// パラメータタイプとパラメータ値のペアを処理
@@ -128,16 +130,16 @@ public class NovelDialogService
     private Dictionary<DialogParameterType, object> ParseDynamicParameters(IList<object> row, int startIndex)
     {
         var parameters = new Dictionary<DialogParameterType, object>();
-        
+
         // パラメータタイプとパラメータ値のペアを解析
         for (var i = startIndex; i < row.Count - 1; i += 2)
         {
             var parameterTypeString = GetStringValue(row, i);
             var parameterValueString = GetStringValue(row, i + 1);
-            
+
             // 空のパラメータタイプはスキップ
             if (string.IsNullOrEmpty(parameterTypeString)) continue;
-            
+
             // パラメータタイプを変換
             if (DialogParameterTypeExtensions.TryParseParameterType(parameterTypeString, out var parameterType))
             {
@@ -150,10 +152,10 @@ public class NovelDialogService
                 Debug.LogWarning($"[NovelDialogService] 不明なパラメータタイプ: {parameterTypeString}");
             }
         }
-        
+
         return parameters;
     }
-    
+
     /// <summary>
     /// 行が空かどうかをチェック
     /// </summary>
@@ -166,7 +168,7 @@ public class NovelDialogService
         }
         return true;
     }
-    
+
     /// <summary>
     /// 安全に文字列値を取得
     /// </summary>

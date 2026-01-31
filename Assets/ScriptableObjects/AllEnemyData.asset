@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: AllEnemyData
   m_EditorClassIdentifier: 
   enemyList:
+  - {fileID: 11400000, guid: f8ea604e8e1164d9d9cc32080f14064e, type: 2}
   - {fileID: 11400000, guid: 05253626a6a1247328c0b42a6ff41804, type: 2}
   - {fileID: 11400000, guid: 56d622f5c9c8147aba7c7a73258ce6b8, type: 2}
-  - {fileID: 11400000, guid: f8ea604e8e1164d9d9cc32080f14064e, type: 2}
