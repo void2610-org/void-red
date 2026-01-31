@@ -65,7 +65,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _battleUIPresenter.SetBattlePresenter(this);
 
         InitializeGameAsync().Forget();
-        BgmManager.Instance.PlayBGMBySceneType(BgmType.Battle);
+        BgmManager.Instance.PlayBGM("Battle");
     }
 
     private async UniTaskVoid InitializeGameAsync()
