@@ -12,7 +12,8 @@ using R3;
 public class MemoryGrowthView : BaseWindowView
 {
     [SerializeField] private MemoryThemeListView themeListView;
-    [SerializeField] private CharacterMemoryView characterView;
+    [SerializeField] private MemoryDetailView detailView;
+    [SerializeField] private GameObject hideObject;
 
     private readonly Subject<Unit> _onContinueClicked = new();
 
@@ -22,21 +23,23 @@ public class MemoryGrowthView : BaseWindowView
     /// <param name="allThemes">全獲得テーマリスト</param>
     public void ShowMemoryGrowth(IReadOnlyList<AcquiredTheme> allThemes)
     {
-        // 左側のテーマリストを初期化
+        // テーマリストを初期化
         themeListView.Initialize(allThemes);
-
         // テーマ選択時のハンドラを設定
         themeListView.OnThemeSelected
-            .Subscribe(theme => characterView?.ShowThemeCards(theme))
+            .Subscribe(theme => HandleThemeSelected(theme).Forget())
             .AddTo(Disposables);
-
         // ウィンドウを表示
         Show();
     }
+    
+    private async UniTask HandleThemeSelected(AcquiredTheme theme)
+    {
+        hideObject.SetActive(false);
+        await detailView.ShowAndWaitClose(theme);
+        hideObject.SetActive(true);
+    }
 
-    /// <summary>
-    /// 続けるボタンクリックを待機
-    /// </summary>
     public async UniTask WaitForContinueAsync()
     {
         await _onContinueClicked.FirstAsync();
