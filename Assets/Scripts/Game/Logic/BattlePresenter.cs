@@ -14,7 +14,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private readonly Enemy _enemy;
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
-    private readonly DiscordService _discordService;
     private readonly AllAuctionData _allAuctionData;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
@@ -36,7 +35,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         Enemy enemy,
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
-        DiscordService discordService,
         AllAuctionData allAuctionData)
     {
         _battleUIPresenter = battleUIPresenter;
@@ -44,7 +42,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _enemy = enemy;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _discordService = discordService;
         _allAuctionData = allAuctionData;
 
         InitializeAuctionData();
@@ -105,9 +102,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
-
-        // Discord Rich Presence更新（バトル開始）
-        _discordService?.SetState("対戦相手", _currentEnemyData.EnemyName);
 
         // 敵を初期化して表示
         _enemy.SetEnemyData(_currentEnemyData);

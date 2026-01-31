@@ -3,6 +3,7 @@ using VContainer;
 using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
+using Void2610.UnityTemplate.Discord;
 
 /// <summary>
 /// ルートレベルのLifetimeScope
@@ -60,7 +61,11 @@ public class RootLifetimeScope : LifetimeScope
         // Steam統合サービス
         builder.RegisterEntryPoint<SteamService>().AsSelf();
         // Discord統合サービス
-        builder.Register<DiscordService>(Lifetime.Singleton);
+        builder.Register<DiscordService>(Lifetime.Singleton)
+            .WithParameter(1415132179377160262UL)   // clientId
+            .WithParameter("Void Red")               // gameName
+            .WithParameter("https://void-red.void2610.dev/") // url
+            .WithParameter("プレイ中");              // defaultDetails
 
         InitializeSingletonMonoBehaviour();
     }
