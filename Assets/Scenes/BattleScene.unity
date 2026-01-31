@@ -5627,8 +5627,8 @@ RectTransform:
   - {fileID: 7605371287240366073}
   - {fileID: 2796001278686421515}
   - {fileID: 1817069434}
-  - {fileID: 1682575735}
   - {fileID: 3961447289890990789}
+  - {fileID: 1682575735}
   - {fileID: 7340877632909031750}
   - {fileID: 1931349578711517344}
   - {fileID: 381149955}
@@ -6566,11 +6566,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8063054174884377505, guid: 626c932d829ce438b8420d45d0b05992, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 150
+      value: 134
       objectReference: {fileID: 0}
     - target: {fileID: 8063054174884377505, guid: 626c932d829ce438b8420d45d0b05992, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 634
+      value: 232
       objectReference: {fileID: 0}
     - target: {fileID: 8063054174884377505, guid: 626c932d829ce438b8420d45d0b05992, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -7308,11 +7308,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -100
+      value: -171
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 388.99994
+      value: -91
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -7773,6 +7773,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 595253103}
     m_Modifications:
+    - target: {fileID: 6678202156017642166, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
+      propertyPath: enemyNarration
+      value: 
+      objectReference: {fileID: 1682575737}
+    - target: {fileID: 6678202156017642166, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
+      propertyPath: playerNarration
+      value: 
+      objectReference: {fileID: 3961447289890990791}
+    - target: {fileID: 6678202156017642166, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
+      propertyPath: resultNarration
+      value: 
+      objectReference: {fileID: 3961447289890990791}
     - target: {fileID: 7823105220120858534, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -8155,6 +8167,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2187487941868099109, guid: 503d0bf342770409c96f4e392d63b93e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4860410803317955882, guid: 503d0bf342770409c96f4e392d63b93e, type: 3}
+      propertyPath: m_Alpha
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

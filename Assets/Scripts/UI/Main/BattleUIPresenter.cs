@@ -197,15 +197,17 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         return selectedIndex;
     }
 
-    public void ShowEnemyDialogue(string text) => _dialoguePhaseView.ShowDialogueText(text);
-    public void HideEnemyDialogue() => _dialoguePhaseView.HideDialogueText();
-    public void ShowDialogueResult(string message) => _dialoguePhaseView.ShowResult(message);
-    public void HideDialogueResult() => _dialoguePhaseView.HideResult();
+    public UniTask ShowPlayerDialogueAsync(string text) => _dialoguePhaseView.ShowPlayerDialogueAsync(text);
+    public UniTask HidePlayerDialogueAsync() => _dialoguePhaseView.HidePlayerDialogueAsync();
+    public UniTask ShowEnemyDialogueAsync(string text) => _dialoguePhaseView.ShowEnemyDialogueAsync(text);
+    public UniTask HideEnemyDialogueAsync() => _dialoguePhaseView.HideEnemyDialogueAsync();
+    public UniTask ShowDialogueResultAsync(string message) => _dialoguePhaseView.ShowResultAsync(message);
+    public UniTask HideDialogueResultAsync() => _dialoguePhaseView.HideResultAsync();
     public void ShowDialogueView() => _dialoguePhaseView.Show();
 
-    public void HideDialogueView()
+    public async UniTask HideDialogueViewAsync()
     {
-        _dialoguePhaseView.HideAll();
+        await _dialoguePhaseView.HideAllAsync();
         _dialoguePhaseView.Hide();
     }
 

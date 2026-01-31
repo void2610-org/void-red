@@ -287,13 +287,11 @@ public class BattlePresenter: IStartable, ISceneInitializable
         var dialogueData = _currentAuctionData.DialogueData;
 
         var playerFirstChoice = await HandlePlayerFirstTurn(dialogueData);
-        await UniTask.Delay(1500);
-        _battleUIPresenter.HideDialogueResult();
+        await _battleUIPresenter.HideDialogueResultAsync();
 
         await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
 
-        await UniTask.Delay(2000);
-        _battleUIPresenter.HideDialogueView();
+        await _battleUIPresenter.HideDialogueViewAsync();
         await ChangeState(GameState.AuctionResult);
     }
 
@@ -302,12 +300,14 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _battleUIPresenter.ShowDialogueView();
         var playerChoice = await _battleUIPresenter.WaitForFourChoiceAsync();
 
+        // プレイヤーの選択をセリフとして表示
+        await _battleUIPresenter.ShowPlayerDialogueAsync(playerChoice.ToJapaneseName());
+
         var response = dialogueData.GetResponse(playerChoice);
-        _battleUIPresenter.ShowEnemyDialogue(response.DialogueText);
-        await UniTask.Delay(1000);
+        await _battleUIPresenter.ShowEnemyDialogueAsync(response.DialogueText);
 
         var resultMessage = DialogueEffectApplier.ApplyEffect(response.Effect, _enemy, _auctionCards);
-        _battleUIPresenter.ShowDialogueResult(resultMessage);
+        await _battleUIPresenter.ShowDialogueResultAsync(resultMessage);
 
         return playerChoice;
     }
@@ -316,19 +316,28 @@ public class BattlePresenter: IStartable, ISceneInitializable
     {
         var initiation = dialogueData.GetInitiation(playerFirstChoice);
 
-        _battleUIPresenter.HideEnemyDialogue();
-        _battleUIPresenter.HideDialogueResult();
-        await UniTask.Delay(500);
+        await UniTask.WhenAll(
+            _battleUIPresenter.HidePlayerDialogueAsync(),
+            _battleUIPresenter.HideEnemyDialogueAsync(),
+            _battleUIPresenter.HideDialogueResultAsync()
+        );
 
-        _battleUIPresenter.ShowEnemyDialogue(initiation.EnemyDialogueText);
-        await UniTask.Delay(1000);
+        await _battleUIPresenter.ShowEnemyDialogueAsync(initiation.EnemyDialogueText);
 
         var options = initiation.PlayerOptions.Select(o => o.OptionText).ToList();
         var selectedIndex = await _battleUIPresenter.WaitForThreeResponseAsync(options);
 
         var selectedOption = initiation.PlayerOptions[selectedIndex];
+
+        // プレイヤーの選択をセリフとして表示
+        await _battleUIPresenter.ShowPlayerDialogueAsync(selectedOption.OptionText);
+
+        // 敵の返答を表示
+        await _battleUIPresenter.ShowEnemyDialogueAsync(selectedOption.ResultText);
+
+        // 効果を適用して結果を表示
         var resultMessage = DialogueEffectApplier.ApplyEffect(selectedOption.Effect, _player, _auctionCards);
-        _battleUIPresenter.ShowDialogueResult(selectedOption.ResultText + "\n" + resultMessage);
+        await _battleUIPresenter.ShowDialogueResultAsync(resultMessage);
     }
 
     // === 4. 落札者判定フェーズ ===
