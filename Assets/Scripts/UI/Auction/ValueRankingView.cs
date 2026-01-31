@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using R3;
 using Cysharp.Threading.Tasks;
+using Auction;
 
 /// <summary>
 /// 価値順位設定UI
@@ -21,6 +22,9 @@ public class ValueRankingView : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Button confirmButton;
 
+    [Header("ドラッグ演出")]
+    [SerializeField] private DragLineView dragLineView;
+
     public Observable<Unit> OnRankingComplete => _onRankingComplete;
 
     private readonly List<DraggableCardView> _handCards = new();
@@ -28,9 +32,17 @@ public class ValueRankingView : MonoBehaviour
     private readonly Subject<Unit> _onRankingComplete = new();
     private CompositeDisposable _disposables = new();
     private bool _wasDroppedToSlot;
+    private RectTransform _handContainerRect;
 
     public void Show() => gameObject.SetActive(true);
     public void Hide() => gameObject.SetActive(false);
+
+    private void Awake()
+    {
+        _handContainerRect = handContainer as RectTransform;
+        var canvas = GetComponentInParent<Canvas>().rootCanvas;
+        dragLineView.Initialize(canvas);
+    }
 
     public void StartRanking(IReadOnlyList<CardModel> cards)
     {
@@ -51,6 +63,10 @@ public class ValueRankingView : MonoBehaviour
 
             draggableCard.OnClicked
                 .Subscribe(OnCardClicked)
+                .AddTo(_disposables);
+
+            draggableCard.OnDragging
+                .Subscribe(OnCardDragging)
                 .AddTo(_disposables);
 
             _handCards.Add(draggableCard);
@@ -103,10 +119,16 @@ public class ValueRankingView : MonoBehaviour
     private void OnCardDragStarted(DraggableCardView card)
     {
         _wasDroppedToSlot = false;
+
+        // 手札エリアの中心からドラッグ線を表示
+        var handCenterWorld = _handContainerRect.position;
+        dragLineView.Show(handCenterWorld);
     }
 
     private void OnCardDragEnded(DraggableCardView card)
     {
+        dragLineView.Hide();
+
         // スロットにドロップされた場合はOnCardDroppedToSlotで処理済み
         if (_wasDroppedToSlot) return;
 
@@ -118,6 +140,11 @@ public class ValueRankingView : MonoBehaviour
         }
 
         card.PlayReturnToHandAsync(handContainer).Forget();
+    }
+
+    private void OnCardDragging(Vector3 cardWorldPos)
+    {
+        dragLineView.UpdateEndPosition(cardWorldPos);
     }
 
     private void OnCardDroppedToSlot(RankingSlotView slot, DraggableCardView droppedCard)

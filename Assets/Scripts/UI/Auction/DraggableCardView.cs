@@ -25,6 +25,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     public Observable<DraggableCardView> OnDragStarted => _onDragStarted;
     public Observable<DraggableCardView> OnDragEnded => _onDragEnded;
     public Observable<DraggableCardView> OnClicked => _onClicked;
+    public Observable<Vector3> OnDragging => _onDragging;
 
     private const float SNAP_DURATION = 0.2f;
     private const float RETURN_DURATION = 0.3f;
@@ -32,6 +33,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private readonly Subject<DraggableCardView> _onDragStarted = new();
     private readonly Subject<DraggableCardView> _onDragEnded = new();
     private readonly Subject<DraggableCardView> _onClicked = new();
+    private readonly Subject<Vector3> _onDragging = new();
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
     private Transform _originalParent;
@@ -139,6 +141,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
                 out var localPoint))
         {
             _rectTransform.localPosition = localPoint;
+            _onDragging.OnNext(_rectTransform.position);
         }
     }
 
@@ -179,5 +182,6 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _onDragStarted.Dispose();
         _onDragEnded.Dispose();
         _onClicked.Dispose();
+        _onDragging.Dispose();
     }
 }
