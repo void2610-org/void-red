@@ -79,14 +79,14 @@ public static class BattleKeyBindings
         //     .Subscribe(_ => battleUIPresenter.NavigateToPrevCard())
         //     .AddTo(disposables);
         
-        // ナレーションをスキップする
-        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
+        // ナレーションをスキップする（非表示のオブジェクトも含めて検索）
+        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         inputActionsProvider.UI.Advance.OnPerformedAsObservable()
             .Where(_ => !BaseWindowView.HasActiveWindows)
             .Subscribe(_ =>
             {
-                narrationViews[0].OnClick();
-                narrationViews[1].OnClick();
+                foreach (var view in narrationViews)
+                    view.OnClick();
             })
             .AddTo(disposables);
     }

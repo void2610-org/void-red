@@ -419,8 +419,15 @@ public class BattlePresenter: IStartable, ISceneInitializable
             Debug.Log($"[BattlePresenter] {card.Data.CardName}: 基本{result.BaseReward} + 相対{result.RelativeReward}{ownCardText} = 合計{result.TotalReward}");
         }
 
+        // 最大リソース値を設定（デフォルト値の3倍を仮の上限とする）
+        var maxResources = new Dictionary<EmotionType, int>();
+        foreach (EmotionType emotion in System.Enum.GetValues(typeof(EmotionType)))
+        {
+            maxResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE * 3;
+        }
+
         // 報酬演出表示
-        await _battleUIPresenter.ShowRewardsAsync(rewardResults);
+        await _battleUIPresenter.ShowRewardsAsync(rewardResults, _player.EmotionResources, maxResources);
 
         await UniTask.Delay(2000);
         _battleUIPresenter.HideRewardView();

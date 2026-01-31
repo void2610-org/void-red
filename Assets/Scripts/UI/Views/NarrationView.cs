@@ -82,6 +82,9 @@ public class NarrationView : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
+        // 未初期化の場合は何もしない（非アクティブ状態でAwakeが呼ばれていない場合）
+        if (_textProgressController == null) return;
+
         // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
         _textProgressController.AdvanceToNext();
     }

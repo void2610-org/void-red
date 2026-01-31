@@ -212,9 +212,12 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     // 報酬フェーズ：報酬計算結果を表示
-    public async UniTask ShowRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results)
+    public async UniTask ShowRewardsAsync(
+        Dictionary<CardModel, RewardCalculator.RewardResult> results,
+        IReadOnlyDictionary<EmotionType, int> currentResources,
+        IReadOnlyDictionary<EmotionType, int> maxResources)
     {
-        await _rewardPhaseView.ShowRewardsAsync(results);
+        await _rewardPhaseView.ShowRewardsAsync(results, currentResources, maxResources);
     }
 
     // 報酬フェーズを非表示
