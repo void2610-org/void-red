@@ -433,7 +433,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7355541710097526288}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -450,9 +450,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rewardInfoText: {fileID: 6667516010175715011}
+  canvasGroup: {fileID: 6855033643061105437}
   nextButton: {fileID: 8876951738870556231}
-  cardDisplayDuration: 3
-  rewardCountDuration: 5
 --- !u!1 &8192268624342431843
 GameObject:
   m_ObjectHideFlags: 0
