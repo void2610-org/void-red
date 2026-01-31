@@ -403,15 +403,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
             _player.Bids,
             _player.Cards);
 
-        var totalReward = RewardCalculator.CalculateTotalReward(rewardResults);
-
-        // 報酬を感情リソースとして付与（一旦Joyに加算）
-        if (totalReward > 0)
-        {
-            _player.AddEmotion(EmotionType.Joy, totalReward);
-            Debug.Log($"[BattlePresenter] プレイヤーに報酬付与: {totalReward}リソース");
-        }
-
         // 各カードの報酬詳細をログ出力
         foreach (var (card, result) in rewardResults)
         {
@@ -426,8 +417,18 @@ public class BattlePresenter: IStartable, ISceneInitializable
             maxResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE * 3;
         }
 
-        // 報酬演出表示
-        await _battleUIPresenter.ShowRewardsAsync(rewardResults, _player.EmotionResources, maxResources);
+        // 報酬演出表示（報酬加算前のリソース値を渡す）
+        var rewardedAmounts = await _battleUIPresenter.ShowRewardsAsync(rewardResults, _player.EmotionResources, maxResources);
+
+        // 報酬を各感情リソースに加算（演出で決まったランダムな感情タイプごとに）
+        foreach (var (emotion, amount) in rewardedAmounts)
+        {
+            if (amount > 0)
+            {
+                _player.AddEmotion(emotion, amount);
+                Debug.Log($"[BattlePresenter] プレイヤーに報酬付与: {emotion} +{amount}リソース");
+            }
+        }
 
         await UniTask.Delay(2000);
         _battleUIPresenter.HideRewardView();
