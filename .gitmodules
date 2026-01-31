@@ -1,3 +1,6 @@
 [submodule "my-unity-settings"]
 	path = my-unity-settings
 	url = https://github.com/void2610/my-unity-settings.git
+[submodule "my-unity-utils"]
+	path = my-unity-utils
+	url = https://github.com/void2610/my-unity-utils.git
