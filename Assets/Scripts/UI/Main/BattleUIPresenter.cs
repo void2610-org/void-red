@@ -51,6 +51,14 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
     public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
     public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
+    public UniTask ShowPlayerDialogueAsync(string text) => _dialoguePhaseView.ShowPlayerDialogueAsync(text);
+    public UniTask HidePlayerDialogueAsync() => _dialoguePhaseView.HidePlayerDialogueAsync();
+    public UniTask ShowEnemyDialogueAsync(string text) => _dialoguePhaseView.ShowEnemyDialogueAsync(text);
+    public UniTask HideEnemyDialogueAsync() => _dialoguePhaseView.HideEnemyDialogueAsync();
+    public UniTask ShowDialogueResultAsync(string message) => _dialoguePhaseView.ShowResultAsync(message);
+    public UniTask HideDialogueResultAsync() => _dialoguePhaseView.HideResultAsync();
+    public void ShowDialogueView() => _dialoguePhaseView.Show();
+
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {
@@ -196,14 +204,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
         return selectedIndex;
     }
-
-    public UniTask ShowPlayerDialogueAsync(string text) => _dialoguePhaseView.ShowPlayerDialogueAsync(text);
-    public UniTask HidePlayerDialogueAsync() => _dialoguePhaseView.HidePlayerDialogueAsync();
-    public UniTask ShowEnemyDialogueAsync(string text) => _dialoguePhaseView.ShowEnemyDialogueAsync(text);
-    public UniTask HideEnemyDialogueAsync() => _dialoguePhaseView.HideEnemyDialogueAsync();
-    public UniTask ShowDialogueResultAsync(string message) => _dialoguePhaseView.ShowResultAsync(message);
-    public UniTask HideDialogueResultAsync() => _dialoguePhaseView.HideResultAsync();
-    public void ShowDialogueView() => _dialoguePhaseView.Show();
 
     public async UniTask HideDialogueViewAsync()
     {
