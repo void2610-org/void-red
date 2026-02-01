@@ -65,7 +65,7 @@ public class HomePresenter : IStartable, IDisposable
             .AddTo(_disposables);
 
         // ホームBGMを再生
-        BgmManager.Instance.PlayBGMBySceneType(BgmType.Home);
+        BgmManager.Instance.PlayBGM("Home");
 
         SafeNavigationManager.SelectRootForceSelectable().Forget();
     }

@@ -74,10 +74,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2e9d17fe8054d84859d0f9ec56b647, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  closeButton: {fileID: 1111621369389808487}
   themeListView: {fileID: 2391297749690328047}
   detailView: {fileID: 6802060944683760655}
   hideObject: {fileID: 8643215281365972384}
+  nextButton: {fileID: 1111621369389808487}
 --- !u!1 &910204389364183136
 GameObject:
   m_ObjectHideFlags: 0
@@ -1109,11 +1109,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3966798620816172413, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 364
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 3966798620816172413, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -229
+      value: -225
       objectReference: {fileID: 0}
     - target: {fileID: 4642221254253192836, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
       propertyPath: m_Pivot.x
@@ -1318,11 +1318,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9037413902010202566, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 439
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 9037413902010202566, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -260
+      value: -225
       objectReference: {fileID: 0}
     - target: {fileID: 9037413902010202566, guid: f450b942b6a054de89f312c4067e8e09, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

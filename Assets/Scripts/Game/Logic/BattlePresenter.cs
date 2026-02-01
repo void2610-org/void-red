@@ -14,7 +14,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
     private readonly Enemy _enemy;
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
-    private readonly DiscordService _discordService;
     private readonly AllAuctionData _allAuctionData;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
@@ -36,7 +35,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         Enemy enemy,
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
-        DiscordService discordService,
         AllAuctionData allAuctionData)
     {
         _battleUIPresenter = battleUIPresenter;
@@ -44,7 +42,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _enemy = enemy;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _discordService = discordService;
         _allAuctionData = allAuctionData;
 
         InitializeAuctionData();
@@ -65,7 +62,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         _battleUIPresenter.SetBattlePresenter(this);
 
         InitializeGameAsync().Forget();
-        BgmManager.Instance.PlayBGMBySceneType(BgmType.Battle);
+        BgmManager.Instance.PlayBGM("Battle");
     }
 
     private async UniTaskVoid InitializeGameAsync()
@@ -105,9 +102,6 @@ public class BattlePresenter: IStartable, ISceneInitializable
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
-
-        // Discord Rich Presence更新（バトル開始）
-        _discordService?.SetState("対戦相手", _currentEnemyData.EnemyName);
 
         // 敵を初期化して表示
         _enemy.SetEnemyData(_currentEnemyData);
@@ -347,6 +341,10 @@ public class BattlePresenter: IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
 
+        // 入札に使ったリソースを消費
+        ConsumeBidResources(_player);
+        ConsumeBidResources(_enemy);
+
         // AuctionViewを再表示（カードは既に存在する）
         _battleUIPresenter.ShowAuctionView();
 
@@ -386,6 +384,19 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // オークション完全終了時にクリア
         _battleUIPresenter.ClearAuctionView();
         await ChangeState(GameState.RewardPhase);
+    }
+
+    /// <summary>
+    /// 入札に使ったリソースを消費する
+    /// </summary>
+    private void ConsumeBidResources(PlayerPresenter player)
+    {
+        var bidsByEmotion = player.Bids.GetTotalBidsByEmotion();
+        foreach (var (emotion, amount) in bidsByEmotion)
+        {
+            player.TryConsumeEmotion(emotion, amount);
+            Debug.Log($"[BattlePresenter] リソース消費: {emotion} -{amount}");
+        }
     }
 
     // === 5. 報酬フェーズ ===

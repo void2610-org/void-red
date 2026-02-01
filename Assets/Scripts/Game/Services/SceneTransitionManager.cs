@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Void2610.UnityTemplate;
+using Void2610.UnityTemplate.Discord;
 using DelayType = Cysharp.Threading.Tasks.DelayType;
 
 /// <summary>
@@ -113,7 +114,15 @@ public class SceneTransitionManager : IDisposable
             _inputActionsProvider.EnableActionMapsForScene(targetScene);
             
             // Discord Rich Presence更新
-            _discordService.SetSceneState(targetScene);
+            var discordState = targetScene switch
+            {
+                SceneType.Title => "タイトル画面",
+                SceneType.Home => "ホーム画面",
+                SceneType.Battle => "バトル中",
+                SceneType.Novel => "ストーリー",
+                _ => "プレイ中"
+            };
+            _discordService.SetCurrentStage(discordState);
 
             // シーンの初期化完了を待つ
             await WaitForSceneReady();

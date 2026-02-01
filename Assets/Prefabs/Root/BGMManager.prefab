@@ -41,16 +41,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 4758466363525563744}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71f27f356df5a461d8140fbae957a904, type: 3}
+  m_Script: {fileID: 11500000, guid: 75963d6e36e5848888ab00912f2eb8c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playOnStart: 1
   bgmMixerGroup: {fileID: 4012142502108132091, guid: b2ecbb207e05140658f87e606166d8f5, type: 2}
   bgmList:
   - name: Title
     audioClip: {fileID: 8300000, guid: e3f47cea037ff4104a0e81704210474c, type: 3}
     volume: 0.15
     bgmType: 0
-  - name: Scenario
+  - name: Novel
     audioClip: {fileID: 8300000, guid: 5fb64eacf247243ac91f4c2ba363eb62, type: 3}
     volume: 0.3
     bgmType: 2
@@ -62,3 +63,4 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: 53f2983d39624484590ff583ac6c5c63, type: 3}
     volume: 0.3
     bgmType: 1
+  fadeTime: 1

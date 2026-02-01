@@ -1,21 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 記憶育成フェーズのメインビュー
 /// BaseWindowViewを継承してウィンドウとして振る舞う
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class MemoryGrowthView : BaseWindowView
+public class MemoryGrowthView : MonoBehaviour
 {
     [SerializeField] private MemoryThemeListView themeListView;
     [SerializeField] private MemoryDetailView detailView;
     [SerializeField] private GameObject hideObject;
+    [SerializeField] private Button nextButton;
 
-    private readonly Subject<Unit> _onContinueClicked = new();
+    private CanvasGroup _canvasGroup;
+
+    public async UniTask WaitForContinueAsync() => await nextButton.OnClickAsync();
 
     /// <summary>
     /// 記憶育成フェーズを表示
@@ -28,9 +32,10 @@ public class MemoryGrowthView : BaseWindowView
         // テーマ選択時のハンドラを設定
         themeListView.OnThemeSelected
             .Subscribe(theme => HandleThemeSelected(theme).Forget())
-            .AddTo(Disposables);
+            .AddTo(this);
+        
         // ウィンドウを表示
-        Show();
+        _canvasGroup.FadeIn(0.5f);
     }
     
     private async UniTask HandleThemeSelected(AcquiredTheme theme)
@@ -40,23 +45,11 @@ public class MemoryGrowthView : BaseWindowView
         hideObject.SetActive(true);
     }
 
-    public async UniTask WaitForContinueAsync()
+    private void Awake()
     {
-        await _onContinueClicked.FirstAsync();
-    }
-
-    protected override void Awake()
-    {
-        base.Awake();
-
-        closeButton.OnClickAsObservable()
-            .Subscribe(_ => _onContinueClicked.OnNext(Unit.Default))
-            .AddTo(Disposables);
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        _onContinueClicked?.Dispose();
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.alpha = 0f;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
     }
 }

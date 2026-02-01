@@ -5527,7 +5527,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 595253098}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbb52015d3d63486e9d606422e470691, type: 3}
+  m_Script: {fileID: 11500000, guid: 09b5a1a0609ed4ee5b733c0a7a41eec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   targetCamera: {fileID: 1535600224}
@@ -6101,14 +6101,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4488256376449785670, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 4488256376449785670, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5041047900222647921, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -6479,7 +6471,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1535600223}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8ea2a2c5f4224d0faca4f12a5d410e9, type: 3}
+  m_Script: {fileID: 11500000, guid: 86b9ae5b3a4b44067973c0b32c71892d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   aspectWidth: 16
@@ -6735,7 +6727,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2065550660}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbeb37a65344247879a67be92f5b641a, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d58a9343da6d4fd9aa9a02066dd51d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: cee22cc1c669849449c927d3378ebd49, type: 2}
@@ -8186,10 +8178,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2187487941868099109, guid: 503d0bf342770409c96f4e392d63b93e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4860410803317955882, guid: 503d0bf342770409c96f4e392d63b93e, type: 3}
-      propertyPath: m_Alpha
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

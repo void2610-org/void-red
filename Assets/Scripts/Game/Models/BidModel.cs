@@ -104,6 +104,24 @@ public class BidModel
     }
 
     /// <summary>
+    /// 感情タイプ別の入札合計を取得（全カードの合計）
+    /// </summary>
+    /// <returns>感情タイプごとの入札合計量</returns>
+    public Dictionary<EmotionType, int> GetTotalBidsByEmotion()
+    {
+        var result = new Dictionary<EmotionType, int>();
+        foreach (var cardBids in _bids.Values)
+        {
+            foreach (var (emotion, amount) in cardBids)
+            {
+                result.TryAdd(emotion, 0);
+                result[emotion] += amount;
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
     /// 全ての入札をクリア
     /// </summary>
     public void Clear()

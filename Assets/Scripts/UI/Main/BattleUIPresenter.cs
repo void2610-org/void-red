@@ -255,7 +255,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _rewardPhaseView.Hide();
 
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
-        _memoryGrowthView?.Hide();
 
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
         _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
@@ -277,7 +276,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _memoryGrowthView.ShowMemoryGrowth(allThemes);
         await _memoryGrowthView.WaitForContinueAsync();
-        _memoryGrowthView.Hide();
     }
 
     public void Dispose()
