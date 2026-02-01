@@ -36,8 +36,6 @@ public class MemoryGrowthView : MonoBehaviour
         
         // ウィンドウを表示
         _canvasGroup.FadeIn(0.5f);
-        _canvasGroup.interactable = true;
-        _canvasGroup.blocksRaycasts = true;
     }
     
     private async UniTask HandleThemeSelected(AcquiredTheme theme)

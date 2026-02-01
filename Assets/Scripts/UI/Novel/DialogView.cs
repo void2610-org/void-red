@@ -377,13 +377,9 @@ public class DialogView : MonoBehaviour
         {
             _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic).AddTo(this);
             await _panelFadeMotion.ToUniTask();
-            dialogTextPanelCanvasGroup.blocksRaycasts = true;
-            dialogTextPanelCanvasGroup.interactable = true;
         }
         else
         {
-            dialogTextPanelCanvasGroup.blocksRaycasts = false;
-            dialogTextPanelCanvasGroup.interactable = false;
             _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic).AddTo(this);
             await _panelFadeMotion.ToUniTask();
         }

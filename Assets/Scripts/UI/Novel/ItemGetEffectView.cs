@@ -177,9 +177,7 @@ public class ItemGetEffectView : MonoBehaviour
     /// </summary>
     private async UniTask PlayHideAnimation()
     {
-        effectPanelCanvasGroup.interactable = false;
         await effectPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
-        effectPanelCanvasGroup.blocksRaycasts = false;
     }
     
     private void OnDestroy()

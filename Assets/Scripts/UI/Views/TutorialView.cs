@@ -100,8 +100,6 @@ public class TutorialView : MonoBehaviour
         
         // フェードイン
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_DURATION);
-        _canvasGroup.interactable = true;
-        _canvasGroup.blocksRaycasts = true;
         
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
@@ -121,8 +119,6 @@ public class TutorialView : MonoBehaviour
         
         // フェードアウト
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_DURATION);
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
         
         await _currentFadeHandle.ToUniTask();
         
