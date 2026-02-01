@@ -594,7 +594,7 @@ PlayerSettings:
   webWasm2023: 0
   scriptingDefineSymbols:
     Standalone: STEAMWORKS_NET;GOOGLE_ENABLE
-    WebGL: GOOGLE_ENABLEs
+    WebGL: GOOGLE_ENABLE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
