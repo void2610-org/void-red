@@ -341,6 +341,10 @@ public class BattlePresenter: IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
 
+        // 入札に使ったリソースを消費
+        ConsumeBidResources(_player);
+        ConsumeBidResources(_enemy);
+
         // AuctionViewを再表示（カードは既に存在する）
         _battleUIPresenter.ShowAuctionView();
 
@@ -380,6 +384,19 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // オークション完全終了時にクリア
         _battleUIPresenter.ClearAuctionView();
         await ChangeState(GameState.RewardPhase);
+    }
+
+    /// <summary>
+    /// 入札に使ったリソースを消費する
+    /// </summary>
+    private void ConsumeBidResources(PlayerPresenter player)
+    {
+        var bidsByEmotion = player.Bids.GetTotalBidsByEmotion();
+        foreach (var (emotion, amount) in bidsByEmotion)
+        {
+            player.TryConsumeEmotion(emotion, amount);
+            Debug.Log($"[BattlePresenter] リソース消費: {emotion} -{amount}");
+        }
     }
 
     // === 5. 報酬フェーズ ===
