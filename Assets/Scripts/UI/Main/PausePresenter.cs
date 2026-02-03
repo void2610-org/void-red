@@ -9,7 +9,7 @@ using VContainer.Unity;
 /// </summary>
 public class PausePresenter : IStartable, System.IDisposable
 {
-    private PauseView _pauseView;
+    private IPauseView _pauseView;
     private PauseButtonView _pauseButtonView;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly InputActionsProvider _inputActionsProvider;
@@ -23,8 +23,9 @@ public class PausePresenter : IStartable, System.IDisposable
 
     public void Start()
     {
-        // ビューの取得
-        _pauseView = Object.FindFirstObjectByType<PauseView>();
+        // ビューの取得（BattlePauseViewを優先、なければPauseViewを使用）
+        _pauseView = (IPauseView)Object.FindFirstObjectByType<BattlePauseView>(FindObjectsInactive.Include)
+                     ?? Object.FindFirstObjectByType<PauseView>(FindObjectsInactive.Include);
         _pauseButtonView = Object.FindFirstObjectByType<PauseButtonView>();
 
         // Pauseアクションの購読
@@ -42,11 +43,13 @@ public class PausePresenter : IStartable, System.IDisposable
             _ => _pauseView.Hide())
             .AddTo(_disposables);
 
-        // タイトルボタンのイベント設定
-        _pauseView.OnTitleButtonClicked.Subscribe(
+        // ホームボタンのイベント設定
+        _pauseView.OnHomeButtonClicked.Subscribe(
             _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget()
         ).AddTo(_disposables);
     }
+
+    public void Dispose() => _disposables.Dispose();
 
     private void TogglePause()
     {
@@ -54,10 +57,5 @@ public class PausePresenter : IStartable, System.IDisposable
             _pauseView.Hide();
         else
             _pauseView.Show();
-    }
-
-    public void Dispose()
-    {
-        _disposables.Dispose();
     }
 }
