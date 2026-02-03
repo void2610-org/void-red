@@ -1107,14 +1107,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MemoryDetailView
       objectReference: {fileID: 0}
-    - target: {fileID: 3966798620816172413, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 400
-      objectReference: {fileID: 0}
-    - target: {fileID: 3966798620816172413, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -225
-      objectReference: {fileID: 0}
     - target: {fileID: 4642221254253192836, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1194,14 +1186,6 @@ PrefabInstance:
     - target: {fileID: 4642221254253192836, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6448644399688174357, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
-      propertyPath: m_text
-      value: "\u9589\u3058\u308B"
-      objectReference: {fileID: 0}
-    - target: {fileID: 6448644399688174357, guid: bdce1cde6ee474cbd9e38d549dd85fbc, type: 3}
-      propertyPath: m_fontSize
-      value: 27.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
