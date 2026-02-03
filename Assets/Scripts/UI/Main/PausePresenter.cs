@@ -47,9 +47,33 @@ public class PausePresenter : IStartable, System.IDisposable
         _pauseView.OnHomeButtonClicked.Subscribe(
             _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget()
         ).AddTo(_disposables);
+
+        // BattlePauseView固有のボタン処理
+        if (_pauseView is BattlePauseView battlePauseView)
+        {
+            battlePauseView.OnHelpButtonClicked
+                .Subscribe(_ => ShowHelp())
+                .AddTo(_disposables);
+
+            battlePauseView.OnOptionButtonClicked
+                .Subscribe(_ => ShowOptions())
+                .AddTo(_disposables);
+        }
     }
 
     public void Dispose() => _disposables.Dispose();
+
+    private void ShowHelp()
+    {
+        var helpView = Object.FindFirstObjectByType<HelpView>();
+        helpView.Show();
+    }
+
+    private void ShowOptions()
+    {
+        var settingsView = Object.FindFirstObjectByType<SettingsWindowView>();
+        settingsView.Show();
+    }
 
     private void TogglePause()
     {

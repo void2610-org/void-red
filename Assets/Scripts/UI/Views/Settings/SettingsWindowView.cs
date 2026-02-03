@@ -28,10 +28,13 @@ public class SettingsWindowView : BaseWindowView
             })
             .AddTo(Disposables);
 
-        // 設定ボタンクリック
-        settingButtonView.OnButtonClicked
-            .Subscribe(_ => Show())
-            .AddTo(Disposables);
+        // 設定ボタンがある場合のみ購読
+        if (settingButtonView)
+        {
+            settingButtonView.OnButtonClicked
+                .Subscribe(_ => Show())
+                .AddTo(Disposables);
+        }
 
         // 閉じるボタン（SettingsPresenter経由）
         _settingsPresenter.OnHideRequested

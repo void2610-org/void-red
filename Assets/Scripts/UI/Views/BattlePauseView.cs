@@ -15,6 +15,8 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
     [Header("UI要素")]
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button homeButton;
+    [SerializeField] private Button helpButton;
+    [SerializeField] private Button optionButton;
     [SerializeField] private RectTransform panelRect;
 
     [Header("アニメーション設定")]
@@ -25,6 +27,8 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
     public bool IsShowing { get; private set; }
     public Observable<Unit> OnResumeButtonClicked => resumeButton.OnClickAsObservable();
     public Observable<Unit> OnHomeButtonClicked => homeButton.OnClickAsObservable();
+    public Observable<Unit> OnHelpButtonClicked => helpButton.OnClickAsObservable();
+    public Observable<Unit> OnOptionButtonClicked => optionButton.OnClickAsObservable();
 
     private CanvasGroup _canvasGroup;
     private MotionHandle _slideHandle;
@@ -36,7 +40,6 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
 
         Time.timeScale = 0;
         gameObject.SetActive(true);
-        transform.SetAsLastSibling();
 
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = true;
