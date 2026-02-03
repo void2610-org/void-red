@@ -67,7 +67,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 8b66d9934a13f45d1b8a027e4baabee7, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -213,6 +213,8 @@ MonoBehaviour:
   choicesView: {fileID: 6329069657319942236}
   playerNarration: {fileID: 106380095789066812}
   enemyNarration: {fileID: 5914673644565070759}
+  portraitImage: {fileID: 7501283165338376241}
+  playerPortraitSprite: {fileID: 21300000, guid: 8b66d9934a13f45d1b8a027e4baabee7, type: 3}
   playerPortrait: {fileID: 7912070706450315405}
   portraitHiddenX: 1100
   portraitShownX: 520
