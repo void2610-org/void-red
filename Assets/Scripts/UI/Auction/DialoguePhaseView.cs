@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
+using LitMotion;
+using Void2610.UnityTemplate;
 
 public class DialoguePhaseView : MonoBehaviour
 {
@@ -9,10 +11,27 @@ public class DialoguePhaseView : MonoBehaviour
     [SerializeField] private NarrationView playerNarration;
     [SerializeField] private NarrationView enemyNarration;
 
+    [Header("プレイヤー立ち絵")]
+    [SerializeField] private RectTransform playerPortrait;
+    [SerializeField] private float portraitHiddenX = 600f;
+    [SerializeField] private float portraitShownX = 300f;
+    [SerializeField] private float slideDuration = 0.3f;
+
     public Observable<int> OnChoiceSelected => choicesView.OnChoiceSelected;
 
-    public void SetupChoices(List<string> labels) => choicesView.Setup(labels);
-    public void HideChoices() => choicesView.Hide();
+    private MotionHandle _slideHandle;
+
+    public void SetupChoices(List<string> labels)
+    {
+        choicesView.Setup(labels);
+        SlideInPortrait();
+    }
+
+    public void HideChoices()
+    {
+        choicesView.Hide();
+        SlideOutPortrait();
+    }
     public void Show() => gameObject.SetActive(true);
     public void Hide() => gameObject.SetActive(false);
 
@@ -32,4 +51,19 @@ public class DialoguePhaseView : MonoBehaviour
             HideResultAsync()
         );
     }
+
+    private void SlideInPortrait()
+    {
+        _slideHandle.TryCancel();
+        playerPortrait.anchoredPosition = new Vector2(portraitHiddenX, playerPortrait.anchoredPosition.y);
+        _slideHandle = playerPortrait.MoveToX(portraitShownX, slideDuration, Ease.OutQuad);
+    }
+
+    private void SlideOutPortrait()
+    {
+        _slideHandle.TryCancel();
+        _slideHandle = playerPortrait.MoveToX(portraitHiddenX, slideDuration, Ease.InQuad);
+    }
+
+    private void OnDestroy() => _slideHandle.TryCancel();
 }

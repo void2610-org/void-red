@@ -254,7 +254,7 @@ MonoBehaviour:
   homeButton: {fileID: 1383763995794430735}
   panelRect: {fileID: 3347628460010679501}
   slideDuration: 0.3
-  hiddenX: -400
+  hiddenX: -250
   shownX: 0
 --- !u!1 &4106664046406252643
 GameObject:
@@ -290,8 +290,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 650, y: 300}
+  m_AnchoredPosition: {x: 140, y: 0}
+  m_SizeDelta: {x: 650, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8429467187968606179
 CanvasRenderer:
