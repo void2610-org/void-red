@@ -19,6 +19,11 @@ public class ValueRankingView : MonoBehaviour
     [SerializeField] private Transform handContainer;
     [SerializeField] private DraggableCardView draggableCardPrefab;
 
+    [Header("扇形配置")]
+    [SerializeField] private float fanSpreadWidth = 400f;
+    [SerializeField] private float fanHeightCurve = 30f;
+    [SerializeField] private float fanMaxAngle = 10f;
+
     [Header("UI")]
     [SerializeField] private Button confirmButton;
 
@@ -48,10 +53,14 @@ public class ValueRankingView : MonoBehaviour
     {
         Clear();
 
-        foreach (var card in cards)
+        for (var i = 0; i < cards.Count; i++)
         {
+            var card = cards[i];
             var draggableCard = Instantiate(draggableCardPrefab, handContainer);
-            draggableCard.Initialize(card);
+            draggableCard.Initialize(card, i);
+
+            // 初期位置・回転を設定
+            SetCardToFanPosition(draggableCard, i, cards.Count);
 
             draggableCard.OnDragStarted
                 .Subscribe(OnCardDragStarted)
@@ -139,7 +148,8 @@ public class ValueRankingView : MonoBehaviour
             UpdateConfirmButtonState();
         }
 
-        card.PlayReturnToHandAsync(handContainer).Forget();
+        var (position, rotation) = CalculateFanPosition(card.HandIndex, _handCards.Count);
+        card.PlayReturnToHandAsync(handContainer, position, rotation).Forget();
     }
 
     private void OnCardDragging(Vector3 cardWorldPos)
@@ -165,7 +175,8 @@ public class ValueRankingView : MonoBehaviour
             }
             else
             {
-                existingCard.PlayReturnToHandAsync(handContainer).Forget();
+                var (pos, rot) = CalculateFanPosition(existingCard.HandIndex, _handCards.Count);
+                existingCard.PlayReturnToHandAsync(handContainer, pos, rot).Forget();
             }
         }
 
@@ -182,7 +193,8 @@ public class ValueRankingView : MonoBehaviour
         var slot = card.CurrentSlot;
         slot.RemoveCard();
 
-        card.PlayReturnToHandAsync(handContainer).Forget();
+        var (position, rotation) = CalculateFanPosition(card.HandIndex, _handCards.Count);
+        card.PlayReturnToHandAsync(handContainer, position, rotation).Forget();
 
         UpdateConfirmButtonState();
     }
@@ -202,6 +214,30 @@ public class ValueRankingView : MonoBehaviour
     private bool IsAllSlotsOccupied()
     {
         return slots.All(s => s.IsOccupied);
+    }
+
+    private (Vector2 position, float rotation) CalculateFanPosition(int index, int totalCount)
+    {
+        // -1 〜 1 の範囲に正規化（中央が0）
+        var t = totalCount > 1
+            ? (index - (totalCount - 1) / 2f) / ((totalCount - 1) / 2f)
+            : 0f;
+
+        var x = t * fanSpreadWidth / 2f;
+        // 放物線で中央が高い
+        var y = (1 - t * t) * fanHeightCurve;
+        var rotation = -t * fanMaxAngle;
+
+        return (new Vector2(x, y), rotation);
+    }
+
+    private void SetCardToFanPosition(DraggableCardView card, int index, int totalCount)
+    {
+        var (position, rotation) = CalculateFanPosition(index, totalCount);
+        var cardRect = card.transform as RectTransform;
+
+        cardRect.anchoredPosition = position;
+        card.transform.localEulerAngles = new Vector3(0, 0, rotation);
     }
 
     private void OnDestroy()
