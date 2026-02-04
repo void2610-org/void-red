@@ -59,7 +59,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public UniTask HideDialogueResultAsync() => _dialoguePhaseView.HideResultAsync();
     public void ShowDialogueView() => _dialoguePhaseView.Show();
 
-
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {
         _battlePresenter = battlePresenter;
@@ -77,6 +76,14 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
+    }
+
+    /// <summary>
+    /// 対話フェーズViewを敵データで初期化
+    /// </summary>
+    public void InitializeDialogueView(EnemyData enemyData)
+    {
+        _dialoguePhaseView.Initialize(enemyData);
     }
     
     // 価値順位設定UIを表示し、完了を待機

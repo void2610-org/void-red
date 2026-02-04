@@ -22,6 +22,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     public CardModel CardModel { get; private set; }
     public RankingSlotView CurrentSlot { get; private set; }
     public bool IsPlaced => CurrentSlot;
+    public int HandIndex { get; private set; }
     public Observable<DraggableCardView> OnDragStarted => _onDragStarted;
     public Observable<DraggableCardView> OnDragEnded => _onDragEnded;
     public Observable<DraggableCardView> OnClicked => _onClicked;
@@ -42,12 +43,14 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private bool _isDragging;
     private MotionHandle _moveTween;
     private MotionHandle _scaleTween;
+    private MotionHandle _rotateTween;
 
     public void SetSlot(RankingSlotView slot) => CurrentSlot = slot;
 
-    public void Initialize(CardModel cardModel)
+    public void Initialize(CardModel cardModel, int handIndex)
     {
         CardModel = cardModel;
+        HandIndex = handIndex;
         cardView.Initialize(cardModel.Data);
         cardView.SetInteractable(false);
     }
@@ -73,9 +76,10 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         await _moveTween.ToUniTask();
     }
 
-    public async UniTask PlayReturnToHandAsync(Transform handParent)
+    public async UniTask PlayReturnToHandAsync(Transform handParent, Vector2 targetPosition, float targetRotation)
     {
         var startWorldPos = _rectTransform.position;
+        var startRotation = transform.localEulerAngles.z;
 
         transform.SetParent(handParent);
         transform.localScale = Vector3.one;
@@ -84,17 +88,18 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         _rectTransform.pivot = new Vector2(0.5f, 0.5f);
 
-        // LayoutGroupにレイアウトを再計算させる
-        LayoutRebuilder.ForceRebuildLayoutImmediate(handParent as RectTransform);
-
-        var targetPosition = _rectTransform.anchoredPosition;
-
-        // ワールド座標からローカル座標へ変換
         _rectTransform.position = startWorldPos;
         var startPosition = _rectTransform.anchoredPosition;
 
         _moveTween.TryCancel();
+        _rotateTween.TryCancel();
+
         _moveTween = _rectTransform.MoveToAnchoredFrom(startPosition, targetPosition, RETURN_DURATION, Ease.OutBack);
+        _rotateTween = LMotion.Create(startRotation, targetRotation, RETURN_DURATION)
+            .WithEase(Ease.OutBack)
+            .Bind(z => transform.localEulerAngles = new Vector3(0, 0, z))
+            .AddTo(gameObject);
+
         await _moveTween.ToUniTask();
     }
 
@@ -123,6 +128,10 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
         _canvasGroup.alpha = dragAlpha;
         _canvasGroup.blocksRaycasts = false;
+
+        // ドラッグ中は回転をリセット
+        _rotateTween.TryCancel();
+        transform.localEulerAngles = Vector3.zero;
 
         _scaleTween.TryCancel();
         _scaleTween = transform.ScaleTo(Vector3.one * dragScale, 0.1f, Ease.OutQuad);
@@ -179,6 +188,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     {
         _moveTween.TryCancel();
         _scaleTween.TryCancel();
+        _rotateTween.TryCancel();
         _onDragStarted.Dispose();
         _onDragEnded.Dispose();
         _onClicked.Dispose();

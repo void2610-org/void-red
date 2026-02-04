@@ -14,39 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyId: alv
   enemyName: "\u30A2\u30EB\u30F4"
-  defaultSprite: {fileID: 21300000, guid: 021a93a055b804f418cd07b3416b25a0, type: 3}
+  defaultSprite: {fileID: 21300000, guid: 282e67a314e1f49c991a33b21650ea2f, type: 3}
   iconSprite: {fileID: 21300000, guid: 9211241a8471d4b319e21e9e18ef4aec, type: 3}
   frameSprite: {fileID: 21300000, guid: d10bb60b880c34b8faed64d901a39fb8, type: 3}
   attributeSprites:
-    serializedList:
-    - key: 0
-      value: {fileID: 21300000, guid: b605c2f9307684c0fad67f28322427f6, type: 3}
-    - key: 1
-      value: {fileID: 21300000, guid: e68ebd9d44f2540e5b10007e15146cc6, type: 3}
-    - key: 2
-      value: {fileID: 21300000, guid: 412de83ff24f348f68b1ca97bf0e3e7d, type: 3}
-    - key: 3
-      value: {fileID: 21300000, guid: 0f04f2ed6f09d4213a05a7b814860a64, type: 3}
-    - key: 4
-      value: {fileID: 21300000, guid: 5ab3d58af953648619198c0ebb508f72, type: 3}
-    - key: 5
-      value: {fileID: 21300000, guid: dbd9d78e045314a78af872aff7db913d, type: 3}
-  playstyleWeights:
-    serializedList:
-    - key: 0
-      value: 0.1
-    - key: 1
-      value: 0.1
-    - key: 2
-      value: 1
-  initialDeck:
-  - {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
-  - {fileID: 11400000, guid: 16f56a4b6822e49e4917ff50562bcb0c, type: 2}
-  - {fileID: 11400000, guid: 96418a77f5ef94e20bf72ebde966a197, type: 2}
-  - {fileID: 11400000, guid: 5ecb5aa2c56fa41448a2e55ccf2af044, type: 2}
-  - {fileID: 11400000, guid: 340062878b38c4d26abf33d3bf2cc4d3, type: 2}
-  resonanceCard: {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
-  themes:
-  - {fileID: 11400000, guid: 88efa80b87a1648a498bf38eff4b79f9, type: 2}
-  - {fileID: 11400000, guid: db655a0ad5e674761a2f9d44351cf842, type: 2}
-  - {fileID: 11400000, guid: ad279f2457096402485e64580c368031, type: 2}
+    _serializedList: []

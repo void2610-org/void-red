@@ -106,6 +106,7 @@ public class BattlePresenter: IStartable, ISceneInitializable
         // 敵を初期化して表示
         _enemy.SetEnemyData(_currentEnemyData);
         _battleUIPresenter.InitializeEnemy(_currentEnemyData);
+        _battleUIPresenter.InitializeDialogueView(_currentEnemyData);
         await _battleUIPresenter.ShowEnemy();
 
         // 敵情報をアナウンス
