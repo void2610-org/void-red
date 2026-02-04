@@ -30,7 +30,7 @@ public class PausePresenter : IStartable, System.IDisposable
 
         // Pauseアクションの購読
         _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
-            .Subscribe(_ => TogglePause())
+            .Subscribe(_ => _pauseView.Toggle())
             .AddTo(_disposables);
 
         // ポーズボタンのイベント設定
@@ -73,13 +73,5 @@ public class PausePresenter : IStartable, System.IDisposable
     {
         var settingsView = Object.FindFirstObjectByType<SettingsWindowView>();
         settingsView.Show();
-    }
-
-    private void TogglePause()
-    {
-        if (_pauseView.IsShowing)
-            _pauseView.Hide();
-        else
-            _pauseView.Show();
     }
 }

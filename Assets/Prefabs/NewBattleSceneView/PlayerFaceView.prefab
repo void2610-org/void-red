@@ -378,8 +378,8 @@ RectTransform:
   m_GameObject: {fileID: 8473755440405703769}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2747432990312163021}
   - {fileID: 8311765659533726114}
@@ -426,6 +426,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1202356682750218691, guid: 55c7bca143b1c49c0b0403bf3b83e2e0, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: dc454a0029cf14657929910d0997916d, type: 2}
     - target: {fileID: 2255225797349648955, guid: 55c7bca143b1c49c0b0403bf3b83e2e0, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

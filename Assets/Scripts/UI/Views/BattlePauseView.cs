@@ -22,7 +22,7 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
     [Header("アニメーション設定")]
     [SerializeField] private float slideDuration = 0.3f;
     [SerializeField] private float hiddenX = -400f;
-    [SerializeField] private float shownX = 0f;
+    [SerializeField] private float shownX;
 
     public bool IsShowing { get; private set; }
     public Observable<Unit> OnResumeButtonClicked => resumeButton.OnClickAsObservable();
@@ -35,39 +35,35 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
 
     public void Show()
     {
-        if (IsShowing) return;
-        IsShowing = true;
-
+        Debug.Log("BattlePauseView: Show");
         Time.timeScale = 0;
-        gameObject.SetActive(true);
-
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = true;
-
+        IsShowing = true;
         _slideHandle.TryCancel();
+        
         _slideHandle = panelRect.MoveToX(shownX, slideDuration, Ease.OutQuad, ignoreTimeScale: true);
-        _slideHandle.ToUniTask().ContinueWith(() => _canvasGroup.interactable = true).Forget();
+        _canvasGroup.FadeIn(0.1f, ignoreTimeScale: true);
     }
 
     public void Hide()
     {
-        if (!IsShowing) return;
-        IsShowing = false;
-
         Time.timeScale = 1;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-
+        IsShowing = false;
         _slideHandle.TryCancel();
+        
         _slideHandle = panelRect.MoveToX(hiddenX, slideDuration, Ease.InQuad, ignoreTimeScale: true);
-        _slideHandle.ToUniTask().ContinueWith(() => gameObject.SetActive(false)).Forget();
+        _canvasGroup.FadeOut(0.1f, ignoreTimeScale: true);
+    }
+    
+    public void Toggle()
+    {
+        if (IsShowing) Hide();
+        else Show();
     }
 
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
         panelRect.anchoredPosition = new Vector2(hiddenX, panelRect.anchoredPosition.y);
-        gameObject.SetActive(false);
     }
 
     private void OnDestroy()

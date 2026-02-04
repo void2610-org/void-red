@@ -61,9 +61,7 @@ public class CardChoiceView : BaseWindowView
     /// </summary>
     private void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (!IsShowing)
-            return;
-
+        if (!IsShowing) return;
         _choiceSelectedSubject.OnNext(choiceIndex);
     }
 
