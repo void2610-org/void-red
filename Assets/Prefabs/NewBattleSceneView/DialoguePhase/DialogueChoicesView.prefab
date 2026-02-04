@@ -124,6 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df2c600e91154c529a6ecc090449709, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonContainer: {fileID: 8487051867017252252}
   choiceButtons:
   - {fileID: 5628067498375041690}
   - {fileID: 1483957876039358800}
@@ -134,6 +135,9 @@ MonoBehaviour:
   - {fileID: 6853600556032393892}
   - {fileID: 2348193377467857928}
   - {fileID: 6965750734127574043}
+  staggerDelay: 0.05
+  animDuration: 0.2
+  slideOffset: 50
 --- !u!1001 &1275334553530119874
 PrefabInstance:
   m_ObjectHideFlags: 0

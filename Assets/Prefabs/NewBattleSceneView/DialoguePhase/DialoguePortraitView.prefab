@@ -218,7 +218,7 @@ MonoBehaviour:
   portraitImage: {fileID: 4752887494469435316}
   portraitImageBack: {fileID: 4954133812321542982}
   crossFadeDuration: 0.2
-  hiddenX: 1000
+  hiddenX: 900
   shownX: 465
   slideDuration: 0.3
 --- !u!1 &4280314331609139659
@@ -351,6 +351,18 @@ PrefabInstance:
     - target: {fileID: 4962667167994278313, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5037747274776359112, guid: e245c412f77b845b79422c820ae1b076, type: 3}
+      propertyPath: slideOffset
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 5037747274776359112, guid: e245c412f77b845b79422c820ae1b076, type: 3}
+      propertyPath: animDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5037747274776359112, guid: e245c412f77b845b79422c820ae1b076, type: 3}
+      propertyPath: staggerDelay
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 6882031426847463832, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Pivot.x
