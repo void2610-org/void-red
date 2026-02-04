@@ -255,9 +255,12 @@ MonoBehaviour:
   helpButton: {fileID: 7893588156882607312}
   optionButton: {fileID: 8280161088778799704}
   panelRect: {fileID: 3347628460010679501}
-  slideDuration: 0.3
-  hiddenX: -250
+  buttonsLayoutGroup: {fileID: 8718745565015138824}
+  slideDuration: 0.4
+  hiddenX: -400
   shownX: 0
+  buttonSlideOffset: -100
+  buttonStaggerDelay: 0.1
 --- !u!1 &4106664046406252643
 GameObject:
   m_ObjectHideFlags: 0
