@@ -7881,10 +7881,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5418870435854250288, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
-      propertyPath: slideDuration
-      value: 0.3
-      objectReference: {fileID: 0}
     - target: {fileID: 7823105220120858534, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
