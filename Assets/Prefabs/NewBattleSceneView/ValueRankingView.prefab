@@ -471,6 +471,11 @@ MonoBehaviour:
   fanMaxAngle: 10
   confirmButton: {fileID: 7491099489286324350}
   dragLineView: {fileID: 7658362565713621403}
+  slotStaggerDelay: 0.2
+  cardStaggerDelay: 0.15
+  animDuration: 0.5
+  slotSlideOffset: 200
+  cardSlideOffset: -150
 --- !u!1001 &1221693844635984270
 PrefabInstance:
   m_ObjectHideFlags: 0
