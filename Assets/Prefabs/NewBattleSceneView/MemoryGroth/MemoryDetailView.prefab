@@ -195,7 +195,7 @@ MonoBehaviour:
   centerThemeImage: {fileID: 4999312165948298217}
   radiusX: 350
   radiusY: 125
-  minScale: 0.7
+  minScale: 0.4
   maxScale: 1
   dragSensitivity: 0.5
   inertiaDecay: 10
