@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// キャラクター記憶ビュー
 /// 右側パネルでキャラクターとカードを表示
 /// </summary>
-public class MemoryDetailView : BaseWindowView
+public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("カード表示")]
     [SerializeField] private Transform cardContainer;
@@ -20,7 +21,15 @@ public class MemoryDetailView : BaseWindowView
     [SerializeField] private float minScale = 0.7f;
     [SerializeField] private float maxScale = 1.0f;
 
+    [Header("ドラッグ回転")]
+    [SerializeField] private float dragSensitivity = 0.5f;
+
     private readonly List<MemoryCardItemView> _cardViews = new();
+    private IReadOnlyList<CardModel> _currentCards;
+    private float _currentAngleOffset;
+    private float _dragStartAngleOffset;
+    private Vector2 _dragStartLocalPoint;
+    private RectTransform _containerRectTransform;
 
     /// <summary>
     /// 既存テーマのカードを表示（リストクリック時）
@@ -37,12 +46,60 @@ public class MemoryDetailView : BaseWindowView
         base.Hide();
     }
 
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (_cardViews.Count == 0) return;
+        _dragStartAngleOffset = _currentAngleOffset;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _containerRectTransform, eventData.position,
+            eventData.pressEventCamera, out _dragStartLocalPoint);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (_cardViews.Count == 0) return;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _containerRectTransform, eventData.position,
+                eventData.pressEventCamera, out var currentLocalPoint)) return;
+
+        // 水平移動量を角度に変換
+        var deltaX = currentLocalPoint.x - _dragStartLocalPoint.x;
+        var angleDelta = (deltaX / radiusX) * Mathf.PI * dragSensitivity;
+
+        _currentAngleOffset = _dragStartAngleOffset + angleDelta;
+        UpdateCardPositions();
+    }
+
+    public void OnEndDrag(PointerEventData eventData) { }
+
     /// <summary>
     /// カードを円形に配置して表示
     /// </summary>
     private void ShowCardsInCircle(IReadOnlyList<CardModel> cards)
     {
+        _currentCards = cards;
+        _currentAngleOffset = 0f;
+
         var count = cards.Count;
+        if (count == 0) return;
+
+        // カードビューを生成
+        for (var i = 0; i < count; i++)
+        {
+            var cardView = Instantiate(cardItemPrefab, cardContainer);
+            cardView.Initialize(cards[i]);
+            _cardViews.Add(cardView);
+        }
+
+        UpdateCardPositions();
+    }
+
+    /// <summary>
+    /// カードの位置を更新（ドラッグ回転に対応）
+    /// </summary>
+    private void UpdateCardPositions()
+    {
+        var count = _cardViews.Count;
         if (count == 0) return;
 
         // 円形配置の計算用リスト（深度でソート用）
@@ -53,7 +110,8 @@ public class MemoryDetailView : BaseWindowView
 
         for (var i = 0; i < count; i++)
         {
-            var angle = startAngle - (2f * Mathf.PI / count) * i;
+            // 角度オフセットを適用
+            var angle = startAngle - (2f * Mathf.PI / count) * i + _currentAngleOffset;
             // 深度: sin(angle)が-1（下）のとき手前、1（上）のとき奥
             // normalizedDepth: 0=手前, 1=奥
             var normalizedDepth = (Mathf.Sin(angle) + 1f) / 2f;
@@ -62,14 +120,6 @@ public class MemoryDetailView : BaseWindowView
 
         // 奥から手前順にソート（描画順用）
         var sortedByDepth = cardPositions.OrderByDescending(p => p.depth).ToList();
-
-        // カード生成と配置
-        for (var i = 0; i < count; i++)
-        {
-            var cardView = Instantiate(cardItemPrefab, cardContainer);
-            cardView.Initialize(cards[i]);
-            _cardViews.Add(cardView);
-        }
 
         // 描画順: 奥側カード → centerThemeImage → 手前側カード
         var backCardCount = sortedByDepth.Count(p => p.depth > 0.5f);
@@ -98,5 +148,11 @@ public class MemoryDetailView : BaseWindowView
 
         // centerThemeImageを奥側カードと手前側カードの間に配置
         centerThemeImage.SetSiblingIndex(backCardCount);
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        _containerRectTransform = cardContainer as RectTransform;
     }
 }
