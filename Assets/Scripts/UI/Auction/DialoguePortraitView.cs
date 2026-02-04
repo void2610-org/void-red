@@ -75,7 +75,7 @@ public class DialoguePortraitView : MonoBehaviour
     {
         _slideHandle.TryCancel();
         _portraitTransform.anchoredPosition = new Vector2(hiddenX, _portraitTransform.anchoredPosition.y);
-        _slideHandle = _portraitTransform.MoveToX(shownX, slideDuration, Ease.OutQuad);
+        _slideHandle = _portraitTransform.MoveToX(shownX, slideDuration, Ease.OutCubic);
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public class DialoguePortraitView : MonoBehaviour
     {
         _slideHandle.TryCancel();
         _portraitTransform = this.GetComponent<RectTransform>();
-        _slideHandle = _portraitTransform.MoveToX(hiddenX, slideDuration, Ease.InQuad);
+        _slideHandle = _portraitTransform.MoveToX(hiddenX, slideDuration, Ease.InCubic);
     }
 
     private void Awake()

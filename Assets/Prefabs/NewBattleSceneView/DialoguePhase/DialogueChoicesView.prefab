@@ -144,7 +144,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5082526181909872633, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Name
-      value: DialogueChoiceButton (3)
+      value: DialogueChoiceButton4
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Pivot.x
@@ -177,6 +177,18 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalPosition.x
@@ -268,7 +280,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5082526181909872633, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Name
-      value: DialogueChoiceButton (1)
+      value: DialogueChoiceButton2
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Pivot.x
@@ -301,6 +313,18 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalPosition.x
@@ -392,7 +416,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5082526181909872633, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Name
-      value: DialogueChoiceButton (2)
+      value: DialogueChoiceButton3
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Pivot.x
@@ -425,6 +449,18 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalPosition.x
@@ -516,7 +552,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5082526181909872633, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Name
-      value: DialogueChoiceButton
+      value: DialogueChoiceButton1
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Pivot.x
@@ -549,6 +585,18 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalPosition.x

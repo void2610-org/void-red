@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 624591397069669842}
   - component: {fileID: 4399505871036866025}
   - component: {fileID: 4223608792398790957}
+  - component: {fileID: 5514790219065128704}
   m_Layer: 5
   m_Name: DialogueChoiceButton
   m_TagString: Untagged
@@ -193,10 +194,25 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 4399505871036866025}
+  m_TargetGraphic: {fileID: 5957501060173758030}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5514790219065128704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5082526181909872633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72dc5e2c488a24b2fa6d4c444c8e202b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scale: 1.1
+  duration: 0.1
+  easeType: 5
 --- !u!1 &7189136821816642082
 GameObject:
   m_ObjectHideFlags: 0

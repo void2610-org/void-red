@@ -157,6 +157,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7124691614296364725, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
+      propertyPath: hiddenX
+      value: 900
+      objectReference: {fileID: 0}
+    - target: {fileID: 7124691614296364725, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
+      propertyPath: slideEase
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 7124691614296364725, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
+      propertyPath: slideDuration
+      value: 0.4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
