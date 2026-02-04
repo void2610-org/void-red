@@ -197,6 +197,10 @@ MonoBehaviour:
   radiusY: 125
   minScale: 0.7
   maxScale: 1
+  dragSensitivity: 0.5
+  inertiaDecay: 10
+  snapThreshold: 0.3
+  snapDuration: 0.15
 --- !u!225 &2340877443651767483
 CanvasGroup:
   m_ObjectHideFlags: 0

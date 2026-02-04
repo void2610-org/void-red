@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -24,12 +25,21 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
     [Header("ドラッグ回転")]
     [SerializeField] private float dragSensitivity = 0.5f;
 
+    [Header("慣性・スナップ")]
+    [SerializeField] private float inertiaDecay = 5f;
+    [SerializeField] private float snapThreshold = 0.1f;
+    [SerializeField] private float snapDuration = 0.2f;
+
     private readonly List<MemoryCardItemView> _cardViews = new();
     private IReadOnlyList<CardModel> _currentCards;
     private float _currentAngleOffset;
     private float _dragStartAngleOffset;
     private Vector2 _dragStartLocalPoint;
     private RectTransform _containerRectTransform;
+    private float _angularVelocity;
+    private bool _isInertiaActive;
+    private Vector2 _previousLocalPoint;
+    private MotionHandle _snapMotionHandle;
 
     /// <summary>
     /// 既存テーマのカードを表示（リストクリック時）
@@ -49,10 +59,17 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (_cardViews.Count == 0) return;
+
+        // スナップ中ならキャンセル
+        _snapMotionHandle.TryCancel();
+        _isInertiaActive = false;
+        _angularVelocity = 0f;
+
         _dragStartAngleOffset = _currentAngleOffset;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             _containerRectTransform, eventData.position,
             eventData.pressEventCamera, out _dragStartLocalPoint);
+        _previousLocalPoint = _dragStartLocalPoint;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -68,9 +85,21 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
 
         _currentAngleOffset = _dragStartAngleOffset + angleDelta;
         UpdateCardPositions();
+
+        // 角速度を計算（慣性用）
+        var frameDeltaX = currentLocalPoint.x - _previousLocalPoint.x;
+        if (Time.unscaledDeltaTime > 0f)
+        {
+            _angularVelocity = (frameDeltaX / radiusX) * Mathf.PI * dragSensitivity / Time.unscaledDeltaTime;
+        }
+        _previousLocalPoint = currentLocalPoint;
     }
 
-    public void OnEndDrag(PointerEventData eventData) { }
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (_cardViews.Count == 0) return;
+        _isInertiaActive = true;
+    }
 
     /// <summary>
     /// カードを円形に配置して表示
@@ -150,9 +179,83 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
         centerThemeImage.SetSiblingIndex(backCardCount);
     }
 
+    /// <summary>
+    /// 最も近いカードを正面にスナップするアニメーションを開始
+    /// </summary>
+    private void StartSnapAnimation()
+    {
+        var count = _cardViews.Count;
+        if (count == 0) return;
+
+        var anglePerCard = 2f * Mathf.PI / count;
+        var startAngle = count == 2 ? 0f : Mathf.PI / 2f;
+
+        // 正面位置: sin(angle) = -1 → angle = -π/2
+        var targetFrontAngle = -Mathf.PI / 2f;
+        var bestSnapOffset = _currentAngleOffset;
+        var minDiff = float.MaxValue;
+
+        // 正面に最も近いカードを見つける
+        for (var i = 0; i < count; i++)
+        {
+            var cardBaseAngle = startAngle - anglePerCard * i;
+            // このカードを正面に持ってくるために必要なオフセット
+            var neededOffset = targetFrontAngle - cardBaseAngle;
+            // 現在のオフセットとの差分（-π〜πに正規化）
+            var diff = NormalizeAngle(neededOffset - _currentAngleOffset);
+
+            if (Mathf.Abs(diff) < minDiff)
+            {
+                minDiff = Mathf.Abs(diff);
+                bestSnapOffset = _currentAngleOffset + diff;
+            }
+        }
+
+        // LitMotionでスムーズにスナップ
+        var startOffset = _currentAngleOffset;
+        _snapMotionHandle = LMotion.Create(0f, 1f, snapDuration)
+            .WithEase(Ease.OutCubic)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+            .Bind(t =>
+            {
+                _currentAngleOffset = Mathf.Lerp(startOffset, bestSnapOffset, t);
+                UpdateCardPositions();
+            });
+    }
+
+    private static float NormalizeAngle(float angle)
+    {
+        while (angle > Mathf.PI) angle -= 2f * Mathf.PI;
+        while (angle < -Mathf.PI) angle += 2f * Mathf.PI;
+        return angle;
+    }
+
     protected override void Awake()
     {
         base.Awake();
         _containerRectTransform = cardContainer as RectTransform;
+    }
+
+    private void Update()
+    {
+        if (!_isInertiaActive || _cardViews.Count == 0) return;
+
+        // 慣性による回転
+        _currentAngleOffset += _angularVelocity * Time.unscaledDeltaTime;
+        _angularVelocity = Mathf.MoveTowards(_angularVelocity, 0f, inertiaDecay * Time.unscaledDeltaTime);
+        UpdateCardPositions();
+
+        // 速度が閾値以下になったらスナップ開始
+        if (Mathf.Abs(_angularVelocity) < snapThreshold)
+        {
+            _isInertiaActive = false;
+            StartSnapAnimation();
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        _snapMotionHandle.TryCancel();
     }
 }
