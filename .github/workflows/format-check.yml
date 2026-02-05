@@ -6,30 +6,67 @@ on:
     paths:
       - 'Assets/Scripts/**/*.cs'
       - '.editorconfig'
-      - 'FormatCheck.csproj'
       - '.github/workflows/format-check.yml'
   pull_request:
     paths:
       - 'Assets/Scripts/**/*.cs'
       - '.editorconfig'
-      - 'FormatCheck.csproj'
       - '.github/workflows/format-check.yml'
+
+env:
+  DOTNET_ROOT: /root/.dotnet
 
 jobs:
   format-check:
     name: dotnet-format
     runs-on: ubuntu-latest
+    # game-ciのDockerイメージ内で全ステップを実行（Unity DLLへのアクセスが必要）
+    container:
+      image: unityci/editor:ubuntu-6000.0.30f1-base-3
     steps:
+      - name: Install dependencies
+        run: |
+          apt-get update && apt-get install -y git git-lfs curl
+          git config --global --add safe.directory '*'
+
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-FormatCheck-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-FormatCheck-
+
+      - name: Activate Unity License
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        run: |
+          mkdir -p /root/.local/share/unity3d/Unity
+          echo "$UNITY_LICENSE" | tr -d '\r' > /root/.local/share/unity3d/Unity/Unity_lic.ulf
+
+      - name: Generate Solution
+        run: |
+          unity-editor \
+            -batchmode \
+            -nographics \
+            -logFile /dev/stdout \
+            -projectPath . \
+            -executeMethod SolutionGenerator.Generate
+          ls Assembly-CSharp.csproj
+
+      - name: Install .NET SDK
+        run: |
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0
+          echo "$DOTNET_ROOT" >> $GITHUB_PATH
+          $DOTNET_ROOT/dotnet --version
 
       - name: Check whitespace formatting
-        run: dotnet format whitespace FormatCheck.csproj --verify-no-changes --verbosity diagnostic
+        run: dotnet format whitespace Assembly-CSharp.csproj --verify-no-changes --verbosity diagnostic
 
       - name: Check code style
-        run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warn --no-restore --verbosity diagnostic
+        run: dotnet format style Assembly-CSharp.csproj --verify-no-changes --severity warn --no-restore --verbosity diagnostic
