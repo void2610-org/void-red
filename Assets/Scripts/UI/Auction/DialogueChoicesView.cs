@@ -71,28 +71,11 @@ public class DialogueChoicesView : MonoBehaviour
     {
         _animHandles.CancelAll();
 
-        // 初回のみCanvasGroupと初期位置を保存
-        var isFirstTime = _buttonCanvasGroups.Count == 0;
-
         buttonContainer.ForEachChildWithDelay((child, index, delay) =>
         {
             var rect = (RectTransform)child;
-
-            CanvasGroup canvasGroup;
-            Vector2 originalPos;
-
-            if (isFirstTime)
-            {
-                canvasGroup = child.GetComponent<CanvasGroup>();
-                originalPos = rect.anchoredPosition;
-                _buttonCanvasGroups.Add(canvasGroup);
-                _buttonOriginalPositions.Add(originalPos);
-            }
-            else
-            {
-                canvasGroup = _buttonCanvasGroups[index];
-                originalPos = _buttonOriginalPositions[index];
-            }
+            var canvasGroup = _buttonCanvasGroups[index];
+            var originalPos = _buttonOriginalPositions[index];
 
             // 開始位置を右にオフセット、透明度を0に
             var startPos = originalPos + new Vector2(slideOffset, 0);
@@ -114,6 +97,20 @@ public class DialogueChoicesView : MonoBehaviour
                 .AddTo(canvasGroup.gameObject);
             _animHandles.Add(fadeHandle);
         }, staggerDelay);
+    }
+
+    private void Awake()
+    {
+        Canvas.ForceUpdateCanvases();
+
+        // 各ボタンのCanvasGroupと初期位置を保存
+        foreach (var button in choiceButtons)
+        {
+            _buttonCanvasGroups.Add(button.GetComponent<CanvasGroup>());
+
+            var rect = (RectTransform)button.transform;
+            _buttonOriginalPositions.Add(rect.anchoredPosition);
+        }
     }
 
     private void OnDestroy()

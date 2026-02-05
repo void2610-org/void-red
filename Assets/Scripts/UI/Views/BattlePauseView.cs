@@ -55,6 +55,8 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
         _slideHandle = panelRect.MoveToX(shownX, slideDuration, Ease.OutQuad, ignoreTimeScale: true);
         _canvasGroup.FadeIn(0.1f, ignoreTimeScale: true);
 
+        Canvas.ForceUpdateCanvases();
+
         // ボタンの順次スライドアニメーション
         buttonsLayoutGroup.ForEachChildWithDelay((child, _, delay) =>
         {
@@ -96,6 +98,7 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
     {
         _canvasGroup = GetComponent<CanvasGroup>();
         panelRect.anchoredPosition = new Vector2(hiddenX, panelRect.anchoredPosition.y);
+
     }
 
     private void OnDestroy()
