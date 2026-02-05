@@ -43,6 +43,7 @@
 ExportedObj/
 .consulo/
 *.csproj
+!FormatCheck.csproj
 *.unityproj
 *.sln
 *.suo

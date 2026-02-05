@@ -1,0 +1,35 @@
+name: Format Check
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Assets/Scripts/**/*.cs'
+      - '.editorconfig'
+      - 'FormatCheck.csproj'
+      - '.github/workflows/format-check.yml'
+  pull_request:
+    paths:
+      - 'Assets/Scripts/**/*.cs'
+      - '.editorconfig'
+      - 'FormatCheck.csproj'
+      - '.github/workflows/format-check.yml'
+
+jobs:
+  format-check:
+    name: dotnet-format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Check whitespace formatting
+        run: dotnet format whitespace FormatCheck.csproj --verify-no-changes --verbosity diagnostic
+
+      - name: Check code style
+        run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warning --verbosity diagnostic
