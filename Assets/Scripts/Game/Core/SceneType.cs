@@ -34,7 +34,7 @@ public static class SceneTypeExtensions
         { SceneType.Battle, "BattleScene" },
         { SceneType.Novel, "NovelScene" }
     };
-    
+
     /// <summary>
     /// SceneTypeから対応するUnityシーン名を取得
     /// </summary>
@@ -46,11 +46,11 @@ public static class SceneTypeExtensions
         {
             return sceneName;
         }
-        
+
         Debug.LogError($"SceneType {sceneType} に対応するシーン名が見つかりません");
         return string.Empty;
     }
-    
+
     /// <summary>
     /// 指定したSceneTypeが有効なシーン名を持つかチェック
     /// </summary>
@@ -60,7 +60,7 @@ public static class SceneTypeExtensions
     {
         return _sceneNames.ContainsKey(sceneType);
     }
-    
+
     /// <summary>
     /// 内部マッピング辞書への読み取り専用アクセス（SceneUtilityから使用）
     /// </summary>
@@ -86,13 +86,13 @@ public static class SceneUtility
         {
             return pair.Key;
         }
-        
+
         // デバッグ情報を詳しく出力
         var availableScenes = string.Join(", ", sceneNames.Values);
         Debug.LogWarning($"シーン名 '{sceneName}' に対応するSceneTypeが見つかりません。利用可能なシーン: [{availableScenes}] Titleを返します");
         return SceneType.Title;
     }
-    
+
     /// <summary>
     /// 現在のシーンのSceneTypeを取得
     /// </summary>

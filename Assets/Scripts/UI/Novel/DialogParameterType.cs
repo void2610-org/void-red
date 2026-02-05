@@ -10,42 +10,42 @@ public enum DialogParameterType
     /// キャラクター画像名（string）
     /// </summary>
     CharacterImageName,
-    
+
     /// <summary>
     /// 背景画像名（string）
     /// </summary>
     BackgroundImageName,
-    
+
     /// <summary>
     /// SEクリップ名（string）
     /// </summary>
     SeClipName,
-    
+
     /// <summary>
     /// カスタム文字速度（float）
     /// </summary>
     CustomCharSpeed,
-    
+
     /// <summary>
     /// 自動で次に進むまでの時間（float、0以下の場合は自動進行なし）
     /// </summary>
     AutoAdvance,
-    
+
     /// <summary>
     /// アイテム取得演出（ItemGetData - 画像名,アイテム名,アイテム説明）
     /// </summary>
     GetItem,
-    
+
     /// <summary>
     /// 選択肢表示（ChoiceData - 質問文,選択肢1,選択肢2,...)
     /// </summary>
     Choice,
-    
+
     /// <summary>
     /// カード風選択肢表示（CardChoiceData - [選択肢1,画像1]/[選択肢2,画像2]）
     /// </summary>
     CardChoice,
-    
+
     /// <summary>
     /// カード獲得演出（パラメータなし - 列が存在すれば発火。選択結果に基づいてカードを決定）
     /// </summary>
@@ -67,7 +67,7 @@ public static class DialogParameterTypeExtensions
     {
         return Enum.TryParse(typeString, true, out parameterType);
     }
-    
+
     /// <summary>
     /// パラメータタイプの期待する値の型を取得
     /// </summary>
@@ -89,7 +89,7 @@ public static class DialogParameterTypeExtensions
             _ => typeof(string)
         };
     }
-    
+
     /// <summary>
     /// 文字列値を適切な型に変換
     /// </summary>
@@ -102,7 +102,7 @@ public static class DialogParameterTypeExtensions
         {
             return parameterType.GetDefaultValue();
         }
-        
+
         return parameterType switch
         {
             DialogParameterType.CharacterImageName => valueString,
@@ -117,7 +117,7 @@ public static class DialogParameterTypeExtensions
             _ => valueString
         };
     }
-    
+
     /// <summary>
     /// パラメータタイプのデフォルト値を取得
     /// </summary>

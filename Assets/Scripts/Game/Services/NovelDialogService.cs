@@ -35,9 +35,9 @@ public class NovelDialogService
     /// </summary>
     private async UniTask<List<DialogData>> GetDialogDataFromExcel(string scenarioId)
     {
-        #if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR
         return new List<DialogData> { new("System", $"WebGL環境ではシナリオを使用できません。 シナリオID: {scenarioId}") };
-        #endif
+#endif
         var excelDialogLoader = new ExcelDialogLoader();
         var dialogData = await excelDialogLoader.LoadDialogDataAsync(scenarioId);
 
@@ -176,5 +176,5 @@ public class NovelDialogService
     {
         return index < row.Count ? row[index]?.ToString() ?? "" : "";
     }
-    
+
 }

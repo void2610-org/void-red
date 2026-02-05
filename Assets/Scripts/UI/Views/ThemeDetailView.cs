@@ -1,5 +1,5 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 /// <summary>
 /// テーマ詳細情報を表示するモーダルViewクラス

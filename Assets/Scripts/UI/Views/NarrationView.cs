@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using LitMotion;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -13,7 +13,7 @@ public class NarrationView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI narrationText;
     [SerializeField] private Image backgroundImage;
-    
+
     private const float FADE_DURATION = 0.3f;
 
     private CanvasGroup _canvasGroup;
@@ -25,16 +25,16 @@ public class NarrationView : MonoBehaviour
     public async UniTask DisplayNarration(string message, float duration = 2f, bool autoAdvance = true)
     {
         _canvasGroup.alpha = 1f;
-        
+
         try
         {
             // メッセージを空で初期化（後で1文字ずつ表示）
             narrationText.text = "";
-            
+
             // 初期状態を設定
             narrationText.gameObject.SetActive(true);
             narrationText.SetAlpha(0f);
-            
+
             // backgroundImageとテキストのフェードインを同時実行
             backgroundImage.FadeIn(FADE_DURATION, Ease.OutQuart).ToUniTask().Forget();
             await narrationText.FadeIn(FADE_DURATION, Ease.OutQuart);
@@ -76,7 +76,7 @@ public class NarrationView : MonoBehaviour
         }
         catch (System.OperationCanceledException) { }
     }
-    
+
     /// <summary>
     /// クリック時の処理（キーボード入力でも使用）
     /// </summary>
@@ -106,7 +106,7 @@ public class NarrationView : MonoBehaviour
             narrationText.gameObject.SetActive(false);
         }
     }
-    
+
     private void Awake()
     {
         // 初期状態の設定
@@ -120,7 +120,7 @@ public class NarrationView : MonoBehaviour
         // TextProgressControllerの初期化
         _textProgressController = new TextProgressController();
     }
-    
+
     private void OnDestroy()
     {
         // TextProgressControllerのクリーンアップ（SEループも含む）

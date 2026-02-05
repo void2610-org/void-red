@@ -4,6 +4,6 @@
 /// </summary>
 public class Player : PlayerPresenter
 {
-    public Player(GameProgressService gameProgressService = null) 
-        : base(gameProgressService){ }
+    public Player(GameProgressService gameProgressService = null)
+        : base(gameProgressService) { }
 }

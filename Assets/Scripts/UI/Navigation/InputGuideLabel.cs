@@ -18,8 +18,8 @@ public class InputGuideLabel : MonoBehaviour
     }
 
     [SerializeField] private InputActionReference inputActionReference;
-    
-    private Image _image; 
+
+    private Image _image;
 
     public event Action<InputSchemeType> OnSchemeChanged;
 
@@ -62,7 +62,7 @@ public class InputGuideLabel : MonoBehaviour
             _ => Scheme
         };
     }
-    
+
     private async UniTask UpdateText()
     {
         // 現在のスキーマに合致するバインディングを探す
@@ -71,11 +71,11 @@ public class InputGuideLabel : MonoBehaviour
         {
             // バインディングが見つからない場合は非表示
             _image.enabled = false;
-            
+
             // 前回ロードしたスプライトを解放
             if (_spriteHandle.IsValid())
                 Addressables.Release(_spriteHandle);
-            
+
             return;
         }
 
@@ -84,11 +84,11 @@ public class InputGuideLabel : MonoBehaviour
         if (string.IsNullOrEmpty(addressableKey))
         {
             _image.enabled = false;
-            
+
             // 前回ロードしたスプライトを解放
             if (_spriteHandle.IsValid())
                 Addressables.Release(_spriteHandle);
-            
+
             return;
         }
 
@@ -96,14 +96,14 @@ public class InputGuideLabel : MonoBehaviour
         try
         {
             var oldHandle = _spriteHandle; // 古いハンドルを保存
-            
+
             _spriteHandle = Addressables.LoadAssetAsync<Sprite>(addressableKey);
             var sprite = await _spriteHandle.ToUniTask();
 
             // 新しいスプライトを設定してから古いハンドルを解放
             _image.sprite = sprite;
             _image.enabled = true;
-            
+
             // 古いハンドルを解放（新しいスプライト設定後）
             if (oldHandle.IsValid())
                 Addressables.Release(oldHandle);
@@ -111,21 +111,21 @@ public class InputGuideLabel : MonoBehaviour
         catch (Exception e)
         {
             if (!this) return;
-            
+
             Debug.LogWarning($"Failed to load sprite: {addressableKey}. Error: {e.Message}");
             _image.enabled = false;
-            
+
             // エラー時も古いハンドルを解放
             if (_spriteHandle.IsValid())
                 Addressables.Release(_spriteHandle);
         }
     }
-    
+
     private void OnEnable()
     {
         UpdateText().Forget();
         OnSchemeChanged += _onSchemeChanged = _ => UpdateText().Forget();
-        
+
         InputSystem.onEvent += OnEvent;
     }
 
@@ -145,13 +145,13 @@ public class InputGuideLabel : MonoBehaviour
             Addressables.Release(_spriteHandle);
         }
     }
-    
+
     private void Awake()
     {
         _image = GetComponent<Image>();
         _image.enabled = false;
     }
-    
+
     /// <summary>
     /// binding.pathからAddressablesキーを生成する。
     /// InputSystemのバインディングパスを小文字化してスプライトパスに変換する。
@@ -172,7 +172,7 @@ public class InputGuideLabel : MonoBehaviour
         var control = "";
         if (slashIndex >= 0 && slashIndex < binding.path.Length - 1)
         {
-             control = binding.path[(slashIndex + 1)..];
+            control = binding.path[(slashIndex + 1)..];
         }
 
         // Addressablesキーとして使用するため、小文字に統一

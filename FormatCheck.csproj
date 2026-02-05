@@ -7,5 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets/Scripts/**/*.cs" />
+    <!-- サブモジュール（シンボリックリンク先）を除外 -->
+    <Compile Remove="Assets/Scripts/SettingsSystem/**/*.cs" />
+    <Compile Remove="Assets/Scripts/Utils/**/*.cs" />
   </ItemGroup>
 </Project>

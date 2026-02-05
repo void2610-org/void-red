@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
 using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
@@ -33,11 +33,11 @@ public class MemoryGrowthView : MonoBehaviour
         themeListView.OnThemeSelected
             .Subscribe(theme => HandleThemeSelected(theme).Forget())
             .AddTo(this);
-        
+
         // ウィンドウを表示
         _canvasGroup.FadeIn(0.5f);
     }
-    
+
     private async UniTask HandleThemeSelected(AcquiredTheme theme)
     {
         hideObject.SetActive(false);

@@ -4,7 +4,7 @@
 public abstract class StoryNode
 {
     public string NodeId { get; protected set; }
-    
+
     /// <summary>
     /// このノード終了後にホームに戻るかどうか
     /// true: ホームに戻る、false: 次のノードへ直接遷移
@@ -41,7 +41,7 @@ public class NovelNode : StoryNode
     /// シナリオID
     /// </summary>
     public string ScenarioId { get; }
-    
+
     /// <summary>
     /// コンストラクタ
     /// </summary>

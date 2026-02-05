@@ -14,7 +14,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
     [Inject] private readonly InputActionsProvider _inputActionsProvider;
-    
+
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
     private readonly NarrationView _playerNarrationView;
@@ -23,7 +23,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly BlackOverlayView _blackOverlayView;
 
     private readonly EyeBlinkTransitionView _eyeBlinkTransitionView;
-    private readonly CompositeDisposable _disposables = new ();
+    private readonly CompositeDisposable _disposables = new();
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
     private readonly ValueRankingView _valueRankingView;
@@ -71,7 +71,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _currentTheme = theme;
         await _themeView.DisplayThemeWithKeywords(theme, isMainTheme);
     }
-    
+
     public void InitializeEnemy(EnemyData enemyData)
     {
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
@@ -85,7 +85,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _dialoguePhaseView.Initialize(enemyData);
     }
-    
+
     // 価値順位設定UIを表示し、完了を待機
     public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync(IReadOnlyList<CardModel> cards)
     {
@@ -268,7 +268,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
     }
-    
+
     public void Start()
     {
         // ルートボタンを初期選択

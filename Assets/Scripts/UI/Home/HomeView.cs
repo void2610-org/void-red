@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using R3;
-using Cysharp.Threading.Tasks;
-using TMPro;
 using Void2610.UnityTemplate;
 
 /// <summary>

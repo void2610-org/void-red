@@ -1,7 +1,7 @@
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using R3;
 
 /// <summary>
 /// ヘルプ画面を表示するViewクラス
@@ -55,7 +55,7 @@ public class HelpView : BaseWindowView
         pageText.text = $"{currentIndex + 1} / {totalCount}";
 
         var currentSelected = SafeNavigationManager.GetCurrentSelected();
-        
+
         // 前へ/次へボタンの有効/無効
         previousButton.interactable = currentIndex > 0;
         nextButton.interactable = currentIndex < totalCount - 1;

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using R3;
+using Auction;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
-using Auction;
+using R3;
+using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -335,7 +335,7 @@ public class ValueRankingView : MonoBehaviour
             _animHandles.Add(fadeHandle);
         }
     }
-    
+
     private void Awake()
     {
         _handContainerRect = handContainer as RectTransform;

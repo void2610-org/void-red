@@ -32,4 +32,4 @@ jobs:
         run: dotnet format whitespace FormatCheck.csproj --verify-no-changes --verbosity diagnostic
 
       - name: Check code style
-        run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warning --verbosity diagnostic
+        run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warn --no-restore --verbosity diagnostic

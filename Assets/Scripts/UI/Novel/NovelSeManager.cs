@@ -32,7 +32,7 @@ public class NovelSeManager : MonoBehaviour
         {
             _seVolume = Mathf.Clamp01(value);
             if (_seVolume <= 0.0f) _seVolume = 0.0001f;
-            
+
             seMixerGroup.audioMixer.SetFloat("SeVolume", Mathf.Log10(_seVolume) * 20);
         }
     }
@@ -77,7 +77,7 @@ public class NovelSeManager : MonoBehaviour
     {
         WaitAndPlaySeAsync(seName, delayTime, volume, pitch).Forget();
     }
-    
+
     public void StopSe()
     {
         if (_seAudioSource && _seAudioSource.isPlaying)

@@ -1,7 +1,7 @@
+using LitMotion;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using LitMotion;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -15,17 +15,17 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     [SerializeField] private Sprite normalSprite;
     [SerializeField] private Sprite selectedSprite;
     [SerializeField] private float selectedScale;
-    
+
     private MotionHandle _scaleMotion;
     private float _defaultScale;
-    
+
     private const float DURATION = 0.1f;
     private const Ease EASE = Ease.OutCubic;
 
     private void Awake()
     {
         _defaultScale = target.transform.localScale.x;
-        
+
         if (SafeNavigationManager.GetCurrentSelected() != this.gameObject)
             OnDeselect(new BaseEventData(EventSystem.current));
     }
@@ -39,7 +39,7 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
         _scaleMotion = target.rectTransform.ScaleTo(Vector3.one * _defaultScale * selectedScale, DURATION, EASE, ignoreTimeScale: true);
         target.sprite = selectedSprite;
     }
-    
+
     /// <summary>
     /// Selectableの選択が解除された時の処理
     /// </summary>
@@ -49,7 +49,7 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
         _scaleMotion = target.rectTransform.ScaleTo(Vector3.one * _defaultScale, DURATION, EASE, ignoreTimeScale: true);
         target.sprite = normalSprite;
     }
-    
+
     private void OnDestroy()
     {
         _scaleMotion.TryCancel();

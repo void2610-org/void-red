@@ -1,10 +1,10 @@
 using Coffee.UIEffects;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using R3;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using R3;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -41,7 +41,7 @@ public class CardView : BaseCardView
     // Tween管理用
     private MotionHandle _backTransitionTween;
     private MotionHandle _edgeColorTween;
-    
+
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
 
     public void SetToBackside(Sprite cardBackSprite)
@@ -60,7 +60,7 @@ public class CardView : BaseCardView
         _originalPosition = _rectTransform.anchoredPosition;
         UpdateDisplay();
     }
-    
+
     /// <summary>
     /// ハイライト表示
     /// </summary>
@@ -112,7 +112,7 @@ public class CardView : BaseCardView
             .Bind(alpha => canvasGroup.alpha = alpha)
             .ToUniTask();
     }
-    
+
     /// <summary>
     /// 表示を更新
     /// </summary>
@@ -129,7 +129,7 @@ public class CardView : BaseCardView
             backUIEffect.transitionColor = CardData.Color * 1.5f;
         }
     }
-    
+
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();

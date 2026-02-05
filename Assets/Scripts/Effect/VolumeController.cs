@@ -1,8 +1,8 @@
+using LitMotion;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using Void2610.UnityTemplate;
-using LitMotion;
 
 [RequireComponent(typeof(Volume))]
 public class VolumeController : SingletonMonoBehaviour<VolumeController>
@@ -29,7 +29,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
         public void SetIntensity(float intensity)
         {
             _motionHandle.TryCancel();
-            
+
             var target = Mathf.Lerp(_range.x, _range.y, intensity);
             var start = _parameter.value;
             _motionHandle = LMotion.Create(0f, 1f, _duration)
@@ -47,7 +47,7 @@ public class VolumeController : SingletonMonoBehaviour<VolumeController>
     [SerializeField] private float dizzyEffectDuration = 2f;
     [SerializeField] private float dizzyMinDistance = 1f;
     [SerializeField] private float dizzyMaxDistance = 10f;
-    
+
     private const float DURATION = 0.5f;
 
     private Volume _volume;

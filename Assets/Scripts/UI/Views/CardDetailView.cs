@@ -1,7 +1,7 @@
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using R3;
 
 /// <summary>
 /// カード詳細情報を表示するモーダルViewクラス
@@ -15,7 +15,7 @@ public class CardDetailView : BaseWindowView
     [SerializeField] private TextMeshProUGUI keywordsText;
     [SerializeField] private TextMeshProUGUI attributeText;
     [SerializeField] private TextMeshProUGUI collapseThresholdText;
-    
+
     public Observable<Unit> PlayButtonClicked => playButton.OnClickAsObservable();
 
     /// <summary>
@@ -33,7 +33,7 @@ public class CardDetailView : BaseWindowView
         // パネルを表示
         Show();
     }
-    
+
     /// <summary>
     /// カード表示を更新
     /// </summary>

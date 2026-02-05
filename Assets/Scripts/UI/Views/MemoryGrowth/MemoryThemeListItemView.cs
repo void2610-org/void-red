@@ -1,7 +1,7 @@
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using R3;
 
 /// <summary>
 /// 記憶テーマリストのアイテムビュー
@@ -13,7 +13,7 @@ public class MemoryThemeListItemView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI themeText;
 
     public AcquiredTheme Theme { get; private set; }
-    
+
     private readonly Subject<Unit> _onClicked = new();
 
     /// <summary>

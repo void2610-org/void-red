@@ -24,7 +24,7 @@ public static class BattleKeyBindings
         //     .Where(_ => !BaseWindowView.HasActiveWindows)
         //     .Subscribe(_ => themeView.ToggleKeywords())
         //     .AddTo(disposables);
-        
+
         // 人格ログを開く
         // inputActionsProvider.Battle.OpenPersonalityLog.OnPerformedAsObservable()
         //     .Where(_ => currentGameState.CurrentValue == GameState.PlayerCardSelection)
@@ -78,7 +78,7 @@ public static class BattleKeyBindings
         //     .Where(_ => !BaseWindowView.HasActiveWindows)
         //     .Subscribe(_ => battleUIPresenter.NavigateToPrevCard())
         //     .AddTo(disposables);
-        
+
         // ナレーションをスキップする（非表示のオブジェクトも含めて検索）
         var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         inputActionsProvider.UI.Advance.OnPerformedAsObservable()

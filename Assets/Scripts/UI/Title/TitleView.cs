@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.UI;
 using R3;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// タイトル画面のView
@@ -36,7 +36,7 @@ public class TitleView : MonoBehaviour
     public void SetContinueButtonState(bool enabled)
     {
         if (!this) return;
-        
+
         continueButton.interactable = enabled;
         continueButtonText.color = enabled ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
     }

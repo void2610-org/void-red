@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using R3;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using R3;
+using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -37,7 +37,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
     // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
     private static readonly List<BaseWindowView> _activeWindows = new();
-    
+
     public static GameObject GetTopActiveWindowCloseButton()
     {
         if (_activeWindows.Count == 0) return null;
@@ -86,7 +86,7 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         HideWithAnimation().Forget();
     }
-    
+
     /// <summary>
     /// ウィンドウの表示/非表示を切り替え
     /// </summary>

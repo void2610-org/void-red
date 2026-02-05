@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using Cysharp.Threading.Tasks;
 using R3;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -21,7 +21,7 @@ public class ChoiceView : BaseWindowView
 
     private readonly List<Button> _choiceButtons = new();
     private readonly Subject<int> _choiceSelectedSubject = new();
-    
+
     /// <summary>
     /// 選択肢を表示して選択を待つ
     /// </summary>
@@ -49,7 +49,7 @@ public class ChoiceView : BaseWindowView
     {
         return _choiceButtons.Count > 0 ? _choiceButtons[0].gameObject : null;
     }
-    
+
     /// <summary>
     /// 選択肢ボタンを動的生成
     /// </summary>
@@ -59,24 +59,24 @@ public class ChoiceView : BaseWindowView
         {
             var button = Instantiate(choiceButtonPrefab, buttonContainer);
             button.gameObject.SetActive(true);
-            
+
             // ボタンテキストを設定
             var buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
             buttonText.text = options[i];
-            
+
             // ボタンクリックイベントを設定
             var choiceIndex = i; // ラムダでキャプチャするためのローカル変数
             button.OnClickAsObservable()
                 .Subscribe(_ => OnChoiceButtonClicked(choiceIndex))
                 .AddTo(button);
-            
+
             _choiceButtons.Add(button);
         }
-        
+
         //ナビゲーションを設定
         _choiceButtons.Select(b => b as Selectable).ToList().SetNavigation(isHorizontal: false, wrapAround: true);
     }
-    
+
     /// <summary>
     /// 既存の選択肢ボタンを削除
     /// </summary>

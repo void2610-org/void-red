@@ -12,10 +12,10 @@ public class TutorialStep
     [TextArea(3, 5)]
     [SerializeField] private string message;
     [SerializeField] private bool isPlayerDialog;
-    
+
     [SerializeField] private Vector2 maskPosition;
     [SerializeField] private Vector2 maskSize = new(200, 100);
-    
+
     public string Message => message;
     public bool IsPlayerDialog => isPlayerDialog;
     public Vector2 MaskPosition => maskPosition;
@@ -44,12 +44,12 @@ public class TutorialData : ScriptableObject
     /// チュートリアルステップのリスト
     /// </summary>
     public List<TutorialStep> Steps => steps;
-    
+
     /// <summary>
     /// チュートリアルステップ数
     /// </summary>
     public int StepCount => steps?.Count ?? 0;
-    
+
     /// <summary>
     /// 指定インデックスのステップを取得
     /// </summary>

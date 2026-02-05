@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
+using UnityEngine.UI;
 using VoidRed.UI.Views;
 
 [RequireComponent(typeof(CanvasGroup))]

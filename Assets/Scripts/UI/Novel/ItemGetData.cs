@@ -9,22 +9,22 @@ public class ItemGetData
     [SerializeField] private string itemImageName;
     [SerializeField] private string itemName;
     [SerializeField] private string itemDescription;
-    
+
     /// <summary>
     /// アイテムの画像名
     /// </summary>
     public string ItemImageName => itemImageName;
-    
+
     /// <summary>
     /// アイテム名
     /// </summary>
     public string ItemName => itemName;
-    
+
     /// <summary>
     /// アイテムの説明文
     /// </summary>
     public string ItemDescription => itemDescription;
-    
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -37,7 +37,7 @@ public class ItemGetData
         this.itemName = itemName;
         this.itemDescription = itemDescription;
     }
-    
+
     /// <summary>
     /// カンマ区切り文字列からItemGetDataを作成
     /// </summary>
@@ -47,18 +47,18 @@ public class ItemGetData
     {
         if (string.IsNullOrEmpty(commaSeparatedValue))
             return null;
-        
+
         var parts = commaSeparatedValue.Split(',');
         if (parts.Length < 3)
         {
             Debug.LogWarning($"[ItemGetData] 不正なGetItemパラメータ形式です。: '{commaSeparatedValue}'");
             return null;
         }
-        
+
         var imageName = parts[0].Trim();
         var name = parts[1].Trim();
         var description = parts[2].Trim();
-        
+
         return new ItemGetData(imageName, name, description);
     }
 }

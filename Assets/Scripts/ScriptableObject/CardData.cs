@@ -13,7 +13,7 @@ public class CardData : ScriptableObject
     [SerializeField] private Sprite image;
     [SerializeField] private Color color = Color.white;
     [SerializeField] private bool isTextColorBlack = false;
-    
+
     public string CardId => cardId;
     public string CardName => cardName;
     public CardAttribute Attribute => attribute;

@@ -114,7 +114,8 @@ csharp_preserve_single_line_blocks = true
 #### 命名規則 ####
 
 # プライベートフィールド: _camelCase
-dotnet_naming_rule.private_fields_should_be_camel_case.severity = warning
+# [SerializeField]フィールドは_プレフィックスなし（Unity規約）のためsuggestionに留める
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
 dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
 dotnet_naming_rule.private_fields_should_be_camel_case.style = private_field_style
 

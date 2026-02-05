@@ -9,14 +9,14 @@ public class SafeNavigationManager : ITickable
     private GameObject _previousSelected;
     private static bool _allowProgrammaticChange;
     private static EventSystem _eventSystem;
-    
+
     public static GameObject GetCurrentSelected() => _eventSystem?.currentSelectedGameObject;
-    
+
     public SafeNavigationManager()
     {
         _eventSystem = EventSystem.current;
     }
-    
+
     public static void SetSelectedGameObjectSafe(GameObject go)
     {
         _allowProgrammaticChange = true;
@@ -46,7 +46,7 @@ public class SafeNavigationManager : ITickable
             break;
         }
     }
-    
+
     /// <summary>
     /// ナビゲーション移動がCanvasGroupを跨いでいるかどうかをチェック
     /// </summary>
@@ -54,15 +54,15 @@ public class SafeNavigationManager : ITickable
     {
         var currentGroup = currentSelected.GetComponentInParent<CanvasGroup>();
         var previousGroup = previousSelected.GetComponentInParent<CanvasGroup>();
-        
+
         if (currentGroup == null && previousGroup == null)
         {
             return true; // 両方ともCanvasGroupがない場合は同じとみなす
         }
-        
+
         return currentGroup == previousGroup;
     }
-    
+
     public void Tick()
     {
         if (!_eventSystem)

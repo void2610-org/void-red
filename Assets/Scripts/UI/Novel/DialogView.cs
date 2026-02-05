@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
+using LitMotion;
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using LitMotion;
-using Cysharp.Threading.Tasks;
 using Void2610.UnityTemplate;
-using R3;
 
 /// <summary>
 /// 単一のダイアログ表示を担当するViewクラス
@@ -19,20 +19,20 @@ public class DialogView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI speakerNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private GameObject nextIndicator;
-    
+
     [Header("操作ボタン")]
     [SerializeField] private Button autoButton;
     [SerializeField] private TextMeshProUGUI autoButtonText;
     [SerializeField] private Button skipButton;
-    
+
     [Header("オートボタン表示設定")]
     [SerializeField] private Color autoButtonNormalColor = Color.white;
     [SerializeField] private Color autoButtonActiveColor = Color.yellow;
-    
+
     [Header("文字送り設定")]
     [SerializeField] private float defaultCharSpeed = 0.03f; // デフォルトの1文字表示間隔（秒）
     [SerializeField] private float autoNextDelay = 3f; // 自動で次へ進むまでの待機時間（秒）
-    
+
     private bool _isTyping;
     private bool _isWaitingForNext;
     private bool _isAutoMode;
@@ -47,10 +47,10 @@ public class DialogView : MonoBehaviour
 
     private string _currentImageName;
     private float _additionalWaitTime;
-    
+
     // イベント
     private readonly Subject<Unit> _onSkipRequested = new();
-    
+
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
 
     private void Awake()
@@ -65,7 +65,7 @@ public class DialogView : MonoBehaviour
         // オートボタンの初期色を設定
         UpdateAutoButtonColor();
     }
-    
+
     /// <summary>
     /// 単一のダイアログを表示する
     /// </summary>
@@ -74,21 +74,21 @@ public class DialogView : MonoBehaviour
     public async UniTask ShowSingleDialog(DialogData dialogData, float additionalWaitTime = 0f)
     {
         if (!this) return;
-        
+
         // 現在のダイアログデータを保存
         _currentDialogData = dialogData;
         _additionalWaitTime = additionalWaitTime;
-        
+
         // 話者名を設定
         SetSpeakerName(dialogData.SpeakerName);
 
         // ダイアログテキストをクリア
         dialogText.text = "";
-        
+
         // インジケーターを非表示
         nextIndicator.SetActive(false);
         CancelActiveMotions();
-        
+
         // 文字送りアニメーションを開始
         _isTyping = true;
         _isWaitingForNext = false;
@@ -115,10 +115,10 @@ public class DialogView : MonoBehaviour
         // アニメーション完了後の状態をリセット
         _isTyping = false;
         _isWaitingForNext = true;
-        
+
         // インジケーターを表示
         ShowNextIndicator();
-        
+
         // 自動進行またはユーザー入力待ち
         if (_isAutoMode || dialogData.HasAutoAdvance)
         {
@@ -129,7 +129,7 @@ public class DialogView : MonoBehaviour
             await WaitForNext();
         }
     }
-    
+
     /// <summary>
     /// オートモードの切り替え
     /// </summary>
@@ -183,7 +183,7 @@ public class DialogView : MonoBehaviour
         var hasSpeaker = !string.IsNullOrEmpty(speakerName);
         speakerNameText.text = hasSpeaker ? speakerName : "";
     }
-    
+
     /// <summary>
     /// 次へ進むのを待つ
     /// </summary>
@@ -204,7 +204,7 @@ public class DialogView : MonoBehaviour
             _waitCancellationTokenSource = null;
         }
     }
-    
+
     /// <summary>
     /// タイムアウト付きで次へ進むのを待つ
     /// </summary>
@@ -219,15 +219,15 @@ public class DialogView : MonoBehaviour
                 if (_additionalWaitTime > 0f)
                 {
                     await UniTask.Delay(TimeSpan.FromSeconds(_additionalWaitTime), cancellationToken: _waitCancellationTokenSource.Token);
-                    
+
                     // 待機後もまだ待機中の場合のみ続行
                     if (!_isWaitingForNext) return;
                 }
-                
+
                 // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
                 var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
                 await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: _waitCancellationTokenSource.Token);
-                
+
                 // タイムアウト後もまだ待機中の場合は自動で進む
                 if (_isWaitingForNext) _isWaitingForNext = false;
             }
@@ -242,34 +242,34 @@ public class DialogView : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// オートモード用の自動進行開始
     /// </summary>
     private async UniTaskVoid StartAutoProgress()
     {
         if (!_isWaitingForNext || !_isAutoMode) return;
-        
+
         try
         {
             // 追加の待機時間（SE再生時間など）がある場合は待つ
             if (_additionalWaitTime > 0f)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(_additionalWaitTime), cancellationToken: this.GetCancellationTokenOnDestroy());
-                
+
                 // 待機後も待機中かつオートモードの場合のみ進む
                 if (!_isWaitingForNext || !_isAutoMode) return;
             }
-            
+
             // 現在のダイアログのAutoAdvance時間を使用、設定されていない場合はデフォルト値
             var delay = _currentDialogData.HasAutoAdvance ? _currentDialogData.AutoAdvance : autoNextDelay;
             await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: this.GetCancellationTokenOnDestroy());
-            
+
             if (_isWaitingForNext && _isAutoMode) _isWaitingForNext = false;
         }
         catch (OperationCanceledException) { }
     }
-    
+
     /// <summary>
     /// クリック時の処理
     /// </summary>
@@ -286,9 +286,9 @@ public class DialogView : MonoBehaviour
 
             return;
         }
-        
+
         if (!_isWaitingForNext) return;
-        
+
         // オートモード中のクリックはオートモードを解除
         if (_isAutoMode)
         {
@@ -297,11 +297,11 @@ public class DialogView : MonoBehaviour
             _waitCancellationTokenSource?.Cancel();
             return;
         }
-        
+
         // 通常モードのクリックで次へ進む
         _isWaitingForNext = false;
     }
-    
+
     /// <summary>
     /// 次へ進むインジケーターを表示
     /// </summary>
@@ -309,9 +309,9 @@ public class DialogView : MonoBehaviour
     {
         nextIndicator.SetActive(true);
         PositionIndicatorAtLastCharacter();
-        
+
         CancelActiveMotions();
-        
+
         var rectTransform = nextIndicator.GetComponent<RectTransform>();
         if (rectTransform)
         {
@@ -328,7 +328,7 @@ public class DialogView : MonoBehaviour
                 .AddTo(this);
         }
     }
-    
+
     /// <summary>
     /// インジケーターを最後の文字の横に配置
     /// </summary>
@@ -336,12 +336,12 @@ public class DialogView : MonoBehaviour
     {
         var indicatorRectTransform = nextIndicator.GetComponent<RectTransform>();
         dialogText.ForceMeshUpdate();
-        
+
         var textInfo = dialogText.textInfo;
         if (textInfo.characterCount == 0) return;
-        
+
         var lastVisibleCharIndex = textInfo.characterCount - 1;
-        
+
         while (lastVisibleCharIndex >= 0)
         {
             var charInfo = textInfo.characterInfo[lastVisibleCharIndex];
@@ -351,7 +351,7 @@ public class DialogView : MonoBehaviour
             }
             lastVisibleCharIndex--;
         }
-        
+
         if (lastVisibleCharIndex >= 0)
         {
             var lastCharInfo = textInfo.characterInfo[lastVisibleCharIndex];
@@ -362,7 +362,7 @@ public class DialogView : MonoBehaviour
             indicatorRectTransform.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
         }
     }
-    
+
     /// <summary>
     /// ダイアログパネルと立ち絵を表示/非表示
     /// nextIndicatorは即時切り替え。
@@ -384,7 +384,7 @@ public class DialogView : MonoBehaviour
             await _panelFadeMotion.ToUniTask();
         }
     }
-    
+
     /// <summary>
     /// アクティブなアニメーションを全てキャンセル
     /// </summary>
@@ -394,12 +394,12 @@ public class DialogView : MonoBehaviour
         _indicatorMotion.TryCancel();
         _panelFadeMotion.TryCancel();
     }
-    
+
     private void UpdateAutoButtonColor()
     {
         autoButtonText.color = _isAutoMode ? autoButtonActiveColor : autoButtonNormalColor;
     }
-    
+
     private void OnDestroy()
     {
         CancelActiveMotions();

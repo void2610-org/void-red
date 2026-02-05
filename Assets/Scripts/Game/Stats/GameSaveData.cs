@@ -12,10 +12,10 @@ public class GameSaveData
     [SerializeField] private int currentStep = 0;
     [SerializeField] private List<string> resultKeys = new();
     [SerializeField] private List<bool> resultValues = new();
-    
+
     [Header("カード閲覧履歴")]
     [SerializeField] private List<string> viewedCardIds = new();
-    
+
     [Header("ノベル選択結果")]
     [SerializeField] private List<NovelChoiceResult> novelChoiceResults = new();
 
@@ -33,30 +33,30 @@ public class GameSaveData
     public void UpdateGameProgress(int step, Dictionary<string, bool> results)
     {
         currentStep = step;
-        
+
         resultKeys.Clear();
         resultValues.Clear();
-        
+
         foreach (var result in results)
         {
             resultKeys.Add(result.Key);
             resultValues.Add(result.Value);
         }
     }
-    
+
     /// <summary>
     /// 結果辞書を取得
     /// </summary>
     public Dictionary<string, bool> GetBattleResults()
     {
         var results = new Dictionary<string, bool>();
-        
+
         for (var i = 0; i < Mathf.Min(resultKeys.Count, resultValues.Count); i++)
             results[resultKeys[i]] = resultValues[i];
-        
+
         return results;
     }
-    
+
     /// <summary>
     /// カード閲覧を記録
     /// </summary>
@@ -68,7 +68,7 @@ public class GameSaveData
             viewedCardIds.Add(cardId);
         }
     }
-    
+
     /// <summary>
     /// カードが閲覧済みかチェック
     /// </summary>
@@ -78,7 +78,7 @@ public class GameSaveData
     {
         return viewedCardIds.Contains(cardId);
     }
-    
+
     /// <summary>
     /// 閲覧済みカードIDリストを取得
     /// </summary>
@@ -87,7 +87,7 @@ public class GameSaveData
     {
         return new HashSet<string>(viewedCardIds);
     }
-    
+
     /// <summary>
     /// ノベル選択結果を追加
     /// </summary>
@@ -96,7 +96,7 @@ public class GameSaveData
     {
         novelChoiceResults.Add(choiceResult);
     }
-    
+
     /// <summary>
     /// 特定のシナリオIDの選択結果を取得
     /// </summary>
@@ -106,7 +106,7 @@ public class GameSaveData
     {
         return novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
     }
-    
+
     /// <summary>
     /// 全ての選択結果を取得
     /// </summary>

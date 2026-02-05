@@ -1,6 +1,6 @@
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 using UnityEngine.EventSystems;
 using UnityEngine.VFX;
 using Void2610.UnityTemplate;
@@ -26,13 +26,13 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         OnPointerExit(null);
         await UniTask.Delay(500);
-        
+
         // メインテーマならVFX再生
         visualEffect.SetInt("Rate", isMainTheme ? 1 : 0);
-        
+
         // BGMボリュームを下げてからME再生
         await BgmManager.Instance.DuckVolume();
-        SeManager.Instance.PlaySe("ThemeAppearance", pitch:1f);
+        SeManager.Instance.PlaySe("ThemeAppearance", pitch: 1f);
         _themeData = themeData;
         themeText.TypewriterAnimation(themeData.Title).Forget();
         await UniTask.Delay(4000);
@@ -45,7 +45,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (_isKeywordsVisible || !_themeData) return;
-        
+
         VolumeController.Instance.SetScreenSpaceLensFlareIntensity(1f);
         _isKeywordsVisible = true;
     }
@@ -56,7 +56,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void OnPointerExit(PointerEventData eventData)
     {
         if (!_isKeywordsVisible || !_themeData) return;
-        
+
         VolumeController.Instance.SetScreenSpaceLensFlareIntensity(0f);
         _isKeywordsVisible = false;
     }
@@ -71,7 +71,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         if (!_isKeywordsVisible) OnPointerEnter(null);
         else OnPointerExit(null);
     }
-    
+
     private void Awake()
     {
         visualEffect.SetInt("Rate", 0);
