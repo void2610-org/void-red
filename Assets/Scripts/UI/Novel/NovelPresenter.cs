@@ -173,15 +173,19 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         if (!string.IsNullOrEmpty(dialogData.BackgroundImageName))
         {
             var backgroundSprite = await _addressableImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
+            if (!_dialogBackgroundView) return;
             await _dialogBackgroundView.SetBackground(backgroundSprite);
         }
-        
+
         // キャラクター画像を読み込み（事前読み込み済みなのでキャッシュから取得）
         if (!string.IsNullOrEmpty(dialogData.CharacterImageName))
         {
             var characterSprite = await _addressableImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
+            if (!_dialogCharacterView) return;
             _dialogCharacterView.SetCharacterImage(characterSprite, dialogData.CharacterImageName.Contains("Alv"));
         }
+
+        if (!_dialogView) return;
 
         // SE再生と再生時間の取得
         _novelSeManager.StopSe();
