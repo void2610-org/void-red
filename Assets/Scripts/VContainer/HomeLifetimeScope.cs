@@ -1,6 +1,6 @@
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using UnityEngine;
 
 /// <summary>
 /// ホームシーン用のLifetimeScope
@@ -9,7 +9,7 @@ using UnityEngine;
 public class HomeLifetimeScope : LifetimeScope
 {
     [SerializeField] private AllCardData allCardData;
-    
+
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterComponentInHierarchy<HomeView>();

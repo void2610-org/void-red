@@ -1,9 +1,9 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Threading;
-using R3;
 
 /// <summary>
 /// 確認ダイアログの表示を担当するViewクラス
@@ -15,7 +15,7 @@ public class ConfirmationDialogView : BaseWindowView
     [SerializeField] private Button confirmButton;
     [SerializeField] private TextMeshProUGUI confirmButtonText;
     [SerializeField] private TextMeshProUGUI cancelButtonText;
-    
+
     private CancellationTokenSource _currentDialogCts;
     private UniTaskCompletionSource<bool> _dialogResult;
 
@@ -31,10 +31,10 @@ public class ConfirmationDialogView : BaseWindowView
         // 現在実行中のダイアログをキャンセル
         _currentDialogCts?.Cancel();
         _currentDialogCts?.Dispose();
-        
+
         // 新しいキャンセレーショントークンを作成
         _currentDialogCts = new CancellationTokenSource();
-        
+
         // アプリケーション終了時にもキャンセルされるようにする
         var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
             _currentDialogCts.Token,
@@ -74,7 +74,7 @@ public class ConfirmationDialogView : BaseWindowView
             return false;
         }
     }
-    
+
     protected override void Awake()
     {
         base.Awake();

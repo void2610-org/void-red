@@ -12,7 +12,7 @@ using Void2610.UnityTemplate;
 [CreateAssetMenu(fileName = "AllThemeData", menuName = "VoidRed/All Theme Data")]
 public class AllThemeData : ScriptableObject
 {
-    [SerializeField] private List<ThemeData> themeList = new ();
+    [SerializeField] private List<ThemeData> themeList = new();
 
     // プロパティ
     public List<ThemeData> ThemeList => themeList;

@@ -36,7 +36,7 @@ public class GameStateRepository
         // 起動時に自動ロード
         LoadAll();
     }
-    
+
     /// <summary>
     /// 全データをセーブ
     /// </summary>

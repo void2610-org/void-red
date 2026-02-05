@@ -1,7 +1,7 @@
+using Coffee.UIEffects;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using Coffee.UIEffects;
 
 /// <summary>
 /// CardView と DeckCardView の共通基底クラス

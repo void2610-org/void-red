@@ -1,5 +1,5 @@
-using Cysharp.Threading.Tasks;
 using System;
+using Cysharp.Threading.Tasks;
 using R3;
 
 /// <summary>
@@ -35,15 +35,15 @@ public class TutorialPresenter : IDisposable
     public async UniTask StartBattleTutorial()
     {
         await StartTutorial("Battle1", true);
-        
+
         // テーマのキーワード表示
         _themeView.OnPointerEnter(null);
         await UniTask.Delay(2000);
         _themeView.OnPointerExit(null);
         await UniTask.Delay(500);
-        
+
         await StartTutorial("Battle2", true);
-        
+
         // 手札の最初のカード（インデックス0）を自動選択
         await UniTask.Delay(500);
         // _player.SelectCardAt(0);
@@ -65,7 +65,7 @@ public class TutorialPresenter : IDisposable
         await StartTutorial("Battle5", true);
         await StartTutorial("Battle6", true);
     }
-    
+
     public async UniTask StartResultTutorial()
     {
         await StartTutorial("BattleResult");

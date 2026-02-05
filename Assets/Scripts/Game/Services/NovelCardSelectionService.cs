@@ -8,7 +8,7 @@ using System.Reflection;
 public static class NovelCardSelectionService
 {
     private static readonly Dictionary<string, MethodInfo> _scenarioMethods = new();
-    
+
     /// <summary>
     /// 静的コンストラクタ ScenarioCardSelectionAttributeが付与されたメソッドを収集
     /// </summary>
@@ -16,14 +16,14 @@ public static class NovelCardSelectionService
     {
         InitializeScenarioMethods();
     }
-    
+
     /// <summary>
     /// アトリビュートが付与されたメソッドを収集してキャッシュ
     /// </summary>
     private static void InitializeScenarioMethods()
     {
         var methods = typeof(NovelCardSelectionService).GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
-        
+
         foreach (var method in methods)
         {
             var attribute = method.GetCustomAttribute<ScenarioCardSelectionAttribute>();
@@ -33,7 +33,7 @@ public static class NovelCardSelectionService
             }
         }
     }
-    
+
     /// <summary>
     /// シナリオIDと選択結果に基づいてカードIDを決定
     /// </summary>
@@ -48,10 +48,10 @@ public static class NovelCardSelectionService
             // リフレクションでメソッドを呼び出し
             return (string)method.Invoke(null, new object[] { choiceResults });
         }
-        
+
         return null;
     }
-    
+
     /// <summary>
     /// プロローグ1のカード選択ロジック
     /// 最初の選択肢の結果に基づいてカードを決定
@@ -66,10 +66,10 @@ public static class NovelCardSelectionService
         {
             return null;
         }
-        
+
         // 最初の選択肢（choiceIndex = 0）の結果を最後から検索
         NovelChoiceResult firstChoice = null;
-        for (int i = choiceResults.Count - 1; i >= 0; i--)
+        for (var i = choiceResults.Count - 1; i >= 0; i--)
         {
             if (choiceResults[i].ChoiceIndex == 0)
             {
@@ -77,12 +77,12 @@ public static class NovelCardSelectionService
                 break;
             }
         }
-        
+
         if (firstChoice == null)
         {
             return null;
         }
-        
+
         // 選択された選択肢のインデックスに基づいてカードIDを決定
         return firstChoice.SelectedOptionIndex switch
         {

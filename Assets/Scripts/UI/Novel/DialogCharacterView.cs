@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 [RequireComponent(typeof(CanvasGroup))]
@@ -34,7 +34,7 @@ public class DialogCharacterView : MonoBehaviour
         if (isAlv)
         {
             transform.localPosition = new Vector3(0f, -130f, 0f);
-            
+
             transform.localScale = Vector3.one * 0.375f;
         }
         else
@@ -43,7 +43,7 @@ public class DialogCharacterView : MonoBehaviour
             transform.localScale = Vector3.one * 0.35f;
         }
     }
-    
+
     /// <summary>
     /// 2枚の画像を使った真のクロスフェードアニメーション
     /// </summary>
@@ -51,29 +51,29 @@ public class DialogCharacterView : MonoBehaviour
     {
         // 現在のスプライトと同じ場合はアニメーションをスキップ
         if (characterImage.sprite == newSprite) return;
-        
+
         // 背面画像に新しいスプライトを設定
         characterImageBack.sprite = newSprite;
         characterImageBack.color = new Color(1, 1, 1, 0);
 
         // 同時進行のクロスフェード
         var fadeOutFront = characterImage.FadeOut(0.2f, Ease.InOutQuad);
-            
+
         var fadeInBack = characterImageBack.FadeIn(0.2f, Ease.InOutQuad);
-        
+
         // 両方のアニメーションを同時実行
         await UniTask.WhenAll(
             fadeOutFront.AddTo(gameObject).ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy()),
             fadeInBack.AddTo(gameObject).ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy())
         );
-        
+
         // アニメーション完了後、前面と背面を入れ替え
         (characterImage.sprite, characterImageBack.sprite) = (characterImageBack.sprite, characterImage.sprite);
 
         characterImage.color = Color.white;
         characterImageBack.color = new Color(1, 1, 1, 0);
     }
-    
+
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();

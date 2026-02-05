@@ -1,0 +1,47 @@
+name: Format Check
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Assets/Scripts/**/*.cs'
+      - '.editorconfig'
+      - '.github/workflows/format-check.yml'
+      - 'tools/UnityNamingAnalyzer/**'
+  pull_request:
+    paths:
+      - 'Assets/Scripts/**/*.cs'
+      - '.editorconfig'
+      - '.github/workflows/format-check.yml'
+      - 'tools/UnityNamingAnalyzer/**'
+
+jobs:
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build analyzer
+        run: dotnet build tools/UnityNamingAnalyzer/UnityNamingAnalyzer.csproj -c Release
+
+      - name: Run analyzer tests
+        run: dotnet test tools/UnityNamingAnalyzer.Tests/UnityNamingAnalyzer.Tests.csproj -c Release --verbosity normal
+
+      - name: Check whitespace formatting
+        run: dotnet format whitespace FormatCheck.csproj --verify-no-changes
+
+      - name: Check code style
+        run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warn
+
+      - name: Check analyzers
+        run: dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn

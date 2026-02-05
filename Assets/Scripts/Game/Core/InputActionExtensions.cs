@@ -1,5 +1,5 @@
-using UnityEngine.InputSystem;
 using R3;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// InputActionの拡張メソッド
@@ -19,7 +19,7 @@ public static class InputActionExtensions
             h => action.performed -= h
         ).Select(_ => Unit.Default);
     }
-    
+
     /// <summary>
     /// InputAction.startedイベントをR3のObservableに変換
     /// </summary>
@@ -32,7 +32,7 @@ public static class InputActionExtensions
             h => action.started -= h
         ).Select(_ => Unit.Default);
     }
-    
+
     /// <summary>
     /// InputAction.canceledイベントをR3のObservableに変換
     /// </summary>

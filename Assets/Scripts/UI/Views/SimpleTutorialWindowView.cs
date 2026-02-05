@@ -1,8 +1,8 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using TMPro;
 using UnityEngine;
-using LitMotion;
-using System.Threading;
 using Void2610.UnityTemplate;
 
 [RequireComponent(typeof(CanvasGroup))]
@@ -77,7 +77,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
             _canvasGroup.alpha = 0f;
         }
     }
-    
+
     /// <summary>
     /// クリック時の処理（キーボード入力でも使用）
     /// </summary>
@@ -103,7 +103,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
 
         tutorialText.gameObject.SetActive(false);
     }
-    
+
     private void Awake()
     {
         // 初期状態の設定
@@ -114,7 +114,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
         // TextProgressControllerの初期化
         _textProgressController = new TextProgressController();
     }
-    
+
     private void OnDestroy()
     {
         // ナレーションのキャンセレーショントークンをクリーンアップ

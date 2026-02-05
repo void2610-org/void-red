@@ -99,7 +99,7 @@ public class HelpPresenter : IStartable, IDisposable
     {
         var helpData = _allHelpData.GetHelpByIndex(_currentIndex);
         if (!helpData) return;
-        
+
         _helpView.DisplayHelp(helpData, _currentIndex, _allHelpData.Count);
     }
 

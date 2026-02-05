@@ -40,7 +40,7 @@ public class MentalPowerEffectController : IStartable, IDisposable
         // 精神力割合を計算（0.0～1.0）
         var ratio = mentalPower / 7f;
         if (ratio > 0.7) return;
-        
+
         var inverseRatio = 1f - ratio; // 精神力が低いほど大きい値
 
         // エフェクト強度を設定

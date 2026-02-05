@@ -1,9 +1,9 @@
-using UnityEngine;
-using Cysharp.Threading.Tasks;
 using System;
+using Cysharp.Threading.Tasks;
 using LitMotion;
-using Void2610.UnityTemplate;
+using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// チュートリアル表示を管理するViewクラス
@@ -39,7 +39,7 @@ public class TutorialView : MonoBehaviour
     public async UniTask ShowStepAndWaitForClick(TutorialStep step, bool isBattleTutorial)
     {
         if (step == null) return;
-        
+
         // マスク領域の更新（アニメーション付き）
         _currentMaskPositionHandle.TryCancel();
         _currentMaskSizeHandle.TryCancel();
@@ -47,7 +47,7 @@ public class TutorialView : MonoBehaviour
         // 現在のマスクサイズと新しいマスクサイズをチェック
         var isCurrentSizeZero = _currentMaskSize == Vector2.zero;
         var isNewSizeZero = step.MaskSize == Vector2.zero;
-        
+
         if (isCurrentSizeZero && !isNewSizeZero)
         {
             // (0,0) → 非(0,0) - 位置を瞬間移動してサイズアニメーションのみ
@@ -63,17 +63,17 @@ public class TutorialView : MonoBehaviour
 
         // 現在のサイズを更新
         _currentMaskSize = step.MaskSize;
-        
+
         // メッセージテキストの更新
         await UpdateMessageText(step.Message, step.IsPlayerDialog, isBattleTutorial);
-        
+
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));
 
         // ルートボタンを選択
         SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
-    
+
     private async UniTask UpdateMessageText(string message, bool isPlayerDialog, bool isBattleTutorial)
     {
         if (!isBattleTutorial)
@@ -89,7 +89,7 @@ public class TutorialView : MonoBehaviour
 
         await narrationView.DisplayNarration(message, autoAdvance: false);
     }
-    
+
     /// <summary>
     /// チュートリアルビューを表示
     /// </summary>
@@ -97,14 +97,14 @@ public class TutorialView : MonoBehaviour
     {
         // 現在のアニメーションをキャンセル
         _currentFadeHandle.TryCancel();
-        
+
         // フェードイン
         _currentFadeHandle = _canvasGroup.FadeIn(FADE_DURATION);
-        
+
         await _currentFadeHandle.ToUniTask();
         SafeNavigationManager.SetSelectedGameObjectSafe(clickAreaButton.gameObject);
     }
-    
+
     /// <summary>
     /// チュートリアルビューを非表示
     /// </summary>
@@ -112,16 +112,16 @@ public class TutorialView : MonoBehaviour
     {
         // 現在のアニメーションをキャンセル
         _currentFadeHandle.TryCancel();
-        
+
         // NarrationViewも非表示にする
         playerNarrationView.HideNarration().Forget();
         enemyNarrationView.HideNarration().Forget();
-        
+
         // フェードアウト
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_DURATION);
-        
+
         await _currentFadeHandle.ToUniTask();
-        
+
         // 次回のために初期化
         _currentMaskSize = Vector2.zero;
     }

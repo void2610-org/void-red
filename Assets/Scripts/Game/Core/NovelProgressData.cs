@@ -26,7 +26,7 @@ public class NovelProgressData
     {
         _choiceResults.Add(choiceResult);
     }
-    
+
     public List<NovelChoiceResult> GetAllChoiceResults()
     {
         return new List<NovelChoiceResult>(_choiceResults);

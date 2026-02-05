@@ -11,12 +11,12 @@ public class CardModel
     /// カードインスタンスの一意ID
     /// </summary>
     public string InstanceId { get; }
-    
+
     /// <summary>
     /// カードの定義データ（ScriptableObject）
     /// </summary>
     public CardData Data { get; }
-    
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -26,7 +26,7 @@ public class CardModel
         InstanceId = Guid.NewGuid().ToString();
         Data = data;
     }
-    
+
     /// <summary>
     /// 復元用コンストラクタ（セーブデータから復元する際に使用）
     /// </summary>
@@ -37,7 +37,7 @@ public class CardModel
         InstanceId = instanceId;
         Data = data;
     }
-    
+
     /// <summary>
     /// デバッグ用文字列
     /// </summary>

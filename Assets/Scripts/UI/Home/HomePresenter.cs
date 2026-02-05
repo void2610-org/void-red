@@ -1,8 +1,8 @@
 using System;
-using UnityEngine;
-using R3;
-using VContainer.Unity;
 using Cysharp.Threading.Tasks;
+using R3;
+using UnityEngine;
+using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 
@@ -126,7 +126,7 @@ public class HomePresenter : IStartable, IDisposable
         var viewedCardIds = _gameProgressService.GetViewedCardIds();
         _homeView.ShowCardLibrary(_allCardData, viewedCardIds);
     }
-    
+
     public void Dispose()
     {
         _disposables.Dispose();

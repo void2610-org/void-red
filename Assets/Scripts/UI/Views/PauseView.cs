@@ -1,6 +1,6 @@
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
-using R3;
 
 /// <summary>
 /// ポーズ画面を表示するViewコンポーネント

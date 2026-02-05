@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using R3;
-using VContainer.Unity;
 using UnityEngine;
+using VContainer.Unity;
 using Void2610.UnityTemplate;
 
-public class BattlePresenter: IStartable, ISceneInitializable
+public class BattlePresenter : IStartable, ISceneInitializable
 {
     private readonly BattleUIPresenter _battleUIPresenter;
     private readonly Player _player;

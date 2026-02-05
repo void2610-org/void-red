@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -23,7 +23,7 @@ public class DialoguePortraitView : MonoBehaviour
     private MotionHandle _slideHandle;
     private MotionHandle _fadeHandle;
     private MotionHandle _fadeBackHandle;
-    
+
     /// <summary>
     /// 立ち絵をクロスフェードで切り替え
     /// </summary>
@@ -93,7 +93,7 @@ public class DialoguePortraitView : MonoBehaviour
         // 背面画像を透明に初期化
         _portraitTransform = this.GetComponent<RectTransform>();
         _portraitTransform.anchoredPosition = new Vector2(hiddenX, _portraitTransform.anchoredPosition.y);
-        
+
         portraitImageBack.color = new Color(1, 1, 1, 0);
     }
 

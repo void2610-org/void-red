@@ -1,5 +1,5 @@
-using Cysharp.Threading.Tasks;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// テキスト表示の進行状態を管理するpure C#クラス

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using R3;
+using UnityEngine;
 
 /// <summary>
 /// ゲーム全体の進行度を管理するサービス（ファサード）

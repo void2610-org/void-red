@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// カードプールを管理するサービスクラス
@@ -10,7 +10,7 @@ public class CardPoolService
 {
     private readonly AllCardData _allCardData;
     private readonly List<CardData> _availableCards;
-    
+
     /// <summary>
     /// コンストラクタ（AllCardDataListをDIで受け取る）
     /// </summary>
@@ -20,7 +20,7 @@ public class CardPoolService
         _allCardData = allCardData;
         _availableCards = _allCardData.CardList.ToList();
     }
-    
+
     /// <summary>
     /// ランダムなカードを1枚取得
     /// </summary>
@@ -31,11 +31,11 @@ public class CardPoolService
         {
             return null;
         }
-        
+
         var randomIndex = Random.Range(0, _availableCards.Count);
         return _availableCards[randomIndex];
     }
-    
+
     /// <summary>
     /// 複数のランダムなカードを取得（重複なし）
     /// </summary>
@@ -45,23 +45,23 @@ public class CardPoolService
     {
         if (count <= 0) return new List<CardData>();
         if (_availableCards.Count == 0) return new List<CardData>();
-        
+
         // 要求数が利用可能カード数を超える場合は、利用可能な分だけ返す
         var actualCount = Mathf.Min(count, _availableCards.Count);
-        
+
         // シャッフルしてから先頭から取得（重複なし）
         var shuffledCards = new List<CardData>(_availableCards);
-        for (int i = 0; i < shuffledCards.Count; i++)
+        for (var i = 0; i < shuffledCards.Count; i++)
         {
             var temp = shuffledCards[i];
             var randomIndex = Random.Range(i, shuffledCards.Count);
             shuffledCards[i] = shuffledCards[randomIndex];
             shuffledCards[randomIndex] = temp;
         }
-        
+
         return shuffledCards.Take(actualCount).ToList();
     }
-    
+
     /// <summary>
     /// 複数のランダムなカードを取得（重複あり）
     /// </summary>
@@ -71,17 +71,17 @@ public class CardPoolService
     {
         if (count <= 0) return new List<CardData>();
         if (_availableCards.Count == 0) return new List<CardData>();
-        
+
         var result = new List<CardData>();
         for (var i = 0; i < count; i++)
         {
             var randomIndex = Random.Range(0, _availableCards.Count);
             result.Add(_availableCards[randomIndex]);
         }
-        
+
         return result;
     }
-    
+
     /// <summary>
     /// 指定した条件に合うカードを取得
     /// </summary>
@@ -91,7 +91,7 @@ public class CardPoolService
     {
         return _availableCards.Where(predicate).ToList();
     }
-    
+
     /// <summary>
     /// 特定のカードIDでカードを取得
     /// </summary>
@@ -101,7 +101,7 @@ public class CardPoolService
     {
         return _availableCards.FirstOrDefault(card => card.CardName == cardName);
     }
-    
+
     /// <summary>
     /// CardIdでカードを取得（全カード対象、進化・劣化先も含む）
     /// </summary>
@@ -111,7 +111,7 @@ public class CardPoolService
     {
         return _allCardData.CardList.FirstOrDefault(card => card.CardId == cardId);
     }
-    
+
     /// <summary>
     /// 初期デッキに使用可能なカードの数を取得
     /// </summary>
@@ -120,5 +120,5 @@ public class CardPoolService
     {
         return _availableCards.Count;
     }
-    
+
 }

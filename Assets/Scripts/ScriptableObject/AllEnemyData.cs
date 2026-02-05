@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 using Void2610.UnityTemplate;
 
 #if UNITY_EDITOR
@@ -12,12 +12,12 @@ using Void2610.UnityTemplate;
 [CreateAssetMenu(fileName = "AllEnemyData", menuName = "VoidRed/All Enemy Data")]
 public class AllEnemyData : ScriptableObject
 {
-    [SerializeField] private List<EnemyData> enemyList = new ();
-    
+    [SerializeField] private List<EnemyData> enemyList = new();
+
     // プロパティ
     public List<EnemyData> EnemyList => enemyList;
     public int Count => enemyList.Count;
-    
+
     /// <summary>
     /// 同じディレクトリ内の全ての敵データを自動的に登録
     /// </summary>
@@ -27,7 +27,7 @@ public class AllEnemyData : ScriptableObject
         this.RegisterAssetsInSameDirectory(enemyList, x => x.EnemyId);
 #endif
     }
-    
+
     /// <summary>
     /// インデックスで敵を取得（ストーリー進行用）
     /// </summary>
@@ -38,7 +38,7 @@ public class AllEnemyData : ScriptableObject
         if (index < 0 || index >= enemyList.Count) return null;
         return enemyList[index];
     }
-    
+
     /// <summary>
     /// 敵IDで敵を取得
     /// </summary>

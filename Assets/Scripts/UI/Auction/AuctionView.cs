@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using R3;
 using Cysharp.Threading.Tasks;
+using R3;
+using UnityEngine;
 
 // オークションフェーズの統合View
 // CardReveal, BiddingPhase, AuctionResultで共有

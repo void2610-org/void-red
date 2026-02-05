@@ -1,7 +1,7 @@
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using R3;
 
 // 入札パネルView
 // カード選択時に表示される入札額調整UI

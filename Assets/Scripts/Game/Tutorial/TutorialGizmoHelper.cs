@@ -8,7 +8,7 @@ public class TutorialGizmoHelper : MonoBehaviour
 {
     [Header("チュートリアルデータ")]
     [SerializeField] private TutorialData tutorialData;
-    
+
 #if UNITY_EDITOR
     /// <summary>
     /// シーンビューでギズモを表示

@@ -21,7 +21,7 @@ public class RootLifetimeScope : LifetimeScope
     [SerializeField] private AllTutorialData allTutorialData;
     [SerializeField] private AllHelpData allHelpData;
     [SerializeField] private ConfirmationDialogView confirmationDialogView;
-    
+
     protected override void Configure(IContainerBuilder builder)
     {
         // データの登録と初期化
@@ -70,18 +70,18 @@ public class RootLifetimeScope : LifetimeScope
 
         InitializeSingletonMonoBehaviour();
     }
-    
+
     private void RegisterAllData()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         allCardData.RegisterAllCards();
         allThemeData.RegisterAllThemes();
         allEnemyData.RegisterAllEnemies();
         allTutorialData.RegisterAllTutorials();
         allHelpData.RegisterAllHelps();
-        #endif
+#endif
     }
-    
+
     private void InitializeSingletonMonoBehaviour()
     {
         DontDestroyOnLoad(Instantiate(bgmManager).gameObject);

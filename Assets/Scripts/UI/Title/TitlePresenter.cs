@@ -1,8 +1,8 @@
 using System;
-using UnityEngine;
-using R3;
-using VContainer.Unity;
 using Cysharp.Threading.Tasks;
+using R3;
+using UnityEngine;
+using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 using Void2610.UnityTemplate.Steam;
@@ -131,7 +131,7 @@ public class TitlePresenter : IStartable, IDisposable
     {
         Application.OpenURL("https://docs.google.com/forms/d/e/1FAIpQLSfNMqCyXFzWijWAv__wTpDVRN6AtEfFXpdPxyFcIkMbiq2UKw/viewform");
     }
-    
+
     public void Dispose()
     {
         _disposables.Dispose();
