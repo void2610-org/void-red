@@ -103,19 +103,25 @@ public class DialogView : MonoBehaviour
         _typingCancellationTokenSource?.Dispose();
         _typingCancellationTokenSource = new CancellationTokenSource();
         var charSpeed = dialogData.HasCustomCharSpeed ? defaultCharSpeed / dialogData.CustomCharSpeed : defaultCharSpeed;
-        await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, cancellationToken: _typingCancellationTokenSource.Token);
+        try
+        {
+            // skipOnClick: falseで旧InputSystemの競合を回避（OnClick経由でCTSキャンセルによりスキップ）
+            await dialogText.TypewriterAnimation(dialogData.DialogText, charSpeed, skipOnClick: false, cancellationToken: _typingCancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // OnClick()からのキャンセル - テキストは全文表示済み
+        }
 
         // dialogSeループを停止
         _dialogSeCancellationTokenSource?.Cancel();
         _dialogSeCancellationTokenSource?.Dispose();
         _dialogSeCancellationTokenSource = null;
 
-        await UniTask.Yield();
-
-        // アニメーション完了後の状態をリセット
+        // 状態をリセット
         _isTyping = false;
         _isWaitingForNext = true;
-        
+
         // インジケーターを表示
         ShowNextIndicator();
         
@@ -124,7 +130,9 @@ public class DialogView : MonoBehaviour
         {
             await WaitForNextWithTimeout();
         }
-        else
+
+        // オートモード解除等で待機がキャンセルされた場合、手動入力を待つ
+        if (_isWaitingForNext)
         {
             await WaitForNext();
         }
@@ -138,15 +146,20 @@ public class DialogView : MonoBehaviour
         _isAutoMode = !_isAutoMode;
         UpdateAutoButtonColor();
 
-        // オートモードONで現在待機中の場合、自動進行を開始
-        if (_isAutoMode && _isWaitingForNext)
+        if (!_isWaitingForNext) return;
+
+        if (_isAutoMode)
         {
+            // オートモードON: 自動進行を開始
             _waitCancellationTokenSource?.Cancel();
             _waitCancellationTokenSource?.Dispose();
             _waitCancellationTokenSource = null;
-
-            // 新しい自動進行タスクを開始
             StartAutoProgress().Forget();
+        }
+        else
+        {
+            // オートモードOFF: タイムアウト待機をキャンセル（WaitForNextにフォールバック）
+            _waitCancellationTokenSource?.Cancel();
         }
     }
 
@@ -277,18 +290,13 @@ public class DialogView : MonoBehaviour
     {
         if (_isTyping)
         {
-            // 文字送り中のクリックで即座に全文表示
+            // 文字送り中のクリックで即座に全文表示（フラグ管理はShowSingleDialogに委譲）
             _typingCancellationTokenSource?.Cancel();
-
-            _isTyping = false;
-            _isWaitingForNext = true;
-            ShowNextIndicator();
-
             return;
         }
-        
+
         if (!_isWaitingForNext) return;
-        
+
         // オートモード中のクリックはオートモードを解除
         if (_isAutoMode)
         {
@@ -297,7 +305,7 @@ public class DialogView : MonoBehaviour
             _waitCancellationTokenSource?.Cancel();
             return;
         }
-        
+
         // 通常モードのクリックで次へ進む
         _isWaitingForNext = false;
     }

@@ -264,13 +264,20 @@ public class ValueRankingView : MonoBehaviour
     {
         _animHandles.CancelAll();
 
+        Canvas.ForceUpdateCanvases();
+
         for (var i = 0; i < slots.Count; i++)
         {
             var slot = slots[i];
-            if (!_slotOriginalPositions.TryGetValue(slot, out var originalPos)) continue;
-
             var slotRect = (RectTransform)slot.transform;
             var canvasGroup = slot.CanvasGroup;
+
+            // 初回は現在位置を保存、2回目以降は保存済みの位置を使用
+            if (!_slotOriginalPositions.TryGetValue(slot, out var originalPos))
+            {
+                originalPos = slotRect.anchoredPosition;
+                _slotOriginalPositions[slot] = originalPos;
+            }
 
             // 開始位置を上にオフセット、透明度を0に
             var startPos = originalPos + new Vector2(0, slotSlideOffset);
@@ -341,15 +348,6 @@ public class ValueRankingView : MonoBehaviour
         _handContainerRect = handContainer as RectTransform;
         var canvas = GetComponentInParent<Canvas>().rootCanvas;
         dragLineView.Initialize(canvas);
-
-        Canvas.ForceUpdateCanvases();
-
-        // スロットの初期位置を保存
-        foreach (var slot in slots)
-        {
-            var slotRect = (RectTransform)slot.transform;
-            _slotOriginalPositions[slot] = slotRect.anchoredPosition;
-        }
     }
 
     private void OnDestroy()

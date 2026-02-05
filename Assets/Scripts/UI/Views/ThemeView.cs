@@ -25,17 +25,17 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public async UniTask DisplayThemeWithKeywords(ThemeData themeData, bool isMainTheme)
     {
         OnPointerExit(null);
-        await UniTask.Delay(500);
-        
+        await UniTask.Delay(500, cancellationToken: destroyCancellationToken);
+
         // メインテーマならVFX再生
         visualEffect.SetInt("Rate", isMainTheme ? 1 : 0);
-        
+
         // BGMボリュームを下げてからME再生
         await BgmManager.Instance.DuckVolume();
         SeManager.Instance.PlaySe("ThemeAppearance", pitch:1f);
         _themeData = themeData;
         themeText.TypewriterAnimation(themeData.Title).Forget();
-        await UniTask.Delay(4000);
+        await UniTask.Delay(4000, cancellationToken: destroyCancellationToken);
         BgmManager.Instance.RestoreVolume().Forget();
     }
 
