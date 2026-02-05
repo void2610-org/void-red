@@ -5,10 +5,10 @@ using R3;
 /// </summary>
 public interface IPauseView
 {
-    bool IsShowing { get; }
-    Observable<Unit> OnResumeButtonClicked { get; }
-    Observable<Unit> OnHomeButtonClicked { get; }
-    void Show();
-    void Hide();
-    void Toggle();
+    public bool IsShowing { get; }
+    public Observable<Unit> OnResumeButtonClicked { get; }
+    public Observable<Unit> OnHomeButtonClicked { get; }
+    public void Show();
+    public void Hide();
+    public void Toggle();
 }

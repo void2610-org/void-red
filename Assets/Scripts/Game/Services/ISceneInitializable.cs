@@ -8,5 +8,5 @@ public interface ISceneInitializable
     /// <summary>
     /// シーンの初期化完了を待つ
     /// </summary>
-    UniTask WaitForInitializationAsync();
+    public UniTask WaitForInitializationAsync();
 }
