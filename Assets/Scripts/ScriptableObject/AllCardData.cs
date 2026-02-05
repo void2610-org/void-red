@@ -46,7 +46,7 @@ public class AllCardData : ScriptableObject
         }
 
         var shuffled = new List<CardData>(cardList);
-        for (int i = 0; i < shuffled.Count; i++)
+        for (var i = 0; i < shuffled.Count; i++)
         {
             var temp = shuffled[i];
             var randomIndex = Random.Range(i, shuffled.Count);

@@ -178,7 +178,7 @@ public class DeckView : BaseWindowView
         // カテゴリボタンからカードグリッドへの下方向ナビゲーション
         if (cardButtons.Count > 0)
         {
-            for (int i = 0; i < categoryButtons.Count && i < cardButtons.Count; i++)
+            for (var i = 0; i < categoryButtons.Count && i < cardButtons.Count; i++)
             {
                 var nav = categoryButtons[i].navigation;
                 nav.selectOnDown = cardButtons[i];
@@ -186,7 +186,7 @@ public class DeckView : BaseWindowView
             }
 
             // カードグリッド最上段からカテゴリボタンへの上方向ナビゲーション
-            for (int i = 0; i < DECK_GRID_COLS && i < cardButtons.Count; i++)
+            for (var i = 0; i < DECK_GRID_COLS && i < cardButtons.Count; i++)
             {
                 var nav = cardButtons[i].navigation;
                 nav.selectOnUp = i < categoryButtons.Count ? categoryButtons[i] : categoryButtons[^1];

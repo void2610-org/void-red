@@ -25,7 +25,7 @@ public class GameViewCapture : MonoBehaviour
     public void CaptureScreenshot()
     {
         // 保存先フォルダのパスを構築
-        string folderPath = Path.Combine(Application.dataPath, "..", folderName);
+        var folderPath = Path.Combine(Application.dataPath, "..", folderName);
 
         // フォルダが存在しない場合は作成
         if (!Directory.Exists(folderPath))
@@ -34,8 +34,8 @@ public class GameViewCapture : MonoBehaviour
         }
 
         // ファイル名を生成（タイムスタンプ付き）
-        string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        string fileName = $"{fileNamePrefix}_{timestamp}.png";
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var fileName = $"{fileNamePrefix}_{timestamp}.png";
         _screenshotPath = Path.Combine(folderPath, fileName);
 
         // スクリーンショットを撮影
@@ -49,7 +49,7 @@ public class GameViewCapture : MonoBehaviour
     /// </summary>
     public void OpenScreenshotFolder()
     {
-        string folderPath = Path.Combine(Application.dataPath, "..", folderName);
+        var folderPath = Path.Combine(Application.dataPath, "..", folderName);
         if (Directory.Exists(folderPath))
         {
             Application.OpenURL($"file://{folderPath}");

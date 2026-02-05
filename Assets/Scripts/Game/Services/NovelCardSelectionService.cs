@@ -69,7 +69,7 @@ public static class NovelCardSelectionService
 
         // 最初の選択肢（choiceIndex = 0）の結果を最後から検索
         NovelChoiceResult firstChoice = null;
-        for (int i = choiceResults.Count - 1; i >= 0; i--)
+        for (var i = choiceResults.Count - 1; i >= 0; i--)
         {
             if (choiceResults[i].ChoiceIndex == 0)
             {

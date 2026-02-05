@@ -51,7 +51,7 @@ public class CardPoolService
 
         // シャッフルしてから先頭から取得（重複なし）
         var shuffledCards = new List<CardData>(_availableCards);
-        for (int i = 0; i < shuffledCards.Count; i++)
+        for (var i = 0; i < shuffledCards.Count; i++)
         {
             var temp = shuffledCards[i];
             var randomIndex = Random.Range(i, shuffledCards.Count);
