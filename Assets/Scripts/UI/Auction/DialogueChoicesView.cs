@@ -71,6 +71,18 @@ public class DialogueChoicesView : MonoBehaviour
     {
         _animHandles.CancelAll();
 
+        Canvas.ForceUpdateCanvases();
+
+        // 初回のみ初期位置を保存
+        if (_buttonOriginalPositions.Count == 0)
+        {
+            foreach (var button in choiceButtons)
+            {
+                var rect = (RectTransform)button.transform;
+                _buttonOriginalPositions.Add(rect.anchoredPosition);
+            }
+        }
+
         buttonContainer.ForEachChildWithDelay((child, index, delay) =>
         {
             var rect = (RectTransform)child;
@@ -101,15 +113,10 @@ public class DialogueChoicesView : MonoBehaviour
 
     private void Awake()
     {
-        Canvas.ForceUpdateCanvases();
-
-        // 各ボタンのCanvasGroupと初期位置を保存
+        // 各ボタンのCanvasGroupを保存
         foreach (var button in choiceButtons)
         {
             _buttonCanvasGroups.Add(button.GetComponent<CanvasGroup>());
-
-            var rect = (RectTransform)button.transform;
-            _buttonOriginalPositions.Add(rect.anchoredPosition);
         }
     }
 
