@@ -81,6 +81,11 @@ jobs:
         run: |
           mkdir -p /root/.local/share/unity3d/Unity
           echo "$UNITY_LICENSE" | tr -d '\r' > /root/.local/share/unity3d/Unity/Unity_lic.ulf
+          # GitHub Actionsコンテナ内ではHOMEが/github/homeになるため両方に配置
+          if [ "$HOME" != "/root" ]; then
+            mkdir -p "$HOME/.local/share/unity3d/Unity"
+            cp /root/.local/share/unity3d/Unity/Unity_lic.ulf "$HOME/.local/share/unity3d/Unity/Unity_lic.ulf"
+          fi
 
       - name: Generate Solution
         run: |
