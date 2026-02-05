@@ -4,6 +4,7 @@ using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 using Void2610.UnityTemplate.Discord;
+using Void2610.UnityTemplate.Steam;
 
 /// <summary>
 /// ルートレベルのLifetimeScope

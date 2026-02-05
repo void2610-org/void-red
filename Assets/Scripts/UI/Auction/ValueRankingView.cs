@@ -63,20 +63,6 @@ public class ValueRankingView : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void Awake()
-    {
-        _handContainerRect = handContainer as RectTransform;
-        var canvas = GetComponentInParent<Canvas>().rootCanvas;
-        dragLineView.Initialize(canvas);
-
-        // スロットの初期位置を保存
-        foreach (var slot in slots)
-        {
-            var slotRect = (RectTransform)slot.transform;
-            _slotOriginalPositions[slot] = slotRect.anchoredPosition;
-        }
-    }
-
     public void StartRanking(IReadOnlyList<CardModel> cards)
     {
         Clear();
@@ -345,6 +331,20 @@ public class ValueRankingView : MonoBehaviour
                 .BindToAlpha(canvasGroup)
                 .AddTo(canvasGroup.gameObject);
             _animHandles.Add(fadeHandle);
+        }
+    }
+    
+    private void Awake()
+    {
+        _handContainerRect = handContainer as RectTransform;
+        var canvas = GetComponentInParent<Canvas>().rootCanvas;
+        dragLineView.Initialize(canvas);
+
+        // スロットの初期位置を保存
+        foreach (var slot in slots)
+        {
+            var slotRect = (RectTransform)slot.transform;
+            _slotOriginalPositions[slot] = slotRect.anchoredPosition;
         }
     }
 
