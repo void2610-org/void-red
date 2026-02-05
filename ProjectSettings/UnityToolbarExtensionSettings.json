@@ -4,28 +4,28 @@
             "_typeName": "YujiAp.UnityToolbarExtension.Editor.Register.ToolbarExtensionMasterAudioVolumeSlider",
             "_displayName": "MasterAudioVolumeSlider",
             "_isEnabled": true,
-            "_order": 0,
+            "_order": 1,
             "_layoutType": 0
         },
         {
             "_typeName": "YujiAp.UnityToolbarExtension.Editor.Register.ToolbarExtensionPrefabHistoryButton",
             "_displayName": "PrefabHistoryButton",
             "_isEnabled": true,
-            "_order": 0,
+            "_order": 1,
             "_layoutType": 1
         },
         {
             "_typeName": "YujiAp.UnityToolbarExtension.Editor.Register.ToolbarExtensionRestartSceneButton",
             "_displayName": "RestartSceneButton",
             "_isEnabled": true,
-            "_order": 2,
+            "_order": 3,
             "_layoutType": 1
         },
         {
             "_typeName": "YujiAp.UnityToolbarExtension.Editor.Register.ToolbarExtensionSceneListButton",
             "_displayName": "SceneListButton",
             "_isEnabled": true,
-            "_order": 1,
+            "_order": 2,
             "_layoutType": 1
         },
         {
@@ -34,6 +34,13 @@
             "_isEnabled": true,
             "_order": 4,
             "_layoutType": 2
+        },
+        {
+            "_typeName": "GardenGnome.Editor.ToolbarExtensionSelectedGameObject",
+            "_displayName": "SelectedGameObject",
+            "_isEnabled": true,
+            "_order": 0,
+            "_layoutType": 0
         }
     ]
 }
