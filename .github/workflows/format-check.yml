@@ -7,22 +7,49 @@ on:
       - 'Assets/Scripts/**/*.cs'
       - '.editorconfig'
       - '.github/workflows/format-check.yml'
+      - 'tools/UnityNamingAnalyzer/**'
   pull_request:
     paths:
       - 'Assets/Scripts/**/*.cs'
       - '.editorconfig'
       - '.github/workflows/format-check.yml'
-
-env:
-  DOTNET_ROOT: /root/.dotnet
+      - 'tools/UnityNamingAnalyzer/**'
 
 jobs:
+  build-analyzer:
+    name: Build Analyzer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build analyzer
+        run: dotnet build tools/UnityNamingAnalyzer/UnityNamingAnalyzer.csproj -c Release
+
+      - name: Run analyzer tests
+        run: dotnet test tools/UnityNamingAnalyzer.Tests/UnityNamingAnalyzer.Tests.csproj -c Release --verbosity normal
+
+      - name: Upload analyzer DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: analyzer-dll
+          path: tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll
+          retention-days: 1
+
   format-check:
     name: dotnet-format
+    needs: build-analyzer
     runs-on: ubuntu-latest
     # game-ciのDockerイメージ内で全ステップを実行（Unity DLLへのアクセスが必要）
     container:
       image: unityci/editor:ubuntu-6000.0.30f1-base-3
+    env:
+      DOTNET_ROOT: /root/.dotnet
     steps:
       - name: Install dependencies
         run: |
@@ -34,6 +61,12 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 1
+
+      - name: Download analyzer DLL
+        uses: actions/download-artifact@v4
+        with:
+          name: analyzer-dll
+          path: tools/UnityNamingAnalyzer/bin/Release/netstandard2.0
 
       - name: Cache Unity Library
         uses: actions/cache@v4
@@ -70,3 +103,6 @@ jobs:
 
       - name: Check code style
         run: dotnet format style Assembly-CSharp.csproj --verify-no-changes --severity warn --no-restore --verbosity diagnostic
+
+      - name: Check analyzers
+        run: dotnet format analyzers Assembly-CSharp.csproj --verify-no-changes --severity warn --no-restore --verbosity diagnostic
