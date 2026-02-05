@@ -11,4 +11,8 @@
     <Compile Remove="Assets/Scripts/SettingsSystem/**/*.cs" />
     <Compile Remove="Assets/Scripts/Utils/**/*.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll"
+              Condition="Exists('tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll')" />
+  </ItemGroup>
 </Project>

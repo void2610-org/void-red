@@ -16,12 +16,15 @@ on:
       - 'tools/UnityNamingAnalyzer/**'
 
 jobs:
-  build-analyzer:
-    name: Build Analyzer
+  format-check:
+    name: Format Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -34,94 +37,11 @@ jobs:
       - name: Run analyzer tests
         run: dotnet test tools/UnityNamingAnalyzer.Tests/UnityNamingAnalyzer.Tests.csproj -c Release --verbosity normal
 
-      - name: Upload analyzer DLL
-        uses: actions/upload-artifact@v4
-        with:
-          name: analyzer-dll
-          path: tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll
-          retention-days: 1
-
-  format-check:
-    name: dotnet-format
-    needs: build-analyzer
-    runs-on: ubuntu-latest
-    # game-ciのDockerイメージ内で全ステップを実行（Unity DLLへのアクセスが必要）
-    container:
-      image: unityci/editor:ubuntu-6000.0.30f1-base-3
-    env:
-      DOTNET_ROOT: /root/.dotnet
-    steps:
-      - name: Install dependencies
-        run: |
-          apt-get update && apt-get install -y git git-lfs curl
-          git config --global --add safe.directory '*'
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 1
-
-      - name: Download analyzer DLL
-        uses: actions/download-artifact@v4
-        with:
-          name: analyzer-dll
-          path: tools/UnityNamingAnalyzer/bin/Release/netstandard2.0
-
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: Library
-          key: Library-FormatCheck-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: Library-FormatCheck-
-
-      - name: Activate Unity License
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        run: |
-          # ライセンスファイルとキャッシュディレクトリを/rootと$HOME両方に配置
-          for dir in /root "$HOME"; do
-            mkdir -p "$dir/.local/share/unity3d/Unity"
-            mkdir -p "$dir/.cache/unity3d"
-          done
-          # ULFファイルがあれば配置
-          if [ -n "$UNITY_LICENSE" ]; then
-            for dir in /root "$HOME"; do
-              echo "$UNITY_LICENSE" | tr -d '\r' > "$dir/.local/share/unity3d/Unity/Unity_lic.ulf"
-            done
-          fi
-          # メール/パスワードでアクティベーション
-          unity-editor \
-            -batchmode \
-            -nographics \
-            -logFile /dev/stdout \
-            -username "$UNITY_EMAIL" \
-            -password "$UNITY_PASSWORD" \
-            -quit || true
-
-      - name: Generate Solution
-        run: |
-          unity-editor \
-            -batchmode \
-            -nographics \
-            -logFile /dev/stdout \
-            -projectPath . \
-            -executeMethod SolutionGenerator.Generate
-          ls Assembly-CSharp.csproj
-
-      - name: Install .NET SDK
-        run: |
-          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0
-          echo "$DOTNET_ROOT" >> $GITHUB_PATH
-          $DOTNET_ROOT/dotnet --version
-
       - name: Check whitespace formatting
-        run: dotnet format whitespace Assembly-CSharp.csproj --verify-no-changes --verbosity diagnostic
+        run: dotnet format whitespace FormatCheck.csproj --verify-no-changes
 
       - name: Check code style
-        run: dotnet format style Assembly-CSharp.csproj --verify-no-changes --severity warn --no-restore --verbosity diagnostic
+        run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warn
 
       - name: Check analyzers
-        run: dotnet format analyzers Assembly-CSharp.csproj --verify-no-changes --severity warn --no-restore --verbosity diagnostic
+        run: dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn
