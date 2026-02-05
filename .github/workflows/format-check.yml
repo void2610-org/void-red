@@ -78,14 +78,28 @@ jobs:
       - name: Activate Unity License
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         run: |
           # ライセンスファイルとキャッシュディレクトリを/rootと$HOME両方に配置
-          # GitHub Actionsコンテナ内ではHOMEが/github/homeになるため
           for dir in /root "$HOME"; do
             mkdir -p "$dir/.local/share/unity3d/Unity"
             mkdir -p "$dir/.cache/unity3d"
-            echo "$UNITY_LICENSE" | tr -d '\r' > "$dir/.local/share/unity3d/Unity/Unity_lic.ulf"
           done
+          # ULFファイルがあれば配置
+          if [ -n "$UNITY_LICENSE" ]; then
+            for dir in /root "$HOME"; do
+              echo "$UNITY_LICENSE" | tr -d '\r' > "$dir/.local/share/unity3d/Unity/Unity_lic.ulf"
+            done
+          fi
+          # メール/パスワードでアクティベーション
+          unity-editor \
+            -batchmode \
+            -nographics \
+            -logFile /dev/stdout \
+            -username "$UNITY_EMAIL" \
+            -password "$UNITY_PASSWORD" \
+            -quit || true
 
       - name: Generate Solution
         run: |
