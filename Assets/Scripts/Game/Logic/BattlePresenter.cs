@@ -67,12 +67,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     private async UniTaskVoid InitializeGameAsync()
     {
-        await InitializeGame();
+        if (!await InitializeGame()) return;
         _initializationComplete.TrySetResult();
         await StartGame();
     }
 
-    private async UniTask InitializeGame()
+    private async UniTask<bool> InitializeGame()
     {
         await UniTask.Delay(500);
 
@@ -82,7 +82,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         {
             Debug.LogError("[BattlePresenter] 現在のノードがBattleNodeではありません");
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
-            return;
+            return false;
         }
 
         // オークションデータを取得
@@ -91,7 +91,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         {
             Debug.LogError("[BattlePresenter] オークションデータが見つかりません");
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
-            return;
+            return false;
         }
 
         // オークションデータから敵データを取得
@@ -100,7 +100,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         {
             Debug.LogError("[BattlePresenter] 敵データが見つかりません");
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
-            return;
+            return false;
         }
 
         // 敵を初期化して表示
@@ -111,6 +111,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 敵情報をアナウンス
         await _battleUIPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
+        return true;
     }
 
     private async UniTask StartGame()
