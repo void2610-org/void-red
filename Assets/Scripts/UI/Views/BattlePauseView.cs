@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
-using Cysharp.Threading.Tasks;
 using LitMotion;
+using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -18,11 +19,14 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
     [SerializeField] private Button helpButton;
     [SerializeField] private Button optionButton;
     [SerializeField] private RectTransform panelRect;
+    [SerializeField] private LayoutGroup buttonsLayoutGroup;
 
     [Header("アニメーション設定")]
     [SerializeField] private float slideDuration = 0.3f;
     [SerializeField] private float hiddenX = -400f;
-    [SerializeField] private float shownX = 0f;
+    [SerializeField] private float shownX;
+    [SerializeField] private float buttonSlideOffset = -50f;
+    [SerializeField] private float buttonStaggerDelay = 0.05f;
 
     public bool IsShowing { get; private set; }
     public Observable<Unit> OnResumeButtonClicked => resumeButton.OnClickAsObservable();
@@ -32,46 +36,74 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
 
     private CanvasGroup _canvasGroup;
     private MotionHandle _slideHandle;
+    private List<MotionHandle> _buttonAnimHandles = new();
+    private Dictionary<Transform, Vector2> _buttonOriginalPositions = new();
+
+    public void Toggle()
+    {
+        if (IsShowing) Hide();
+        else Show();
+    }
 
     public void Show()
     {
-        if (IsShowing) return;
-        IsShowing = true;
-
         Time.timeScale = 0;
-        gameObject.SetActive(true);
-
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = true;
-
+        IsShowing = true;
         _slideHandle.TryCancel();
+        _buttonAnimHandles.CancelAll();
+
         _slideHandle = panelRect.MoveToX(shownX, slideDuration, Ease.OutQuad, ignoreTimeScale: true);
-        _slideHandle.ToUniTask().ContinueWith(() => _canvasGroup.interactable = true).Forget();
+        _canvasGroup.FadeIn(0.1f, ignoreTimeScale: true);
+
+        Canvas.ForceUpdateCanvases();
+
+        // ボタンの順次スライドアニメーション
+        buttonsLayoutGroup.ForEachChildWithDelay((child, _, delay) =>
+        {
+            var rect = child.GetComponent<RectTransform>();
+
+            // 初回は現在位置を保存、2回目以降は保存済みの位置を使用
+            if (!_buttonOriginalPositions.TryGetValue(child, out var targetPos))
+            {
+                targetPos = rect.anchoredPosition;
+                _buttonOriginalPositions[child] = targetPos;
+            }
+
+            var startPos = new Vector2(targetPos.x + buttonSlideOffset, targetPos.y);
+            rect.anchoredPosition = startPos;
+
+            var handle = LMotion.Create(startPos, targetPos, slideDuration)
+                .WithDelay(delay)
+                .WithEase(Ease.OutQuad)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .BindToAnchoredPosition(rect)
+                .AddTo(rect.gameObject);
+
+            _buttonAnimHandles.Add(handle);
+        }, buttonStaggerDelay);
     }
 
     public void Hide()
     {
-        if (!IsShowing) return;
-        IsShowing = false;
-
         Time.timeScale = 1;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-
+        IsShowing = false;
         _slideHandle.TryCancel();
+        _buttonAnimHandles.CancelAll();
+
         _slideHandle = panelRect.MoveToX(hiddenX, slideDuration, Ease.InQuad, ignoreTimeScale: true);
-        _slideHandle.ToUniTask().ContinueWith(() => gameObject.SetActive(false)).Forget();
+        _canvasGroup.FadeOut(0.1f, ignoreTimeScale: true);
     }
 
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
         panelRect.anchoredPosition = new Vector2(hiddenX, panelRect.anchoredPosition.y);
-        gameObject.SetActive(false);
+
     }
 
     private void OnDestroy()
     {
         _slideHandle.TryCancel();
+        _buttonAnimHandles.CancelAll();
     }
 }

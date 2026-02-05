@@ -1,5 +1,6 @@
 using UnityEngine;
 using VContainer;
+using Void2610.UnityTemplate.Steam;
 
 /// <summary>
 /// デバッグ機能をまとめて管理するコンポーネント

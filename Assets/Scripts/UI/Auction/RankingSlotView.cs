@@ -10,6 +10,7 @@ using Void2610.UnityTemplate;
 /// ドラッグされたカードを受け入れるドロップ先
 /// </summary>
 [RequireComponent(typeof(RectTransform))]
+[RequireComponent(typeof(CanvasGroup))]
 public class RankingSlotView : MonoBehaviour, IDropHandler
 {
     [SerializeField] private int rank;
@@ -19,12 +20,14 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
     public DraggableCardView PlacedCard { get; private set; }
     public bool IsOccupied => PlacedCard;
     public Transform CardAnchor => this.transform;
+    public CanvasGroup CanvasGroup => _canvasGroup;
     public Observable<(RankingSlotView slot, DraggableCardView card)> OnCardDropped => _onCardDropped;
 
     private const float FADE_DURATION = 0.15f;
 
     private readonly Subject<(RankingSlotView slot, DraggableCardView card)> _onCardDropped = new();
     private MotionHandle _fadeTween;
+    private CanvasGroup _canvasGroup;
 
     /// <summary>
     /// スロットにカードがドロップされた時の処理
@@ -72,6 +75,7 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
 
     private void Awake()
     {
+        _canvasGroup = GetComponent<CanvasGroup>();
         highlightImage.SetAlpha(0f);
     }
 

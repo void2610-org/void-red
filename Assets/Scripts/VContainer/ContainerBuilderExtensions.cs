@@ -22,7 +22,7 @@ public static class ContainerBuilderExtensions
             var presenter = container.Resolve<SettingsPresenter>();
             var inputProvider = container.Resolve<InputActionsProvider>();
             var settingButton = container.Resolve<SettingButtonView>();
-            windowView.Initialize(presenter, inputProvider, settingButton);
+            windowView.Initialize(presenter, inputProvider, settingButton, false);
         });
     }
 
@@ -38,7 +38,7 @@ public static class ContainerBuilderExtensions
             var windowView = container.Resolve<SettingsWindowView>();
             var presenter = container.Resolve<SettingsPresenter>();
             var inputProvider = container.Resolve<InputActionsProvider>();
-            windowView.Initialize(presenter, inputProvider, null);
+            windowView.Initialize(presenter, inputProvider, null, true);
         });
     }
 }

@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
-using UnityEngine.UI;
-using LitMotion;
-using Void2610.UnityTemplate;
 
 public class DialoguePhaseView : MonoBehaviour
 {
@@ -13,24 +10,17 @@ public class DialoguePhaseView : MonoBehaviour
     [SerializeField] private NarrationView enemyNarration;
 
     [Header("立ち絵")]
-    [SerializeField] private Image portraitImage;
+    [SerializeField] private DialoguePortraitView portraitView;
     [SerializeField] private Sprite playerPortraitSprite;
-
-    [Header("プレイヤー立ち絵アニメーション")]
-    [SerializeField] private RectTransform playerPortrait;
-    [SerializeField] private float portraitHiddenX = 600f;
-    [SerializeField] private float portraitShownX = 300f;
-    [SerializeField] private float slideDuration = 0.3f;
 
     public Observable<int> OnChoiceSelected => choicesView.OnChoiceSelected;
 
-    private MotionHandle _slideHandle;
     private Sprite _enemyPortraitSprite;
 
-    public void SetupChoices(List<string> labels)
+    public async UniTask SetupChoices(List<string> labels)
     {
         // 選択肢表示中はプレイヤー立ち絵
-        portraitImage.sprite = playerPortraitSprite;
+        await portraitView.ChangePortrait(playerPortraitSprite);
         choicesView.Setup(labels);
     }
 
@@ -39,14 +29,14 @@ public class DialoguePhaseView : MonoBehaviour
     public void Show()
     {
         // プレイヤー立ち絵で開始
-        portraitImage.sprite = playerPortraitSprite;
+        portraitView.SetPortraitImmediate(playerPortraitSprite);
         gameObject.SetActive(true);
-        SlideInPortrait();
+        portraitView.SlideIn();
     }
 
     public void Hide()
     {
-        SlideOutPortrait();
+        portraitView.SlideOut();
         gameObject.SetActive(false);
     }
 
@@ -58,17 +48,17 @@ public class DialoguePhaseView : MonoBehaviour
         _enemyPortraitSprite = enemyData.DefaultSprite;
     }
 
-    public UniTask ShowPlayerDialogueAsync(string text)
+    public async UniTask ShowPlayerDialogueAsync(string text)
     {
-        portraitImage.sprite = playerPortraitSprite;
-        return playerNarration.DisplayNarration(text, autoAdvance: false);
+        await portraitView.ChangePortrait(playerPortraitSprite);
+        await playerNarration.DisplayNarration(text, autoAdvance: false);
     }
     public UniTask HidePlayerDialogueAsync() => playerNarration.HideNarration();
 
-    public UniTask ShowEnemyDialogueAsync(string text)
+    public async UniTask ShowEnemyDialogueAsync(string text)
     {
-        portraitImage.sprite = _enemyPortraitSprite;
-        return enemyNarration.DisplayNarration(text, autoAdvance: false);
+        await portraitView.ChangePortrait(_enemyPortraitSprite);
+        await enemyNarration.DisplayNarration(text, autoAdvance: false);
     }
     public UniTask HideEnemyDialogueAsync() => enemyNarration.HideNarration();
     public UniTask ShowResultAsync(string message) => playerNarration.DisplayNarration(message, autoAdvance: false);
@@ -83,19 +73,4 @@ public class DialoguePhaseView : MonoBehaviour
             HideResultAsync()
         );
     }
-
-    private void SlideInPortrait()
-    {
-        _slideHandle.TryCancel();
-        playerPortrait.anchoredPosition = new Vector2(portraitHiddenX, playerPortrait.anchoredPosition.y);
-        _slideHandle = playerPortrait.MoveToX(portraitShownX, slideDuration, Ease.OutQuad);
-    }
-
-    private void SlideOutPortrait()
-    {
-        _slideHandle.TryCancel();
-        _slideHandle = playerPortrait.MoveToX(portraitHiddenX, slideDuration, Ease.InQuad);
-    }
-
-    private void OnDestroy() => _slideHandle.TryCancel();
 }

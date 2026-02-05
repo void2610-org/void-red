@@ -86,6 +86,17 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         HideWithAnimation().Forget();
     }
+    
+    /// <summary>
+    /// ウィンドウの表示/非表示を切り替え
+    /// </summary>
+    public void Toggle()
+    {
+        if (IsShowing)
+            Hide();
+        else
+            Show();
+    }
 
     /// <summary>
     /// ウィンドウが閉じられるまで待機

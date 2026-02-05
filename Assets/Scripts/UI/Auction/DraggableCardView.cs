@@ -23,6 +23,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     public RankingSlotView CurrentSlot { get; private set; }
     public bool IsPlaced => CurrentSlot;
     public int HandIndex { get; private set; }
+    public CanvasGroup CanvasGroup => _canvasGroup;
     public Observable<DraggableCardView> OnDragStarted => _onDragStarted;
     public Observable<DraggableCardView> OnDragEnded => _onDragEnded;
     public Observable<DraggableCardView> OnClicked => _onClicked;

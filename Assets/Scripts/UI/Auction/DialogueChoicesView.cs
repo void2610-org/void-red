@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
+using LitMotion;
+using LitMotion.Extensions;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 対話フェーズの選択肢表示View
@@ -10,12 +13,21 @@ using R3;
 /// </summary>
 public class DialogueChoicesView : MonoBehaviour
 {
+    [SerializeField] private LayoutGroup buttonContainer;
     [SerializeField] private List<Button> choiceButtons;
     [SerializeField] private List<TextMeshProUGUI> choiceLabels;
+
+    [Header("アニメーション設定")]
+    [SerializeField] private float staggerDelay = 0.05f;
+    [SerializeField] private float animDuration = 0.2f;
+    [SerializeField] private float slideOffset = 50f;
 
     public Observable<int> OnChoiceSelected => _onChoiceSelected;
 
     private readonly Subject<int> _onChoiceSelected = new();
+    private readonly List<MotionHandle> _animHandles = new();
+    private readonly List<CanvasGroup> _buttonCanvasGroups = new();
+    private readonly List<Vector2> _buttonOriginalPositions = new();
     private CompositeDisposable _disposables = new();
 
     public void Setup(List<string> labels)
@@ -41,17 +53,76 @@ public class DialogueChoicesView : MonoBehaviour
         }
 
         gameObject.SetActive(true);
+        PlayEnterAnimation();
     }
 
     public void Hide()
     {
+        _animHandles.CancelAll();
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
         gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// ボタンの順次スライド+フェードインアニメーション
+    /// </summary>
+    private void PlayEnterAnimation()
+    {
+        _animHandles.CancelAll();
+
+        Canvas.ForceUpdateCanvases();
+
+        // 初回のみ初期位置を保存
+        if (_buttonOriginalPositions.Count == 0)
+        {
+            foreach (var button in choiceButtons)
+            {
+                var rect = (RectTransform)button.transform;
+                _buttonOriginalPositions.Add(rect.anchoredPosition);
+            }
+        }
+
+        buttonContainer.ForEachChildWithDelay((child, index, delay) =>
+        {
+            var rect = (RectTransform)child;
+            var canvasGroup = _buttonCanvasGroups[index];
+            var originalPos = _buttonOriginalPositions[index];
+
+            // 開始位置を右にオフセット、透明度を0に
+            var startPos = originalPos + new Vector2(slideOffset, 0);
+            rect.anchoredPosition = startPos;
+            canvasGroup.alpha = 0f;
+
+            // ディレイ付きでスライド+フェードイン
+            var moveHandle = LMotion.Create(startPos, originalPos, animDuration)
+                .WithEase(Ease.OutCubic)
+                .WithDelay(delay)
+                .BindToAnchoredPosition(rect)
+                .AddTo(rect.gameObject);
+            _animHandles.Add(moveHandle);
+
+            var fadeHandle = LMotion.Create(0f, 1f, animDuration)
+                .WithEase(Ease.OutCubic)
+                .WithDelay(delay)
+                .BindToAlpha(canvasGroup)
+                .AddTo(canvasGroup.gameObject);
+            _animHandles.Add(fadeHandle);
+        }, staggerDelay);
+    }
+
+    private void Awake()
+    {
+        // 各ボタンのCanvasGroupを保存
+        foreach (var button in choiceButtons)
+        {
+            _buttonCanvasGroups.Add(button.GetComponent<CanvasGroup>());
+        }
+    }
+
     private void OnDestroy()
     {
+        _animHandles.CancelAll();
         _disposables.Dispose();
         _onChoiceSelected.Dispose();
     }

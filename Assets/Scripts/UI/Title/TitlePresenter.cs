@@ -5,6 +5,7 @@ using VContainer.Unity;
 using Cysharp.Threading.Tasks;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
+using Void2610.UnityTemplate.Steam;
 
 /// <summary>
 /// タイトル画面のPresenter
@@ -72,7 +73,7 @@ public class TitlePresenter : IStartable, IDisposable
         BgmManager.Instance.PlayBGM("Title");
 
         // Steam実績解除
-        _steamService.UnlockAchievement(SteamAchieveType.FIRST_BOOT);
+        _steamService.UnlockAchievement(nameof(SteamAchieveType.FIRST_BOOT));
 
         SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
@@ -95,7 +96,7 @@ public class TitlePresenter : IStartable, IDisposable
         }
 
         _gameProgressService.ResetToDefaultData();
-        _steamService.AddStat(SteamStatType.START_GAME_COUNT, 1);
+        _steamService.AddStat(nameof(SteamStatType.START_GAME_COUNT), 1);
 
         // 新規開始時は次のノードに直接遷移
         var nextScene = _gameProgressService.GetNextSceneType();

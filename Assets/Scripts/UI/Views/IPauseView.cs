@@ -10,4 +10,5 @@ public interface IPauseView
     Observable<Unit> OnHomeButtonClicked { get; }
     void Show();
     void Hide();
+    void Toggle();
 }

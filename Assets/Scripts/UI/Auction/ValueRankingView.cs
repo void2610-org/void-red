@@ -4,7 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using R3;
 using Cysharp.Threading.Tasks;
+using LitMotion;
+using LitMotion.Extensions;
 using Auction;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 価値順位設定UI
@@ -30,23 +33,34 @@ public class ValueRankingView : MonoBehaviour
     [Header("ドラッグ演出")]
     [SerializeField] private DragLineView dragLineView;
 
+    [Header("アニメーション設定")]
+    [SerializeField] private float slotStaggerDelay = 0.05f;
+    [SerializeField] private float cardStaggerDelay = 0.03f;
+    [SerializeField] private float animDuration = 0.2f;
+    [SerializeField] private float slotSlideOffset = 50f;
+    [SerializeField] private float cardSlideOffset = -100f;
+
     public Observable<Unit> OnRankingComplete => _onRankingComplete;
 
     private readonly List<DraggableCardView> _handCards = new();
     private readonly List<CardModel> _rankedCards = new();
     private readonly Subject<Unit> _onRankingComplete = new();
+    private readonly List<MotionHandle> _animHandles = new();
+    private readonly Dictionary<RankingSlotView, Vector2> _slotOriginalPositions = new();
     private CompositeDisposable _disposables = new();
     private bool _wasDroppedToSlot;
     private RectTransform _handContainerRect;
 
-    public void Show() => gameObject.SetActive(true);
-    public void Hide() => gameObject.SetActive(false);
-
-    private void Awake()
+    public void Show()
     {
-        _handContainerRect = handContainer as RectTransform;
-        var canvas = GetComponentInParent<Canvas>().rootCanvas;
-        dragLineView.Initialize(canvas);
+        gameObject.SetActive(true);
+        PlaySlotEnterAnimation();
+    }
+
+    public void Hide()
+    {
+        _animHandles.CancelAll();
+        gameObject.SetActive(false);
     }
 
     public void StartRanking(IReadOnlyList<CardModel> cards)
@@ -80,6 +94,9 @@ public class ValueRankingView : MonoBehaviour
 
             _handCards.Add(draggableCard);
         }
+
+        // カードのスライドインアニメーション
+        PlayCardEnterAnimation();
 
         foreach (var slot in slots)
         {
@@ -240,8 +257,104 @@ public class ValueRankingView : MonoBehaviour
         card.transform.localEulerAngles = new Vector3(0, 0, rotation);
     }
 
+    /// <summary>
+    /// スロットの順次スライド+フェードインアニメーション
+    /// </summary>
+    private void PlaySlotEnterAnimation()
+    {
+        _animHandles.CancelAll();
+
+        for (var i = 0; i < slots.Count; i++)
+        {
+            var slot = slots[i];
+            if (!_slotOriginalPositions.TryGetValue(slot, out var originalPos)) continue;
+
+            var slotRect = (RectTransform)slot.transform;
+            var canvasGroup = slot.CanvasGroup;
+
+            // 開始位置を上にオフセット、透明度を0に
+            var startPos = originalPos + new Vector2(0, slotSlideOffset);
+            slotRect.anchoredPosition = startPos;
+            canvasGroup.alpha = 0f;
+
+            // ディレイ付きでスライド+フェードイン
+            var delay = slotStaggerDelay * i;
+
+            var moveHandle = LMotion.Create(startPos, originalPos, animDuration)
+                .WithEase(Ease.OutCubic)
+                .WithDelay(delay)
+                .BindToAnchoredPosition(slotRect)
+                .AddTo(slotRect.gameObject);
+            _animHandles.Add(moveHandle);
+
+            var fadeHandle = LMotion.Create(0f, 1f, animDuration)
+                .WithEase(Ease.OutCubic)
+                .WithDelay(delay)
+                .BindToAlpha(canvasGroup)
+                .AddTo(canvasGroup.gameObject);
+            _animHandles.Add(fadeHandle);
+        }
+    }
+
+    /// <summary>
+    /// カードの順次スライド+フェードインアニメーション
+    /// </summary>
+    private void PlayCardEnterAnimation()
+    {
+        Canvas.ForceUpdateCanvases();
+
+        for (var i = 0; i < _handCards.Count; i++)
+        {
+            var card = _handCards[i];
+            var cardRect = (RectTransform)card.transform;
+            var canvasGroup = card.CanvasGroup;
+
+            // ターゲット位置を取得
+            var targetPos = cardRect.anchoredPosition;
+
+            // 開始位置を下にオフセット、透明度を0に
+            var startPos = targetPos + new Vector2(0, cardSlideOffset);
+            cardRect.anchoredPosition = startPos;
+            canvasGroup.alpha = 0f;
+
+            // ディレイ付きでスライド+フェードイン
+            var delay = cardStaggerDelay * i;
+
+            var moveHandle = LMotion.Create(startPos, targetPos, animDuration)
+                .WithEase(Ease.OutCubic)
+                .WithDelay(delay)
+                .BindToAnchoredPosition(cardRect)
+                .AddTo(cardRect.gameObject);
+            _animHandles.Add(moveHandle);
+
+            var fadeHandle = LMotion.Create(0f, 1f, animDuration)
+                .WithEase(Ease.OutCubic)
+                .WithDelay(delay)
+                .BindToAlpha(canvasGroup)
+                .AddTo(canvasGroup.gameObject);
+            _animHandles.Add(fadeHandle);
+        }
+    }
+    
+    private void Awake()
+    {
+        _handContainerRect = handContainer as RectTransform;
+        var canvas = GetComponentInParent<Canvas>().rootCanvas;
+        dragLineView.Initialize(canvas);
+
+        Canvas.ForceUpdateCanvases();
+
+        // スロットの初期位置を保存
+        foreach (var slot in slots)
+        {
+            var slotRect = (RectTransform)slot.transform;
+            _slotOriginalPositions[slot] = slotRect.anchoredPosition;
+        }
+    }
+
     private void OnDestroy()
     {
+        _animHandles.CancelAll();
         _disposables.Dispose();
         _onRankingComplete.Dispose();
     }
