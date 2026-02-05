@@ -59,9 +59,15 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
         buttonsLayoutGroup.ForEachChildWithDelay((child, _, delay) =>
         {
             var rect = child.GetComponent<RectTransform>();
-            var targetPos = _buttonOriginalPositions[child];
-            var startPos = new Vector2(targetPos.x + buttonSlideOffset, targetPos.y);
 
+            // 初回は現在位置を保存、2回目以降は保存済みの位置を使用
+            if (!_buttonOriginalPositions.TryGetValue(child, out var targetPos))
+            {
+                targetPos = rect.anchoredPosition;
+                _buttonOriginalPositions[child] = targetPos;
+            }
+
+            var startPos = new Vector2(targetPos.x + buttonSlideOffset, targetPos.y);
             rect.anchoredPosition = startPos;
 
             var handle = LMotion.Create(startPos, targetPos, slideDuration)
@@ -90,15 +96,6 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
     {
         _canvasGroup = GetComponent<CanvasGroup>();
         panelRect.anchoredPosition = new Vector2(hiddenX, panelRect.anchoredPosition.y);
-
-        // ボタンの初期位置を保存
-        var buttonsParent = buttonsLayoutGroup.transform;
-        for (var i = 0; i < buttonsParent.childCount; i++)
-        {
-            var child = buttonsParent.GetChild(i);
-            var rect = child.GetComponent<RectTransform>();
-            _buttonOriginalPositions[child] = rect.anchoredPosition;
-        }
     }
 
     private void OnDestroy()
