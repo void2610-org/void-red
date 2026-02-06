@@ -45,6 +45,10 @@ namespace UnityNamingAnalyzer
             if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
                 return;
 
+            // IDisposable.Disposeメソッドは除外
+            if (method.Identifier.Text == "Dispose" && method.ParameterList.Parameters.Count == 0)
+                return;
+
             // ステートメントが1つだけの場合に警告
             if (method.Body.Statements.Count != 1)
                 return;
@@ -52,6 +56,10 @@ namespace UnityNamingAnalyzer
             // 式本体に変換可能な文のみ対象（return文、式文のみ）
             var statement = method.Body.Statements[0];
             if (!(statement is ReturnStatementSyntax) && !(statement is ExpressionStatementSyntax))
+                return;
+
+            // switch式を含む場合は除外（複雑になるため式本体にしない）
+            if (statement.DescendantNodes().OfType<SwitchExpressionSyntax>().Any())
                 return;
 
             var diagnostic = Diagnostic.Create(

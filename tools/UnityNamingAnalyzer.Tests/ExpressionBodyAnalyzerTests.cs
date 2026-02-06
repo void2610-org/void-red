@@ -151,5 +151,41 @@ public class TestClass
 }";
             await Verify.VerifyAnalyzerAsync(test);
         }
+
+        [Fact]
+        public async Task PublicMethodSingleReturnWithSwitchExpression_NoDiagnostic()
+        {
+            // switch式を含むreturn文は複雑になるため除外
+            var test = @"
+public class TestClass
+{
+    public string GetName(int x)
+    {
+        return x switch
+        {
+            1 => ""One"",
+            2 => ""Two"",
+            _ => ""Other""
+        };
+    }
+}";
+            await Verify.VerifyAnalyzerAsync(test);
+        }
+
+        [Fact]
+        public async Task PublicDisposeMethod_NoDiagnostic()
+        {
+            // IDisposable.Disposeメソッドは除外
+            var test = @"
+public class TestClass
+{
+    private object _resource;
+    public void Dispose()
+    {
+        _resource = null;
+    }
+}";
+            await Verify.VerifyAnalyzerAsync(test);
+        }
     }
 }
