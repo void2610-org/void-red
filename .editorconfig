@@ -168,9 +168,11 @@ dotnet_naming_style.camel_case_style.capitalization = camel_case
 # IDE1006（標準命名規則）はカスタムアナライザーと競合するためsuggestに下げる
 dotnet_diagnostic.IDE1006.severity = suggestion
 
-# カスタムアナライザー: SerializeFieldの命名規約
+# カスタムアナライザー: UnityNamingAnalyzer
 dotnet_diagnostic.UNA0001.severity = warning
 dotnet_diagnostic.UNA0002.severity = warning
+dotnet_diagnostic.UNA0003.severity = warning
+dotnet_diagnostic.UNA0004.severity = warning
 
 # XML, JSON
 [*.{xml,json,yml,yaml}]
