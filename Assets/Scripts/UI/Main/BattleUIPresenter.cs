@@ -261,5 +261,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     // すべてのViewのイベントを解除
-    public void Dispose() => _disposables.Dispose();
+    public void Dispose()
+    {
+        _disposables.Dispose();
+    }
 }

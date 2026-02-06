@@ -103,5 +103,8 @@ public class HelpPresenter : IStartable, IDisposable
         _helpView.DisplayHelp(helpData, _currentIndex, _allHelpData.Count);
     }
 
-    public void Dispose() => _disposables?.Dispose();
+    public void Dispose()
+    {
+        _disposables?.Dispose();
+    }
 }

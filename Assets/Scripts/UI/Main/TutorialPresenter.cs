@@ -107,5 +107,8 @@ public class TutorialPresenter : IDisposable
         _disposables.Clear();
     }
 
-    public void Dispose() => _disposables?.Dispose();
+    public void Dispose()
+    {
+        _disposables?.Dispose();
+    }
 }
