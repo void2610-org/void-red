@@ -26,8 +26,5 @@ public class AllTutorialData : ScriptableObject
     /// </summary>
     /// <param name="tutorialId">チュートリアルID</param>
     /// <returns>指定されたIDのチュートリアルデータ</returns>
-    public TutorialData GetTutorialById(string tutorialId)
-    {
-        return tutorialList.FirstOrDefault(tutorial => tutorial.TutorialId == tutorialId);
-    }
+    public TutorialData GetTutorialById(string tutorialId) => tutorialList.FirstOrDefault(tutorial => tutorial.TutorialId == tutorialId);
 }

@@ -81,10 +81,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     /// <summary>
     /// 対話フェーズViewを敵データで初期化
     /// </summary>
-    public void InitializeDialogueView(EnemyData enemyData)
-    {
-        _dialoguePhaseView.Initialize(enemyData);
-    }
+    public void InitializeDialogueView(EnemyData enemyData) => _dialoguePhaseView.Initialize(enemyData);
 
     // 価値順位設定UIを表示し、完了を待機
     public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync(IReadOnlyList<CardModel> cards)
@@ -122,10 +119,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     // AuctionViewを表示（カードは再生成しない）
-    public void ShowAuctionView()
-    {
-        _auctionView.Show();
-    }
+    public void ShowAuctionView() => _auctionView.Show();
 
     // 入札待機（BiddingPhaseフェーズ）
     public async UniTask WaitForBiddingAsync(
@@ -142,37 +136,24 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     // 結果表示（AuctionResultフェーズ）
-    public void ShowAuctionResults(IReadOnlyList<AuctionJudge.AuctionResultEntry> results)
-    {
-        _auctionView.ShowResults(results);
-    }
+    public void ShowAuctionResults(IReadOnlyList<AuctionJudge.AuctionResultEntry> results) => _auctionView.ShowResults(results);
 
     // 順次結果表示（各カードごとにアニメーション付き）
     public async UniTask ShowAuctionResultsSequentialAsync(
         IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
         ValueRankingModel playerRanking,
-        ValueRankingModel enemyRanking)
-    {
+        ValueRankingModel enemyRanking) =>
         await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking);
-    }
 
     // 入札対象カード公開演出
-    public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f)
-    {
+    public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) =>
         await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
-    }
 
     // 全カードを再表示
-    public void ShowAllAuctionCards()
-    {
-        _auctionView.ShowAllCards();
-    }
+    public void ShowAllAuctionCards() => _auctionView.ShowAllCards();
 
     // オークションView非表示
-    public void HideAuctionView()
-    {
-        _auctionView.Hide();
-    }
+    public void HideAuctionView() => _auctionView.Hide();
 
     // AuctionViewをクリアして非表示
     public void ClearAuctionView()
@@ -229,10 +210,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     // 報酬フェーズを非表示
-    public void HideRewardView()
-    {
-        _rewardPhaseView.Hide();
-    }
+    public void HideRewardView() => _rewardPhaseView.Hide();
 
     public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
     {
@@ -269,11 +247,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
     }
 
-    public void Start()
-    {
-        // ルートボタンを初期選択
-        SafeNavigationManager.SelectRootForceSelectable().Forget();
-    }
+    // ルートボタンを初期選択
+    public void Start() => SafeNavigationManager.SelectRootForceSelectable().Forget();
 
     /// <summary>
     /// 記憶育成フェーズを表示
@@ -285,9 +260,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         await _memoryGrowthView.WaitForContinueAsync();
     }
 
-    public void Dispose()
-    {
-        // すべてのViewのイベントを解除
-        _disposables.Dispose();
-    }
+    // すべてのViewのイベントを解除
+    public void Dispose() => _disposables.Dispose();
 }

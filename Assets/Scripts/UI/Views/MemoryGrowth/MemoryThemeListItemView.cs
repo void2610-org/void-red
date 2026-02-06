@@ -46,11 +46,8 @@ public class MemoryThemeListItemView : MonoBehaviour
     /// 選択状態を設定
     /// </summary>
     /// <param name="isSelected">選択されているか</param>
-    public void SetSelected(bool isSelected)
-    {
-        // 選択状態に応じた視覚的フィードバック
-        themeText.fontStyle = isSelected ? FontStyles.Bold : FontStyles.Normal;
-    }
+    // 選択状態に応じた視覚的フィードバック
+    public void SetSelected(bool isSelected) => themeText.fontStyle = isSelected ? FontStyles.Bold : FontStyles.Normal;
 
     /// <summary>
     /// 表示を更新

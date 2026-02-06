@@ -127,8 +127,5 @@ public class HomePresenter : IStartable, IDisposable
         _homeView.ShowCardLibrary(_allCardData, viewedCardIds);
     }
 
-    public void Dispose()
-    {
-        _disposables.Dispose();
-    }
+    public void Dispose() => _disposables.Dispose();
 }

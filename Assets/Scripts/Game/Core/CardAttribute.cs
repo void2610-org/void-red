@@ -27,17 +27,14 @@ public static class CardAttributeExtensions
     /// </summary>
     /// <param name="attribute">カード属性</param>
     /// <returns>日本語名</returns>
-    public static string ToJapaneseName(this CardAttribute attribute)
+    public static string ToJapaneseName(this CardAttribute attribute) => attribute switch
     {
-        return attribute switch
-        {
-            CardAttribute.Forgiveness => "赦し",
-            CardAttribute.Anger => "怒り",
-            CardAttribute.Anxiety => "不安",
-            CardAttribute.Rejection => "拒絶",
-            CardAttribute.Loss => "喪失",
-            CardAttribute.Hope => "希望",
-            _ => "不明"
-        };
-    }
+        CardAttribute.Forgiveness => "赦し",
+        CardAttribute.Anger => "怒り",
+        CardAttribute.Anxiety => "不安",
+        CardAttribute.Rejection => "拒絶",
+        CardAttribute.Loss => "喪失",
+        CardAttribute.Hope => "希望",
+        _ => "不明"
+    };
 }

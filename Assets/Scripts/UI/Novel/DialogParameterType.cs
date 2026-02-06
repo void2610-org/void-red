@@ -63,32 +63,27 @@ public static class DialogParameterTypeExtensions
     /// <param name="typeString">パラメータタイプの文字列</param>
     /// <param name="parameterType">変換されたパラメータタイプ</param>
     /// <returns>変換に成功した場合はtrue</returns>
-    public static bool TryParseParameterType(string typeString, out DialogParameterType parameterType)
-    {
-        return Enum.TryParse(typeString, true, out parameterType);
-    }
+    public static bool TryParseParameterType(string typeString, out DialogParameterType parameterType) =>
+        Enum.TryParse(typeString, true, out parameterType);
 
     /// <summary>
     /// パラメータタイプの期待する値の型を取得
     /// </summary>
     /// <param name="parameterType">パラメータタイプ</param>
     /// <returns>期待する値の型</returns>
-    public static Type GetExpectedValueType(this DialogParameterType parameterType)
+    public static Type GetExpectedValueType(this DialogParameterType parameterType) => parameterType switch
     {
-        return parameterType switch
-        {
-            DialogParameterType.CharacterImageName => typeof(string),
-            DialogParameterType.BackgroundImageName => typeof(string),
-            DialogParameterType.SeClipName => typeof(string),
-            DialogParameterType.CustomCharSpeed => typeof(float),
-            DialogParameterType.AutoAdvance => typeof(float),
-            DialogParameterType.GetItem => typeof(ItemGetData),
-            DialogParameterType.Choice => typeof(ChoiceData),
-            DialogParameterType.CardChoice => typeof(CardChoiceData),
-            DialogParameterType.GetCard => typeof(bool),
-            _ => typeof(string)
-        };
-    }
+        DialogParameterType.CharacterImageName => typeof(string),
+        DialogParameterType.BackgroundImageName => typeof(string),
+        DialogParameterType.SeClipName => typeof(string),
+        DialogParameterType.CustomCharSpeed => typeof(float),
+        DialogParameterType.AutoAdvance => typeof(float),
+        DialogParameterType.GetItem => typeof(ItemGetData),
+        DialogParameterType.Choice => typeof(ChoiceData),
+        DialogParameterType.CardChoice => typeof(CardChoiceData),
+        DialogParameterType.GetCard => typeof(bool),
+        _ => typeof(string)
+    };
 
     /// <summary>
     /// 文字列値を適切な型に変換
@@ -123,20 +118,17 @@ public static class DialogParameterTypeExtensions
     /// </summary>
     /// <param name="parameterType">パラメータタイプ</param>
     /// <returns>デフォルト値</returns>
-    public static object GetDefaultValue(this DialogParameterType parameterType)
+    public static object GetDefaultValue(this DialogParameterType parameterType) => parameterType switch
     {
-        return parameterType switch
-        {
-            DialogParameterType.CharacterImageName => "",
-            DialogParameterType.BackgroundImageName => "",
-            DialogParameterType.SeClipName => "",
-            DialogParameterType.CustomCharSpeed => -1f,
-            DialogParameterType.AutoAdvance => -1f,
-            DialogParameterType.GetItem => null,
-            DialogParameterType.Choice => null,
-            DialogParameterType.CardChoice => null,
-            DialogParameterType.GetCard => false,
-            _ => ""
-        };
-    }
+        DialogParameterType.CharacterImageName => "",
+        DialogParameterType.BackgroundImageName => "",
+        DialogParameterType.SeClipName => "",
+        DialogParameterType.CustomCharSpeed => -1f,
+        DialogParameterType.AutoAdvance => -1f,
+        DialogParameterType.GetItem => null,
+        DialogParameterType.Choice => null,
+        DialogParameterType.CardChoice => null,
+        DialogParameterType.GetCard => false,
+        _ => ""
+    };
 }

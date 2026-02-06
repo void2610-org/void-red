@@ -81,11 +81,8 @@ public class SimpleTutorialWindowView : MonoBehaviour
     /// <summary>
     /// クリック時の処理（キーボード入力でも使用）
     /// </summary>
-    public void OnClick()
-    {
-        // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
-        _textProgressController.AdvanceToNext();
-    }
+    // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
+    public void OnClick() => _textProgressController.AdvanceToNext();
 
     /// <summary>
     /// ナレーションを非表示にする

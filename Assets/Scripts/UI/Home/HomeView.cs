@@ -48,42 +48,27 @@ public class HomeView : MonoBehaviour
     /// <summary>
     /// デッキデータを表示
     /// </summary>
-    public void ShowDeckData(List<CardModel> cardModels)
-    {
-        deckView.Show(cardModels);
-    }
+    public void ShowDeckData(List<CardModel> cardModels) => deckView.Show(cardModels);
 
     /// <summary>
     /// カード図鑑を表示
     /// </summary>
-    public void ShowCardLibrary(AllCardData allCardData, HashSet<string> viewedCardIds)
-    {
-        cardLibraryView.Show(allCardData, viewedCardIds);
-    }
+    public void ShowCardLibrary(AllCardData allCardData, HashSet<string> viewedCardIds) => cardLibraryView.Show(allCardData, viewedCardIds);
 
     /// <summary>
     /// カード詳細を表示
     /// </summary>
-    public void ShowCardDetail(CardData cardData)
-    {
-        cardDetailView.ShowCardDetail(cardData, false);
-    }
+    public void ShowCardDetail(CardData cardData) => cardDetailView.ShowCardDetail(cardData, false);
 
     /// <summary>
     /// Personボタンのinteractable設定
     /// </summary>
-    public void SetPersonButtonInteractable(bool interactable)
-    {
-        personButton.interactable = interactable;
-    }
+    public void SetPersonButtonInteractable(bool interactable) => personButton.interactable = interactable;
 
     /// <summary>
     /// Dreamボタンのinteractable設定
     /// </summary>
-    public void SetDreamButtonInteractable(bool interactable)
-    {
-        dreamButton.interactable = interactable;
-    }
+    public void SetDreamButtonInteractable(bool interactable) => dreamButton.interactable = interactable;
 
     /// <summary>
     /// セリフテキストの初期化

@@ -8,9 +8,7 @@ public static class PrologueProvider
     /// <summary>
     /// プロローグシナリオを取得
     /// </summary>
-    public static List<DialogData> GetPrologueScenario()
-    {
-        return new List<DialogData>
+    public static List<DialogData> GetPrologueScenario() => new List<DialogData>
         {
             // 演出：暗転
             new DialogData("", "（エレベーターが停止する音）"),
@@ -122,26 +120,19 @@ public static class PrologueProvider
             new DialogData("", "（足音が遠ざかる）"),
 
         };
-    }
 
     /// <summary>
     /// プロローグ2シナリオを取得
     /// </summary>
-    public static List<DialogData> GetPrologue2Scenario()
-    {
-        return new List<DialogData>
+    public static List<DialogData> GetPrologue2Scenario() => new List<DialogData>
         {
             new DialogData("システム", "(プロローグ後半)")
         };
-    }
 
-    public static List<DialogData> GetEndingScenario()
-    {
-        return new List<DialogData>
+    public static List<DialogData> GetEndingScenario() => new List<DialogData>
         {
             new DialogData("システム", "アルファ版はここまでです。"),
             new DialogData("システム", "プレイしていただきありがとうございます。"),
             new DialogData("システム", "製品版リリースをお待ちください。")
         };
-    }
 }

@@ -85,10 +85,7 @@ public class SaveDataManager
     /// セーブファイルが存在するかチェック
     /// </summary>
     /// <returns>セーブファイルの存在有無</returns>
-    public bool SaveFileExists()
-    {
-        return DataPersistence.DataExists(SAVE_DATA_KEY);
-    }
+    public bool SaveFileExists() => DataPersistence.DataExists(SAVE_DATA_KEY);
 
     /// <summary>
     /// セーブファイルを削除（デバッグ用）

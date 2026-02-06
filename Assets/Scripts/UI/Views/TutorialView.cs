@@ -27,11 +27,8 @@ public class TutorialView : MonoBehaviour
     private MotionHandle _currentMaskSizeHandle;
     private Vector2 _currentMaskSize = Vector2.zero;
 
-    public void NotifyAdvance()
-    {
-        // 各Viewに対してクリックを通知（各Viewが自分の状態に応じて処理）
-        simpleTutorialWindow.OnClick();
-    }
+    // 各Viewに対してクリックを通知（各Viewが自分の状態に応じて処理）
+    public void NotifyAdvance() => simpleTutorialWindow.OnClick();
 
     /// <summary>
     /// チュートリアルステップを表示してクリック待機

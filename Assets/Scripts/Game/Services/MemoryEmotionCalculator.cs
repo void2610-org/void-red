@@ -155,10 +155,8 @@ public static class MemoryEmotionCalculator
     /// </summary>
     /// <param name="cardInfoList">カード獲得情報リスト</param>
     /// <returns>支配的な感情タイプ（デフォルトはJoy）</returns>
-    public static EmotionType CalculateFromCardInfoList(IReadOnlyList<CardAcquisitionInfo> cardInfoList)
-    {
-        return CalculateWithCompoundFromCardInfoList(cardInfoList).PrimaryEmotion;
-    }
+    public static EmotionType CalculateFromCardInfoList(IReadOnlyList<CardAcquisitionInfo> cardInfoList) =>
+        CalculateWithCompoundFromCardInfoList(cardInfoList).PrimaryEmotion;
 
     /// <summary>
     /// CardAcquisitionInfoリストから複合感情も考慮した支配的感情を計算（勝利カードのみ対象）
@@ -192,10 +190,8 @@ public static class MemoryEmotionCalculator
     /// </summary>
     /// <param name="cardInfoList">保存されたカード獲得情報リスト</param>
     /// <returns>支配的な感情タイプ（デフォルトはJoy）</returns>
-    public static EmotionType CalculateFromSavedCardInfoList(IReadOnlyList<SavedCardAcquisitionInfo> cardInfoList)
-    {
-        return CalculateWithCompoundFromSavedCardInfoList(cardInfoList).PrimaryEmotion;
-    }
+    public static EmotionType CalculateFromSavedCardInfoList(IReadOnlyList<SavedCardAcquisitionInfo> cardInfoList) =>
+        CalculateWithCompoundFromSavedCardInfoList(cardInfoList).PrimaryEmotion;
 
     /// <summary>
     /// SavedCardAcquisitionInfoリストから複合感情も考慮した支配的感情を計算（勝利カードのみ対象）

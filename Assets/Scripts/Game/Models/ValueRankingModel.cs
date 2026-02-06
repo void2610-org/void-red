@@ -52,18 +52,12 @@ public class ValueRankingModel
     /// </summary>
     /// <param name="card">対象カード</param>
     /// <returns>順位（未設定の場合は0）</returns>
-    public int GetRanking(CardModel card)
-    {
-        return _rankings.TryGetValue(card, out var rank) ? rank : 0;
-    }
+    public int GetRanking(CardModel card) => _rankings.TryGetValue(card, out var rank) ? rank : 0;
 
     /// <summary>
     /// カードが順位設定済みか
     /// </summary>
-    public bool HasRanking(CardModel card)
-    {
-        return _rankings.ContainsKey(card);
-    }
+    public bool HasRanking(CardModel card) => _rankings.ContainsKey(card);
 
     /// <summary>
     /// 順位に応じた基準リソース値を取得（報酬計算用）
@@ -71,17 +65,11 @@ public class ValueRankingModel
     /// </summary>
     /// <param name="rank">順位</param>
     /// <returns>基準リソース値</returns>
-    public int GetBaseResourceValue(int rank)
-    {
-        // 順位1 → 基準値4, 順位4 → 基準値1
-        return GameConstants.VALUE_RANKING_BASE_RESOURCE - rank + 1;
-    }
+    // 順位1 → 基準値4, 順位4 → 基準値1
+    public int GetBaseResourceValue(int rank) => GameConstants.VALUE_RANKING_BASE_RESOURCE - rank + 1;
 
     /// <summary>
     /// 全ての順位設定をクリア
     /// </summary>
-    public void Clear()
-    {
-        _rankings.Clear();
-    }
+    public void Clear() => _rankings.Clear();
 }

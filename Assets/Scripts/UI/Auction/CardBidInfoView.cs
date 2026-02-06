@@ -29,10 +29,7 @@ public class CardBidInfoView : MonoBehaviour
     }
 
     // 価値順位を非表示
-    public void HideRank()
-    {
-        rankText.text = "";
-    }
+    public void HideRank() => rankText.text = "";
 
     // 入札額を表示（両方公開）
     public void ShowBidAmounts(int playerBid, int enemyBid)
@@ -96,8 +93,5 @@ public class CardBidInfoView : MonoBehaviour
     }
 
     // 結果を非表示
-    public void HideResult()
-    {
-        resultText.gameObject.SetActive(false);
-    }
+    public void HideResult() => resultText.gameObject.SetActive(false);
 }

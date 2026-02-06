@@ -111,10 +111,8 @@ public static class RewardCalculator
     /// 順位に応じた基準リソース値を取得
     /// 順位1=4, 順位2=3, 順位3=2, 順位4=1
     /// </summary>
-    public static int GetBaseResourceValue(int rank)
-    {
-        return GameConstants.VALUE_RANKING_BASE_RESOURCE - rank + 1;
-    }
+    public static int GetBaseResourceValue(int rank) =>
+        GameConstants.VALUE_RANKING_BASE_RESOURCE - rank + 1;
 
     /// <summary>
     /// 合計報酬を計算
