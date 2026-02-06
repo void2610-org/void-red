@@ -29,8 +29,5 @@ public class AllAuctionData : ScriptableObject
     /// </summary>
     /// <param name="auctionId">オークションID</param>
     /// <returns>指定されたIDのオークションデータ</returns>
-    public AuctionData GetAuctionById(string auctionId)
-    {
-        return auctionList.FirstOrDefault(auction => auction.AuctionId == auctionId);
-    }
+    public AuctionData GetAuctionById(string auctionId) => auctionList.FirstOrDefault(auction => auction.AuctionId == auctionId);
 }

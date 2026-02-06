@@ -61,7 +61,10 @@ public class PausePresenter : IStartable, System.IDisposable
         }
     }
 
-    public void Dispose() => _disposables.Dispose();
+    public void Dispose()
+    {
+        _disposables.Dispose();
+    }
 
     private void ShowHelp()
     {

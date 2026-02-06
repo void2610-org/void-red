@@ -305,10 +305,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     /// <summary>
     /// 全ダイアログをスキップして即座に完了（InputSystem用の公開メソッド）
     /// </summary>
-    public void RequestSkipAllDialogs()
-    {
-        SkipAllDialogsInternal().Forget();
-    }
+    public void RequestSkipAllDialogs() => SkipAllDialogsInternal().Forget();
 
     /// <summary>
     /// 全ダイアログをスキップして即座に完了（内部実装）

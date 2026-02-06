@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using R3;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
@@ -21,9 +22,8 @@ public class InputGuideLabel : MonoBehaviour
 
     private Image _image;
 
-    public event Action<InputSchemeType> OnSchemeChanged;
-
-    private Action<InputSchemeType> _onSchemeChanged;
+    private readonly Subject<InputSchemeType> _schemeChanged = new();
+    private IDisposable _schemeSubscription;
     private InputSchemeType _scheme = InputSchemeType.KeyboardAndMouse;
     private AsyncOperationHandle<Sprite> _spriteHandle;
 
@@ -34,7 +34,7 @@ public class InputGuideLabel : MonoBehaviour
         {
             if (_scheme == value) return;
             _scheme = value;
-            OnSchemeChanged?.Invoke(_scheme);
+            _schemeChanged.OnNext(_scheme);
         }
     }
 
@@ -124,18 +124,15 @@ public class InputGuideLabel : MonoBehaviour
     private void OnEnable()
     {
         UpdateText().Forget();
-        OnSchemeChanged += _onSchemeChanged = _ => UpdateText().Forget();
+        _schemeSubscription = _schemeChanged.Subscribe(_ => UpdateText().Forget());
 
         InputSystem.onEvent += OnEvent;
     }
 
     private void OnDisable()
     {
-        if (_onSchemeChanged != null)
-        {
-            OnSchemeChanged -= _onSchemeChanged;
-            _onSchemeChanged = null;
-        }
+        _schemeSubscription?.Dispose();
+        _schemeSubscription = null;
 
         InputSystem.onEvent -= OnEvent;
 

@@ -15,16 +15,10 @@ public class MemoryProgressData
     /// テーマを追加
     /// </summary>
     /// <param name="theme">獲得したテーマ</param>
-    public void AddAcquiredTheme(AcquiredTheme theme)
-    {
-        AcquiredThemes.Add(theme);
-    }
+    public void AddAcquiredTheme(AcquiredTheme theme) => AcquiredThemes.Add(theme);
 
     /// <summary>
     /// データをリセット
     /// </summary>
-    public void Reset()
-    {
-        AcquiredThemes.Clear();
-    }
+    public void Reset() => AcquiredThemes.Clear();
 }

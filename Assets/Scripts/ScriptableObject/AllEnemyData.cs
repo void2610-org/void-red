@@ -44,8 +44,5 @@ public class AllEnemyData : ScriptableObject
     /// </summary>
     /// <param name="enemyId">敵ID</param>
     /// <returns>指定されたIDの敵データ</returns>
-    public EnemyData GetEnemyById(string enemyId)
-    {
-        return enemyList.FirstOrDefault(enemy => enemy.EnemyId == enemyId);
-    }
+    public EnemyData GetEnemyById(string enemyId) => enemyList.FirstOrDefault(enemy => enemy.EnemyId == enemyId);
 }

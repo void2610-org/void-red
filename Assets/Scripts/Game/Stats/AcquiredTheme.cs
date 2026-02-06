@@ -66,17 +66,14 @@ public class CardAcquisitionInfo
     /// <summary>
     /// シリアライズ用データに変換
     /// </summary>
-    public SavedCardAcquisitionInfo ToSavedData()
-    {
-        return new SavedCardAcquisitionInfo(
-            Card.Data.CardId,
-            new Dictionary<EmotionType, int>(PlayerBids),
-            new Dictionary<EmotionType, int>(EnemyBids),
-            PlayerValueRank,
-            EnemyValueRank,
-            PlayerWon
-        );
-    }
+    public SavedCardAcquisitionInfo ToSavedData() => new SavedCardAcquisitionInfo(
+        Card.Data.CardId,
+        new Dictionary<EmotionType, int>(PlayerBids),
+        new Dictionary<EmotionType, int>(EnemyBids),
+        PlayerValueRank,
+        EnemyValueRank,
+        PlayerWon
+    );
 }
 
 /// <summary>

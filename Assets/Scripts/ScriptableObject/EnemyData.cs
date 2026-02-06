@@ -30,8 +30,5 @@ public class EnemyData : ScriptableObject
     /// 指定された属性に対応するSpriteを取得
     /// 対応するSpriteがない場合はnullを返す
     /// </summary>
-    public Sprite GetSpriteForAttribute(CardAttribute attribute)
-    {
-        return attributeSprites.GetValueOrDefault(attribute);
-    }
+    public Sprite GetSpriteForAttribute(CardAttribute attribute) => attributeSprites.GetValueOrDefault(attribute);
 }

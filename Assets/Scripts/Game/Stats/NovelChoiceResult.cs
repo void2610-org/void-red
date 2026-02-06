@@ -42,8 +42,5 @@ public class NovelChoiceResult
     /// <summary>
     /// デバッグ用の文字列表現
     /// </summary>
-    public override string ToString()
-    {
-        return $"[{scenarioId}] Choice{choiceIndex}: Index{selectedOptionIndex}";
-    }
+    public override string ToString() => $"[{scenarioId}] Choice{choiceIndex}: Index{selectedOptionIndex}";
 }

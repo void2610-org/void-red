@@ -85,10 +85,7 @@ namespace VoidRed.UI.Views
         /// <summary>
         /// バーの色を設定
         /// </summary>
-        public void SetColor(Color color)
-        {
-            fillImage.color = color;
-        }
+        public void SetColor(Color color) => fillImage.color = color;
 
         private void UpdateValueText()
         {

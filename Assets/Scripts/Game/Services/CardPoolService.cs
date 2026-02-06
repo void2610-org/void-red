@@ -87,38 +87,29 @@ public class CardPoolService
     /// </summary>
     /// <param name="predicate">検索条件</param>
     /// <returns>条件に合うカードのリスト</returns>
-    public List<CardData> GetCardsWhere(System.Func<CardData, bool> predicate)
-    {
-        return _availableCards.Where(predicate).ToList();
-    }
+    public List<CardData> GetCardsWhere(System.Func<CardData, bool> predicate) =>
+        _availableCards.Where(predicate).ToList();
 
     /// <summary>
     /// 特定のカードIDでカードを取得
     /// </summary>
     /// <param name="cardName">カード名</param>
     /// <returns>見つかったカード（存在しない場合はnull）</returns>
-    public CardData GetCardByName(string cardName)
-    {
-        return _availableCards.FirstOrDefault(card => card.CardName == cardName);
-    }
+    public CardData GetCardByName(string cardName) =>
+        _availableCards.FirstOrDefault(card => card.CardName == cardName);
 
     /// <summary>
     /// CardIdでカードを取得（全カード対象、進化・劣化先も含む）
     /// </summary>
     /// <param name="cardId">カードID</param>
     /// <returns>見つかったカード（存在しない場合はnull）</returns>
-    public CardData GetCardById(string cardId)
-    {
-        return _allCardData.CardList.FirstOrDefault(card => card.CardId == cardId);
-    }
+    public CardData GetCardById(string cardId) =>
+        _allCardData.CardList.FirstOrDefault(card => card.CardId == cardId);
 
     /// <summary>
     /// 初期デッキに使用可能なカードの数を取得
     /// </summary>
     /// <returns>進化・劣化先を除いたカード数</returns>
-    public int GetInitialDeckCardCount()
-    {
-        return _availableCards.Count;
-    }
+    public int GetInitialDeckCardCount() => _availableCards.Count;
 
 }

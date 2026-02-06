@@ -56,10 +56,7 @@ public static class SceneTypeExtensions
     /// </summary>
     /// <param name="sceneType">シーンタイプ</param>
     /// <returns>有効なシーン名を持つかどうか</returns>
-    public static bool IsValid(this SceneType sceneType)
-    {
-        return _sceneNames.ContainsKey(sceneType);
-    }
+    public static bool IsValid(this SceneType sceneType) => _sceneNames.ContainsKey(sceneType);
 
     /// <summary>
     /// 内部マッピング辞書への読み取り専用アクセス（SceneUtilityから使用）
