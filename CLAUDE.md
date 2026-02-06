@@ -10,9 +10,11 @@ void-red is a Unity card game project using Unity 6000.0.50f1 with VContainer fo
 
 1. Make code changes
 2. Use unity-compile.sh to verify compilation
-3. run code quality check by `unity-code-quality-checker` subagent
-4. fix issues reported by the code quality checker
-5. report results to the user
+3. Run format check with `dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn`
+4. Fix any format violations
+5. Run code quality check by `unity-code-quality-checker` subagent
+6. Fix issues reported by the code quality checker
+7. Report results to the user
 
 **YAGNI (You Aren't Gonna Need It) 原則:**
 - 将来必要になるかもしれない機能を先回りして実装しない
@@ -42,6 +44,10 @@ void-red is a Unity card game project using Unity 6000.0.50f1 with VContainer fo
 
 # Check compilation errors only
 ./unity-tools/unity-compile.sh check .
+
+# Format check (code style + custom analyzers UNA0001-UNA0004)
+dotnet format style FormatCheck.csproj --verify-no-changes --severity warn
+dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn
 ```
 
 ## Key Design Principles

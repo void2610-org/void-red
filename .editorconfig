@@ -22,11 +22,11 @@ tab_width = 4
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
 
-# this. 修飾子 - 不要
-dotnet_style_qualification_for_field = false:warning
-dotnet_style_qualification_for_property = false:warning
-dotnet_style_qualification_for_method = false:warning
-dotnet_style_qualification_for_event = false:warning
+# this. 修飾子 - 使用してもよい
+dotnet_style_qualification_for_field = false:silent
+dotnet_style_qualification_for_property = false:silent
+dotnet_style_qualification_for_method = false:silent
+dotnet_style_qualification_for_event = false:silent
 
 # 言語キーワード vs フレームワーク型名
 dotnet_style_predefined_type_for_locals_parameters_members = true:warning
@@ -114,8 +114,8 @@ csharp_preserve_single_line_blocks = true
 #### 命名規則 ####
 
 # プライベートフィールド: _camelCase
-# [SerializeField]フィールドは_プレフィックスなし（Unity規約）のためsuggestionに留める
-dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
+# UNA0001/UNA0002カスタムアナライザーで管理するためnoneに設定
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = none
 dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
 dotnet_naming_rule.private_fields_should_be_camel_case.style = private_field_style
 
@@ -165,8 +165,8 @@ dotnet_naming_symbols.locals.applicable_accessibilities = *
 
 dotnet_naming_style.camel_case_style.capitalization = camel_case
 
-# IDE1006（標準命名規則）はカスタムアナライザーと競合するためsuggestに下げる
-dotnet_diagnostic.IDE1006.severity = suggestion
+# IDE1006（標準命名規則）: privateフィールドのみnoneで除外済みのためwarningで有効化
+dotnet_diagnostic.IDE1006.severity = warning
 
 # カスタムアナライザー: UnityNamingAnalyzer
 dotnet_diagnostic.UNA0001.severity = warning

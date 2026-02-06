@@ -38,10 +38,25 @@ jobs:
         run: dotnet test tools/UnityNamingAnalyzer.Tests/UnityNamingAnalyzer.Tests.csproj -c Release --verbosity normal
 
       - name: Check whitespace formatting
+        id: whitespace
+        continue-on-error: true
         run: dotnet format whitespace FormatCheck.csproj --verify-no-changes
 
       - name: Check code style
+        id: style
+        continue-on-error: true
         run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warn
 
       - name: Check analyzers
+        id: analyzers
+        continue-on-error: true
         run: dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn
+
+      - name: Report results
+        if: steps.whitespace.outcome == 'failure' || steps.style.outcome == 'failure' || steps.analyzers.outcome == 'failure'
+        run: |
+          echo "::error::Format check failed:"
+          [ "${{ steps.whitespace.outcome }}" = "failure" ] && echo "  - Whitespace formatting violations found"
+          [ "${{ steps.style.outcome }}" = "failure" ] && echo "  - Code style violations found"
+          [ "${{ steps.analyzers.outcome }}" = "failure" ] && echo "  - Analyzer violations found"
+          exit 1
