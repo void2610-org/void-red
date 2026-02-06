@@ -124,11 +124,9 @@ public class GameStateRepository
     /// <summary>
     /// 有効なセーブデータが存在するかチェック
     /// </summary>
-    public bool HasSaveData()
-    {
-        return _saveDataManager.SaveFileExists() &&
-               (StoryProgress.CurrentStep > 0 || StoryProgress.BattleResults.Count > 0);
-    }
+    public bool HasSaveData() =>
+        _saveDataManager.SaveFileExists() &&
+        (StoryProgress.CurrentStep > 0 || StoryProgress.BattleResults.Count > 0);
 
     /// <summary>
     /// 全データをリセット

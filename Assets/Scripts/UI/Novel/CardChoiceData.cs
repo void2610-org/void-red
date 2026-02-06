@@ -80,26 +80,20 @@ public class CardChoiceData
     /// <summary>
     /// 指定されたインデックスの選択肢テキストを取得
     /// </summary>
-    public string GetOption(int index)
+    public string GetOption(int index) => index switch
     {
-        return index switch
-        {
-            0 => option1,
-            1 => option2,
-            _ => ""
-        };
-    }
+        0 => option1,
+        1 => option2,
+        _ => ""
+    };
 
     /// <summary>
     /// 指定されたインデックスの画像名を取得
     /// </summary>
-    public string GetImageName(int index)
+    public string GetImageName(int index) => index switch
     {
-        return index switch
-        {
-            0 => imageName1,
-            1 => imageName2,
-            _ => ""
-        };
-    }
+        0 => imageName1,
+        1 => imageName2,
+        _ => ""
+    };
 }

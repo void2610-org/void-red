@@ -37,28 +37,19 @@ public class StoryProgressData
     /// </summary>
     /// <param name="nodeId"></param>
     /// <param name="isPlayerWon"></param>
-    public void RecordBattleResult(string nodeId, bool isPlayerWon)
-    {
-        BattleResults[nodeId] = isPlayerWon;
-    }
+    public void RecordBattleResult(string nodeId, bool isPlayerWon) => BattleResults[nodeId] = isPlayerWon;
 
     /// <summary>
     /// 結果を取得
     /// </summary>
     /// <param name="nodeId">結果のキー</param>
     /// <returns>結果の値（存在しない場合は空文字列）</returns>
-    public bool GetBattleResult(string nodeId)
-    {
-        return BattleResults.GetValueOrDefault(nodeId, false);
-    }
+    public bool GetBattleResult(string nodeId) => BattleResults.GetValueOrDefault(nodeId, false);
 
     /// <summary>
     /// ステップを進める
     /// </summary>
-    public void AdvanceStep()
-    {
-        CurrentStep++;
-    }
+    public void AdvanceStep() => CurrentStep++;
 
     /// <summary>
     /// リセット

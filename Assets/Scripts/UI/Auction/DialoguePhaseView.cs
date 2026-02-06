@@ -43,10 +43,7 @@ public class DialoguePhaseView : MonoBehaviour
     /// <summary>
     /// 敵データで初期化する
     /// </summary>
-    public void Initialize(EnemyData enemyData)
-    {
-        _enemyPortraitSprite = enemyData.DefaultSprite;
-    }
+    public void Initialize(EnemyData enemyData) => _enemyPortraitSprite = enemyData.DefaultSprite;
 
     public async UniTask ShowPlayerDialogueAsync(string text)
     {

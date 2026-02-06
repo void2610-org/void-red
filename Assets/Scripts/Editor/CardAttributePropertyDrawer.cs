@@ -30,8 +30,5 @@ public class CardAttributePropertyDrawer : PropertyDrawer
         EditorGUI.EndProperty();
     }
 
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-    {
-        return EditorGUIUtility.singleLineHeight;
-    }
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) => EditorGUIUtility.singleLineHeight;
 }

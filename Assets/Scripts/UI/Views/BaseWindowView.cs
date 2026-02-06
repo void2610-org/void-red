@@ -74,37 +74,26 @@ public abstract class BaseWindowView : MonoBehaviour
     /// <summary>
     /// ウィンドウを表示
     /// </summary>
-    public virtual void Show()
-    {
-        ShowWithAnimation().Forget();
-    }
+    public virtual void Show() => ShowWithAnimation().Forget();
 
     /// <summary>
     /// ウィンドウを非表示
     /// </summary>
-    public virtual void Hide()
-    {
-        HideWithAnimation().Forget();
-    }
+    public virtual void Hide() => HideWithAnimation().Forget();
 
     /// <summary>
     /// ウィンドウの表示/非表示を切り替え
     /// </summary>
     public void Toggle()
     {
-        if (IsShowing)
-            Hide();
-        else
-            Show();
+        if (IsShowing) Hide();
+        else Show();
     }
 
     /// <summary>
     /// ウィンドウが閉じられるまで待機
     /// </summary>
-    public async UniTask WaitForClose()
-    {
-        await _onClosed.FirstAsync();
-    }
+    public async UniTask WaitForClose() => await _onClosed.FirstAsync();
 
     private async UniTaskVoid ShowWithAnimation()
     {

@@ -41,8 +41,5 @@ public class CardModel
     /// <summary>
     /// デバッグ用文字列
     /// </summary>
-    public override string ToString()
-    {
-        return $"{Data?.CardName ?? "Unknown"} [{InstanceId.Substring(0, 8)}]";
-    }
+    public override string ToString() => $"{Data?.CardName ?? "Unknown"} [{InstanceId.Substring(0, 8)}]";
 }

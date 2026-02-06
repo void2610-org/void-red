@@ -32,7 +32,7 @@ dotnet-format とカスタム Roslyn アナライザーを使用した C# コー
 │    ▼                        ▼                        ▼         │
 │ ┌──────────────┐  ┌─────────────────┐  ┌──────────────────┐   │
 │ │FormatCheck   │  │ IDE 標準規則    │  │UnityNamingAnalyzer│   │
-│ │.csproj       │  │ (IDE0001等)     │  │(UNA0001/UNA0002) │   │
+│ │.csproj       │  │ (IDE0001等)     │  │(UNA0001-UNA0004) │   │
 │ │(対象定義)    │  │                 │  │                  │   │
 │ └──────────────┘  └─────────────────┘  └──────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
@@ -49,10 +49,14 @@ void-red/
 └── tools/
     ├── UnityNamingAnalyzer/
     │   ├── UnityNamingAnalyzer.csproj
-    │   └── SerializeFieldNamingAnalyzer.cs   # カスタムアナライザー
+    │   ├── SerializeFieldNamingAnalyzer.cs   # UNA0001/UNA0002: フィールド命名規約
+    │   ├── EventSystemAnalyzer.cs            # UNA0003: R3イベントシステム強制
+    │   └── ExpressionBodyAnalyzer.cs         # UNA0004: 単一文public式本体強制
     └── UnityNamingAnalyzer.Tests/
         ├── UnityNamingAnalyzer.Tests.csproj
-        └── SerializeFieldNamingAnalyzerTests.cs
+        ├── SerializeFieldNamingAnalyzerTests.cs
+        ├── EventSystemAnalyzerTests.cs
+        └── ExpressionBodyAnalyzerTests.cs
 ```
 
 ### 各ファイルの役割
@@ -74,6 +78,8 @@ Unity プロジェクト特有の命名規約を検証するカスタム Roslyn 
 |----|------|------|
 | **UNA0001** | privateフィールドには `_` プレフィックスが必要 | `[SerializeField]` なしの private フィールド |
 | **UNA0002** | `[SerializeField]` フィールドには `_` プレフィックスを付けない | `[SerializeField]` 付きの private フィールド |
+| **UNA0003** | イベントにはR3の `Subject<T>` を使用 | `event` キーワード、`Action`/`Func` 型のフィールド・プロパティ |
+| **UNA0004** | 単一文の public メソッドには式本体を使用 | ブロック本体で1ステートメントの public メソッド |
 
 ### 命名規約の理由
 
@@ -93,6 +99,48 @@ public class Player : MonoBehaviour
 - **`[SerializeField]`**: Unity Inspector に表示されるため、見やすさを優先して `_` なし
 - **通常の private フィールド**: ローカル変数と区別するため `_` プレフィックス必須
 
+### イベントシステム規約 (UNA0003)
+
+C# 標準の `event`、`Action`、`Func` の代わりに R3 の `Subject<T>` を使用する:
+
+```csharp
+// NG: C#標準のイベント・デリゲート
+public event EventHandler OnDamaged;        // UNA0003
+private Action _onHealthChanged;            // UNA0003
+public Func<int> GetValue { get; set; }     // UNA0003
+
+// OK: R3のSubjectを使用
+private readonly Subject<int> _onDamaged = new();
+public Observable<int> OnDamaged => _onDamaged;
+```
+
+- メソッドパラメータやローカル変数の `Action`/`Func` は除外（コールバック受け取りは許可）
+
+### 式本体規約 (UNA0004)
+
+単一ステートメントの public メソッドは式本体 (`=>`) で記述する:
+
+```csharp
+// NG: 単一文のブロック本体
+public int GetValue()
+{
+    return 42;       // UNA0004
+}
+
+// OK: 式本体
+public int GetValue() => 42;
+
+// OK: 複数文はブロック本体のまま
+public int Calculate()
+{
+    var x = 42;
+    return x * 2;
+}
+```
+
+- private/protected/internal メソッドは対象外
+- コンストラクタは対象外
+
 ### IDE1006 との競合回避
 
 標準の命名規則 (IDE1006) はカスタムアナライザーと競合するため、`.editorconfig` で severity を `suggestion` に下げている:
@@ -101,9 +149,11 @@ public class Player : MonoBehaviour
 # IDE1006（標準命名規則）はカスタムアナライザーと競合するためsuggestに下げる
 dotnet_diagnostic.IDE1006.severity = suggestion
 
-# カスタムアナライザー: SerializeFieldの命名規約
+# カスタムアナライザー: UnityNamingAnalyzer
 dotnet_diagnostic.UNA0001.severity = warning
 dotnet_diagnostic.UNA0002.severity = warning
+dotnet_diagnostic.UNA0003.severity = warning
+dotnet_diagnostic.UNA0004.severity = warning
 ```
 
 ## ローカル実行
@@ -240,6 +290,8 @@ public class Example
 |------|------|-----|--------|
 | 通常 private フィールド | `_camelCase` | `_playerHealth` | warning (UNA0001) |
 | `[SerializeField]` フィールド | `camelCase` | `maxHealth` | warning (UNA0002) |
+| イベント・デリゲート | R3 `Subject<T>` を使用 | `Subject<int>` | warning (UNA0003) |
+| 単一文 public メソッド | 式本体 (`=>`) で記述 | `=> 42` | warning (UNA0004) |
 | パブリックメンバー | `PascalCase` | `GetPlayer()` | warning |
 | 型 | `PascalCase` | `PlayerController` | warning |
 | インターフェース | `IPascalCase` | `IDisposable` | warning |
@@ -249,33 +301,29 @@ public class Example
 
 ### 新しい診断ルールの追加
 
-1. `SerializeFieldNamingAnalyzer.cs` に新しい `DiagnosticDescriptor` を追加:
+1. `tools/UnityNamingAnalyzer/` に新しいアナライザークラスを作成（既存の `EventSystemAnalyzer.cs` 等を参考）:
 
 ```csharp
-public static readonly DiagnosticDescriptor UNA0003 = new DiagnosticDescriptor(
-    "UNA0003",
-    "タイトル",
-    "メッセージ '{0}'",
-    "Naming",
-    DiagnosticSeverity.Warning,
-    isEnabledByDefault: true);
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class NewAnalyzer : DiagnosticAnalyzer
+{
+    public static readonly DiagnosticDescriptor UNA0005 = new DiagnosticDescriptor(
+        "UNA0005", "タイトル", "メッセージ '{0}'",
+        "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        ImmutableArray.Create(UNA0005);
+
+    public override void Initialize(AnalysisContext context) { /* ... */ }
+}
 ```
 
-2. `SupportedDiagnostics` に追加:
+2. `tools/UnityNamingAnalyzer.Tests/` にテストクラスを追加
 
-```csharp
-public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    ImmutableArray.Create(UNA0001, UNA0002, UNA0003);
-```
-
-3. `AnalyzeField` または新しい分析メソッドで診断を報告
-
-4. テストを追加
-
-5. `.editorconfig` に severity を設定:
+3. `.editorconfig` に severity を設定:
 
 ```ini
-dotnet_diagnostic.UNA0003.severity = warning
+dotnet_diagnostic.UNA0005.severity = warning
 ```
 
 ### 外部アナライザーパッケージの追加

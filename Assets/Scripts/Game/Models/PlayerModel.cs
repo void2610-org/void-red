@@ -39,18 +39,12 @@ public class PlayerModel : IDisposable
     /// <summary>
     /// 感情リソースを追加
     /// </summary>
-    public void AddEmotion(EmotionType emotion, int amount)
-    {
-        _emotionResources[emotion] += amount;
-    }
+    public void AddEmotion(EmotionType emotion, int amount) => _emotionResources[emotion] += amount;
 
     /// <summary>
     /// 感情リソースをリセット
     /// </summary>
-    public void ResetEmotionResources()
-    {
-        InitializeEmotionResources();
-    }
+    public void ResetEmotionResources() => InitializeEmotionResources();
 
     /// <summary>
     /// 特定の感情リソース量を取得

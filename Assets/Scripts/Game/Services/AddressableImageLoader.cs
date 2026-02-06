@@ -134,8 +134,6 @@ public class AddressableImageLoader
     /// </summary>
     /// <param name="imageName">確認する画像名</param>
     /// <returns>キャッシュに存在するかどうか</returns>
-    public bool IsImageCached(string imageName)
-    {
-        return !string.IsNullOrEmpty(imageName) && _loadedSprites.ContainsKey(imageName);
-    }
+    public bool IsImageCached(string imageName) =>
+        !string.IsNullOrEmpty(imageName) && _loadedSprites.ContainsKey(imageName);
 }

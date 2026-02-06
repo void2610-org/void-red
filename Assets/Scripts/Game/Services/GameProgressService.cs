@@ -27,10 +27,7 @@ public class GameProgressService
     /// <summary>
     /// 有効なセーブデータが存在するかチェック（ストーリー進行ベース）
     /// </summary>
-    public bool HasSaveData()
-    {
-        return _repository.HasSaveData();
-    }
+    public bool HasSaveData() => _repository.HasSaveData();
 
     /// <summary>
     /// 全データを初期状態にリセット（デバッグ用）
@@ -138,11 +135,8 @@ public class GameProgressService
     /// <summary>
     /// カード閲覧をリストで記録
     /// </summary>
-    public void RecordCardViews(List<CardData> cardDataList)
-    {
-        foreach (var cardData in cardDataList)
-            RecordCardView(cardData);
-    }
+    public void RecordCardViews(List<CardData> cardDataList) =>
+        cardDataList.ForEach(RecordCardView);
 
     /// <summary>
     /// カード閲覧を記録
@@ -156,27 +150,21 @@ public class GameProgressService
     /// <summary>
     /// 閲覧済みカードIDリストを取得
     /// </summary>
-    public HashSet<string> GetViewedCardIds()
-    {
-        return new HashSet<string>(_repository.PlayerProgress.ViewedCardIds);
-    }
+    public HashSet<string> GetViewedCardIds() =>
+        new HashSet<string>(_repository.PlayerProgress.ViewedCardIds);
 
     /// <summary>
     /// 特定のシナリオの選択結果を取得
     /// </summary>
-    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
-    {
-        return _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-    }
+    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) =>
+        _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
 
     /// <summary>
     /// 獲得済みテーマリストを取得
     /// </summary>
     /// <returns>獲得済みテーマのリスト</returns>
-    public IReadOnlyList<AcquiredTheme> GetAcquiredThemes()
-    {
-        return _repository.MemoryProgress.AcquiredThemes;
-    }
+    public IReadOnlyList<AcquiredTheme> GetAcquiredThemes() =>
+        _repository.MemoryProgress.AcquiredThemes;
 
     /// <summary>
     /// 獲得テーマを記録して保存

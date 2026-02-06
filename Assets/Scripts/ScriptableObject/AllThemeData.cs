@@ -22,10 +22,7 @@ public class AllThemeData : ScriptableObject
     /// </summary>
     /// <param name="themeId">テーマID</param>
     /// <returns>該当するThemeData、見つからない場合はnull</returns>
-    public ThemeData GetThemeById(string themeId)
-    {
-        return themeList.FirstOrDefault(theme => theme.ThemeId == themeId);
-    }
+    public ThemeData GetThemeById(string themeId) => themeList.FirstOrDefault(theme => theme.ThemeId == themeId);
 
     /// <summary>
     /// 同じディレクトリ内の全てのThemeDataを自動的に登録

@@ -57,9 +57,9 @@ public class InputActionsProvider : IDisposable
         }
     }
 
+    // InputActionsのクリーンアップ
     public void Dispose()
     {
-        // InputActionsのクリーンアップ
         _inputActions?.Dispose();
     }
 }

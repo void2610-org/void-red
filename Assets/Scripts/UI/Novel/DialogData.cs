@@ -181,18 +181,12 @@ public class DialogData
     /// </summary>
     /// <param name="parameterType">パラメータタイプ</param>
     /// <param name="value">設定する値</param>
-    public void SetParameter(DialogParameterType parameterType, object value)
-    {
-        _parameters[parameterType] = value;
-    }
+    public void SetParameter(DialogParameterType parameterType, object value) => _parameters[parameterType] = value;
 
     /// <summary>
     /// 特定のパラメータが設定されているかチェック
     /// </summary>
     /// <param name="parameterType">パラメータタイプ</param>
     /// <returns>設定されている場合はtrue</returns>
-    public bool HasParameter(DialogParameterType parameterType)
-    {
-        return _parameters.ContainsKey(parameterType);
-    }
+    public bool HasParameter(DialogParameterType parameterType) => _parameters.ContainsKey(parameterType);
 }

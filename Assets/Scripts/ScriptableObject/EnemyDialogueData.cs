@@ -58,13 +58,7 @@ public class EnemyDialogueData : ScriptableObject
     [Header("敵先攻時の対話（プレイヤーの先攻選択に基づく4パターン）")]
     [SerializeField] private List<EnemyDialogueInitiation> initiations;
 
-    public EnemyDialogueResponse GetResponse(DialogueChoiceType playerChoice)
-    {
-        return responses?.FirstOrDefault(r => r.TargetChoice == playerChoice);
-    }
+    public EnemyDialogueResponse GetResponse(DialogueChoiceType playerChoice) => responses?.FirstOrDefault(r => r.TargetChoice == playerChoice);
 
-    public EnemyDialogueInitiation GetInitiation(DialogueChoiceType playerFirstChoice)
-    {
-        return initiations?.FirstOrDefault(i => i.TriggerChoice == playerFirstChoice);
-    }
+    public EnemyDialogueInitiation GetInitiation(DialogueChoiceType playerFirstChoice) => initiations?.FirstOrDefault(i => i.TriggerChoice == playerFirstChoice);
 }

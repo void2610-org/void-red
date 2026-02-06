@@ -63,10 +63,7 @@ public class GameSaveData
     /// <param name="cardId">閲覧したカードのID</param>
     public void RecordCardView(string cardId)
     {
-        if (!string.IsNullOrEmpty(cardId) && !viewedCardIds.Contains(cardId))
-        {
-            viewedCardIds.Add(cardId);
-        }
+        if (!string.IsNullOrEmpty(cardId) && !viewedCardIds.Contains(cardId)) viewedCardIds.Add(cardId);
     }
 
     /// <summary>
@@ -74,56 +71,38 @@ public class GameSaveData
     /// </summary>
     /// <param name="cardId">チェックするカードのID</param>
     /// <returns>閲覧済みの場合true</returns>
-    public bool IsCardViewed(string cardId)
-    {
-        return viewedCardIds.Contains(cardId);
-    }
+    public bool IsCardViewed(string cardId) => viewedCardIds.Contains(cardId);
 
     /// <summary>
     /// 閲覧済みカードIDリストを取得
     /// </summary>
     /// <returns>閲覧済みカードIDのHashSet</returns>
-    public HashSet<string> GetViewedCardIds()
-    {
-        return new HashSet<string>(viewedCardIds);
-    }
+    public HashSet<string> GetViewedCardIds() => new HashSet<string>(viewedCardIds);
 
     /// <summary>
     /// ノベル選択結果を追加
     /// </summary>
     /// <param name="choiceResult">追加する選択結果</param>
-    public void AddNovelChoiceResult(NovelChoiceResult choiceResult)
-    {
-        novelChoiceResults.Add(choiceResult);
-    }
+    public void AddNovelChoiceResult(NovelChoiceResult choiceResult) => novelChoiceResults.Add(choiceResult);
 
     /// <summary>
     /// 特定のシナリオIDの選択結果を取得
     /// </summary>
     /// <param name="scenarioId">シナリオID</param>
     /// <returns>該当する選択結果のリスト</returns>
-    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
-    {
-        return novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
-    }
+    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) => novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
 
     /// <summary>
     /// 全ての選択結果を取得
     /// </summary>
     /// <returns>全選択結果のリスト</returns>
-    public List<NovelChoiceResult> GetAllChoiceResults()
-    {
-        return new List<NovelChoiceResult>(novelChoiceResults);
-    }
+    public List<NovelChoiceResult> GetAllChoiceResults() => new List<NovelChoiceResult>(novelChoiceResults);
 
     /// <summary>
     /// 獲得テーマを追加
     /// </summary>
     /// <param name="theme">追加する獲得テーマ</param>
-    public void AddAcquiredTheme(SavedAcquiredTheme theme)
-    {
-        acquiredThemes.Add(theme);
-    }
+    public void AddAcquiredTheme(SavedAcquiredTheme theme) => acquiredThemes.Add(theme);
 
     /// <summary>
     /// 獲得テーマリストを更新
@@ -138,8 +117,5 @@ public class GameSaveData
     /// <summary>
     /// デバッグ用情報文字列
     /// </summary>
-    public string GetDebugInfo()
-    {
-        return $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
-    }
+    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
 }
