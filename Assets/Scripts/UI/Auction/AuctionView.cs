@@ -156,6 +156,10 @@ public class AuctionView : MonoBehaviour
             .Subscribe(_ => OnDecreaseBid())
             .AddTo(_disposables);
 
+        bidWindowView.OnClose
+            .Subscribe(_ => DeselectCard())
+            .AddTo(_disposables);
+
         confirmBiddingButton.OnClickAsObservable()
             .Subscribe(_ => OnConfirmBidding())
             .AddTo(_disposables);

@@ -17,6 +17,7 @@ public class BidWindowView : BaseWindowView
 
     public Observable<Unit> OnIncrease => increaseButton.OnClickAsObservable();
     public Observable<Unit> OnDecrease => decreaseButton.OnClickAsObservable();
+    public Observable<Unit> OnClose => closeButton.OnClickAsObservable();
 
     public void SetEmotion(EmotionType emotion) => emotionIndicator.color = emotion.GetColor();
 
