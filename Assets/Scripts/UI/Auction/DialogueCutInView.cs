@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using LitMotion.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,7 @@ public class DialogueCutInView : MonoBehaviour
     [SerializeField] private Image cutInImage;
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private RectTransform rectTransform;
+    [SerializeField] private CanvasGroup backgroundCanvasGroup;
 
     [Header("プレイヤーカットイン画像")]
     [SerializeField] private Sprite playerStandingSprite;
@@ -27,10 +29,13 @@ public class DialogueCutInView : MonoBehaviour
     [SerializeField] private float exitDuration = 0.3f;
     [SerializeField] private float slideOffset = 1200f;
     [SerializeField] private float intervalDuration = 0.3f;
+    [SerializeField] private float fadeDuration = 0.3f;
 
     private CanvasGroup _canvasGroup;
     private float _initialX;
     private MotionHandle _slideHandle;
+    private MotionHandle _fadeHandle;
+    private MotionHandle _bgFadeHandle;
 
     /// <summary>
     /// プレイヤーのカットイン演出を再生する
@@ -43,23 +48,30 @@ public class DialogueCutInView : MonoBehaviour
     public async UniTask PlayCutInAsync(Sprite standing, Sprite cutIn, string text)
     {
         _slideHandle.TryCancel();
+        _fadeHandle.TryCancel();
+        _bgFadeHandle.TryCancel();
 
         standingImage.sprite = standing;
         cutInImage.sprite = cutIn;
         dialogueText.text = $"「{text}」";
 
-        _canvasGroup.alpha = 1f;
-        // 右画面外からスライドイン
+        // フェードイン + 右画面外からスライドイン
+        _canvasGroup.alpha = 0f;
         rectTransform.anchoredPosition = new Vector2(_initialX + slideOffset, rectTransform.anchoredPosition.y);
+        _fadeHandle = LMotion.Create(0f, 1f, fadeDuration)
+            .WithEase(Ease.OutCubic)
+            .BindToAlpha(_canvasGroup)
+            .AddTo(gameObject);
+        _bgFadeHandle = backgroundCanvasGroup.FadeIn(fadeDuration, Ease.OutCubic);
         _slideHandle = rectTransform.MoveToX(_initialX, slideDuration, Ease.OutCubic);
         await _slideHandle.ToUniTask();
 
         await UniTask.Delay((int)(displayDuration * 1000));
 
-        // 左画面外へスライドアウト
-        _slideHandle = rectTransform.MoveToX(_initialX - slideOffset, exitDuration, Ease.InCubic);
-        await _slideHandle.ToUniTask();
-        _canvasGroup.alpha = 0f;
+        // フェードアウト
+        _fadeHandle = _canvasGroup.FadeOut(exitDuration, Ease.InCubic);
+        _bgFadeHandle = backgroundCanvasGroup.FadeOut(exitDuration, Ease.InCubic);
+        await _fadeHandle.ToUniTask();
 
         rectTransform.anchoredPosition = new Vector2(_initialX, rectTransform.anchoredPosition.y);
 
@@ -75,10 +87,15 @@ public class DialogueCutInView : MonoBehaviour
         _canvasGroup.blocksRaycasts = false;
 
         _initialX = rectTransform.anchoredPosition.x;
+
+        // 背景の初期状態を透明にする
+        backgroundCanvasGroup.alpha = 0f;
     }
 
     private void OnDestroy()
     {
         _slideHandle.TryCancel();
+        _fadeHandle.TryCancel();
+        _bgFadeHandle.TryCancel();
     }
 }
