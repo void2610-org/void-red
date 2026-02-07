@@ -28,6 +28,49 @@ public class GameSaveData
     public IReadOnlyList<SavedAcquiredTheme> AcquiredThemes => acquiredThemes;
 
     /// <summary>
+    /// カードが閲覧済みかチェック
+    /// </summary>
+    /// <param name="cardId">チェックするカードのID</param>
+    /// <returns>閲覧済みの場合true</returns>
+    public bool IsCardViewed(string cardId) => viewedCardIds.Contains(cardId);
+
+    /// <summary>
+    /// 閲覧済みカードIDリストを取得
+    /// </summary>
+    /// <returns>閲覧済みカードIDのHashSet</returns>
+    public HashSet<string> GetViewedCardIds() => new HashSet<string>(viewedCardIds);
+
+    /// <summary>
+    /// ノベル選択結果を追加
+    /// </summary>
+    /// <param name="choiceResult">追加する選択結果</param>
+    public void AddNovelChoiceResult(NovelChoiceResult choiceResult) => novelChoiceResults.Add(choiceResult);
+
+    /// <summary>
+    /// 特定のシナリオIDの選択結果を取得
+    /// </summary>
+    /// <param name="scenarioId">シナリオID</param>
+    /// <returns>該当する選択結果のリスト</returns>
+    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) => novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
+
+    /// <summary>
+    /// 全ての選択結果を取得
+    /// </summary>
+    /// <returns>全選択結果のリスト</returns>
+    public List<NovelChoiceResult> GetAllChoiceResults() => new List<NovelChoiceResult>(novelChoiceResults);
+
+    /// <summary>
+    /// 獲得テーマを追加
+    /// </summary>
+    /// <param name="theme">追加する獲得テーマ</param>
+    public void AddAcquiredTheme(SavedAcquiredTheme theme) => acquiredThemes.Add(theme);
+
+    /// <summary>
+    /// デバッグ用情報文字列
+    /// </summary>
+    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
+
+    /// <summary>
     /// ゲーム進行情報を更新
     /// </summary>
     public void UpdateGameProgress(int step, Dictionary<string, bool> results)
@@ -67,44 +110,6 @@ public class GameSaveData
     }
 
     /// <summary>
-    /// カードが閲覧済みかチェック
-    /// </summary>
-    /// <param name="cardId">チェックするカードのID</param>
-    /// <returns>閲覧済みの場合true</returns>
-    public bool IsCardViewed(string cardId) => viewedCardIds.Contains(cardId);
-
-    /// <summary>
-    /// 閲覧済みカードIDリストを取得
-    /// </summary>
-    /// <returns>閲覧済みカードIDのHashSet</returns>
-    public HashSet<string> GetViewedCardIds() => new HashSet<string>(viewedCardIds);
-
-    /// <summary>
-    /// ノベル選択結果を追加
-    /// </summary>
-    /// <param name="choiceResult">追加する選択結果</param>
-    public void AddNovelChoiceResult(NovelChoiceResult choiceResult) => novelChoiceResults.Add(choiceResult);
-
-    /// <summary>
-    /// 特定のシナリオIDの選択結果を取得
-    /// </summary>
-    /// <param name="scenarioId">シナリオID</param>
-    /// <returns>該当する選択結果のリスト</returns>
-    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) => novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
-
-    /// <summary>
-    /// 全ての選択結果を取得
-    /// </summary>
-    /// <returns>全選択結果のリスト</returns>
-    public List<NovelChoiceResult> GetAllChoiceResults() => new List<NovelChoiceResult>(novelChoiceResults);
-
-    /// <summary>
-    /// 獲得テーマを追加
-    /// </summary>
-    /// <param name="theme">追加する獲得テーマ</param>
-    public void AddAcquiredTheme(SavedAcquiredTheme theme) => acquiredThemes.Add(theme);
-
-    /// <summary>
     /// 獲得テーマリストを更新
     /// </summary>
     /// <param name="themes">獲得テーマリスト</param>
@@ -113,9 +118,4 @@ public class GameSaveData
         acquiredThemes.Clear();
         acquiredThemes.AddRange(themes);
     }
-
-    /// <summary>
-    /// デバッグ用情報文字列
-    /// </summary>
-    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
 }

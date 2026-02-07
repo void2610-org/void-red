@@ -121,34 +121,6 @@ public class InputGuideLabel : MonoBehaviour
         }
     }
 
-    private void OnEnable()
-    {
-        UpdateText().Forget();
-        _schemeSubscription = _schemeChanged.Subscribe(_ => UpdateText().Forget());
-
-        InputSystem.onEvent += OnEvent;
-    }
-
-    private void OnDisable()
-    {
-        _schemeSubscription?.Dispose();
-        _schemeSubscription = null;
-
-        InputSystem.onEvent -= OnEvent;
-
-        // Addressablesハンドルを解放
-        if (_spriteHandle.IsValid())
-        {
-            Addressables.Release(_spriteHandle);
-        }
-    }
-
-    private void Awake()
-    {
-        _image = GetComponent<Image>();
-        _image.enabled = false;
-    }
-
     /// <summary>
     /// binding.pathからAddressablesキーを生成する。
     /// InputSystemのバインディングパスを小文字化してスプライトパスに変換する。
@@ -198,5 +170,33 @@ public class InputGuideLabel : MonoBehaviour
                    binding.path.StartsWith("<DualShockGamepad>");
         }
         return false;
+    }
+
+    private void Awake()
+    {
+        _image = GetComponent<Image>();
+        _image.enabled = false;
+    }
+
+    private void OnEnable()
+    {
+        UpdateText().Forget();
+        _schemeSubscription = _schemeChanged.Subscribe(_ => UpdateText().Forget());
+
+        InputSystem.onEvent += OnEvent;
+    }
+
+    private void OnDisable()
+    {
+        _schemeSubscription?.Dispose();
+        _schemeSubscription = null;
+
+        InputSystem.onEvent -= OnEvent;
+
+        // Addressablesハンドルを解放
+        if (_spriteHandle.IsValid())
+        {
+            Addressables.Release(_spriteHandle);
+        }
     }
 }

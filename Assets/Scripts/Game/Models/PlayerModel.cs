@@ -18,24 +18,6 @@ public class PlayerModel : IDisposable
         InitializeEmotionResources();
     }
 
-    private void InitializeEmotionResources()
-    {
-        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
-        {
-            _emotionResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE;
-        }
-    }
-
-    /// <summary>
-    /// 感情リソースを消費
-    /// </summary>
-    public bool TryConsumeEmotion(EmotionType emotion, int amount)
-    {
-        if (_emotionResources[emotion] < amount) return false;
-        _emotionResources[emotion] -= amount;
-        return true;
-    }
-
     /// <summary>
     /// 感情リソースを追加
     /// </summary>
@@ -50,6 +32,24 @@ public class PlayerModel : IDisposable
     /// 特定の感情リソース量を取得
     /// </summary>
     public int GetEmotionAmount(EmotionType emotion) => _emotionResources[emotion];
+
+    /// <summary>
+    /// 感情リソースを消費
+    /// </summary>
+    public bool TryConsumeEmotion(EmotionType emotion, int amount)
+    {
+        if (_emotionResources[emotion] < amount) return false;
+        _emotionResources[emotion] -= amount;
+        return true;
+    }
+
+    private void InitializeEmotionResources()
+    {
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            _emotionResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE;
+        }
+    }
 
     public void Dispose() { }
 }

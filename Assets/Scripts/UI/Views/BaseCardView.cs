@@ -16,11 +16,11 @@ public abstract class BaseCardView : MonoBehaviour
     protected abstract UIEffect EdgeUIEffect { get; }
     protected abstract Image GaugeImage { get; }
 
-    // CardData取得メソッド（各サブクラスで実装）
-    protected abstract CardData GetCardData();
-
     private TMProArchedText _archedText;
     private bool _archedTextCached;
+
+    // CardData取得メソッド（各サブクラスで実装）
+    protected abstract CardData GetCardData();
 
     /// <summary>
     /// ゲージの表示を更新

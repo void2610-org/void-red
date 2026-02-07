@@ -61,32 +61,6 @@ public class SavedCardAcquisitionInfo
     public int EnemyTotalBid => enemyTotalBid;
 
     /// <summary>
-    /// プレイヤーの感情別入札を取得
-    /// </summary>
-    public Dictionary<EmotionType, int> GetPlayerBidsByEmotion()
-    {
-        var result = new Dictionary<EmotionType, int>();
-        for (var i = 0; i < playerEmotionTypes.Count && i < playerBidAmounts.Count; i++)
-        {
-            result[(EmotionType)playerEmotionTypes[i]] = playerBidAmounts[i];
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// 敵の感情別入札を取得
-    /// </summary>
-    public Dictionary<EmotionType, int> GetEnemyBidsByEmotion()
-    {
-        var result = new Dictionary<EmotionType, int>();
-        for (var i = 0; i < enemyEmotionTypes.Count && i < enemyBidAmounts.Count; i++)
-        {
-            result[(EmotionType)enemyEmotionTypes[i]] = enemyBidAmounts[i];
-        }
-        return result;
-    }
-
-    /// <summary>
     /// コンストラクタ
     /// </summary>
     public SavedCardAcquisitionInfo(
@@ -119,5 +93,31 @@ public class SavedCardAcquisitionInfo
             enemyBidAmounts.Add(kvp.Value);
             enemyTotalBid += kvp.Value;
         }
+    }
+
+    /// <summary>
+    /// プレイヤーの感情別入札を取得
+    /// </summary>
+    public Dictionary<EmotionType, int> GetPlayerBidsByEmotion()
+    {
+        var result = new Dictionary<EmotionType, int>();
+        for (var i = 0; i < playerEmotionTypes.Count && i < playerBidAmounts.Count; i++)
+        {
+            result[(EmotionType)playerEmotionTypes[i]] = playerBidAmounts[i];
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 敵の感情別入札を取得
+    /// </summary>
+    public Dictionary<EmotionType, int> GetEnemyBidsByEmotion()
+    {
+        var result = new Dictionary<EmotionType, int>();
+        for (var i = 0; i < enemyEmotionTypes.Count && i < enemyBidAmounts.Count; i++)
+        {
+            result[(EmotionType)enemyEmotionTypes[i]] = enemyBidAmounts[i];
+        }
+        return result;
     }
 }

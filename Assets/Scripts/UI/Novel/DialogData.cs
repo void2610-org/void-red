@@ -13,8 +13,6 @@ public class DialogData
     [SerializeField] private string dialogText;
     [SerializeField] private string characterImageName;
 
-    private Dictionary<DialogParameterType, object> _parameters;
-
     /// <summary>
     /// 話者名
     /// </summary>
@@ -130,6 +128,8 @@ public class DialogData
     /// </summary>
     public bool HasGetCard => GetParameterValue<bool>(DialogParameterType.GetCard, false);
 
+    private Dictionary<DialogParameterType, object> _parameters;
+
     /// <summary>
     /// コンストラクタ（動的パラメータ対応版）
     /// </summary>
@@ -155,6 +155,20 @@ public class DialogData
     }
 
     /// <summary>
+    /// パラメータを設定する
+    /// </summary>
+    /// <param name="parameterType">パラメータタイプ</param>
+    /// <param name="value">設定する値</param>
+    public void SetParameter(DialogParameterType parameterType, object value) => _parameters[parameterType] = value;
+
+    /// <summary>
+    /// 特定のパラメータが設定されているかチェック
+    /// </summary>
+    /// <param name="parameterType">パラメータタイプ</param>
+    /// <returns>設定されている場合はtrue</returns>
+    public bool HasParameter(DialogParameterType parameterType) => _parameters.ContainsKey(parameterType);
+
+    /// <summary>
     /// パラメータ値を取得する
     /// </summary>
     /// <typeparam name="T">取得する値の型</typeparam>
@@ -175,18 +189,4 @@ public class DialogData
         }
         return defaultValue;
     }
-
-    /// <summary>
-    /// パラメータを設定する
-    /// </summary>
-    /// <param name="parameterType">パラメータタイプ</param>
-    /// <param name="value">設定する値</param>
-    public void SetParameter(DialogParameterType parameterType, object value) => _parameters[parameterType] = value;
-
-    /// <summary>
-    /// 特定のパラメータが設定されているかチェック
-    /// </summary>
-    /// <param name="parameterType">パラメータタイプ</param>
-    /// <returns>設定されている場合はtrue</returns>
-    public bool HasParameter(DialogParameterType parameterType) => _parameters.ContainsKey(parameterType);
 }

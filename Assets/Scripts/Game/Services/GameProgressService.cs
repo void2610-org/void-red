@@ -9,12 +9,12 @@ using UnityEngine;
 /// </summary>
 public class GameProgressService
 {
-    private readonly GameStateRepository _repository;
-
     /// <summary>
     /// データセーブ時のイベント
     /// </summary>
     public Observable<Unit> OnDataSaved => _repository.OnDataSaved;
+
+    private readonly GameStateRepository _repository;
 
     public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, AllThemeData allThemeData)
     {
@@ -30,6 +30,38 @@ public class GameProgressService
     public bool HasSaveData() => _repository.HasSaveData();
 
     /// <summary>
+    /// 現在のストーリーノードを取得
+    /// </summary>
+    public StoryNode GetCurrentNode() => _repository.StoryProgress.CurrentNode;
+
+    public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
+
+    /// <summary>
+    /// カード閲覧をリストで記録
+    /// </summary>
+    public void RecordCardViews(List<CardData> cardDataList) =>
+        cardDataList.ForEach(RecordCardView);
+
+    /// <summary>
+    /// 閲覧済みカードIDリストを取得
+    /// </summary>
+    public HashSet<string> GetViewedCardIds() =>
+        new HashSet<string>(_repository.PlayerProgress.ViewedCardIds);
+
+    /// <summary>
+    /// 特定のシナリオの選択結果を取得
+    /// </summary>
+    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) =>
+        _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
+
+    /// <summary>
+    /// 獲得済みテーマリストを取得
+    /// </summary>
+    /// <returns>獲得済みテーマのリスト</returns>
+    public IReadOnlyList<AcquiredTheme> GetAcquiredThemes() =>
+        _repository.MemoryProgress.AcquiredThemes;
+
+    /// <summary>
     /// 全データを初期状態にリセット（デバッグ用）
     /// </summary>
     public void ResetToDefaultData()
@@ -37,11 +69,6 @@ public class GameProgressService
         _repository.ResetAll();
         _repository.StoryProgress.CurrentNode = GetNextNode();
     }
-
-    /// <summary>
-    /// 現在のストーリーノードを取得
-    /// </summary>
-    public StoryNode GetCurrentNode() => _repository.StoryProgress.CurrentNode;
 
     /// <summary>
     /// 次に発生するストーリーノードを決定（結果辞書による分岐対応）
@@ -86,21 +113,6 @@ public class GameProgressService
         return nextNode;
     }
 
-    public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
-
-    /// <summary>
-    /// StoryNodeから対応するSceneTypeを取得
-    /// </summary>
-    private SceneType GetSceneTypeForNode(StoryNode node)
-    {
-        return node switch
-        {
-            BattleNode => SceneType.Battle,
-            NovelNode => SceneType.Novel,
-            _ => SceneType.Home
-        };
-    }
-
     /// <summary>
     /// 現在のバトル結果を記録
     /// </summary>
@@ -133,12 +145,6 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// カード閲覧をリストで記録
-    /// </summary>
-    public void RecordCardViews(List<CardData> cardDataList) =>
-        cardDataList.ForEach(RecordCardView);
-
-    /// <summary>
     /// カード閲覧を記録
     /// </summary>
     public void RecordCardView(CardData cardData)
@@ -146,25 +152,6 @@ public class GameProgressService
         if (!cardData || string.IsNullOrEmpty(cardData.CardId)) return;
         _repository.PlayerProgress.RecordCardView(cardData.CardId);
     }
-
-    /// <summary>
-    /// 閲覧済みカードIDリストを取得
-    /// </summary>
-    public HashSet<string> GetViewedCardIds() =>
-        new HashSet<string>(_repository.PlayerProgress.ViewedCardIds);
-
-    /// <summary>
-    /// 特定のシナリオの選択結果を取得
-    /// </summary>
-    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) =>
-        _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-
-    /// <summary>
-    /// 獲得済みテーマリストを取得
-    /// </summary>
-    /// <returns>獲得済みテーマのリスト</returns>
-    public IReadOnlyList<AcquiredTheme> GetAcquiredThemes() =>
-        _repository.MemoryProgress.AcquiredThemes;
 
     /// <summary>
     /// 獲得テーマを記録して保存
@@ -175,5 +162,18 @@ public class GameProgressService
         _repository.MemoryProgress.AddAcquiredTheme(theme);
         _repository.SaveAll();
         Debug.Log($"[GameProgressService] 獲得テーマを記録: {theme.ThemeName} ({theme.AcquiredCards.Count}枚, 感情: {theme.DominantEmotionResult})");
+    }
+
+    /// <summary>
+    /// StoryNodeから対応するSceneTypeを取得
+    /// </summary>
+    private SceneType GetSceneTypeForNode(StoryNode node)
+    {
+        return node switch
+        {
+            BattleNode => SceneType.Battle,
+            NovelNode => SceneType.Novel,
+            _ => SceneType.Home
+        };
     }
 }

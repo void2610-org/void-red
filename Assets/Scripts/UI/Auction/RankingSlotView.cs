@@ -30,17 +30,6 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
     private CanvasGroup _canvasGroup;
 
     /// <summary>
-    /// スロットにカードがドロップされた時の処理
-    /// </summary>
-    public void OnDrop(PointerEventData eventData)
-    {
-        var draggableCard = eventData.pointerDrag?.GetComponent<DraggableCardView>();
-        if (!draggableCard) return;
-
-        _onCardDropped.OnNext((this, draggableCard));
-    }
-
-    /// <summary>
     /// スロットにカードを配置
     /// </summary>
     public void PlaceCard(DraggableCardView card)
@@ -71,6 +60,17 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
         _fadeTween = highlight
             ? highlightImage.FadeIn(FADE_DURATION, Ease.OutQuad)
             : highlightImage.FadeOut(FADE_DURATION, Ease.OutQuad);
+    }
+
+    /// <summary>
+    /// スロットにカードがドロップされた時の処理
+    /// </summary>
+    public void OnDrop(PointerEventData eventData)
+    {
+        var draggableCard = eventData.pointerDrag?.GetComponent<DraggableCardView>();
+        if (!draggableCard) return;
+
+        _onCardDropped.OnNext((this, draggableCard));
     }
 
     private void Awake()

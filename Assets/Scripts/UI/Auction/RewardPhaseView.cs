@@ -14,6 +14,11 @@ public class RewardPhaseView : MonoBehaviour
     [SerializeField] private CardView cardPrefab;
     [SerializeField] private EmotionGaugeView[] emotionGauges;
 
+    /// <summary>
+    /// 報酬演出で各感情タイプに加算された量を取得
+    /// </summary>
+    public IReadOnlyDictionary<EmotionType, int> RewardedAmounts => _rewardedAmounts;
+
     private readonly Subject<Unit> _onNextButtonClicked = new();
     private readonly List<CardView> _instantiatedCards = new();
     private Dictionary<EmotionType, EmotionGaugeView> _gaugeDict = new();
@@ -21,11 +26,6 @@ public class RewardPhaseView : MonoBehaviour
     private Dictionary<EmotionType, int> _rewardedAmounts = new();
     private Dictionary<EmotionType, int> _maxResources = new();
     private EmotionType[] _emotionTypes;
-
-    /// <summary>
-    /// 報酬演出で各感情タイプに加算された量を取得
-    /// </summary>
-    public IReadOnlyDictionary<EmotionType, int> RewardedAmounts => _rewardedAmounts;
 
     public void Hide()
     {

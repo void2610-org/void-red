@@ -12,6 +12,13 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class DeckView : BaseWindowView
 {
+    private enum DeckDisplayMode
+    {
+        All,        // 全カード
+        Active,     // 使用可能カード
+        Collapsed   // 崩壊カード
+    }
+
     [Header("UIコンポーネント")]
     [SerializeField] private Transform contentContainer;
     [SerializeField] private DeckCardView cardPrefab;
@@ -36,13 +43,6 @@ public class DeckView : BaseWindowView
 
     // CardModelリストを保持
     private List<CardModel> _cardModels;
-
-    private enum DeckDisplayMode
-    {
-        All,        // 全カード
-        Active,     // 使用可能カード
-        Collapsed   // 崩壊カード
-    }
 
     public override void Show()
     {

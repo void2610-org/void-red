@@ -86,6 +86,25 @@ public static class DialogParameterTypeExtensions
     };
 
     /// <summary>
+    /// パラメータタイプのデフォルト値を取得
+    /// </summary>
+    /// <param name="parameterType">パラメータタイプ</param>
+    /// <returns>デフォルト値</returns>
+    public static object GetDefaultValue(this DialogParameterType parameterType) => parameterType switch
+    {
+        DialogParameterType.CharacterImageName => "",
+        DialogParameterType.BackgroundImageName => "",
+        DialogParameterType.SeClipName => "",
+        DialogParameterType.CustomCharSpeed => -1f,
+        DialogParameterType.AutoAdvance => -1f,
+        DialogParameterType.GetItem => null,
+        DialogParameterType.Choice => null,
+        DialogParameterType.CardChoice => null,
+        DialogParameterType.GetCard => false,
+        _ => ""
+    };
+
+    /// <summary>
     /// 文字列値を適切な型に変換
     /// </summary>
     /// <param name="parameterType">パラメータタイプ</param>
@@ -112,23 +131,4 @@ public static class DialogParameterTypeExtensions
             _ => valueString
         };
     }
-
-    /// <summary>
-    /// パラメータタイプのデフォルト値を取得
-    /// </summary>
-    /// <param name="parameterType">パラメータタイプ</param>
-    /// <returns>デフォルト値</returns>
-    public static object GetDefaultValue(this DialogParameterType parameterType) => parameterType switch
-    {
-        DialogParameterType.CharacterImageName => "",
-        DialogParameterType.BackgroundImageName => "",
-        DialogParameterType.SeClipName => "",
-        DialogParameterType.CustomCharSpeed => -1f,
-        DialogParameterType.AutoAdvance => -1f,
-        DialogParameterType.GetItem => null,
-        DialogParameterType.Choice => null,
-        DialogParameterType.CardChoice => null,
-        DialogParameterType.GetCard => false,
-        _ => ""
-    };
 }

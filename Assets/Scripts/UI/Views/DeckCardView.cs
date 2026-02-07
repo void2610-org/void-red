@@ -40,14 +40,6 @@ public class DeckCardView : BaseCardView
     public CardModel CardModel { get; private set; }
     public Observable<CardData> OnCardClicked => _onCardClicked;
 
-    // BaseCardView 抽象プロパティの実装
-    protected override Image CardImage => cardImage;
-    protected override TextMeshProUGUI CardNameText => cardNameText;
-    protected override Image CardFrame => cardFrame;
-    protected override UIEffect EdgeUIEffect => edgeUIEffect;
-    protected override Image GaugeImage => gaugeImage;
-    protected override CardData GetCardData() => CardModel?.Data;
-
     private readonly Subject<CardData> _onCardClicked = new();
 
     /// <summary>
@@ -60,6 +52,14 @@ public class DeckCardView : BaseCardView
         CardModel = cardModel;
         UpdateDisplay(displayState);
     }
+
+    // BaseCardView 抽象プロパティの実装
+    protected override Image CardImage => cardImage;
+    protected override TextMeshProUGUI CardNameText => cardNameText;
+    protected override Image CardFrame => cardFrame;
+    protected override UIEffect EdgeUIEffect => edgeUIEffect;
+    protected override Image GaugeImage => gaugeImage;
+    protected override CardData GetCardData() => CardModel?.Data;
 
     /// <summary>
     /// 表示を更新
@@ -90,17 +90,6 @@ public class DeckCardView : BaseCardView
         }
     }
 
-    private void Awake()
-    {
-        // カードボタンのクリックイベントを購読
-        if (cardButton)
-        {
-            cardButton.OnClickAsObservable()
-                .Subscribe(_ => OnCardButtonClicked())
-                .AddTo(this);
-        }
-    }
-
     /// <summary>
     /// カードボタンがクリックされた時の処理
     /// </summary>
@@ -109,6 +98,17 @@ public class DeckCardView : BaseCardView
         if (CardModel?.Data)
         {
             _onCardClicked.OnNext(CardModel.Data);
+        }
+    }
+
+    private void Awake()
+    {
+        // カードボタンのクリックイベントを購読
+        if (cardButton)
+        {
+            cardButton.OnClickAsObservable()
+                .Subscribe(_ => OnCardButtonClicked())
+                .AddTo(this);
         }
     }
 

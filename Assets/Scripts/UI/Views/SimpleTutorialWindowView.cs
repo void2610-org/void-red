@@ -16,6 +16,12 @@ public class SimpleTutorialWindowView : MonoBehaviour
     private TextProgressController _textProgressController;
 
     /// <summary>
+    /// クリック時の処理（キーボード入力でも使用）
+    /// </summary>
+    // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
+    public void OnClick() => _textProgressController.AdvanceToNext();
+
+    /// <summary>
     /// ナレーションを表示
     /// </summary>
     public async UniTask DisplayText(string message, float duration = 2f, bool autoAdvance = true)
@@ -77,12 +83,6 @@ public class SimpleTutorialWindowView : MonoBehaviour
             _canvasGroup.alpha = 0f;
         }
     }
-
-    /// <summary>
-    /// クリック時の処理（キーボード入力でも使用）
-    /// </summary>
-    // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
-    public void OnClick() => _textProgressController.AdvanceToNext();
 
     /// <summary>
     /// ナレーションを非表示にする

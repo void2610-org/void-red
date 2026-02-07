@@ -11,8 +11,9 @@ using Void2610.UnityTemplate;
 [RequireComponent(typeof(Image))]
 public class DialogBackgroundView : MonoBehaviour
 {
-    private Image _backgroundImage;
     [SerializeField] private float fadeDuration = 0.5f;
+
+    private Image _backgroundImage;
 
     /// <summary>
     /// 背景画像を設定（黒経由でフェード）

@@ -6,8 +6,6 @@ using System;
 /// </summary>
 public class InputActionsProvider : IDisposable
 {
-    private InputSystem_Actions _inputActions;
-
     /// <summary>
     /// Battle アクションマップへのアクセス
     /// </summary>
@@ -22,6 +20,8 @@ public class InputActionsProvider : IDisposable
     /// Novel アクションマップへのアクセス
     /// </summary>
     public InputSystem_Actions.NovelActions Novel => _inputActions.Novel;
+
+    private InputSystem_Actions _inputActions;
 
     public InputActionsProvider()
     {

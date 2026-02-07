@@ -14,6 +14,11 @@ using DelayType = Cysharp.Threading.Tasks.DelayType;
 /// </summary>
 public class SceneTransitionManager : IDisposable
 {
+    /// <summary>
+    /// 現在フェード中かどうか
+    /// </summary>
+    public bool IsFading { get; private set; }
+
     // フェード設定
     private const float DEFAULT_FADE_DURATION = 0.5f;
     private const float MAX_OPACITY = 1f;
@@ -27,11 +32,6 @@ public class SceneTransitionManager : IDisposable
     private readonly InputActionsProvider _inputActionsProvider;
 
     /// <summary>
-    /// 現在フェード中かどうか
-    /// </summary>
-    public bool IsFading { get; private set; }
-
-    /// <summary>
     /// コンストラクタでフェード用のUIを初期化
     /// </summary>
     public SceneTransitionManager(DiscordService discordService, InputActionsProvider inputActionsProvider)
@@ -39,45 +39,6 @@ public class SceneTransitionManager : IDisposable
         _discordService = discordService;
         _inputActionsProvider = inputActionsProvider;
         InitializeFadeCanvas();
-    }
-
-    /// <summary>
-    /// フェード用のCanvasとImageを作成・初期化
-    /// </summary>
-    private void InitializeFadeCanvas()
-    {
-        // フェード用Canvasの作成
-        _fadeCanvas = new GameObject("SceneTransitionCanvas");
-        UnityEngine.Object.DontDestroyOnLoad(_fadeCanvas);
-
-        // Canvas設定
-        var canvas = _fadeCanvas.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 9999; // 最前面に表示
-
-        var canvasScaler = _fadeCanvas.AddComponent<CanvasScaler>();
-        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        canvasScaler.referenceResolution = new Vector2(1920, 1080);
-
-        _fadeCanvas.AddComponent<GraphicRaycaster>();
-
-        // フェード用Image作成
-        var imageObject = new GameObject("FadeImage");
-        imageObject.tag = "IgnoreHoverSelection";
-        imageObject.transform.SetParent(_fadeCanvas.transform, false);
-
-        _fadeImage = imageObject.AddComponent<Image>();
-        _fadeImage.color = new Color(0, 0, 0, 0); // 初期状態は透明
-
-        // RectTransformを全画面サイズに設定
-        var rectTransform = imageObject.GetComponent<RectTransform>();
-        rectTransform.anchorMin = Vector2.zero;
-        rectTransform.anchorMax = Vector2.one;
-        rectTransform.sizeDelta = Vector2.zero;
-        rectTransform.anchoredPosition = Vector2.zero;
-
-        // 初期状態では非表示
-        _fadeCanvas.SetActive(false);
     }
 
     /// <summary>
@@ -133,6 +94,45 @@ public class SceneTransitionManager : IDisposable
         {
             IsFading = false;
         }
+    }
+
+    /// <summary>
+    /// フェード用のCanvasとImageを作成・初期化
+    /// </summary>
+    private void InitializeFadeCanvas()
+    {
+        // フェード用Canvasの作成
+        _fadeCanvas = new GameObject("SceneTransitionCanvas");
+        UnityEngine.Object.DontDestroyOnLoad(_fadeCanvas);
+
+        // Canvas設定
+        var canvas = _fadeCanvas.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 9999; // 最前面に表示
+
+        var canvasScaler = _fadeCanvas.AddComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1920, 1080);
+
+        _fadeCanvas.AddComponent<GraphicRaycaster>();
+
+        // フェード用Image作成
+        var imageObject = new GameObject("FadeImage");
+        imageObject.tag = "IgnoreHoverSelection";
+        imageObject.transform.SetParent(_fadeCanvas.transform, false);
+
+        _fadeImage = imageObject.AddComponent<Image>();
+        _fadeImage.color = new Color(0, 0, 0, 0); // 初期状態は透明
+
+        // RectTransformを全画面サイズに設定
+        var rectTransform = imageObject.GetComponent<RectTransform>();
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.sizeDelta = Vector2.zero;
+        rectTransform.anchoredPosition = Vector2.zero;
+
+        // 初期状態では非表示
+        _fadeCanvas.SetActive(false);
     }
 
     /// <summary>

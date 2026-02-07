@@ -6,9 +6,6 @@ using System.Collections.Generic;
 /// </summary>
 public class ValueRankingModel
 {
-    private readonly Dictionary<CardModel, int> _rankings = new();
-    private readonly int _maxRank;
-
     /// <summary>
     /// 全順位が設定済みか
     /// </summary>
@@ -19,6 +16,9 @@ public class ValueRankingModel
     /// </summary>
     public int Count => _rankings.Count;
 
+    private readonly Dictionary<CardModel, int> _rankings = new();
+    private readonly int _maxRank;
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -26,25 +26,6 @@ public class ValueRankingModel
     public ValueRankingModel(int maxRank = GameConstants.CARDS_PER_PLAYER)
     {
         _maxRank = maxRank;
-    }
-
-    /// <summary>
-    /// 順位を設定（重複チェック付き）
-    /// </summary>
-    /// <param name="card">対象カード</param>
-    /// <param name="rank">順位（1-maxRank）</param>
-    /// <returns>設定成功時true、順位が既に使用済みの場合false</returns>
-    public bool TrySetRanking(CardModel card, int rank)
-    {
-        if (rank < 1 || rank > _maxRank)
-            return false;
-
-        // 既に同じ順位が設定されているカードがあるかチェック
-        if (_rankings.ContainsValue(rank) && !_rankings.ContainsKey(card))
-            return false;
-
-        _rankings[card] = rank;
-        return true;
     }
 
     /// <summary>
@@ -72,4 +53,23 @@ public class ValueRankingModel
     /// 全ての順位設定をクリア
     /// </summary>
     public void Clear() => _rankings.Clear();
+
+    /// <summary>
+    /// 順位を設定（重複チェック付き）
+    /// </summary>
+    /// <param name="card">対象カード</param>
+    /// <param name="rank">順位（1-maxRank）</param>
+    /// <returns>設定成功時true、順位が既に使用済みの場合false</returns>
+    public bool TrySetRanking(CardModel card, int rank)
+    {
+        if (rank < 1 || rank > _maxRank)
+            return false;
+
+        // 既に同じ順位が設定されているカードがあるかチェック
+        if (_rankings.ContainsValue(rank) && !_rankings.ContainsKey(card))
+            return false;
+
+        _rankings[card] = rank;
+        return true;
+    }
 }

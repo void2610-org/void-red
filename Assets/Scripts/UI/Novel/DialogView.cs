@@ -33,6 +33,8 @@ public class DialogView : MonoBehaviour
     [SerializeField] private float defaultCharSpeed = 0.03f; // デフォルトの1文字表示間隔（秒）
     [SerializeField] private float autoNextDelay = 3f; // 自動で次へ進むまでの待機時間（秒）
 
+    public Observable<Unit> OnSkipRequested => _onSkipRequested;
+
     private bool _isTyping;
     private bool _isWaitingForNext;
     private bool _isAutoMode;
@@ -50,21 +52,6 @@ public class DialogView : MonoBehaviour
 
     // イベント
     private readonly Subject<Unit> _onSkipRequested = new();
-
-    public Observable<Unit> OnSkipRequested => _onSkipRequested;
-
-    private void Awake()
-    {
-        dialogText.text = "";
-
-        nextIndicator.SetActive(false);
-
-        autoButton.OnClickAsObservable().Subscribe(_ => ToggleAutoMode()).AddTo(this);
-        skipButton.OnClickAsObservable().Subscribe(_ => _onSkipRequested.OnNext(Unit.Default)).AddTo(this);
-
-        // オートボタンの初期色を設定
-        UpdateAutoButtonColor();
-    }
 
     /// <summary>
     /// 単一のダイアログを表示する
@@ -189,6 +176,55 @@ public class DialogView : MonoBehaviour
     }
 
     /// <summary>
+    /// クリック時の処理
+    /// </summary>
+    public void OnClick()
+    {
+        if (_isTyping)
+        {
+            // 文字送り中のクリックで即座に全文表示（フラグ管理はShowSingleDialogに委譲）
+            _typingCancellationTokenSource?.Cancel();
+            return;
+        }
+
+        if (!_isWaitingForNext) return;
+
+        // オートモード中のクリックはオートモードを解除
+        if (_isAutoMode)
+        {
+            _isAutoMode = false;
+            UpdateAutoButtonColor();
+            _waitCancellationTokenSource?.Cancel();
+            return;
+        }
+
+        // 通常モードのクリックで次へ進む
+        _isWaitingForNext = false;
+    }
+
+    /// <summary>
+    /// ダイアログパネルと立ち絵を表示/非表示
+    /// nextIndicatorは即時切り替え。
+    /// </summary>
+    public async UniTask SetDialogPanelVisible(bool visible)
+    {
+        CancelActiveMotions();
+        nextIndicator.SetActive(visible);
+
+        const float fadeDuration = 0.5f;
+        if (visible)
+        {
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic).AddTo(this);
+            await _panelFadeMotion.ToUniTask();
+        }
+        else
+        {
+            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic).AddTo(this);
+            await _panelFadeMotion.ToUniTask();
+        }
+    }
+
+    /// <summary>
     /// 話者名を設定する
     /// </summary>
     private void SetSpeakerName(string speakerName)
@@ -284,33 +320,6 @@ public class DialogView : MonoBehaviour
     }
 
     /// <summary>
-    /// クリック時の処理
-    /// </summary>
-    public void OnClick()
-    {
-        if (_isTyping)
-        {
-            // 文字送り中のクリックで即座に全文表示（フラグ管理はShowSingleDialogに委譲）
-            _typingCancellationTokenSource?.Cancel();
-            return;
-        }
-
-        if (!_isWaitingForNext) return;
-
-        // オートモード中のクリックはオートモードを解除
-        if (_isAutoMode)
-        {
-            _isAutoMode = false;
-            UpdateAutoButtonColor();
-            _waitCancellationTokenSource?.Cancel();
-            return;
-        }
-
-        // 通常モードのクリックで次へ進む
-        _isWaitingForNext = false;
-    }
-
-    /// <summary>
     /// 次へ進むインジケーターを表示
     /// </summary>
     private void ShowNextIndicator()
@@ -372,28 +381,6 @@ public class DialogView : MonoBehaviour
     }
 
     /// <summary>
-    /// ダイアログパネルと立ち絵を表示/非表示
-    /// nextIndicatorは即時切り替え。
-    /// </summary>
-    public async UniTask SetDialogPanelVisible(bool visible)
-    {
-        CancelActiveMotions();
-        nextIndicator.SetActive(visible);
-
-        const float fadeDuration = 0.5f;
-        if (visible)
-        {
-            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeIn(fadeDuration, Ease.InCubic).AddTo(this);
-            await _panelFadeMotion.ToUniTask();
-        }
-        else
-        {
-            _panelFadeMotion = dialogTextPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic).AddTo(this);
-            await _panelFadeMotion.ToUniTask();
-        }
-    }
-
-    /// <summary>
     /// アクティブなアニメーションを全てキャンセル
     /// </summary>
     private void CancelActiveMotions()
@@ -406,6 +393,19 @@ public class DialogView : MonoBehaviour
     private void UpdateAutoButtonColor()
     {
         autoButtonText.color = _isAutoMode ? autoButtonActiveColor : autoButtonNormalColor;
+    }
+
+    private void Awake()
+    {
+        dialogText.text = "";
+
+        nextIndicator.SetActive(false);
+
+        autoButton.OnClickAsObservable().Subscribe(_ => ToggleAutoMode()).AddTo(this);
+        skipButton.OnClickAsObservable().Subscribe(_ => _onSkipRequested.OnNext(Unit.Default)).AddTo(this);
+
+        // オートボタンの初期色を設定
+        UpdateAutoButtonColor();
     }
 
     private void OnDestroy()

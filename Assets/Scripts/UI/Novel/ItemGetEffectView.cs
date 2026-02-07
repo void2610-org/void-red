@@ -29,29 +29,11 @@ public class ItemGetEffectView : MonoBehaviour
     [SerializeField] private Vector3 itemImageEndScale = Vector3.one;
     [SerializeField] private Color backgroundOverlayColor = new Color(0f, 0f, 0f, 0.7f);
 
+    public bool IsShowing => effectPanelCanvasGroup.alpha > 0f;
+
     private readonly Subject<Unit> _clickSubject = new();
 
-    public bool IsShowing => effectPanelCanvasGroup.alpha > 0f;
     public void OnClick() => _clickSubject.OnNext(Unit.Default);
-
-    private void Awake()
-    {
-        effectPanelCanvasGroup.alpha = 0f;
-
-        backgroundOverlay.color = backgroundOverlayColor;
-        itemImageBackground.color = Color.clear;
-        itemImage.transform.localScale = itemImageStartScale;
-
-        // DeckCardViewの初期設定
-        deckCardView.transform.localScale = itemImageStartScale;
-        deckCardView.gameObject.SetActive(false);
-
-        itemNameText.text = "";
-        itemDescriptionText.text = "";
-
-        particle.Stop();
-        particle.Clear();
-    }
 
     /// <summary>
     /// アイテム取得演出を表示
@@ -178,6 +160,25 @@ public class ItemGetEffectView : MonoBehaviour
     private async UniTask PlayHideAnimation()
     {
         await effectPanelCanvasGroup.FadeOut(fadeDuration, Ease.InCubic);
+    }
+
+    private void Awake()
+    {
+        effectPanelCanvasGroup.alpha = 0f;
+
+        backgroundOverlay.color = backgroundOverlayColor;
+        itemImageBackground.color = Color.clear;
+        itemImage.transform.localScale = itemImageStartScale;
+
+        // DeckCardViewの初期設定
+        deckCardView.transform.localScale = itemImageStartScale;
+        deckCardView.gameObject.SetActive(false);
+
+        itemNameText.text = "";
+        itemDescriptionText.text = "";
+
+        particle.Stop();
+        particle.Clear();
     }
 
     private void OnDestroy()

@@ -17,14 +17,24 @@ public class DialoguePhaseView : MonoBehaviour
 
     private Sprite _enemyPortraitSprite;
 
+    public void HideChoices() => choicesView.Hide();
+
+    /// <summary>
+    /// 敵データで初期化する
+    /// </summary>
+    public void Initialize(EnemyData enemyData) => _enemyPortraitSprite = enemyData.DefaultSprite;
+
+    public UniTask HidePlayerDialogueAsync() => playerNarration.HideNarration();
+    public UniTask HideEnemyDialogueAsync() => enemyNarration.HideNarration();
+    public UniTask ShowResultAsync(string message) => playerNarration.DisplayNarration(message, autoAdvance: false);
+    public UniTask HideResultAsync() => playerNarration.HideNarration();
+
     public async UniTask SetupChoices(List<string> labels)
     {
         // 選択肢表示中はプレイヤー立ち絵
         await portraitView.ChangePortrait(playerPortraitSprite);
         choicesView.Setup(labels);
     }
-
-    public void HideChoices() => choicesView.Hide();
 
     public void Show()
     {
@@ -40,26 +50,17 @@ public class DialoguePhaseView : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// 敵データで初期化する
-    /// </summary>
-    public void Initialize(EnemyData enemyData) => _enemyPortraitSprite = enemyData.DefaultSprite;
-
     public async UniTask ShowPlayerDialogueAsync(string text)
     {
         await portraitView.ChangePortrait(playerPortraitSprite);
         await playerNarration.DisplayNarration(text, autoAdvance: false);
     }
-    public UniTask HidePlayerDialogueAsync() => playerNarration.HideNarration();
 
     public async UniTask ShowEnemyDialogueAsync(string text)
     {
         await portraitView.ChangePortrait(_enemyPortraitSprite);
         await enemyNarration.DisplayNarration(text, autoAdvance: false);
     }
-    public UniTask HideEnemyDialogueAsync() => enemyNarration.HideNarration();
-    public UniTask ShowResultAsync(string message) => playerNarration.DisplayNarration(message, autoAdvance: false);
-    public UniTask HideResultAsync() => playerNarration.HideNarration();
 
     public async UniTask HideAllAsync()
     {

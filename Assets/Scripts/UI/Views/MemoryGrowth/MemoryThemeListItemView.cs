@@ -14,12 +14,19 @@ public class MemoryThemeListItemView : MonoBehaviour
 
     public AcquiredTheme Theme { get; private set; }
 
-    private readonly Subject<Unit> _onClicked = new();
-
     /// <summary>
     /// クリックイベント
     /// </summary>
     public Observable<Unit> OnClicked => _onClicked;
+
+    private readonly Subject<Unit> _onClicked = new();
+
+    /// <summary>
+    /// 選択状態を設定
+    /// </summary>
+    /// <param name="isSelected">選択されているか</param>
+    // 選択状態に応じた視覚的フィードバック
+    public void SetSelected(bool isSelected) => themeText.fontStyle = isSelected ? FontStyles.Bold : FontStyles.Normal;
 
     /// <summary>
     /// アイテムを初期化
@@ -41,13 +48,6 @@ public class MemoryThemeListItemView : MonoBehaviour
         themeText.text = "???";
         button.interactable = false;
     }
-
-    /// <summary>
-    /// 選択状態を設定
-    /// </summary>
-    /// <param name="isSelected">選択されているか</param>
-    // 選択状態に応じた視覚的フィードバック
-    public void SetSelected(bool isSelected) => themeText.fontStyle = isSelected ? FontStyles.Bold : FontStyles.Normal;
 
     /// <summary>
     /// 表示を更新

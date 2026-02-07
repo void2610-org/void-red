@@ -19,6 +19,13 @@ public class AllEnemyData : ScriptableObject
     public int Count => enemyList.Count;
 
     /// <summary>
+    /// 敵IDで敵を取得
+    /// </summary>
+    /// <param name="enemyId">敵ID</param>
+    /// <returns>指定されたIDの敵データ</returns>
+    public EnemyData GetEnemyById(string enemyId) => enemyList.FirstOrDefault(enemy => enemy.EnemyId == enemyId);
+
+    /// <summary>
     /// 同じディレクトリ内の全ての敵データを自動的に登録
     /// </summary>
     public void RegisterAllEnemies()
@@ -38,11 +45,4 @@ public class AllEnemyData : ScriptableObject
         if (index < 0 || index >= enemyList.Count) return null;
         return enemyList[index];
     }
-
-    /// <summary>
-    /// 敵IDで敵を取得
-    /// </summary>
-    /// <param name="enemyId">敵ID</param>
-    /// <returns>指定されたIDの敵データ</returns>
-    public EnemyData GetEnemyById(string enemyId) => enemyList.FirstOrDefault(enemy => enemy.EnemyId == enemyId);
 }

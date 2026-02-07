@@ -10,12 +10,12 @@ public class SafeNavigationManager : ITickable
     private static bool _allowProgrammaticChange;
     private static EventSystem _eventSystem;
 
-    public static GameObject GetCurrentSelected() => _eventSystem?.currentSelectedGameObject;
-
     public SafeNavigationManager()
     {
         _eventSystem = EventSystem.current;
     }
+
+    public static GameObject GetCurrentSelected() => _eventSystem?.currentSelectedGameObject;
 
     public static void SetSelectedGameObjectSafe(GameObject go)
     {
@@ -45,22 +45,6 @@ public class SafeNavigationManager : ITickable
             }
             break;
         }
-    }
-
-    /// <summary>
-    /// ナビゲーション移動がCanvasGroupを跨いでいるかどうかをチェック
-    /// </summary>
-    private bool IsSameCanvasGroup(GameObject currentSelected, GameObject previousSelected)
-    {
-        var currentGroup = currentSelected.GetComponentInParent<CanvasGroup>();
-        var previousGroup = previousSelected.GetComponentInParent<CanvasGroup>();
-
-        if (currentGroup == null && previousGroup == null)
-        {
-            return true; // 両方ともCanvasGroupがない場合は同じとみなす
-        }
-
-        return currentGroup == previousGroup;
     }
 
     public void Tick()
@@ -105,5 +89,21 @@ public class SafeNavigationManager : ITickable
         }
 
         _allowProgrammaticChange = false;
+    }
+
+    /// <summary>
+    /// ナビゲーション移動がCanvasGroupを跨いでいるかどうかをチェック
+    /// </summary>
+    private bool IsSameCanvasGroup(GameObject currentSelected, GameObject previousSelected)
+    {
+        var currentGroup = currentSelected.GetComponentInParent<CanvasGroup>();
+        var previousGroup = previousSelected.GetComponentInParent<CanvasGroup>();
+
+        if (currentGroup == null && previousGroup == null)
+        {
+            return true; // 両方ともCanvasGroupがない場合は同じとみなす
+        }
+
+        return currentGroup == previousGroup;
     }
 }

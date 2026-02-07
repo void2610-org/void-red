@@ -64,6 +64,29 @@ public class SavedAcquiredTheme
         .ToList();
 
     /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public SavedAcquiredTheme(
+        string themeId,
+        IEnumerable<SavedCardAcquisitionInfo> cardInfoList,
+        Dictionary<EmotionType, int> usedEmotions)
+    {
+        this.themeId = themeId;
+        this.cardInfoList = new List<SavedCardAcquisitionInfo>(cardInfoList);
+
+        // 感情リソース使用量を保存
+        foreach (var kvp in usedEmotions)
+        {
+            usedEmotionTypes.Add((int)kvp.Key);
+            usedEmotionAmounts.Add(kvp.Value);
+        }
+
+        // 勝敗カウントを計算
+        wonCardCount = this.cardInfoList.Count(info => info.PlayerWon);
+        lostCardCount = this.cardInfoList.Count(info => !info.PlayerWon);
+    }
+
+    /// <summary>
     /// 使用した感情リソースを取得
     /// </summary>
     public Dictionary<EmotionType, int> GetUsedEmotions()
@@ -91,28 +114,5 @@ public class SavedAcquiredTheme
             }
         }
         return result;
-    }
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public SavedAcquiredTheme(
-        string themeId,
-        IEnumerable<SavedCardAcquisitionInfo> cardInfoList,
-        Dictionary<EmotionType, int> usedEmotions)
-    {
-        this.themeId = themeId;
-        this.cardInfoList = new List<SavedCardAcquisitionInfo>(cardInfoList);
-
-        // 感情リソース使用量を保存
-        foreach (var kvp in usedEmotions)
-        {
-            usedEmotionTypes.Add((int)kvp.Key);
-            usedEmotionAmounts.Add(kvp.Value);
-        }
-
-        // 勝敗カウントを計算
-        wonCardCount = this.cardInfoList.Count(info => info.PlayerWon);
-        lostCardCount = this.cardInfoList.Count(info => !info.PlayerWon);
     }
 }

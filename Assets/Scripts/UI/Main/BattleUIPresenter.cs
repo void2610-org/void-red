@@ -35,6 +35,41 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly EnemyFaceView _enemyFaceView;
     private BattlePresenter _battlePresenter;
 
+    public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
+    {
+        // 初期化
+        _themeView = Object.FindFirstObjectByType<ThemeView>();
+        _announcementView = Object.FindFirstObjectByType<AnnouncementView>();
+        _enemyView = Object.FindFirstObjectByType<EnemyView>();
+        _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
+        _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
+
+        // 複数のViewを取得して、プレイヤー用と敵用を区別
+        // Y座標が低い方をプレイヤー、高い方を敵とする
+        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
+        _playerNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
+        _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
+
+        _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
+        _valueRankingView.Hide();
+
+        _auctionView = Object.FindFirstObjectByType<AuctionView>();
+        _auctionView.Hide();
+
+        _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>();
+        _dialoguePhaseView.Hide();
+
+        _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
+        _rewardPhaseView.Hide();
+
+        _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
+
+        _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
+        _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
+
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
+    }
+
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
@@ -58,6 +93,29 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public UniTask ShowDialogueResultAsync(string message) => _dialoguePhaseView.ShowResultAsync(message);
     public UniTask HideDialogueResultAsync() => _dialoguePhaseView.HideResultAsync();
     public void ShowDialogueView() => _dialoguePhaseView.Show();
+    /// <summary>
+    /// 対話フェーズViewを敵データで初期化
+    /// </summary>
+    public void InitializeDialogueView(EnemyData enemyData) => _dialoguePhaseView.Initialize(enemyData);
+    // AuctionViewを表示（カードは再生成しない）
+    public void ShowAuctionView() => _auctionView.Show();
+    // 結果表示（AuctionResultフェーズ）
+    public void ShowAuctionResults(IReadOnlyList<AuctionJudge.AuctionResultEntry> results) => _auctionView.ShowResults(results);
+    // 順次結果表示（各カードごとにアニメーション付き）
+    public async UniTask ShowAuctionResultsSequentialAsync(
+        IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
+        ValueRankingModel playerRanking,
+        ValueRankingModel enemyRanking) =>
+        await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking);
+    // 入札対象カード公開演出
+    public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) =>
+        await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
+    // 全カードを再表示
+    public void ShowAllAuctionCards() => _auctionView.ShowAllCards();
+    // オークションView非表示
+    public void HideAuctionView() => _auctionView.Hide();
+    // 報酬フェーズを非表示
+    public void HideRewardView() => _rewardPhaseView.Hide();
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {
@@ -77,11 +135,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _enemyView.Initialize(enemyData);
     }
-
-    /// <summary>
-    /// 対話フェーズViewを敵データで初期化
-    /// </summary>
-    public void InitializeDialogueView(EnemyData enemyData) => _dialoguePhaseView.Initialize(enemyData);
 
     // 価値順位設定UIを表示し、完了を待機
     public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync(IReadOnlyList<CardModel> cards)
@@ -118,9 +171,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _auctionView.SetSelectedEmotion(EmotionType.Joy);
     }
 
-    // AuctionViewを表示（カードは再生成しない）
-    public void ShowAuctionView() => _auctionView.Show();
-
     // 入札待機（BiddingPhaseフェーズ）
     public async UniTask WaitForBiddingAsync(
         IReadOnlyList<CardModel> playerCards,
@@ -134,26 +184,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
         await _auctionView.OnBiddingComplete.FirstAsync();
     }
-
-    // 結果表示（AuctionResultフェーズ）
-    public void ShowAuctionResults(IReadOnlyList<AuctionJudge.AuctionResultEntry> results) => _auctionView.ShowResults(results);
-
-    // 順次結果表示（各カードごとにアニメーション付き）
-    public async UniTask ShowAuctionResultsSequentialAsync(
-        IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
-        ValueRankingModel playerRanking,
-        ValueRankingModel enemyRanking) =>
-        await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking);
-
-    // 入札対象カード公開演出
-    public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) =>
-        await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
-
-    // 全カードを再表示
-    public void ShowAllAuctionCards() => _auctionView.ShowAllCards();
-
-    // オークションView非表示
-    public void HideAuctionView() => _auctionView.Hide();
 
     // AuctionViewをクリアして非表示
     public void ClearAuctionView()
@@ -209,47 +239,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         return _rewardPhaseView.RewardedAmounts;
     }
 
-    // 報酬フェーズを非表示
-    public void HideRewardView() => _rewardPhaseView.Hide();
-
-    public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
-    {
-        // 初期化
-        _themeView = Object.FindFirstObjectByType<ThemeView>();
-        _announcementView = Object.FindFirstObjectByType<AnnouncementView>();
-        _enemyView = Object.FindFirstObjectByType<EnemyView>();
-        _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
-        _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
-
-        // 複数のViewを取得して、プレイヤー用と敵用を区別
-        // Y座標が低い方をプレイヤー、高い方を敵とする
-        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
-        _playerNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
-        _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
-
-        _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
-        _valueRankingView.Hide();
-
-        _auctionView = Object.FindFirstObjectByType<AuctionView>();
-        _auctionView.Hide();
-
-        _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>();
-        _dialoguePhaseView.Hide();
-
-        _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
-        _rewardPhaseView.Hide();
-
-        _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
-
-        _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
-        _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
-
-        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
-    }
-
-    // ルートボタンを初期選択
-    public void Start() => SafeNavigationManager.SelectRootForceSelectable().Forget();
-
     /// <summary>
     /// 記憶育成フェーズを表示
     /// </summary>
@@ -259,6 +248,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _memoryGrowthView.ShowMemoryGrowth(allThemes);
         await _memoryGrowthView.WaitForContinueAsync();
     }
+
+    // ルートボタンを初期選択
+    public void Start() => SafeNavigationManager.SelectRootForceSelectable().Forget();
 
     // すべてのViewのイベントを解除
     public void Dispose()

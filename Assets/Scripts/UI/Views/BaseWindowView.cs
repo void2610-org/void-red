@@ -16,35 +16,6 @@ public abstract class BaseWindowView : MonoBehaviour
     [Header("基本コンポーネント")]
     [SerializeField] protected Button closeButton;
 
-    private const float FADE_ANIMATION_DURATION = 0.15f;
-
-    protected readonly CompositeDisposable Disposables = new();
-
-    private CanvasGroup _canvasGroup;
-    private MotionHandle _currentFadeHandle;
-    private readonly Subject<Unit> _onClosed = new();
-    private bool _isInitialized;
-
-    private void EnsureInitialized()
-    {
-        if (_isInitialized) return;
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-        _isInitialized = true;
-    }
-
-    // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
-    private static readonly List<BaseWindowView> _activeWindows = new();
-
-    public static GameObject GetTopActiveWindowCloseButton()
-    {
-        if (_activeWindows.Count == 0) return null;
-        var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
-        return topWindow ? topWindow.GetPreferredNavigationTarget() : null;
-    }
-
     /// <summary>
     /// アクティブなウィンドウが存在するか
     /// </summary>
@@ -62,14 +33,17 @@ public abstract class BaseWindowView : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// このウィンドウが再アクティブになったときに選択すべきGameObject
-    /// デフォルトはcloseButton、継承先でオーバーライド可能
-    /// </summary>
-    protected virtual GameObject GetPreferredNavigationTarget()
-    {
-        return closeButton ? closeButton.gameObject : null;
-    }
+    private const float FADE_ANIMATION_DURATION = 0.15f;
+
+    // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
+    private static readonly List<BaseWindowView> _activeWindows = new();
+
+    protected readonly CompositeDisposable Disposables = new();
+
+    private CanvasGroup _canvasGroup;
+    private MotionHandle _currentFadeHandle;
+    private readonly Subject<Unit> _onClosed = new();
+    private bool _isInitialized;
 
     /// <summary>
     /// ウィンドウを表示
@@ -82,6 +56,18 @@ public abstract class BaseWindowView : MonoBehaviour
     public virtual void Hide() => HideWithAnimation().Forget();
 
     /// <summary>
+    /// ウィンドウが閉じられるまで待機
+    /// </summary>
+    public async UniTask WaitForClose() => await _onClosed.FirstAsync();
+
+    public static GameObject GetTopActiveWindowCloseButton()
+    {
+        if (_activeWindows.Count == 0) return null;
+        var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
+        return topWindow ? topWindow.GetPreferredNavigationTarget() : null;
+    }
+
+    /// <summary>
     /// ウィンドウの表示/非表示を切り替え
     /// </summary>
     public void Toggle()
@@ -91,9 +77,23 @@ public abstract class BaseWindowView : MonoBehaviour
     }
 
     /// <summary>
-    /// ウィンドウが閉じられるまで待機
+    /// このウィンドウが再アクティブになったときに選択すべきGameObject
+    /// デフォルトはcloseButton、継承先でオーバーライド可能
     /// </summary>
-    public async UniTask WaitForClose() => await _onClosed.FirstAsync();
+    protected virtual GameObject GetPreferredNavigationTarget()
+    {
+        return closeButton ? closeButton.gameObject : null;
+    }
+
+    private void EnsureInitialized()
+    {
+        if (_isInitialized) return;
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.alpha = 0f;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
+        _isInitialized = true;
+    }
 
     private async UniTaskVoid ShowWithAnimation()
     {

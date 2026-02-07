@@ -17,6 +17,12 @@ public class SaveDataManager
     }
 
     /// <summary>
+    /// セーブファイルが存在するかチェック
+    /// </summary>
+    /// <returns>セーブファイルの存在有無</returns>
+    public bool SaveFileExists() => DataPersistence.DataExists(SAVE_DATA_KEY);
+
+    /// <summary>
     /// GameSaveDataをファイルに保存
     /// </summary>
     /// <param name="saveData">保存するデータ</param>
@@ -80,12 +86,6 @@ public class SaveDataManager
             return newSaveData;
         }
     }
-
-    /// <summary>
-    /// セーブファイルが存在するかチェック
-    /// </summary>
-    /// <returns>セーブファイルの存在有無</returns>
-    public bool SaveFileExists() => DataPersistence.DataExists(SAVE_DATA_KEY);
 
     /// <summary>
     /// セーブファイルを削除（デバッグ用）

@@ -56,51 +56,6 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
         base.Hide();
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if (_cardViews.Count == 0) return;
-
-        // スナップ中ならキャンセル
-        _snapMotionHandle.TryCancel();
-        _isInertiaActive = false;
-        _angularVelocity = 0f;
-
-        _dragStartAngleOffset = _currentAngleOffset;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _containerRectTransform, eventData.position,
-            eventData.pressEventCamera, out _dragStartLocalPoint);
-        _previousLocalPoint = _dragStartLocalPoint;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (_cardViews.Count == 0) return;
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _containerRectTransform, eventData.position,
-                eventData.pressEventCamera, out var currentLocalPoint)) return;
-
-        // 水平移動量を角度に変換
-        var deltaX = currentLocalPoint.x - _dragStartLocalPoint.x;
-        var angleDelta = (deltaX / radiusX) * Mathf.PI * dragSensitivity;
-
-        _currentAngleOffset = _dragStartAngleOffset + angleDelta;
-        UpdateCardPositions();
-
-        // 角速度を計算（慣性用）
-        var frameDeltaX = currentLocalPoint.x - _previousLocalPoint.x;
-        if (Time.unscaledDeltaTime > 0f)
-        {
-            _angularVelocity = (frameDeltaX / radiusX) * Mathf.PI * dragSensitivity / Time.unscaledDeltaTime;
-        }
-        _previousLocalPoint = currentLocalPoint;
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (_cardViews.Count == 0) return;
-        _isInertiaActive = true;
-    }
-
     /// <summary>
     /// カードを円形に配置して表示
     /// </summary>
@@ -234,6 +189,51 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
     {
         base.Awake();
         _containerRectTransform = cardContainer as RectTransform;
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (_cardViews.Count == 0) return;
+
+        // スナップ中ならキャンセル
+        _snapMotionHandle.TryCancel();
+        _isInertiaActive = false;
+        _angularVelocity = 0f;
+
+        _dragStartAngleOffset = _currentAngleOffset;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _containerRectTransform, eventData.position,
+            eventData.pressEventCamera, out _dragStartLocalPoint);
+        _previousLocalPoint = _dragStartLocalPoint;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (_cardViews.Count == 0) return;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _containerRectTransform, eventData.position,
+                eventData.pressEventCamera, out var currentLocalPoint)) return;
+
+        // 水平移動量を角度に変換
+        var deltaX = currentLocalPoint.x - _dragStartLocalPoint.x;
+        var angleDelta = (deltaX / radiusX) * Mathf.PI * dragSensitivity;
+
+        _currentAngleOffset = _dragStartAngleOffset + angleDelta;
+        UpdateCardPositions();
+
+        // 角速度を計算（慣性用）
+        var frameDeltaX = currentLocalPoint.x - _previousLocalPoint.x;
+        if (Time.unscaledDeltaTime > 0f)
+        {
+            _angularVelocity = (frameDeltaX / radiusX) * Mathf.PI * dragSensitivity / Time.unscaledDeltaTime;
+        }
+        _previousLocalPoint = currentLocalPoint;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (_cardViews.Count == 0) return;
+        _isInertiaActive = true;
     }
 
     private void Update()

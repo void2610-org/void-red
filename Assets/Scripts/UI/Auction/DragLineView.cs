@@ -18,6 +18,8 @@ namespace Auction
         private Vector3 _startWorldPos;
         private Vector2[] _points;
 
+        public void Hide() => lineRenderer.gameObject.SetActive(false);
+
         public void Initialize(Canvas canvas)
         {
             _canvas = canvas;
@@ -54,8 +56,6 @@ namespace Auction
 
             lineRenderer.SetPositions(_points);
         }
-
-        public void Hide() => lineRenderer.gameObject.SetActive(false);
 
         private Vector2 WorldToLocalPoint(Vector3 worldPos)
         {
