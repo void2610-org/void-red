@@ -386,6 +386,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HelpView
       objectReference: {fileID: 0}
+    - target: {fileID: 3899471781622959422, guid: a84becd9d991049b49820812f776f948, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6733839795666888246, guid: a84becd9d991049b49820812f776f948, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1218,6 +1222,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 515078507906374864, guid: a223455677416467b962bcb76dc34e82, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2345645635233192588, guid: a223455677416467b962bcb76dc34e82, type: 3}
       propertyPath: m_Name
       value: CardDetailView
@@ -1505,8 +1513,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -210, y: -175}
-  m_SizeDelta: {x: 740, y: 1400}
+  m_AnchoredPosition: {x: -210, y: -275}
+  m_SizeDelta: {x: 1049, y: 2048}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1105445639
 MonoBehaviour:
@@ -2252,6 +2260,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 1528704412222517414, guid: 145c8ebe97ab04f52b221ec961b1dc25, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4939305253589568464, guid: 145c8ebe97ab04f52b221ec961b1dc25, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2895,6 +2907,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardLibraryView
       objectReference: {fileID: 0}
+    - target: {fileID: 8494103153874636217, guid: 8d023df5fdb7e4b0cb851cf977fbcaa4, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2908,6 +2924,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 7491934983972129885, guid: dd78bc20ce1354020b49c7177d3b14f3, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8609056279436902593, guid: dd78bc20ce1354020b49c7177d3b14f3, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
