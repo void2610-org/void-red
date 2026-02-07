@@ -13,7 +13,7 @@ public class CardData : ScriptableObject
 
     [Header("記憶情報")]
     [SerializeField] private MemoryType memoryType;
-    [SerializeField, Range(0, 20)] private int effectAmount;
+    [SerializeField, Range(0, GameConstants.MAX_GAUGE_VALUE)] private int effectAmount;
 
     public string CardId => name;
     public string CardName => cardName;

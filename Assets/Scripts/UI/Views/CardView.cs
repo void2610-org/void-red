@@ -19,6 +19,7 @@ public class CardView : BaseCardView
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
     [SerializeField] private UIEffect edgeUIEffect;
+    [SerializeField] private Image gaugeImage;
 
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked { get; private set; }
@@ -28,6 +29,7 @@ public class CardView : BaseCardView
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardFrame => cardFrame;
     protected override UIEffect EdgeUIEffect => edgeUIEffect;
+    protected override Image GaugeImage => gaugeImage;
     protected override CardData GetCardData() => CardData;
     private Vector2 _originalPosition;
     private RectTransform _rectTransform;
@@ -46,6 +48,7 @@ public class CardView : BaseCardView
     {
         CardData = cardData;
         _originalPosition = _rectTransform.anchoredPosition;
+        UpdateCardDisplay(_displayState);
     }
 
     /// <summary>

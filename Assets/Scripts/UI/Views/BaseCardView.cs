@@ -14,9 +14,25 @@ public abstract class BaseCardView : MonoBehaviour
     protected abstract TextMeshProUGUI CardNameText { get; }
     protected abstract Image CardFrame { get; }
     protected abstract UIEffect EdgeUIEffect { get; }
+    protected abstract Image GaugeImage { get; }
 
     // CardData取得メソッド（各サブクラスで実装）
     protected abstract CardData GetCardData();
+
+    /// <summary>
+    /// ゲージの表示を更新
+    /// </summary>
+    private void UpdateGaugeDisplay(CardData cardData, CardDisplayState displayState)
+    {
+        if (displayState == CardDisplayState.Backside)
+        {
+            GaugeImage.color = Color.clear;
+            return;
+        }
+
+        GaugeImage.color = cardData.MemoryType.ToGaugeColor();
+        GaugeImage.fillAmount = (float)cardData.EffectAmount / GameConstants.MAX_GAUGE_VALUE;
+    }
 
     /// <summary>
     /// カードの基本表示を更新（画像、名前、バナー、フレーム）
@@ -31,13 +47,13 @@ public abstract class BaseCardView : MonoBehaviour
         CardImage.sprite = cardData.CardImage;
         CardNameText.text = cardData.CardName;
 
+        UpdateGaugeDisplay(cardData, displayState);
+
         switch (displayState)
         {
             case CardDisplayState.Normal:
                 // 通常表示
                 CardImage.color = cardData.CardImage ? Color.white : Color.clear;
-                CardFrame.color = cardData.Color;
-                CardNameText.color = cardData.IsTextColorBlack ? Color.black : Color.white;
                 break;
 
             case CardDisplayState.Veiled:
@@ -52,7 +68,6 @@ public abstract class BaseCardView : MonoBehaviour
                 // 崩壊表示：グレーアウト, UIEffectを有効化
                 CardImage.color = cardData.CardImage ? new Color(0.5f, 0.5f, 0.5f, 0.7f) : Color.clear;
                 CardFrame.color = new Color(0.5f, 0.5f, 0.5f, 0.7f);
-                CardNameText.color = cardData.IsTextColorBlack ? new Color(0.2f, 0.2f, 0.2f, 1f) : new Color(0.7f, 0.7f, 0.7f, 1f);
                 break;
 
             case CardDisplayState.Backside:
