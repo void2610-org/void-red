@@ -9,15 +9,15 @@ public class CardData : ScriptableObject
     [Header("基本情報")]
     [SerializeField] private string cardId;
     [SerializeField] private string cardName;
-    [SerializeField] private CardAttribute attribute;
     [SerializeField] private Sprite image;
-    [SerializeField] private Color color = Color.white;
-    [SerializeField] private bool isTextColorBlack = false;
+
+    [Header("記憶情報")]
+    [SerializeField] private MemoryType memoryType;
+    [SerializeField, Range(0, 20)] private int effectAmount;
 
     public string CardId => cardId;
     public string CardName => cardName;
-    public CardAttribute Attribute => attribute;
     public Sprite CardImage => image;
-    public Color Color => color;
-    public bool IsTextColorBlack => isTextColorBlack;
+    public MemoryType MemoryType => memoryType;
+    public int EffectAmount => effectAmount;
 }

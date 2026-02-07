@@ -45,7 +45,5 @@ public class CardDetailView : BaseWindowView
         var cardModel = new CardModel(cardData);
         cardView.Initialize(cardModel);
 
-        // 詳細情報を更新
-        attributeText.text = $"属性: {cardData.Attribute.ToJapaneseName()}";
     }
 }
