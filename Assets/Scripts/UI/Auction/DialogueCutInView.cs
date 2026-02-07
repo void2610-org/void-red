@@ -25,6 +25,7 @@ public class DialogueCutInView : MonoBehaviour
     [SerializeField] private float displayDuration = 1.5f;
     [SerializeField] private float exitDuration = 0.3f;
     [SerializeField] private float slideOffset = 1200f;
+    [SerializeField] private float intervalDuration = 0.3f;
 
     private CanvasGroup _canvasGroup;
     private RectTransform _rectTransform;
@@ -61,6 +62,9 @@ public class DialogueCutInView : MonoBehaviour
         _canvasGroup.alpha = 0f;
 
         _rectTransform.anchoredPosition = new Vector2(_initialX, _rectTransform.anchoredPosition.y);
+
+        // 次のカットインとの間隔
+        await UniTask.Delay((int)(intervalDuration * 1000));
     }
 
     private void Awake()
