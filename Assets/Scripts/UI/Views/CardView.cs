@@ -13,6 +13,10 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class CardView : BaseCardView
 {
+    private static readonly int _alpha = Shader.PropertyToID("_Alpha");
+    private static readonly int _value = Shader.PropertyToID("_Value");
+    private static readonly int _color2 = Shader.PropertyToID("_Color2");
+
     public enum CardBidState
     {
         None,       // 入札なし
@@ -38,7 +42,6 @@ public class CardView : BaseCardView
     protected override Image CardFrame => cardFrame;
     protected override Image GaugeImage => gaugeImage;
 
-    private Vector2 _originalPosition;
     private RectTransform _rectTransform;
     private CardDisplayState _displayState = CardDisplayState.Normal;
     // Tween管理用
@@ -54,7 +57,6 @@ public class CardView : BaseCardView
     public void Initialize(CardData cardData)
     {
         CardData = cardData;
-        _originalPosition = _rectTransform.anchoredPosition;
         UpdateCardDisplay(_displayState);
     }
 
@@ -65,32 +67,6 @@ public class CardView : BaseCardView
     {
         _rectTransform.ScaleTo(highlight ? Vector3.one * 1.1f : Vector3.one, 0.1f);
         if (highlight) SeManager.Instance.PlaySe("CardSelect");
-    }
-
-    /// <summary>
-    /// プレイヤー側（画面下）へ移動するアニメーション
-    /// </summary>
-    public async UniTask PlayMoveToPlayerSideAsync(float duration = 0.5f)
-    {
-        var startY = _rectTransform.anchoredPosition.y;
-        var targetY = startY - 500f;
-        await LMotion.Create(startY, targetY, duration)
-            .WithEase(Ease.OutCubic)
-            .Bind(y => _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, y))
-            .ToUniTask();
-    }
-
-    /// <summary>
-    /// 敵側（画面上）へ移動するアニメーション
-    /// </summary>
-    public async UniTask PlayMoveToEnemySideAsync(float duration = 0.5f)
-    {
-        var startY = _rectTransform.anchoredPosition.y;
-        var targetY = startY + 500f;
-        await LMotion.Create(startY, targetY, duration)
-            .WithEase(Ease.OutCubic)
-            .Bind(y => _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, y))
-            .ToUniTask();
     }
 
     /// <summary>
@@ -112,22 +88,19 @@ public class CardView : BaseCardView
     
     public void SetGrowEffect(CardBidState state, Color enemyColor)
     {
-        _instancedGrowMaterial.SetFloat("_Alpha", 0f);
+        _instancedGrowMaterial.SetFloat(_alpha, state != CardBidState.None ? 0.4f : 0f);
         switch (state)
         {
             case CardBidState.PlayerBid:
-                _instancedGrowMaterial.SetFloat("_Value", 0f);
-                CardImage.material = _instancedGrowMaterial;
+                _instancedGrowMaterial.SetFloat(_value, 1f);
                 break;
             case CardBidState.EnemyBid:
-                _instancedGrowMaterial.SetColor("_Color2", enemyColor);
-                _instancedGrowMaterial.SetFloat("_Value", 1f);
-                CardImage.material = _instancedGrowMaterial;
+                _instancedGrowMaterial.SetColor(_color2, enemyColor);
+                _instancedGrowMaterial.SetFloat(_value, 0f);
                 break;
             case CardBidState.DrawBid:
-                _instancedGrowMaterial.SetColor("_Color2", enemyColor);
-                _instancedGrowMaterial.SetFloat("_Value", 0.5f);
-                CardImage.material = _instancedGrowMaterial;
+                _instancedGrowMaterial.SetColor(_color2, enemyColor);
+                _instancedGrowMaterial.SetFloat(_value, 0.5f);
                 break;
         }
     }
@@ -138,6 +111,7 @@ public class CardView : BaseCardView
     {
         _rectTransform = GetComponent<RectTransform>();
         _instancedGrowMaterial = Instantiate(growImage.material);
+        growImage.material = _instancedGrowMaterial;
 
         // R3のOnClickAsObservableでボタンクリックを購読し、CardView自身を発行
         OnClicked = cardButton.OnClickAsObservable().Select(_ => this);
@@ -149,5 +123,4 @@ public class CardView : BaseCardView
         _edgeColorTween.TryCancel();
         _backTransitionTween.TryCancel();
     }
-
 }

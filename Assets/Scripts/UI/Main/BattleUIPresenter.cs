@@ -98,8 +98,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowAuctionResultsSequentialAsync(
         IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
         ValueRankingModel playerRanking,
-        ValueRankingModel enemyRanking) =>
-        await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking);
+        ValueRankingModel enemyRanking,
+        Color enemyColor) =>
+        await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking, enemyColor);
     // 入札対象カード公開演出
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) =>
         await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);

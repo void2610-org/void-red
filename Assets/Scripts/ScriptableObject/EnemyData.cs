@@ -12,6 +12,8 @@ public class EnemyData : ScriptableObject
     [SerializeField] private string enemyId;
     [SerializeField] private string enemyName;
 
+    [SerializeField] private Color enemyColor = Color.red;
+
     [Header("敵画像")]
     [SerializeField] private Sprite defaultSprite;
     [SerializeField] private Sprite cutInSprite;
@@ -23,6 +25,7 @@ public class EnemyData : ScriptableObject
 
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
+    public Color EnemyColor => enemyColor;
     public Sprite DefaultSprite => defaultSprite;
     public Sprite CutInSprite => cutInSprite;
     public Sprite IconSprite => iconSprite;

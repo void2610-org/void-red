@@ -371,7 +371,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log($"[BattlePresenter] 落札結果: プレイヤー{_player.WonCards.Count}枚、敵{_enemy.WonCards.Count}枚");
 
         // 順次演出で結果を表示（価値順位も公開）
-        await _battleUIPresenter.ShowAuctionResultsSequentialAsync(results, _player.ValueRanking, _enemy.ValueRanking);
+        await _battleUIPresenter.ShowAuctionResultsSequentialAsync(results, _player.ValueRanking, _enemy.ValueRanking, _currentEnemyData.EnemyColor);
 
         await UniTask.Delay(1000);
         // オークション完全終了時にクリア
