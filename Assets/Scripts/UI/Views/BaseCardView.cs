@@ -19,6 +19,9 @@ public abstract class BaseCardView : MonoBehaviour
     // CardData取得メソッド（各サブクラスで実装）
     protected abstract CardData GetCardData();
 
+    private TMProArchedText _archedText;
+    private bool _archedTextCached;
+
     /// <summary>
     /// ゲージの表示を更新
     /// </summary>
@@ -46,6 +49,13 @@ public abstract class BaseCardView : MonoBehaviour
         // カード画像と名前を設定
         CardImage.sprite = cardData.CardImage;
         CardNameText.text = cardData.CardName;
+
+        if (!_archedTextCached)
+        {
+            _archedText = CardNameText.GetComponent<TMProArchedText>();
+            _archedTextCached = true;
+        }
+        if (_archedText) _archedText.ForceUpdate();
 
         UpdateGaugeDisplay(cardData, displayState);
 
