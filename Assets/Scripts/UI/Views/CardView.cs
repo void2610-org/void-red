@@ -13,13 +13,21 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class CardView : BaseCardView
 {
+    public enum CardBidState
+    {
+        None,       // 入札なし
+        PlayerBid, // プレイヤーが入札
+        EnemyBid,   // 敵が入札
+        DrawBid    // 引き分け入札
+    }
+    
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
     [SerializeField] private Image cardFrame;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
-    [SerializeField] private UIEffect edgeUIEffect;
     [SerializeField] private Image gaugeImage;
+    [SerializeField] private Image growImage;
 
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked { get; private set; }
@@ -28,7 +36,6 @@ public class CardView : BaseCardView
     protected override Image CardImage => cardImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardFrame => cardFrame;
-    protected override UIEffect EdgeUIEffect => edgeUIEffect;
     protected override Image GaugeImage => gaugeImage;
 
     private Vector2 _originalPosition;
@@ -37,6 +44,7 @@ public class CardView : BaseCardView
     // Tween管理用
     private MotionHandle _backTransitionTween;
     private MotionHandle _edgeColorTween;
+    private Material _instancedGrowMaterial;
 
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
 
@@ -101,12 +109,35 @@ public class CardView : BaseCardView
             .Bind(alpha => canvasGroup.alpha = alpha)
             .ToUniTask();
     }
+    
+    public void SetGrowEffect(CardBidState state, Color enemyColor)
+    {
+        _instancedGrowMaterial.SetFloat("_Alpha", 0f);
+        switch (state)
+        {
+            case CardBidState.PlayerBid:
+                _instancedGrowMaterial.SetFloat("_Value", 0f);
+                CardImage.material = _instancedGrowMaterial;
+                break;
+            case CardBidState.EnemyBid:
+                _instancedGrowMaterial.SetColor("_Color2", enemyColor);
+                _instancedGrowMaterial.SetFloat("_Value", 1f);
+                CardImage.material = _instancedGrowMaterial;
+                break;
+            case CardBidState.DrawBid:
+                _instancedGrowMaterial.SetColor("_Color2", enemyColor);
+                _instancedGrowMaterial.SetFloat("_Value", 0.5f);
+                CardImage.material = _instancedGrowMaterial;
+                break;
+        }
+    }
 
     protected override CardData GetCardData() => CardData;
 
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
+        _instancedGrowMaterial = Instantiate(growImage.material);
 
         // R3のOnClickAsObservableでボタンクリックを購読し、CardView自身を発行
         OnClicked = cardButton.OnClickAsObservable().Select(_ => this);

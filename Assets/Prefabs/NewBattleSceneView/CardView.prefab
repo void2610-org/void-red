@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 769330347978762152}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.086, y: 0.086, z: 0.086}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2076843184319234}
@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 935, y: 336}
+  m_SizeDelta: {x: 2048, y: 2048}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8752859073934885011
 CanvasRenderer:
@@ -564,7 +564,7 @@ RectTransform:
   m_GameObject: {fileID: 7160041557901845528}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.086, y: 0.086, z: 0.086}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2076843184319234}
@@ -572,7 +572,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 935, y: 336}
+  m_SizeDelta: {x: 2048, y: 2048}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8650692043123005
 CanvasRenderer:
@@ -602,12 +602,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9212a9151b06c4b01b3af91b3d9e4f63, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f519f02d001db4ec7bdd82591a57b46b, type: 3}
   m_Type: 3
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 3
-  m_FillAmount: 0.402
+  m_FillAmount: 0.218
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -952,8 +952,8 @@ MonoBehaviour:
   cardFrame: {fileID: 7303585836931223984}
   cardNameText: {fileID: 2523552460966807409}
   cardButton: {fileID: 4779874160718359984}
-  edgeUIEffect: {fileID: 583448122867867901}
   gaugeImage: {fileID: 7290151873224534544}
+  growImage: {fileID: 7854775870858053053}
 --- !u!114 &1349791090358352898
 MonoBehaviour:
   m_ObjectHideFlags: 0

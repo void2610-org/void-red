@@ -28,8 +28,6 @@ public class DeckCardView : BaseCardView
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image cardTextBanner;
     [SerializeField] private Image cardFrame;
-    [SerializeField] private UIEffect backUIEffect;
-    [SerializeField] private UIEffect edgeUIEffect;
     [SerializeField] private Image gaugeImage;
 
     [Header("色設定")]
@@ -57,7 +55,6 @@ public class DeckCardView : BaseCardView
     protected override Image CardImage => cardImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardFrame => cardFrame;
-    protected override UIEffect EdgeUIEffect => edgeUIEffect;
     protected override Image GaugeImage => gaugeImage;
     protected override CardData GetCardData() => CardModel?.Data;
 
