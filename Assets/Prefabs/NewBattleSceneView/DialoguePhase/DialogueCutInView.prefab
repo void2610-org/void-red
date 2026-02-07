@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6246378470798386398}
   - component: {fileID: 6184211166435321077}
   m_Layer: 5
-  m_Name: CutIn
+  m_Name: CutInImage
   m_TagString: IgnoreHoverSelection
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -237,6 +237,7 @@ GameObject:
   m_Component:
   - component: {fileID: 545032329588202734}
   - component: {fileID: 8797511044503666886}
+  - component: {fileID: 5590112734727461070}
   m_Layer: 5
   m_Name: DialogueCutInView
   m_TagString: Untagged
@@ -274,6 +275,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6275267270233696108}
   m_CullTransparentMesh: 1
+--- !u!114 &5590112734727461070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6275267270233696108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68870deb68e6d4dc981d46223bf01b16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  standingImage: {fileID: 4871559575547990997}
+  cutInImage: {fileID: 6184211166435321077}
+  dialogueText: {fileID: 8783053521306992567}
+  playerStandingSprite: {fileID: 21300000, guid: 8b66d9934a13f45d1b8a027e4baabee7, type: 3}
+  playerCutInSprite: {fileID: 21300000, guid: 106f6612eeafc4a2d91e0bd5ec70e163, type: 3}
+  slideDuration: 0.4
+  staggerDelay: 0.05
+  displayDuration: 1.5
+  exitDuration: 0.3
+  slideOffset: 1200
 --- !u!1 &8441047961661868296
 GameObject:
   m_ObjectHideFlags: 0
@@ -286,7 +309,7 @@ GameObject:
   - component: {fileID: 4958213842762330336}
   - component: {fileID: 4871559575547990997}
   m_Layer: 5
-  m_Name: Portrait
+  m_Name: PortraitImage
   m_TagString: IgnoreHoverSelection
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

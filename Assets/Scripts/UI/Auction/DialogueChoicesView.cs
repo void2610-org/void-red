@@ -88,7 +88,7 @@ public class DialogueChoicesView : MonoBehaviour
 
             // ディレイ付きでスライド+フェードイン
             var moveHandle = LMotion.Create(startPos, originalPos, animDuration)
-                .WithEase(Ease.OutCubic)
+                .WithEase(Ease.OutBack)
                 .WithDelay(delay)
                 .BindToAnchoredPosition(rect)
                 .AddTo(rect.gameObject);
