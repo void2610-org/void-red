@@ -15,6 +15,7 @@ public class DialogueCutInView : MonoBehaviour
     [SerializeField] private Image standingImage;
     [SerializeField] private Image cutInImage;
     [SerializeField] private TextMeshProUGUI dialogueText;
+    [SerializeField] private RectTransform rectTransform;
 
     [Header("プレイヤーカットイン画像")]
     [SerializeField] private Sprite playerStandingSprite;
@@ -28,7 +29,6 @@ public class DialogueCutInView : MonoBehaviour
     [SerializeField] private float intervalDuration = 0.3f;
 
     private CanvasGroup _canvasGroup;
-    private RectTransform _rectTransform;
     private float _initialX;
     private MotionHandle _slideHandle;
 
@@ -46,22 +46,22 @@ public class DialogueCutInView : MonoBehaviour
 
         standingImage.sprite = standing;
         cutInImage.sprite = cutIn;
-        dialogueText.text = text;
+        dialogueText.text = $"「{text}」";
 
         _canvasGroup.alpha = 1f;
         // 右画面外からスライドイン
-        _rectTransform.anchoredPosition = new Vector2(_initialX + slideOffset, _rectTransform.anchoredPosition.y);
-        _slideHandle = _rectTransform.MoveToX(_initialX, slideDuration, Ease.OutCubic);
+        rectTransform.anchoredPosition = new Vector2(_initialX + slideOffset, rectTransform.anchoredPosition.y);
+        _slideHandle = rectTransform.MoveToX(_initialX, slideDuration, Ease.OutCubic);
         await _slideHandle.ToUniTask();
 
         await UniTask.Delay((int)(displayDuration * 1000));
 
         // 左画面外へスライドアウト
-        _slideHandle = _rectTransform.MoveToX(_initialX - slideOffset, exitDuration, Ease.InCubic);
+        _slideHandle = rectTransform.MoveToX(_initialX - slideOffset, exitDuration, Ease.InCubic);
         await _slideHandle.ToUniTask();
         _canvasGroup.alpha = 0f;
 
-        _rectTransform.anchoredPosition = new Vector2(_initialX, _rectTransform.anchoredPosition.y);
+        rectTransform.anchoredPosition = new Vector2(_initialX, rectTransform.anchoredPosition.y);
 
         // 次のカットインとの間隔
         await UniTask.Delay((int)(intervalDuration * 1000));
@@ -74,8 +74,7 @@ public class DialogueCutInView : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
-        _rectTransform = GetComponent<RectTransform>();
-        _initialX = _rectTransform.anchoredPosition.x;
+        _initialX = rectTransform.anchoredPosition.x;
     }
 
     private void OnDestroy()
