@@ -30,11 +30,10 @@ public class CardView : BaseCardView
     protected override Image CardFrame => cardFrame;
     protected override UIEffect EdgeUIEffect => edgeUIEffect;
     protected override Image GaugeImage => gaugeImage;
-    protected override CardData GetCardData() => CardData;
+
     private Vector2 _originalPosition;
     private RectTransform _rectTransform;
     private CardDisplayState _displayState = CardDisplayState.Normal;
-
     // Tween管理用
     private MotionHandle _backTransitionTween;
     private MotionHandle _edgeColorTween;
@@ -102,6 +101,8 @@ public class CardView : BaseCardView
             .Bind(alpha => canvasGroup.alpha = alpha)
             .ToUniTask();
     }
+
+    protected override CardData GetCardData() => CardData;
 
     private void Awake()
     {

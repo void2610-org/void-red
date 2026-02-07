@@ -33,14 +33,14 @@ public class NovelProgressData
     /// <returns>該当する選択結果のリスト</returns>
     public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) => _choiceResults.FindAll(result => result.ScenarioId == scenarioId);
 
-    /// <summary>
-    /// リセット
-    /// </summary>
-    public void Reset() => _choiceResults.Clear();
-
     public void LoadFrom(List<NovelChoiceResult> getAllChoiceResults)
     {
         _choiceResults.Clear();
         _choiceResults.AddRange(getAllChoiceResults);
     }
+
+    /// <summary>
+    /// リセット
+    /// </summary>
+    public void Reset() => _choiceResults.Clear();
 }

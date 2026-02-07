@@ -7,29 +7,19 @@ using VContainer.Unity;
 /// </summary>
 public class MentalPowerEffectController : IStartable, IDisposable
 {
+    private const float DIZZY_EFFECT_THRESHOLD = 0.6f;
+
     private readonly Player _player;
     private readonly VolumeController _volumeController;
     private readonly CompositeDisposable _disposables = new();
 
     // めまいエフェクト制御用
     private bool _isDizzyEffectActive;
-    private const float DIZZY_EFFECT_THRESHOLD = 0.6f;
 
     public MentalPowerEffectController(Player player)
     {
         _player = player;
         _volumeController = VolumeController.Instance;
-    }
-
-    /// <summary>
-    /// 初期化処理
-    /// </summary>
-    public void Start()
-    {
-        // TODO: 感情リソースシステムに移行後、エフェクト制御を更新する
-        // _player.MentalPower
-        //     .Subscribe(OnMentalPowerChanged)
-        //     .AddTo(_disposables);
     }
 
     /// <summary>
@@ -59,6 +49,17 @@ public class MentalPowerEffectController : IStartable, IDisposable
             _volumeController.StopDizzyEffect();
             _isDizzyEffectActive = false;
         }
+    }
+
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
+    public void Start()
+    {
+        // TODO: 感情リソースシステムに移行後、エフェクト制御を更新する
+        // _player.MentalPower
+        //     .Subscribe(OnMentalPowerChanged)
+        //     .AddTo(_disposables);
     }
 
     /// <summary>

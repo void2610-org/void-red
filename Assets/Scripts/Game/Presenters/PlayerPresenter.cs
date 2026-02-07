@@ -49,6 +49,14 @@ public abstract class PlayerPresenter : IDisposable
 
     // === カード管理 ===
 
+    public void AddWonCard(CardModel card) => _wonCards.Add(card);
+
+    public void ClearWonCards() => _wonCards.Clear();
+
+    // === 状態ゲージ管理 ===
+    public void SetPainLevel(float value) => _painLevel.Value = UnityEngine.Mathf.Clamp01(value);
+    public void SetDilutionLevel(float value) => _dilutionLevel.Value = UnityEngine.Mathf.Clamp01(value);
+
     public void SetCards(IEnumerable<CardData> cardDataList)
     {
         _cards.Clear();
@@ -57,10 +65,6 @@ public abstract class PlayerPresenter : IDisposable
             _cards.Add(new CardModel(cardData));
         }
     }
-
-    public void AddWonCard(CardModel card) => _wonCards.Add(card);
-
-    public void ClearWonCards() => _wonCards.Clear();
 
     // === 状態管理 ===
 
@@ -77,10 +81,6 @@ public abstract class PlayerPresenter : IDisposable
         _playerModel.ResetEmotionResources();
         InitializeAuctionData();
     }
-
-    // === 状態ゲージ管理 ===
-    public void SetPainLevel(float value) => _painLevel.Value = UnityEngine.Mathf.Clamp01(value);
-    public void SetDilutionLevel(float value) => _dilutionLevel.Value = UnityEngine.Mathf.Clamp01(value);
 
     public virtual void Dispose()
     {

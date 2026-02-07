@@ -19,6 +19,11 @@ namespace VoidRed.UI.Views
         private int _currentValue;
 
         /// <summary>
+        /// バーの色を設定
+        /// </summary>
+        public void SetColor(Color color) => fillImage.color = color;
+
+        /// <summary>
         /// バーの値を即座に設定（0.0〜1.0）
         /// </summary>
         public void SetValue(float normalizedValue)
@@ -81,11 +86,6 @@ namespace VoidRed.UI.Views
                     UpdateValueText();
                 });
         }
-
-        /// <summary>
-        /// バーの色を設定
-        /// </summary>
-        public void SetColor(Color color) => fillImage.color = color;
 
         private void UpdateValueText()
         {

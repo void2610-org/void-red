@@ -18,23 +18,6 @@ public static class NovelCardSelectionService
     }
 
     /// <summary>
-    /// アトリビュートが付与されたメソッドを収集してキャッシュ
-    /// </summary>
-    private static void InitializeScenarioMethods()
-    {
-        var methods = typeof(NovelCardSelectionService).GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
-
-        foreach (var method in methods)
-        {
-            var attribute = method.GetCustomAttribute<ScenarioCardSelectionAttribute>();
-            if (attribute != null)
-            {
-                _scenarioMethods[attribute.ScenarioId] = method;
-            }
-        }
-    }
-
-    /// <summary>
     /// シナリオIDと選択結果に基づいてカードIDを決定
     /// </summary>
     /// <param name="scenarioId">シナリオID</param>
@@ -50,6 +33,23 @@ public static class NovelCardSelectionService
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// アトリビュートが付与されたメソッドを収集してキャッシュ
+    /// </summary>
+    private static void InitializeScenarioMethods()
+    {
+        var methods = typeof(NovelCardSelectionService).GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
+
+        foreach (var method in methods)
+        {
+            var attribute = method.GetCustomAttribute<ScenarioCardSelectionAttribute>();
+            if (attribute != null)
+            {
+                _scenarioMethods[attribute.ScenarioId] = method;
+            }
+        }
     }
 
     /// <summary>

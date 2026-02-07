@@ -14,11 +14,11 @@ public class CardButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHandl
     [SerializeField] private RectTransform target;
     [SerializeField] private float selectedScale;
 
-    private MotionHandle _scaleMotion;
-    private float _defaultScale;
-
     private const float DURATION = 0.1f;
     private const Ease EASE = Ease.OutCubic;
+
+    private MotionHandle _scaleMotion;
+    private float _defaultScale;
 
     private void Awake()
     {

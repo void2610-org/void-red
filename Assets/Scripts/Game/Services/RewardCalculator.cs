@@ -36,6 +36,13 @@ public static class RewardCalculator
     }
 
     /// <summary>
+    /// 順位に応じた基準リソース値を取得
+    /// 順位1=4, 順位2=3, 順位3=2, 順位4=1
+    /// </summary>
+    public static int GetBaseResourceValue(int rank) =>
+        GameConstants.VALUE_RANKING_BASE_RESOURCE - rank + 1;
+
+    /// <summary>
     /// 落札カードの報酬を計算
     /// </summary>
     /// <param name="valueRank">価値順位（1-4）</param>
@@ -106,13 +113,6 @@ public static class RewardCalculator
 
         return results;
     }
-
-    /// <summary>
-    /// 順位に応じた基準リソース値を取得
-    /// 順位1=4, 順位2=3, 順位3=2, 順位4=1
-    /// </summary>
-    public static int GetBaseResourceValue(int rank) =>
-        GameConstants.VALUE_RANKING_BASE_RESOURCE - rank + 1;
 
     /// <summary>
     /// 合計報酬を計算

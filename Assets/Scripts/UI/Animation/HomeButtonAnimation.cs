@@ -16,12 +16,12 @@ public class HomeButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHandl
     [SerializeField] private Color selectedColor = Color.white;
     [SerializeField] private Color unselectedColor = Color.white;
 
+    private const float DURATION = 0.1f;
+    private const Ease EASE = Ease.OutCubic;
+
     private MotionHandle _scaleMotion;
     private MotionHandle _colorMotion;
     private float _defaultScale;
-
-    private const float DURATION = 0.1f;
-    private const Ease EASE = Ease.OutCubic;
 
     private void Awake()
     {

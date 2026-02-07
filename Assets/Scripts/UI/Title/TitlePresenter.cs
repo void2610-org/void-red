@@ -38,46 +38,6 @@ public class TitlePresenter : IStartable, IDisposable
         _steamService = steamService;
     }
 
-    public void Start()
-    {
-        // Viewを初期化
-        _titleView.Initialize();
-
-        // ボタンイベントの購読
-        _titleView.StartButtonClicked
-            .Subscribe(_ => OnStartButtonClicked().Forget())
-            .AddTo(_disposables);
-
-        _titleView.ContinueButtonClicked
-            .Subscribe(_ => OnContinueButtonClicked())
-            .AddTo(_disposables);
-
-        _titleView.QuitButtonClicked
-            .Subscribe(_ => OnQuitButtonClicked())
-            .AddTo(_disposables);
-
-        _titleView.ReviewFormButtonClicked
-            .Subscribe(_ => OnReviewFormButtonClicked())
-            .AddTo(_disposables);
-
-        // セーブデータの有無によるボタン状態管理
-        var hasSaveData = _gameProgressService.HasSaveData();
-        _titleView.SetContinueButtonState(hasSaveData);
-
-        _gameProgressService.OnDataSaved
-            .Select(_ => _gameProgressService.HasSaveData())
-            .Subscribe(enabled => _titleView.SetContinueButtonState(enabled))
-            .AddTo(_disposables);
-
-        // タイトルBGMを再生
-        BgmManager.Instance.PlayBGM("Title");
-
-        // Steam実績解除
-        _steamService.UnlockAchievement(nameof(SteamAchieveType.FIRST_BOOT));
-
-        SafeNavigationManager.SelectRootForceSelectable().Forget();
-    }
-
     /// <summary>
     /// スタートボタンがクリックされた時の処理（セーブデータリセット）
     /// </summary>
@@ -130,6 +90,46 @@ public class TitlePresenter : IStartable, IDisposable
     private void OnReviewFormButtonClicked()
     {
         Application.OpenURL("https://docs.google.com/forms/d/e/1FAIpQLSfNMqCyXFzWijWAv__wTpDVRN6AtEfFXpdPxyFcIkMbiq2UKw/viewform");
+    }
+
+    public void Start()
+    {
+        // Viewを初期化
+        _titleView.Initialize();
+
+        // ボタンイベントの購読
+        _titleView.StartButtonClicked
+            .Subscribe(_ => OnStartButtonClicked().Forget())
+            .AddTo(_disposables);
+
+        _titleView.ContinueButtonClicked
+            .Subscribe(_ => OnContinueButtonClicked())
+            .AddTo(_disposables);
+
+        _titleView.QuitButtonClicked
+            .Subscribe(_ => OnQuitButtonClicked())
+            .AddTo(_disposables);
+
+        _titleView.ReviewFormButtonClicked
+            .Subscribe(_ => OnReviewFormButtonClicked())
+            .AddTo(_disposables);
+
+        // セーブデータの有無によるボタン状態管理
+        var hasSaveData = _gameProgressService.HasSaveData();
+        _titleView.SetContinueButtonState(hasSaveData);
+
+        _gameProgressService.OnDataSaved
+            .Select(_ => _gameProgressService.HasSaveData())
+            .Subscribe(enabled => _titleView.SetContinueButtonState(enabled))
+            .AddTo(_disposables);
+
+        // タイトルBGMを再生
+        BgmManager.Instance.PlayBGM("Title");
+
+        // Steam実績解除
+        _steamService.UnlockAchievement(nameof(SteamAchieveType.FIRST_BOOT));
+
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
 
     public void Dispose()

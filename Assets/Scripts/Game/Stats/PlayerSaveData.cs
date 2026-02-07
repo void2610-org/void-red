@@ -37,15 +37,6 @@ public class PlayerSaveData
         InitializeEmotionResources();
     }
 
-    private void InitializeEmotionResources()
-    {
-        emotionResources.Clear();
-        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
-        {
-            emotionResources.Add(new EmotionResourceData(emotion, GameConstants.DEFAULT_EMOTION_VALUE));
-        }
-    }
-
     /// <summary>
     /// 感情リソースを更新
     /// </summary>
@@ -88,5 +79,14 @@ public class PlayerSaveData
     {
         var emotionStr = string.Join(", ", emotionResources.ConvertAll(e => $"{e.emotionType}:{e.amount}"));
         return $"Chapter: {currentChapter}, Emotions: [{emotionStr}]";
+    }
+
+    private void InitializeEmotionResources()
+    {
+        emotionResources.Clear();
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            emotionResources.Add(new EmotionResourceData(emotion, GameConstants.DEFAULT_EMOTION_VALUE));
+        }
     }
 }

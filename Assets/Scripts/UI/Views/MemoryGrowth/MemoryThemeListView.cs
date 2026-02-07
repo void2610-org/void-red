@@ -10,14 +10,14 @@ public class MemoryThemeListView : MonoBehaviour
 {
     [SerializeField] private List<MemoryThemeListItemView> items = new();
 
-    private readonly Subject<AcquiredTheme> _onThemeSelected = new();
-    private readonly CompositeDisposable _itemDisposables = new();
-    private MemoryThemeListItemView _selectedItem;
-
     /// <summary>
     /// テーマ選択イベント
     /// </summary>
     public Observable<AcquiredTheme> OnThemeSelected => _onThemeSelected;
+
+    private readonly Subject<AcquiredTheme> _onThemeSelected = new();
+    private readonly CompositeDisposable _itemDisposables = new();
+    private MemoryThemeListItemView _selectedItem;
 
     /// <summary>
     /// テーマリストを初期化

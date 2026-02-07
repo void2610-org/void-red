@@ -34,18 +34,6 @@ public class HomeView : MonoBehaviour
     public Observable<CardData> LibraryCardClicked => cardLibraryView.OnCardClicked;
 
     /// <summary>
-    /// 初期化
-    /// </summary>
-    public void Initialize()
-    {
-        // 未実装のボタンを無効化
-        personButton.interactable = false;
-        dreamButton.interactable = false;
-
-        InitSpeaking().Forget();
-    }
-
-    /// <summary>
     /// デッキデータを表示
     /// </summary>
     public void ShowDeckData(List<CardModel> cardModels) => deckView.Show(cardModels);
@@ -69,6 +57,18 @@ public class HomeView : MonoBehaviour
     /// Dreamボタンのinteractable設定
     /// </summary>
     public void SetDreamButtonInteractable(bool interactable) => dreamButton.interactable = interactable;
+
+    /// <summary>
+    /// 初期化
+    /// </summary>
+    public void Initialize()
+    {
+        // 未実装のボタンを無効化
+        personButton.interactable = false;
+        dreamButton.interactable = false;
+
+        InitSpeaking().Forget();
+    }
 
     /// <summary>
     /// セリフテキストの初期化

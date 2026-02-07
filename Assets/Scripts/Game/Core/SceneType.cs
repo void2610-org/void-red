@@ -36,6 +36,18 @@ public static class SceneTypeExtensions
     };
 
     /// <summary>
+    /// 内部マッピング辞書への読み取り専用アクセス（SceneUtilityから使用）
+    /// </summary>
+    internal static IReadOnlyDictionary<SceneType, string> SceneNames => _sceneNames;
+
+    /// <summary>
+    /// 指定したSceneTypeが有効なシーン名を持つかチェック
+    /// </summary>
+    /// <param name="sceneType">シーンタイプ</param>
+    /// <returns>有効なシーン名を持つかどうか</returns>
+    public static bool IsValid(this SceneType sceneType) => _sceneNames.ContainsKey(sceneType);
+
+    /// <summary>
     /// SceneTypeから対応するUnityシーン名を取得
     /// </summary>
     /// <param name="sceneType">シーンタイプ</param>
@@ -50,18 +62,6 @@ public static class SceneTypeExtensions
         Debug.LogError($"SceneType {sceneType} に対応するシーン名が見つかりません");
         return string.Empty;
     }
-
-    /// <summary>
-    /// 指定したSceneTypeが有効なシーン名を持つかチェック
-    /// </summary>
-    /// <param name="sceneType">シーンタイプ</param>
-    /// <returns>有効なシーン名を持つかどうか</returns>
-    public static bool IsValid(this SceneType sceneType) => _sceneNames.ContainsKey(sceneType);
-
-    /// <summary>
-    /// 内部マッピング辞書への読み取り専用アクセス（SceneUtilityから使用）
-    /// </summary>
-    internal static IReadOnlyDictionary<SceneType, string> SceneNames => _sceneNames;
 }
 
 /// <summary>

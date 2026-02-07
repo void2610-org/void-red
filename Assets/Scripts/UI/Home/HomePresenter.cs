@@ -38,38 +38,6 @@ public class HomePresenter : IStartable, IDisposable
         _confirmationDialogService = confirmationDialogService;
     }
 
-    public void Start()
-    {
-        // Viewを初期化
-        _homeView.Initialize();
-
-        _homeView.TitleButtonClicked
-            .Subscribe(_ => OnTitleButtonClicked())
-            .AddTo(_disposables);
-
-        _homeView.StoryButtonClicked
-            .Subscribe(_ => StartCurrentNodeAsync().Forget())
-            .AddTo(_disposables);
-
-        _homeView.LibraryButtonClicked
-            .Subscribe(_ => ShowCardLibrary())
-            .AddTo(_disposables);
-
-        // カードクリックイベントの購読
-        _homeView.DeckCardClicked
-            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
-            .AddTo(_disposables);
-
-        _homeView.LibraryCardClicked
-            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
-            .AddTo(_disposables);
-
-        // ホームBGMを再生
-        BgmManager.Instance.PlayBGM("Home");
-
-        SafeNavigationManager.SelectRootForceSelectable().Forget();
-    }
-
     /// <summary>
     /// タイトルボタンがクリックされた時の処理
     /// </summary>
@@ -125,6 +93,38 @@ public class HomePresenter : IStartable, IDisposable
     {
         var viewedCardIds = _gameProgressService.GetViewedCardIds();
         _homeView.ShowCardLibrary(_allCardData, viewedCardIds);
+    }
+
+    public void Start()
+    {
+        // Viewを初期化
+        _homeView.Initialize();
+
+        _homeView.TitleButtonClicked
+            .Subscribe(_ => OnTitleButtonClicked())
+            .AddTo(_disposables);
+
+        _homeView.StoryButtonClicked
+            .Subscribe(_ => StartCurrentNodeAsync().Forget())
+            .AddTo(_disposables);
+
+        _homeView.LibraryButtonClicked
+            .Subscribe(_ => ShowCardLibrary())
+            .AddTo(_disposables);
+
+        // カードクリックイベントの購読
+        _homeView.DeckCardClicked
+            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
+            .AddTo(_disposables);
+
+        _homeView.LibraryCardClicked
+            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
+            .AddTo(_disposables);
+
+        // ホームBGMを再生
+        BgmManager.Instance.PlayBGM("Home");
+
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
 
     public void Dispose()

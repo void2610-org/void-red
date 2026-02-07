@@ -39,6 +39,13 @@ public class AuctionView : MonoBehaviour
     private IReadOnlyDictionary<EmotionType, int> _emotionResources;
     private Dictionary<EmotionType, int> _usedResources = new();
 
+    public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
+
+    public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
+
+    public void Show() => gameObject.SetActive(true);
+    public void Hide() => gameObject.SetActive(false);
+
     // カード表示のみ（CardReveal用）
     public void ShowCards(
         IReadOnlyList<CardModel> playerCards,
@@ -100,12 +107,6 @@ public class AuctionView : MonoBehaviour
             _cardBidInfoViews[cardView] = bidInfoView;
         }
     }
-
-
-    public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
-
-
-    public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
 
     // 入札フェーズ開始
     public void StartBidding(
@@ -315,19 +316,6 @@ public class AuctionView : MonoBehaviour
         }
     }
 
-    // CardModelからCardViewを探すヘルパー
-    private CardView FindCardView(CardModel cardModel)
-    {
-        foreach (var kvp in _cardViewToModel)
-        {
-            if (kvp.Value == cardModel)
-            {
-                return kvp.Key;
-            }
-        }
-        return null;
-    }
-
     public void Clear()
     {
         _disposables.Dispose();
@@ -354,8 +342,18 @@ public class AuctionView : MonoBehaviour
         _playerBids = null;
     }
 
-    public void Show() => gameObject.SetActive(true);
-    public void Hide() => gameObject.SetActive(false);
+    // CardModelからCardViewを探すヘルパー
+    private CardView FindCardView(CardModel cardModel)
+    {
+        foreach (var kvp in _cardViewToModel)
+        {
+            if (kvp.Value == cardModel)
+            {
+                return kvp.Key;
+            }
+        }
+        return null;
+    }
 
     private void OnCardClicked(CardView cardView)
     {

@@ -13,10 +13,10 @@ public class ButtonSelectionGlow : MonoBehaviour, ISelectHandler, IDeselectHandl
 {
     [SerializeField] private Image glowImage;
 
-    private MotionHandle _currentMotion;
-
     private const float FADE_DURATION = 0.3f;
     private const Ease FADE_EASE = Ease.OutCubic;
+
+    private MotionHandle _currentMotion;
 
     private void Awake()
     {

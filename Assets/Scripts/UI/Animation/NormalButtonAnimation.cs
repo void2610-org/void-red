@@ -16,11 +16,11 @@ public class NormalButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHan
     [SerializeField] private Sprite selectedSprite;
     [SerializeField] private float selectedScale;
 
-    private MotionHandle _scaleMotion;
-    private float _defaultScale;
-
     private const float DURATION = 0.1f;
     private const Ease EASE = Ease.OutCubic;
+
+    private MotionHandle _scaleMotion;
+    private float _defaultScale;
 
     private void Awake()
     {

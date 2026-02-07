@@ -10,6 +10,27 @@ public class BidModel
     private readonly Dictionary<CardModel, Dictionary<EmotionType, int>> _bids = new();
 
     /// <summary>
+    /// 入札対象カード一覧を取得
+    /// </summary>
+    /// <returns>入札があるカードのリスト</returns>
+    public IReadOnlyList<CardModel> GetBidTargets() => _bids.Keys.ToList();
+
+    /// <summary>
+    /// 特定カードに入札があるか
+    /// </summary>
+    public bool HasBid(CardModel card) => _bids.ContainsKey(card) && _bids[card].Count > 0;
+
+    /// <summary>
+    /// 入札合計を取得（全カード）
+    /// </summary>
+    public int GetTotalBidAmount() => _bids.Values.SelectMany(e => e.Values).Sum();
+
+    /// <summary>
+    /// 全ての入札をクリア
+    /// </summary>
+    public void Clear() => _bids.Clear();
+
+    /// <summary>
     /// 入札を追加
     /// </summary>
     /// <param name="card">対象カード</param>
@@ -79,22 +100,6 @@ public class BidModel
     }
 
     /// <summary>
-    /// 入札対象カード一覧を取得
-    /// </summary>
-    /// <returns>入札があるカードのリスト</returns>
-    public IReadOnlyList<CardModel> GetBidTargets() => _bids.Keys.ToList();
-
-    /// <summary>
-    /// 特定カードに入札があるか
-    /// </summary>
-    public bool HasBid(CardModel card) => _bids.ContainsKey(card) && _bids[card].Count > 0;
-
-    /// <summary>
-    /// 入札合計を取得（全カード）
-    /// </summary>
-    public int GetTotalBidAmount() => _bids.Values.SelectMany(e => e.Values).Sum();
-
-    /// <summary>
     /// 感情タイプ別の入札合計を取得（全カードの合計）
     /// </summary>
     /// <returns>感情タイプごとの入札合計量</returns>
@@ -111,9 +116,4 @@ public class BidModel
         }
         return result;
     }
-
-    /// <summary>
-    /// 全ての入札をクリア
-    /// </summary>
-    public void Clear() => _bids.Clear();
 }

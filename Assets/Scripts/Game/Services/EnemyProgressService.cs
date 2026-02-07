@@ -4,8 +4,6 @@
 /// </summary>
 public class EnemyProgressService
 {
-    public bool IsAllEnemiesDefeated(int chapter) => chapter >= _allEnemyData.Count;
-
     private readonly AllEnemyData _allEnemyData;
 
     /// <summary>
@@ -17,6 +15,8 @@ public class EnemyProgressService
         _allEnemyData = allEnemyData;
         _allEnemyData.RegisterAllEnemies();
     }
+
+    public bool IsAllEnemiesDefeated(int chapter) => chapter >= _allEnemyData.Count;
 
     /// <summary>
     /// 指定チャプターの敵データを取得

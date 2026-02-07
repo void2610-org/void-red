@@ -14,6 +14,7 @@ public class GameStateRepository
     public PlayerProgressData PlayerProgress { get; } = new();
     public NovelProgressData NovelProgress { get; } = new();
     public MemoryProgressData MemoryProgress { get; } = new();
+    public Observable<Unit> OnDataSaved => _onDataSaved;
 
     // 依存サービス
     private readonly SaveDataManager _saveDataManager;
@@ -21,8 +22,6 @@ public class GameStateRepository
     private readonly AllThemeData _allThemeData;
 
     private readonly Subject<Unit> _onDataSaved = new();
-
-    public Observable<Unit> OnDataSaved => _onDataSaved;
 
     /// <summary>
     /// コンストラクタ
@@ -38,6 +37,13 @@ public class GameStateRepository
     }
 
     /// <summary>
+    /// 有効なセーブデータが存在するかチェック
+    /// </summary>
+    public bool HasSaveData() =>
+        _saveDataManager.SaveFileExists() &&
+        (StoryProgress.CurrentStep > 0 || StoryProgress.BattleResults.Count > 0);
+
+    /// <summary>
     /// 全データをセーブ
     /// </summary>
     public void SaveAll()
@@ -45,6 +51,21 @@ public class GameStateRepository
         var saveData = CreateGameSaveData();
         _saveDataManager.SaveGameData(saveData);
         _onDataSaved.OnNext(Unit.Default);
+    }
+
+    /// <summary>
+    /// 全データをリセット
+    /// </summary>
+    public void ResetAll()
+    {
+        StoryProgress.Reset();
+        PlayerProgress.Reset();
+        NovelProgress.Reset();
+        MemoryProgress.Reset();
+
+        SaveAll();
+
+        Debug.Log("[GameStateRepository] 全データを初期状態にリセット完了");
     }
 
     /// <summary>
@@ -119,28 +140,6 @@ public class GameStateRepository
         saveData.UpdateAcquiredThemes(savedThemes);
 
         return saveData;
-    }
-
-    /// <summary>
-    /// 有効なセーブデータが存在するかチェック
-    /// </summary>
-    public bool HasSaveData() =>
-        _saveDataManager.SaveFileExists() &&
-        (StoryProgress.CurrentStep > 0 || StoryProgress.BattleResults.Count > 0);
-
-    /// <summary>
-    /// 全データをリセット
-    /// </summary>
-    public void ResetAll()
-    {
-        StoryProgress.Reset();
-        PlayerProgress.Reset();
-        NovelProgress.Reset();
-        MemoryProgress.Reset();
-
-        SaveAll();
-
-        Debug.Log("[GameStateRepository] 全データを初期状態にリセット完了");
     }
 
     /// <summary>

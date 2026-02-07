@@ -7,9 +7,6 @@ using UnityEngine;
 // 価値順位、入札額、WIN/LOSEを表示
 public class CardBidInfoView : MonoBehaviour
 {
-    private static readonly Color PLAYER_COLOR = Color.green;
-    private static readonly Color ENEMY_COLOR = Color.red;
-
     [Header("価値順位表示")]
     [SerializeField] private TextMeshProUGUI rankText;
 
@@ -20,6 +17,15 @@ public class CardBidInfoView : MonoBehaviour
     [Header("結果表示")]
     [SerializeField] private TextMeshProUGUI resultText;
 
+    private static readonly Color PLAYER_COLOR = Color.green;
+    private static readonly Color ENEMY_COLOR = Color.red;
+
+    // 価値順位を非表示
+    public void HideRank() => rankText.text = "";
+
+    // 結果を非表示
+    public void HideResult() => resultText.gameObject.SetActive(false);
+
     // 価値順位を表示（色でプレイヤー/敵を判別）
     public void ShowRank(int rank, bool isPlayerCard)
     {
@@ -27,9 +33,6 @@ public class CardBidInfoView : MonoBehaviour
         rankText.text = isPlayerCard ? $"{rank}" : "?";
         rankText.color = isPlayerCard ? PLAYER_COLOR : ENEMY_COLOR;
     }
-
-    // 価値順位を非表示
-    public void HideRank() => rankText.text = "";
 
     // 入札額を表示（両方公開）
     public void ShowBidAmounts(int playerBid, int enemyBid)
@@ -91,7 +94,4 @@ public class CardBidInfoView : MonoBehaviour
         resultText.text = isPlayerWon ? "WIN" : "LOSE";
         resultText.color = isPlayerWon ? PLAYER_COLOR : ENEMY_COLOR;
     }
-
-    // 結果を非表示
-    public void HideResult() => resultText.gameObject.SetActive(false);
 }

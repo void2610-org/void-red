@@ -157,6 +157,22 @@ public static class CompoundEmotionTypeExtensions
     };
 
     /// <summary>
+    /// 複合感情の日本語名を取得
+    /// </summary>
+    public static string ToJapaneseName(this CompoundEmotionType compound) => compound switch
+    {
+        CompoundEmotionType.Love => "愛",
+        CompoundEmotionType.Submission => "服従",
+        CompoundEmotionType.Awe => "畏敬",
+        CompoundEmotionType.Disapproval => "失望",
+        CompoundEmotionType.Remorse => "自責",
+        CompoundEmotionType.Contempt => "軽蔑",
+        CompoundEmotionType.Aggressiveness => "積極性",
+        CompoundEmotionType.Optimism => "楽観",
+        _ => "不明"
+    };
+
+    /// <summary>
     /// 2つの基本感情から複合感情を取得（隣接していない場合はnull）
     /// </summary>
     public static CompoundEmotionType? GetCompoundEmotion(EmotionType first, EmotionType second)
@@ -179,38 +195,6 @@ public static class CompoundEmotionTypeExtensions
     }
 
     /// <summary>
-    /// 感情ペアを感情の輪の順序で正規化
-    /// </summary>
-    private static (EmotionType, EmotionType) NormalizeEmotionPair(EmotionType a, EmotionType b)
-    {
-        // 同じ感情の場合はそのまま返す
-        if (a == b) return (a, b);
-
-        // aの次がbならそのまま、bの次がaなら入れ替え
-        if (a.GetNextEmotion() == b) return (a, b);
-        if (b.GetNextEmotion() == a) return (b, a);
-
-        // 隣接していない場合は元の順序を維持
-        return (a, b);
-    }
-
-    /// <summary>
-    /// 複合感情の日本語名を取得
-    /// </summary>
-    public static string ToJapaneseName(this CompoundEmotionType compound) => compound switch
-    {
-        CompoundEmotionType.Love => "愛",
-        CompoundEmotionType.Submission => "服従",
-        CompoundEmotionType.Awe => "畏敬",
-        CompoundEmotionType.Disapproval => "失望",
-        CompoundEmotionType.Remorse => "自責",
-        CompoundEmotionType.Contempt => "軽蔑",
-        CompoundEmotionType.Aggressiveness => "積極性",
-        CompoundEmotionType.Optimism => "楽観",
-        _ => "不明"
-    };
-
-    /// <summary>
     /// 複合感情に対応する色を取得（構成感情の中間色）
     /// </summary>
     public static UnityEngine.Color GetColor(this CompoundEmotionType compound)
@@ -230,5 +214,21 @@ public static class CompoundEmotionTypeExtensions
         var color1 = first.GetTintColor();
         var color2 = second.GetTintColor();
         return UnityEngine.Color.Lerp(color1, color2, 0.5f);
+    }
+
+    /// <summary>
+    /// 感情ペアを感情の輪の順序で正規化
+    /// </summary>
+    private static (EmotionType, EmotionType) NormalizeEmotionPair(EmotionType a, EmotionType b)
+    {
+        // 同じ感情の場合はそのまま返す
+        if (a == b) return (a, b);
+
+        // aの次がbならそのまま、bの次がaなら入れ替え
+        if (a.GetNextEmotion() == b) return (a, b);
+        if (b.GetNextEmotion() == a) return (b, a);
+
+        // 隣接していない場合は元の順序を維持
+        return (a, b);
     }
 }

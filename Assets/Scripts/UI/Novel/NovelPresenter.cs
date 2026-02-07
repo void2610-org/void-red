@@ -38,11 +38,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     private string _currentScenarioId;
     private readonly CompositeDisposable _disposables = new();
 
-    /// <summary>
-    /// シーンの初期化完了を待つ（ISceneInitializable実装）
-    /// </summary>
-    public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
-
     public NovelPresenter(bool useLocalExcel)
     {
         // ビルドでは必ずローカルExcelを使用
@@ -52,6 +47,16 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
 
         _novelDialogService = new NovelDialogService(useLocalExcel);
     }
+
+    /// <summary>
+    /// シーンの初期化完了を待つ（ISceneInitializable実装）
+    /// </summary>
+    public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
+
+    /// <summary>
+    /// 全ダイアログをスキップして即座に完了（InputSystem用の公開メソッド）
+    /// </summary>
+    public void RequestSkipAllDialogs() => SkipAllDialogsInternal().Forget();
 
     [Inject]
     public void Construct(
@@ -71,13 +76,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         _cardPoolService = cardPoolService;
         _inputActionsProvider = inputActionsProvider;
         _addressableImageLoader = new AddressableImageLoader();
-    }
-
-    public void Start()
-    {
-        Initialize().Forget();
-        SafeNavigationManager.SelectRootForceSelectable().Forget();
-        BgmManager.Instance.PlayBGM("Novel");
     }
 
     private async UniTaskVoid Initialize()
@@ -303,11 +301,6 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     }
 
     /// <summary>
-    /// 全ダイアログをスキップして即座に完了（InputSystem用の公開メソッド）
-    /// </summary>
-    public void RequestSkipAllDialogs() => SkipAllDialogsInternal().Forget();
-
-    /// <summary>
     /// 全ダイアログをスキップして即座に完了（内部実装）
     /// </summary>
     private async UniTaskVoid SkipAllDialogsInternal()
@@ -431,6 +424,13 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             var nextScene = _gameProgressService.GetNextSceneType();
             await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
         }
+    }
+
+    public void Start()
+    {
+        Initialize().Forget();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
+        BgmManager.Instance.PlayBGM("Novel");
     }
 
     public void Dispose()

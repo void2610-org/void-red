@@ -19,9 +19,6 @@ public class NovelSeManager : MonoBehaviour
     [SerializeField] private AudioMixerGroup seMixerGroup;
     [SerializeField] private SoundData[] soundData;
 
-    private AudioSource _seAudioSource;
-    private float _seVolume = 0.5f;
-
     /// <summary>
     /// SE音量プロパティ（0.0f～1.0f）
     /// </summary>
@@ -36,6 +33,20 @@ public class NovelSeManager : MonoBehaviour
             seMixerGroup.audioMixer.SetFloat("SeVolume", Mathf.Log10(_seVolume) * 20);
         }
     }
+
+    private AudioSource _seAudioSource;
+    private float _seVolume = 0.5f;
+
+    /// <summary>
+    /// 遅延してSEを再生
+    /// </summary>
+    /// <param name="seName">SE名</param>
+    /// <param name="delayTime">遅延時間（秒）</param>
+    /// <param name="volume">音量倍率</param>
+    /// <param name="pitch">ピッチ</param>
+    /// <param name="important">重要なSEフラグ</param>
+    public void WaitAndPlaySe(string seName, float delayTime, float volume = 1.0f, float pitch = 1.0f) =>
+        WaitAndPlaySeAsync(seName, delayTime, volume, pitch).Forget();
 
     /// <summary>
     /// 名前を指定してSEを再生
@@ -64,17 +75,6 @@ public class NovelSeManager : MonoBehaviour
         _seAudioSource.Play();
         return data.audioClip.length / _seAudioSource.pitch;
     }
-
-    /// <summary>
-    /// 遅延してSEを再生
-    /// </summary>
-    /// <param name="seName">SE名</param>
-    /// <param name="delayTime">遅延時間（秒）</param>
-    /// <param name="volume">音量倍率</param>
-    /// <param name="pitch">ピッチ</param>
-    /// <param name="important">重要なSEフラグ</param>
-    public void WaitAndPlaySe(string seName, float delayTime, float volume = 1.0f, float pitch = 1.0f) =>
-        WaitAndPlaySeAsync(seName, delayTime, volume, pitch).Forget();
 
     public void StopSe()
     {

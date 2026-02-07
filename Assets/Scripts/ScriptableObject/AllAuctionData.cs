@@ -15,6 +15,13 @@ public class AllAuctionData : ScriptableObject
     public int Count => auctionList.Count;
 
     /// <summary>
+    /// オークションIDでオークションデータを取得
+    /// </summary>
+    /// <param name="auctionId">オークションID</param>
+    /// <returns>指定されたIDのオークションデータ</returns>
+    public AuctionData GetAuctionById(string auctionId) => auctionList.FirstOrDefault(auction => auction.AuctionId == auctionId);
+
+    /// <summary>
     /// 同じディレクトリ内の全てのオークションデータを自動的に登録
     /// </summary>
     public void RegisterAllAuctions()
@@ -23,11 +30,4 @@ public class AllAuctionData : ScriptableObject
         this.RegisterAssetsInSameDirectory(auctionList, x => x.AuctionId);
 #endif
     }
-
-    /// <summary>
-    /// オークションIDでオークションデータを取得
-    /// </summary>
-    /// <param name="auctionId">オークションID</param>
-    /// <returns>指定されたIDのオークションデータ</returns>
-    public AuctionData GetAuctionById(string auctionId) => auctionList.FirstOrDefault(auction => auction.AuctionId == auctionId);
 }

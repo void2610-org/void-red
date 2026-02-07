@@ -21,6 +21,18 @@ public class PausePresenter : IStartable, System.IDisposable
         _inputActionsProvider = inputActionsProvider;
     }
 
+    private void ShowHelp()
+    {
+        var helpView = Object.FindFirstObjectByType<HelpView>();
+        helpView.Show();
+    }
+
+    private void ShowOptions()
+    {
+        var settingsView = Object.FindFirstObjectByType<SettingsWindowView>();
+        settingsView.Show();
+    }
+
     public void Start()
     {
         // ビューの取得（BattlePauseViewを優先、なければPauseViewを使用）
@@ -64,17 +76,5 @@ public class PausePresenter : IStartable, System.IDisposable
     public void Dispose()
     {
         _disposables.Dispose();
-    }
-
-    private void ShowHelp()
-    {
-        var helpView = Object.FindFirstObjectByType<HelpView>();
-        helpView.Show();
-    }
-
-    private void ShowOptions()
-    {
-        var settingsView = Object.FindFirstObjectByType<SettingsWindowView>();
-        settingsView.Show();
     }
 }

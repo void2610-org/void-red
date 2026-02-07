@@ -9,6 +9,8 @@ using Void2610.UnityTemplate;
 
 public class BattlePresenter : IStartable, ISceneInitializable
 {
+    public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
+
     private readonly BattleUIPresenter _battleUIPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
@@ -24,10 +26,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private readonly List<CardModel> _auctionCards = new();
 
     private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
-
-    public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
-
-    public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
 
     public BattlePresenter(
         BattleUIPresenter battleUIPresenter,
@@ -47,6 +45,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         InitializeAuctionData();
     }
 
+    public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
+
     private void InitializeAuctionData()
     {
         _auctionCards.Clear();
@@ -54,15 +54,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // Player/Enemyの状態をリセット
         _player.ResetPlayerState();
         _enemy.ResetPlayerState();
-    }
-
-    public void Start()
-    {
-        // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
-        _battleUIPresenter.SetBattlePresenter(this);
-
-        InitializeGameAsync().Forget();
-        BgmManager.Instance.PlayBGM("Battle");
     }
 
     private async UniTaskVoid InitializeGameAsync()
@@ -586,5 +577,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
             var nextScene = _gameProgressService.GetNextSceneType();
             await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
         }
+    }
+
+    public void Start()
+    {
+        // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
+        _battleUIPresenter.SetBattlePresenter(this);
+
+        InitializeGameAsync().Forget();
+        BgmManager.Instance.PlayBGM("Battle");
     }
 }

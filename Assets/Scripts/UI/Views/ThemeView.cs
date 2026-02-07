@@ -40,6 +40,22 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     }
 
     /// <summary>
+    /// キーワード表示をトグル（InputSystemアクション用）
+    /// </summary>
+    public void ToggleKeywords()
+    {
+        if (!_isKeywordsVisible && !_themeData) return;
+
+        if (!_isKeywordsVisible) OnPointerEnter(null);
+        else OnPointerExit(null);
+    }
+
+    private void Awake()
+    {
+        visualEffect.SetInt("Rate", 0);
+    }
+
+    /// <summary>
     /// マウスカーソルが乗ったときの処理
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
@@ -59,21 +75,5 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
         VolumeController.Instance.SetScreenSpaceLensFlareIntensity(0f);
         _isKeywordsVisible = false;
-    }
-
-    /// <summary>
-    /// キーワード表示をトグル（InputSystemアクション用）
-    /// </summary>
-    public void ToggleKeywords()
-    {
-        if (!_isKeywordsVisible && !_themeData) return;
-
-        if (!_isKeywordsVisible) OnPointerEnter(null);
-        else OnPointerExit(null);
-    }
-
-    private void Awake()
-    {
-        visualEffect.SetInt("Rate", 0);
     }
 }

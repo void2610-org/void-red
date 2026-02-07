@@ -43,6 +43,26 @@ public class CardChoiceData
     }
 
     /// <summary>
+    /// 指定されたインデックスの選択肢テキストを取得
+    /// </summary>
+    public string GetOption(int index) => index switch
+    {
+        0 => option1,
+        1 => option2,
+        _ => ""
+    };
+
+    /// <summary>
+    /// 指定されたインデックスの画像名を取得
+    /// </summary>
+    public string GetImageName(int index) => index switch
+    {
+        0 => imageName1,
+        1 => imageName2,
+        _ => ""
+    };
+
+    /// <summary>
     /// スラッシュ区切り文字列からCardChoiceDataを作成
     /// </summary>
     /// <param name="slashSeparatedValue">スラッシュ区切り文字列 ("[選択肢1,画像1]/[選択肢2,画像2]")</param>
@@ -76,24 +96,4 @@ public class CardChoiceData
 
         return new CardChoiceData(option1, imageName1, option2, imageName2);
     }
-
-    /// <summary>
-    /// 指定されたインデックスの選択肢テキストを取得
-    /// </summary>
-    public string GetOption(int index) => index switch
-    {
-        0 => option1,
-        1 => option2,
-        _ => ""
-    };
-
-    /// <summary>
-    /// 指定されたインデックスの画像名を取得
-    /// </summary>
-    public string GetImageName(int index) => index switch
-    {
-        0 => imageName1,
-        1 => imageName2,
-        _ => ""
-    };
 }

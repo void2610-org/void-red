@@ -71,22 +71,6 @@ public class TutorialView : MonoBehaviour
         SafeNavigationManager.SelectRootForceSelectable().Forget();
     }
 
-    private async UniTask UpdateMessageText(string message, bool isPlayerDialog, bool isBattleTutorial)
-    {
-        if (!isBattleTutorial)
-        {
-            // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
-            await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
-            return;
-        }
-
-        var narrationView = isPlayerDialog ? playerNarrationView : enemyNarrationView;
-        var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
-        disableView.HideNarration().Forget();
-
-        await narrationView.DisplayNarration(message, autoAdvance: false);
-    }
-
     /// <summary>
     /// チュートリアルビューを表示
     /// </summary>
@@ -121,6 +105,22 @@ public class TutorialView : MonoBehaviour
 
         // 次回のために初期化
         _currentMaskSize = Vector2.zero;
+    }
+
+    private async UniTask UpdateMessageText(string message, bool isPlayerDialog, bool isBattleTutorial)
+    {
+        if (!isBattleTutorial)
+        {
+            // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
+            await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
+            return;
+        }
+
+        var narrationView = isPlayerDialog ? playerNarrationView : enemyNarrationView;
+        var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
+        disableView.HideNarration().Forget();
+
+        await narrationView.DisplayNarration(message, autoAdvance: false);
     }
 
     private void Awake()
