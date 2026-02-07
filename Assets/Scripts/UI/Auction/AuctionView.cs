@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
+using UnityEngine.UI;
 
 // オークションフェーズの統合View
 // CardReveal, BiddingPhase, AuctionResultで共有
@@ -14,7 +15,8 @@ public class AuctionView : MonoBehaviour
     [SerializeField] private CardView cardPrefab;
 
     [Header("入札UI")]
-    [SerializeField] private BidPanelView bidPanelView;
+    [SerializeField] private BidWindowView bidWindowView;
+    [SerializeField] private Button confirmBiddingButton;
 
     [Header("感情リソース表示")]
     [SerializeField] private EmotionResourceDisplayView emotionResourceDisplayView;
@@ -22,13 +24,12 @@ public class AuctionView : MonoBehaviour
     [Header("結果表示")]
     [SerializeField] private CardBidInfoView cardBidInfoPrefab;
 
-    public Observable<Unit> OnBiddingComplete => _onBiddingComplete;
+    public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
 
     private readonly List<CardView> _cardViews = new();
     private readonly Dictionary<CardView, CardModel> _cardViewToModel = new();
     private readonly Dictionary<CardView, CardBidInfoView> _cardBidInfoViews = new();
     private readonly HashSet<CardModel> _playerCardModels = new();
-    private readonly Subject<Unit> _onBiddingComplete = new();
     private CompositeDisposable _disposables = new();
 
     private CardView _selectedCard;
@@ -144,18 +145,22 @@ public class AuctionView : MonoBehaviour
         emotionResourceDisplayView.UpdateResources(emotionResources);
         emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
 
-        // 入札パネルを初期化
+        // 入札UIを初期化
         UpdateRemainingResourceDisplay();
 
-        bidPanelView.OnIncrease
+        bidWindowView.OnIncrease
             .Subscribe(_ => OnIncreaseBid())
             .AddTo(_disposables);
 
-        bidPanelView.OnDecrease
+        bidWindowView.OnDecrease
             .Subscribe(_ => OnDecreaseBid())
             .AddTo(_disposables);
 
-        bidPanelView.OnConfirm
+        bidWindowView.OnClose
+            .Subscribe(_ => DeselectCard())
+            .AddTo(_disposables);
+
+        confirmBiddingButton.OnClickAsObservable()
             .Subscribe(_ => OnConfirmBidding())
             .AddTo(_disposables);
 
@@ -357,6 +362,8 @@ public class AuctionView : MonoBehaviour
         if (_selectedCard == cardView)
         {
             DeselectCard();
+            if (bidWindowView.IsShowing)
+                bidWindowView.Hide();
             return;
         }
 
@@ -365,11 +372,22 @@ public class AuctionView : MonoBehaviour
 
     private void SelectCard(CardView cardView)
     {
+        // ウィンドウが既に表示中なら閉じる
+        if (bidWindowView.IsShowing)
+            bidWindowView.Hide();
+
         DeselectCard();
 
         _selectedCard = cardView;
         _selectedCardModel = _cardViewToModel[cardView];
         _selectedCard.SetHighlight(true);
+
+        // ウィンドウに現在の感情の入札値をセット
+        bidWindowView.SetEmotion(_currentEmotion);
+        var emotionBids = _playerBids.GetBidsByEmotion(_selectedCardModel);
+        var currentBid = emotionBids.GetValueOrDefault(_currentEmotion, 0);
+        bidWindowView.UpdateBidAmount(currentBid);
+        bidWindowView.Show();
     }
 
     private void DeselectCard()
@@ -397,6 +415,7 @@ public class AuctionView : MonoBehaviour
 
         UpdateRemainingResourceDisplay();
         UpdateCardBidInfoDisplay(_selectedCard);
+        UpdateBidWindowAmount();
     }
 
     private void OnDecreaseBid()
@@ -415,6 +434,7 @@ public class AuctionView : MonoBehaviour
 
         UpdateRemainingResourceDisplay();
         UpdateCardBidInfoDisplay(_selectedCard);
+        UpdateBidWindowAmount();
     }
 
     private void UpdateCardBidInfoDisplay(CardView cardView)
@@ -428,13 +448,31 @@ public class AuctionView : MonoBehaviour
 
     private void OnConfirmBidding()
     {
-        _onBiddingComplete.OnNext(Unit.Default);
+        if (bidWindowView.IsShowing)
+            bidWindowView.Hide();
+        DeselectCard();
+    }
+
+    // ウィンドウ内の入札値表示を更新
+    private void UpdateBidWindowAmount()
+    {
+        if (_selectedCardModel == null) return;
+        var emotionBids = _playerBids.GetBidsByEmotion(_selectedCardModel);
+        var currentBid = emotionBids.GetValueOrDefault(_currentEmotion, 0);
+        bidWindowView.UpdateBidAmount(currentBid);
     }
 
     private void OnEmotionChanged(EmotionType emotion)
     {
         _currentEmotion = emotion;
         UpdateRemainingResourceDisplay();
+
+        // ウィンドウが表示中なら感情色と入札値を更新
+        if (bidWindowView.IsShowing && _selectedCardModel != null)
+        {
+            bidWindowView.SetEmotion(_currentEmotion);
+            UpdateBidWindowAmount();
+        }
     }
 
     private void UpdateRemainingResourceDisplay()
@@ -452,6 +490,5 @@ public class AuctionView : MonoBehaviour
     private void OnDestroy()
     {
         _disposables.Dispose();
-        _onBiddingComplete.Dispose();
     }
 }
