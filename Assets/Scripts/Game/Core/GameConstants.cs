@@ -29,4 +29,9 @@ public static class GameConstants
     /// 自分のカードを落札した場合のボーナス
     /// </summary>
     public const int OWN_CARD_BONUS = 2;
+
+    /// <summary>
+    /// カードゲージの最大値
+    /// </summary>
+    public const int MAX_GAUGE_VALUE = 10;
 }

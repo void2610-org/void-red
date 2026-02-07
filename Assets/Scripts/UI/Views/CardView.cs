@@ -15,13 +15,11 @@ public class CardView : BaseCardView
 {
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
-    [SerializeField] private Image cardNameBanner;
     [SerializeField] private Image cardFrame;
-    [SerializeField] private Image cardBackImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
-    [SerializeField] private UIEffect backUIEffect;
     [SerializeField] private UIEffect edgeUIEffect;
+    [SerializeField] private Image gaugeImage;
 
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked { get; private set; }
@@ -29,10 +27,9 @@ public class CardView : BaseCardView
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
-    protected override Image CardBanner => cardNameBanner;
     protected override Image CardFrame => cardFrame;
-    protected override UIEffect BackUIEffect => backUIEffect;
     protected override UIEffect EdgeUIEffect => edgeUIEffect;
+    protected override Image GaugeImage => gaugeImage;
     protected override CardData GetCardData() => CardData;
     private Vector2 _originalPosition;
     private RectTransform _rectTransform;
@@ -44,13 +41,6 @@ public class CardView : BaseCardView
 
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
 
-    public void SetToBackside(Sprite cardBackSprite)
-    {
-        _displayState = CardDisplayState.Backside;
-        cardBackImage.sprite = cardBackSprite;
-        UpdateCardDisplay(_displayState);
-    }
-
     /// <summary>
     /// カードデータを設定して初期化
     /// </summary>
@@ -58,7 +48,7 @@ public class CardView : BaseCardView
     {
         CardData = cardData;
         _originalPosition = _rectTransform.anchoredPosition;
-        UpdateDisplay();
+        UpdateCardDisplay(_displayState);
     }
 
     /// <summary>
@@ -111,23 +101,6 @@ public class CardView : BaseCardView
             .WithEase(Ease.OutCubic)
             .Bind(alpha => canvasGroup.alpha = alpha)
             .ToUniTask();
-    }
-
-    /// <summary>
-    /// 表示を更新
-    /// </summary>
-    private void UpdateDisplay()
-    {
-        if (!CardData) return;
-
-        // 基底クラスの共通表示ロジックを呼び出し
-        UpdateCardDisplay(_displayState);
-
-        // CardView固有の処理：backUIEffect の色設定
-        if (_displayState != CardDisplayState.Backside)
-        {
-            backUIEffect.transitionColor = CardData.Color * 1.5f;
-        }
     }
 
     private void Awake()
