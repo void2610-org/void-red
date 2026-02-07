@@ -30,6 +30,7 @@ public class DeckCardView : BaseCardView
     [SerializeField] private Image cardFrame;
     [SerializeField] private UIEffect backUIEffect;
     [SerializeField] private UIEffect edgeUIEffect;
+    [SerializeField] private Image gaugeImage;
 
     [Header("色設定")]
     [SerializeField] private Color activeColor = Color.white;
@@ -42,10 +43,9 @@ public class DeckCardView : BaseCardView
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
-    protected override Image CardBanner => cardTextBanner;
     protected override Image CardFrame => cardFrame;
-    protected override UIEffect BackUIEffect => backUIEffect;
     protected override UIEffect EdgeUIEffect => edgeUIEffect;
+    protected override Image GaugeImage => gaugeImage;
     protected override CardData GetCardData() => CardModel?.Data;
 
     private readonly Subject<CardData> _onCardClicked = new();

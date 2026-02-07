@@ -1,5 +1,4 @@
 using R3;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,40 +11,17 @@ public class CardDetailView : BaseWindowView
     [Header("UIコンポーネント")]
     [SerializeField] private Button playButton;
     [SerializeField] private DeckCardView cardView;
-    [SerializeField] private TextMeshProUGUI keywordsText;
-    [SerializeField] private TextMeshProUGUI attributeText;
-    [SerializeField] private TextMeshProUGUI collapseThresholdText;
 
     public Observable<Unit> PlayButtonClicked => playButton.OnClickAsObservable();
 
     /// <summary>
     /// カード詳細を表示
     /// </summary>
-    /// <param name="cardData">表示するカードデータ</param>
-    /// <param name="isPlayable">プレイボタンを表示するか</param>
-    /// <param name="themeData">現在のテーマ（nullの場合は色分けなし）</param>
-    public void ShowCardDetail(CardData cardData, bool isPlayable, ThemeData themeData = null)
+    public void ShowCardDetail(CardData cardData, bool isPlayable)
     {
-        // カード詳細情報を設定
-        UpdateCardDisplay(cardData, themeData);
-        playButton.gameObject.SetActive(isPlayable);
-
-        // パネルを表示
-        Show();
-    }
-
-    /// <summary>
-    /// カード表示を更新
-    /// </summary>
-    /// <param name="cardData">表示するカードデータ</param>
-    /// <param name="themeData">現在のテーマ（nullの場合は色分けなし）</param>
-    private void UpdateCardDisplay(CardData cardData, ThemeData themeData)
-    {
-        // 新しいカードViewを作成
         var cardModel = new CardModel(cardData);
         cardView.Initialize(cardModel);
-
-        // 詳細情報を更新
-        attributeText.text = $"属性: {cardData.Attribute.ToJapaneseName()}";
+        playButton.gameObject.SetActive(isPlayable);
+        Show();
     }
 }
