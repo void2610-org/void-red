@@ -48,6 +48,7 @@ public class CardView : BaseCardView
     private MotionHandle _backTransitionTween;
     private MotionHandle _edgeColorTween;
     private Material _instancedGrowMaterial;
+    private MotionHandle _growAlphaHandle;
 
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
 
@@ -86,23 +87,27 @@ public class CardView : BaseCardView
             .ToUniTask();
     }
     
-    public void SetGrowEffect(CardBidState state, Color enemyColor)
+    public void SetGrowEffect(CardBidState state, Color enemyColor, float fadeDuration = 0.3f)
     {
-        _instancedGrowMaterial.SetFloat(_alpha, state != CardBidState.None ? 0.4f : 0f);
+        _growAlphaHandle.TryCancel();
+
         switch (state)
         {
             case CardBidState.PlayerBid:
-                _instancedGrowMaterial.SetFloat(_value, 1f);
+                _instancedGrowMaterial.SetFloat(_value, 1.5f);
                 break;
             case CardBidState.EnemyBid:
-                _instancedGrowMaterial.SetColor(_color2, enemyColor);
+                _instancedGrowMaterial.SetColor(_color2, enemyColor * 2);
                 _instancedGrowMaterial.SetFloat(_value, 0f);
                 break;
             case CardBidState.DrawBid:
-                _instancedGrowMaterial.SetColor(_color2, enemyColor);
+                _instancedGrowMaterial.SetColor(_color2, enemyColor * 2);
                 _instancedGrowMaterial.SetFloat(_value, 0.5f);
                 break;
         }
+
+        var targetAlpha = state != CardBidState.None ? 0.6f : 0f;
+        _growAlphaHandle = _instancedGrowMaterial.MaterialFloatTo(_alpha, targetAlpha, fadeDuration, Ease.OutCubic, gameObject);
     }
 
     protected override CardData GetCardData() => CardData;
@@ -122,5 +127,6 @@ public class CardView : BaseCardView
         // Tweenのクリーンアップ
         _edgeColorTween.TryCancel();
         _backTransitionTween.TryCancel();
+        _growAlphaHandle.TryCancel();
     }
 }
