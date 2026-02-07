@@ -1374,12 +1374,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
       propertyPath: m_Interactable
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
       propertyPath: m_BlocksRaycasts
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1394,6 +1398,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5052638610521521187, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
       propertyPath: m_Name
       value: ChoiceView
@@ -1664,6 +1680,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6116264079152724370, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
       propertyPath: m_Name
       value: CardChoiceView
