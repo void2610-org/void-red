@@ -37,9 +37,9 @@ public static class MemoryTypeExtensions
     /// </summary>
     public static Color ToGaugeColor(this MemoryType memoryType) => memoryType switch
     {
-        MemoryType.SelfMemory => new Color(0.2f, 0.4f, 0.9f, 1f),
+        MemoryType.SelfMemory => new Color(1f, 0f, 0f, 1f),
         MemoryType.OtherMemory => new Color(0.2f, 0.8f, 0.3f, 1f),
-        MemoryType.SpecificOtherMemory => new Color(0.9f, 0.2f, 0.2f, 1f),
+        MemoryType.SpecificOtherMemory => new Color(0f, 0f, 1f, 1f),
         MemoryType.AmbiguousMemory => new Color(0.6f, 0.2f, 0.8f, 1f),
         _ => Color.gray
     };

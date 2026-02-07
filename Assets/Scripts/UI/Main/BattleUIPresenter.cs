@@ -18,7 +18,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
     private readonly NarrationView _playerNarrationView;
-    private readonly NarrationView _enemyNarrationView;
     private EnemyView _enemyView;
     private readonly BlackOverlayView _blackOverlayView;
 
@@ -43,12 +42,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
-
-        // 複数のViewを取得して、プレイヤー用と敵用を区別
-        // Y座標が低い方をプレイヤー、高い方を敵とする
-        var narrationViews = Object.FindObjectsByType<NarrationView>(FindObjectsSortMode.None);
-        _playerNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[1] : narrationViews[0];
-        _enemyNarrationView = narrationViews[0].transform.position.y > narrationViews[1].transform.position.y ? narrationViews[0] : narrationViews[1];
+        _playerNarrationView = Object.FindFirstObjectByType<NarrationView>();
 
         _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
         _valueRankingView.Hide();
@@ -72,7 +66,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
-    public async UniTask ShowEnemyNarration(string message, bool autoAdvance) => await _enemyNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public void InitializeEnemyFace(EnemyData enemyData) => _enemyFaceView.Initialize(enemyData);
     public void UpdatePlayerPainGauge(float value) => _playerFaceView.UpdatePainGauge(value);
     public void UpdatePlayerDilutionGauge(float value) => _playerFaceView.UpdateDilutionGauge(value);
@@ -196,10 +189,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         var labels = new List<string>
         {
-            DialogueChoiceType.Provoke.ToJapaneseName(),
-            DialogueChoiceType.Empathize.ToJapaneseName(),
-            DialogueChoiceType.Persuade.ToJapaneseName(),
-            DialogueChoiceType.Silence.ToJapaneseName()
+            DialogueChoiceType.Provoke.ToJapaneseName() + "する",
+            DialogueChoiceType.Empathize.ToJapaneseName() + "する",
+            DialogueChoiceType.Persuade.ToJapaneseName() + "する",
+            DialogueChoiceType.Silence.ToJapaneseName() + "する"
         };
 
         await _dialoguePhaseView.SetupChoices(labels);

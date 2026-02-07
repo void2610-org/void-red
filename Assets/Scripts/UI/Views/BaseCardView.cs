@@ -13,7 +13,6 @@ public abstract class BaseCardView : MonoBehaviour
     protected abstract Image CardImage { get; }
     protected abstract TextMeshProUGUI CardNameText { get; }
     protected abstract Image CardFrame { get; }
-    protected abstract UIEffect EdgeUIEffect { get; }
     protected abstract Image GaugeImage { get; }
 
     private TMProArchedText _archedText;

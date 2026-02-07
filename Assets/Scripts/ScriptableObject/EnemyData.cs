@@ -14,6 +14,7 @@ public class EnemyData : ScriptableObject
 
     [Header("敵画像")]
     [SerializeField] private Sprite defaultSprite;
+    [SerializeField] private Sprite cutInSprite;
     [SerializeField] private Sprite iconSprite;
     [SerializeField] private Sprite frameSprite;
 
@@ -23,6 +24,7 @@ public class EnemyData : ScriptableObject
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
     public Sprite DefaultSprite => defaultSprite;
+    public Sprite CutInSprite => cutInSprite;
     public Sprite IconSprite => iconSprite;
     public Sprite FrameSprite => frameSprite;
 
