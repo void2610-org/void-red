@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14a33cbb2e84d4741ae09b382decdefc, type: 3}
   m_Name: CARD_008
   m_EditorClassIdentifier: 
-  cardId: CARD_008
   cardName: "\u4F55\u304B\u3092\u5207\u308A\u6368\u3066\u305F\u3053\u3068"
+  description: "\u5207\u308A\u6368\u3066\u3066\u304D\u305F\u3082\u306E\u304C\u9053\u3092\u4F5C\u3063\u3066\u304D\u305F\u3068\u77E5\u3063\u3066\u3044\u305F\u3093\u3060\u3002"
   image: {fileID: 21300000, guid: 4705c3553248b4e719883bcb94010efa, type: 3}
   memoryType: 3
   effectAmount: 3

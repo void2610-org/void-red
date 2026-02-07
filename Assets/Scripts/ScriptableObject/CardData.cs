@@ -7,16 +7,17 @@ using UnityEngine;
 public class CardData : ScriptableObject
 {
     [Header("基本情報")]
-    [SerializeField] private string cardId;
     [SerializeField] private string cardName;
+    [SerializeField, TextArea(2, 5)] private string description;
     [SerializeField] private Sprite image;
 
     [Header("記憶情報")]
     [SerializeField] private MemoryType memoryType;
     [SerializeField, Range(0, 20)] private int effectAmount;
 
-    public string CardId => cardId;
+    public string CardId => name;
     public string CardName => cardName;
+    public string Description => description;
     public Sprite CardImage => image;
     public MemoryType MemoryType => memoryType;
     public int EffectAmount => effectAmount;
