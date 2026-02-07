@@ -42,9 +42,7 @@ public class DeckCardView : BaseCardView
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
-    protected override Image CardBanner => cardTextBanner;
     protected override Image CardFrame => cardFrame;
-    protected override UIEffect BackUIEffect => backUIEffect;
     protected override UIEffect EdgeUIEffect => edgeUIEffect;
     protected override CardData GetCardData() => CardModel?.Data;
 
