@@ -173,6 +173,7 @@ dotnet_diagnostic.UNA0001.severity = warning
 dotnet_diagnostic.UNA0002.severity = warning
 dotnet_diagnostic.UNA0003.severity = warning
 dotnet_diagnostic.UNA0004.severity = warning
+dotnet_diagnostic.UNA0005.severity = warning
 
 # XML, JSON
 [*.{xml,json,yml,yaml}]

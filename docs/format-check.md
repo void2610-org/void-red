@@ -32,7 +32,7 @@ dotnet-format とカスタム Roslyn アナライザーを使用した C# コー
 │    ▼                        ▼                        ▼         │
 │ ┌──────────────┐  ┌─────────────────┐  ┌──────────────────┐   │
 │ │FormatCheck   │  │ IDE 標準規則    │  │UnityNamingAnalyzer│   │
-│ │.csproj       │  │ (IDE0001等)     │  │(UNA0001-UNA0004) │   │
+│ │.csproj       │  │ (IDE0001等)     │  │(UNA0001-UNA0005) │   │
 │ │(対象定義)    │  │                 │  │                  │   │
 │ └──────────────┘  └─────────────────┘  └──────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
@@ -51,12 +51,14 @@ void-red/
     │   ├── UnityNamingAnalyzer.csproj
     │   ├── SerializeFieldNamingAnalyzer.cs   # UNA0001/UNA0002: フィールド命名規約
     │   ├── EventSystemAnalyzer.cs            # UNA0003: R3イベントシステム強制
-    │   └── ExpressionBodyAnalyzer.cs         # UNA0004: 単一文public式本体強制
+    │   ├── ExpressionBodyAnalyzer.cs         # UNA0004: 単一文public式本体強制
+    │   └── MemberOrderAnalyzer.cs            # UNA0005: クラスメンバー宣言順序
     └── UnityNamingAnalyzer.Tests/
         ├── UnityNamingAnalyzer.Tests.csproj
         ├── SerializeFieldNamingAnalyzerTests.cs
         ├── EventSystemAnalyzerTests.cs
-        └── ExpressionBodyAnalyzerTests.cs
+        ├── ExpressionBodyAnalyzerTests.cs
+        └── MemberOrderAnalyzerTests.cs
 ```
 
 ### 各ファイルの役割
@@ -80,6 +82,7 @@ Unity プロジェクト特有の命名規約を検証するカスタム Roslyn 
 | **UNA0002** | `[SerializeField]` フィールドには `_` プレフィックスを付けない | `[SerializeField]` 付きの private フィールド |
 | **UNA0003** | イベントにはR3の `Subject<T>` を使用 | `event` キーワード、`Action`/`Func` 型のフィールド・プロパティ |
 | **UNA0004** | 単一文の public メソッドには式本体を使用 | ブロック本体で1ステートメントの public メソッド |
+| **UNA0005** | クラスメンバーの宣言順序が不正 | クラス・構造体のメンバー宣言順序 |
 
 ### 命名規約の理由
 
@@ -141,6 +144,79 @@ public int Calculate()
 - private/protected/internal メソッドは対象外
 - コンストラクタは対象外
 
+### メンバー宣言順序規約 (UNA0005)
+
+クラス・構造体のメンバーは以下の順序で宣言する:
+
+| 順序 | カテゴリ | 説明 |
+|------|----------|------|
+| 0 | Enum | ネストされた enum |
+| 1 | SerializeField | `[SerializeField]` 付き private フィールド |
+| 2 | public properties | public プロパティ |
+| 3 | constants | `const`、`static readonly` フィールド |
+| 4 | private fields | その他の private フィールド（readonly 含む） |
+| 5 | constructors | コンストラクタ |
+| 6 | public methods (one line) | 式本体 (`=>`) の public メソッド |
+| 7 | public methods (multi line) | ブロック本体の public メソッド |
+| 8 | private methods | private/protected/internal メソッド（Unity event、cleanup 以外） |
+| 9 | Unity events | `Awake`, `Start`, `Update`, `OnEnable`, `OnDisable` 等 |
+| 10 | cleanup | `OnDestroy`, `Dispose` |
+
+```csharp
+public class Player : MonoBehaviour
+{
+    // 0. Enum
+    public enum State { Idle, Running }
+
+    // 1. SerializeField
+    [SerializeField] private int maxHealth;
+
+    // 2. public properties
+    public int CurrentHealth { get; private set; }
+
+    // 3. constants
+    public const int MaxLevel = 100;
+    private static readonly int DefaultHealth = 10;
+
+    // 4. private fields
+    private int _level;
+
+    // 5. constructors（MonoBehaviourでは通常不要）
+
+    // 6. public methods (one line)
+    public int GetLevel() => _level;
+
+    // 7. public methods (multi line)
+    public void TakeDamage(int damage)
+    {
+        CurrentHealth -= damage;
+        if (CurrentHealth < 0) CurrentHealth = 0;
+    }
+
+    // 8. private methods
+    private void UpdateUI()
+    {
+        // UI更新処理
+    }
+
+    // 9. Unity events
+    private void Awake()
+    {
+        CurrentHealth = maxHealth;
+    }
+
+    // 10. cleanup
+    private void OnDestroy()
+    {
+        // クリーンアップ処理
+    }
+}
+```
+
+- ネストされたクラス/構造体/インターフェースは順序チェック対象外（enum は対象）
+- `static` メソッドはアクセス修飾子に従い通常メソッドと同カテゴリ
+- `protected`/`internal` プロパティは対象外
+
 ### IDE1006 との競合回避
 
 標準の命名規則 (IDE1006) はカスタムアナライザーと競合するため、`.editorconfig` で severity を `suggestion` に下げている:
@@ -154,6 +230,7 @@ dotnet_diagnostic.UNA0001.severity = warning
 dotnet_diagnostic.UNA0002.severity = warning
 dotnet_diagnostic.UNA0003.severity = warning
 dotnet_diagnostic.UNA0004.severity = warning
+dotnet_diagnostic.UNA0005.severity = warning
 ```
 
 ## ローカル実行
@@ -292,6 +369,7 @@ public class Example
 | `[SerializeField]` フィールド | `camelCase` | `maxHealth` | warning (UNA0002) |
 | イベント・デリゲート | R3 `Subject<T>` を使用 | `Subject<int>` | warning (UNA0003) |
 | 単一文 public メソッド | 式本体 (`=>`) で記述 | `=> 42` | warning (UNA0004) |
+| メンバー宣言順序 | 規定の順序で宣言 | Enum → ... → cleanup | warning (UNA0005) |
 | パブリックメンバー | `PascalCase` | `GetPlayer()` | warning |
 | 型 | `PascalCase` | `PlayerController` | warning |
 | インターフェース | `IPascalCase` | `IDisposable` | warning |
