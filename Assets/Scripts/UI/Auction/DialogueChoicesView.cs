@@ -13,7 +13,6 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class DialogueChoicesView : MonoBehaviour
 {
-    [SerializeField] private LayoutGroup buttonContainer;
     [SerializeField] private List<Button> choiceButtons;
     [SerializeField] private List<TextMeshProUGUI> choiceLabels;
 
@@ -66,28 +65,21 @@ public class DialogueChoicesView : MonoBehaviour
 
     /// <summary>
     /// ボタンの順次スライド+フェードインアニメーション
+    /// シーンに配置された位置めがけてアニメーションする
     /// </summary>
     private void PlayEnterAnimation()
     {
         _animHandles.CancelAll();
 
-        Canvas.ForceUpdateCanvases();
-
-        // 初回のみ初期位置を保存
-        if (_buttonOriginalPositions.Count == 0)
+        var activeIndex = 0;
+        for (var i = 0; i < choiceButtons.Count; i++)
         {
-            foreach (var button in choiceButtons)
-            {
-                var rect = (RectTransform)button.transform;
-                _buttonOriginalPositions.Add(rect.anchoredPosition);
-            }
-        }
+            if (!choiceButtons[i].gameObject.activeSelf) continue;
 
-        buttonContainer.ForEachChildWithDelay((child, index, delay) =>
-        {
-            var rect = (RectTransform)child;
-            var canvasGroup = _buttonCanvasGroups[index];
-            var originalPos = _buttonOriginalPositions[index];
+            var rect = (RectTransform)choiceButtons[i].transform;
+            var canvasGroup = _buttonCanvasGroups[i];
+            var originalPos = _buttonOriginalPositions[i];
+            var delay = staggerDelay * activeIndex;
 
             // 開始位置を右にオフセット、透明度を0に
             var startPos = originalPos + new Vector2(slideOffset, 0);
@@ -108,15 +100,19 @@ public class DialogueChoicesView : MonoBehaviour
                 .BindToAlpha(canvasGroup)
                 .AddTo(canvasGroup.gameObject);
             _animHandles.Add(fadeHandle);
-        }, staggerDelay);
+
+            activeIndex++;
+        }
     }
 
     private void Awake()
     {
-        // 各ボタンのCanvasGroupを保存
+        // 各ボタンのCanvasGroupとシーン配置位置を保存
         foreach (var button in choiceButtons)
         {
             _buttonCanvasGroups.Add(button.GetComponent<CanvasGroup>());
+            var rect = (RectTransform)button.transform;
+            _buttonOriginalPositions.Add(rect.anchoredPosition);
         }
     }
 

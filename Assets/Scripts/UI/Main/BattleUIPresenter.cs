@@ -196,10 +196,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         var labels = new List<string>
         {
-            DialogueChoiceType.Provoke.ToJapaneseName(),
-            DialogueChoiceType.Empathize.ToJapaneseName(),
-            DialogueChoiceType.Persuade.ToJapaneseName(),
-            DialogueChoiceType.Silence.ToJapaneseName()
+            DialogueChoiceType.Provoke.ToJapaneseName() + "する",
+            DialogueChoiceType.Empathize.ToJapaneseName() + "する",
+            DialogueChoiceType.Persuade.ToJapaneseName() + "する",
+            DialogueChoiceType.Silence.ToJapaneseName() + "する"
         };
 
         await _dialoguePhaseView.SetupChoices(labels);
