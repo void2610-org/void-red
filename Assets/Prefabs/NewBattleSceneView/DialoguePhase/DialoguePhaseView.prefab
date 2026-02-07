@@ -158,6 +158,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8464418665960230811, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
+      propertyPath: slideOffset
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464418665960230811, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
+      propertyPath: animDuration
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464418665960230811, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
+      propertyPath: staggerDelay
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -280,7 +292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6275267270233696108, guid: 85a37a036604e42768389bba1d49fbec, type: 3}
       propertyPath: m_Name
-      value: DialoguePhaseCutInView
+      value: DialogueCutInView
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
