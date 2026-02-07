@@ -150,6 +150,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueChoiceButton4
       objectReference: {fileID: 0}
+    - target: {fileID: 5957501060173758030, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 558c993700a034f7f8da5637bcabbfd4, type: 3}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -241,6 +245,10 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149746649642998489, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_text
+      value: "\u6C88\u9ED9\u3059\u308B"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -286,6 +294,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueChoiceButton2
       objectReference: {fileID: 0}
+    - target: {fileID: 5957501060173758030, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: de7cb7f317b5c4a0b85159f21d23e28b, type: 3}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -377,6 +389,10 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149746649642998489, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_text
+      value: "\u5171\u611F\u3059\u308B"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -422,6 +438,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueChoiceButton3
       objectReference: {fileID: 0}
+    - target: {fileID: 5957501060173758030, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 6bc7da4f9514a4bb6967a91cfb8ee3d6, type: 3}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -513,6 +533,10 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149746649642998489, guid: e234f0f13482b4a41930081bf210d142, type: 3}
+      propertyPath: m_text
+      value: "\u8AAC\u5F97\u3059\u308B"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -589,18 +613,6 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.65
-      objectReference: {fileID: 0}
-    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.65
-      objectReference: {fileID: 0}
-    - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: e234f0f13482b4a41930081bf210d142, type: 3}
       propertyPath: m_LocalPosition.x
