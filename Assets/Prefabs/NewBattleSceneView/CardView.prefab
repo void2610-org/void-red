@@ -352,9 +352,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d763d33370227481b8d89bebef408610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _vAlignment: 1
-  _hAlignment: 2
-  _vertexCurve:
+  vAlignment: 1
+  hAlignment: 2
+  vertexCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
