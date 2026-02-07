@@ -8,6 +8,8 @@ using UnityEngine;
 [CustomPropertyDrawer(typeof(MemoryType))]
 public class MemoryTypePropertyDrawer : PropertyDrawer
 {
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) => EditorGUIUtility.singleLineHeight;
+
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         EditorGUI.BeginProperty(position, label, property);
@@ -26,6 +28,4 @@ public class MemoryTypePropertyDrawer : PropertyDrawer
 
         EditorGUI.EndProperty();
     }
-
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) => EditorGUIUtility.singleLineHeight;
 }
