@@ -723,6 +723,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PauseView
       objectReference: {fileID: 0}
+    - target: {fileID: 4107963480110281205, guid: 8b7e0c8942aea479fb2d24460e39ece2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -853,6 +857,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PauseButton
       objectReference: {fileID: 0}
+    - target: {fileID: 2388141028732612707, guid: b41619f9c66f540bb9c8304d07983bfa, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6887676441548646170, guid: b41619f9c66f540bb9c8304d07983bfa, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -954,6 +962,10 @@ PrefabInstance:
     - target: {fileID: 2748508848187296338, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_Name
       value: VersionText
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748508848187296338, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_Pivot.x
@@ -1135,7 +1147,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9221868408885396068, guid: b6373f6819e0f4d8091604738042b445, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 40
+      value: -240
       objectReference: {fileID: 0}
     - target: {fileID: 9221868408885396068, guid: b6373f6819e0f4d8091604738042b445, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1175,6 +1187,10 @@ PrefabInstance:
     - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Name
       value: DialogView
+      objectReference: {fileID: 0}
+    - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8503395000404048060, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Pivot.x
@@ -1353,6 +1369,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: ItemGetEffectView
       objectReference: {fileID: 0}
+    - target: {fileID: 2143870529256237546, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1366,9 +1398,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5052638610521521187, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
       propertyPath: m_Name
       value: ChoiceView
+      objectReference: {fileID: 0}
+    - target: {fileID: 5052638610521521187, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5393066055707613523, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
       propertyPath: m_Pivot.x
@@ -1632,9 +1680,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6116264079152724370, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
       propertyPath: m_Name
       value: CardChoiceView
+      objectReference: {fileID: 0}
+    - target: {fileID: 6116264079152724370, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8581034581683863317, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
       propertyPath: m_Pivot.x

@@ -19,7 +19,7 @@ public class DialogCharacterView : MonoBehaviour
     /// <summary>
     /// キャラクター画像を設定（位置とスケールも調整）
     /// </summary>
-    public void SetCharacterImage(Sprite sprite, bool isAlv)
+    public void SetCharacterImage(Sprite sprite)
     {
         if (sprite == null)
         {
@@ -29,19 +29,6 @@ public class DialogCharacterView : MonoBehaviour
         }
 
         SetSprite(sprite);
-
-        // アルヴだけ別サイズにする
-        if (isAlv)
-        {
-            transform.localPosition = new Vector3(0f, -130f, 0f);
-
-            transform.localScale = Vector3.one * 0.375f;
-        }
-        else
-        {
-            transform.localPosition = new Vector3(0f, -110f, 0f);
-            transform.localScale = Vector3.one * 0.35f;
-        }
     }
 
     /// <summary>

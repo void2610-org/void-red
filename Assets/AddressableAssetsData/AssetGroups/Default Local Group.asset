@@ -15,11 +15,6 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 35f51d2df38fb4d749217d0a19b95792
   m_SerializeEntries:
-  - m_GUID: 021a93a055b804f418cd07b3416b25a0
-    m_Address: Assets/Sprites/Character/Alv/1-1.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0a4d225f374f34d92ad66b5f91f0fac0
     m_Address: Assets/Sprites/Input/keyboard/space.png
     m_ReadOnly: 0
@@ -27,11 +22,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0a603675306744af093b8a5c59cb98d2
     m_Address: Assets/Sprites/Input/keyboard/x.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0f04f2ed6f09d4213a05a7b814860a64
-    m_Address: Assets/Sprites/Character/Alv/1-5.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -65,18 +55,13 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 23cde201719fc48f2aa1bde7fa2d0560
-    m_Address: Assets/Sprites/Character/Alv/2-5.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 261c3d12628ae40fe88056f9697d5275
     m_Address: Assets/Sprites/Input/gamepad/dpad.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 282e67a314e1f49c991a33b21650ea2f
-    m_Address: Assets/Sprites/Character/Alv/Alv_Normal.png
+    m_Address: Assets/Sprites/Character/Alv/Normal.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -112,11 +97,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3fa2d505ad595416cbbb79d2f1418898
     m_Address: Assets/Sprites/Input/keyboard/leftalt.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 412de83ff24f348f68b1ca97bf0e3e7d
-    m_Address: Assets/Sprites/Character/Alv/1-4.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -170,11 +150,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5ab3d58af953648619198c0ebb508f72
-    m_Address: Assets/Sprites/Character/Alv/2-1.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5c924ef377b34447eaaef7a196013709
     m_Address: Assets/Sprites/Input/mouse/rightbutton.png
     m_ReadOnly: 0
@@ -207,11 +182,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 65d4bb5098ce0c5458b3cfdd1e50554a
     m_Address: Assets/Sprites/Item/LightCard.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 662dbee2ec75a47adbf1ffd469ff3af9
-    m_Address: Assets/Sprites/Character/Alv/2-4.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -310,11 +280,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9f53c6cf7e0ba48c5a1684a9818b0157
-    m_Address: Assets/Sprites/Character/Alv/2-3.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a0653047ddcb5487d907028c6ae82568
     m_Address: Assets/Sprites/Input/gamepad/buttonwest.png
     m_ReadOnly: 0
@@ -345,18 +310,13 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b605c2f9307684c0fad67f28322427f6
-    m_Address: Assets/Sprites/Character/Alv/1-2.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b92dfd407e702475ea16e832de851460
     m_Address: Assets/Sprites/Input/keyboard/o.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b99907c1ff5694e0db0aa21c848c6aae
-    m_Address: Assets/Sprites/Character/Alv/Alv_kamenn1.png
+    m_Address: Assets/Sprites/Character/Alv/Mask1.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -430,11 +390,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dbd9d78e045314a78af872aff7db913d
-    m_Address: Assets/Sprites/Character/Alv/2-2.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: df33a4a076a680b4a8c8fc692c24f006
     m_Address: Assets/Sprites/Item/ShadowCard.png
     m_ReadOnly: 0
@@ -452,11 +407,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e55aa82b701ec498bacae2d02fd3be3c
     m_Address: Assets/Sprites/Input/keyboard/uparrow.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e68ebd9d44f2540e5b10007e15146cc6
-    m_Address: Assets/Sprites/Character/Alv/1-3.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

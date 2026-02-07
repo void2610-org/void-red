@@ -182,7 +182,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         {
             var characterSprite = await _addressableImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
             if (!_dialogCharacterView) return;
-            _dialogCharacterView.SetCharacterImage(characterSprite, dialogData.CharacterImageName.Contains("Alv"));
+            _dialogCharacterView.SetCharacterImage(characterSprite);
         }
 
         if (!_dialogView) return;
