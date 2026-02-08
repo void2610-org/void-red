@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 using VoidRed.UI.Views;
 
 /// <summary>
@@ -26,6 +27,8 @@ public class ResourceRewardView : MonoBehaviour
     private Dictionary<EmotionType, int> _rewardedAmounts = new();
     private Dictionary<EmotionType, int> _maxResources = new();
     private EmotionType[] _emotionTypes;
+
+    public void Hide() => canvasGroup.Hide();
 
     /// <summary>
     /// リソース報酬をゲージアニメーションで表示
@@ -64,18 +67,9 @@ public class ResourceRewardView : MonoBehaviour
         Hide();
     }
 
-    public void Hide()
-    {
-        canvasGroup.alpha = 0f;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-    }
-
     private void Show()
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
+        canvasGroup.Show();
     }
 
     private EmotionType GetRandomEmotion()

@@ -55,7 +55,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
     public void UpdatePlayerPainGauge(float value) => _playerFaceView.UpdatePainGauge(value);
     public void UpdatePlayerDilutionGauge(float value) => _playerFaceView.UpdateDilutionGauge(value);
-    public async UniTask ResetEnemyToDefault() => await _enemyView.ResetToDefaultSprite();
     public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
     public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
     public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 獲得カード一覧を表示するサブView
@@ -48,17 +49,13 @@ public class CardAcquisitionView : MonoBehaviour
 
     public void Hide()
     {
-        canvasGroup.alpha = 0f;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
+        canvasGroup.Hide();
         ClearInstantiatedItems();
     }
 
     private void Show()
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
+        canvasGroup.Show();
     }
 
     private void ClearInstantiatedItems()

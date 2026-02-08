@@ -82,9 +82,7 @@ public class DialogueCutInView : MonoBehaviour
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
+        _canvasGroup.Hide();
 
         _initialX = rectTransform.anchoredPosition.x;
 

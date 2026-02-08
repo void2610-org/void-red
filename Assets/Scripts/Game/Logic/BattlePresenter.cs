@@ -120,7 +120,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         {
             // 1. 出品者フェーズ
             case GameState.ThemeAnnouncement:
-                _battleUIPresenter.ResetEnemyToDefault().Forget();
                 await HandleThemeAnnouncement();
                 break;
             case GameState.CardDistribution:

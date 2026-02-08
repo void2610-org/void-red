@@ -20,8 +20,6 @@ public abstract class BasePhaseView : MonoBehaviour
     {
         CanvasGroup = GetComponent<CanvasGroup>();
         // 初期状態は即時非表示
-        CanvasGroup.alpha = 0f;
-        CanvasGroup.interactable = false;
-        CanvasGroup.blocksRaycasts = false;
+        CanvasGroup.Hide();
     }
 }

@@ -5,6 +5,7 @@ using LitMotion;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 // オークションフェーズの統合View
 // CardReveal, BiddingPhase, AuctionResultで共有
@@ -25,13 +26,6 @@ public class AuctionView : BasePhaseView
     [Header("結果表示")]
     [SerializeField] private CardBidInfoView cardBidInfoPrefab;
 
-    public override void Show()
-    {
-        CanvasGroup.alpha = 1f;
-        CanvasGroup.interactable = true;
-        CanvasGroup.blocksRaycasts = true;
-    }
-
     public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
 
     private readonly List<CardView> _cardViews = new();
@@ -50,6 +44,8 @@ public class AuctionView : BasePhaseView
     public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
 
     public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
+
+    public override void Show() => CanvasGroup.Show();
 
     // カード表示のみ（CardReveal用）
     public void ShowCards(
