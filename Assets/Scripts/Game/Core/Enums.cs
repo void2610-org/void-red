@@ -31,14 +31,22 @@ public enum GameState
 /// </summary>
 public enum EmotionType
 {
-    Joy,         // 喜び
-    Trust,       // 信頼
-    Fear,        // 恐れ
-    Surprise,    // 驚き
-    Sadness,     // 悲しみ
-    Disgust,     // 嫌悪
-    Anger,       // 怒り
-    Anticipation // 期待
+    /// <summary> 喜び </summary>
+    Joy,
+    /// <summary> 信頼 </summary>
+    Trust,
+    /// <summary> 恐れ </summary>
+    Fear,
+    /// <summary> 驚き </summary>
+    Surprise,
+    /// <summary> 悲しみ </summary>
+    Sadness,
+    /// <summary> 嫌悪 </summary>
+    Disgust,
+    /// <summary> 怒り </summary>
+    Anger,
+    /// <summary> 期待 </summary>
+    Anticipation
 }
 
 /// <summary>
@@ -47,14 +55,22 @@ public enum EmotionType
 /// </summary>
 public enum CompoundEmotionType
 {
-    Love,        // 愛 = 喜び + 信頼
-    Submission,  // 服従 = 信頼 + 恐れ
-    Awe,         // 畏敬 = 恐れ + 驚き
-    Disapproval, // 失望 = 驚き + 悲しみ
-    Remorse,     // 自責（後悔） = 悲しみ + 嫌悪
-    Contempt,    // 軽蔑 = 嫌悪 + 怒り
-    Aggressiveness, // 積極性 = 怒り + 期待
-    Optimism     // 楽観 = 期待 + 喜び
+    /// <summary> 愛 = 喜び + 信頼 </summary>
+    Love,
+    /// <summary> 服従 = 信頼 + 恐れ </summary>
+    Submission,
+    /// <summary> 畏敬 = 恐れ + 驚き </summary>
+    Awe,
+    /// <summary> 失望 = 驚き + 悲しみ </summary>
+    Disapproval,
+    /// <summary> 自責（後悔） = 悲しみ + 嫌悪 </summary>
+    Remorse,
+    /// <summary> 軽蔑 = 嫌悪 + 怒り </summary>
+    Contempt,
+    /// <summary> 積極性 = 怒り + 期待 </summary>
+    Aggressiveness,
+    /// <summary> 楽観 = 期待 + 喜び </summary>
+    Optimism
 }
 
 // EmotionTypeの拡張メソッド

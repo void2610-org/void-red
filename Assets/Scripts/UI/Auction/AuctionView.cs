@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
@@ -257,6 +258,7 @@ public class AuctionView : MonoBehaviour
         IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
         ValueRankingModel playerRanking,
         ValueRankingModel enemyRanking,
+        Color enemyColor,
         float delayBetweenCards = 0.8f)
     {
         // 全カードを表示状態に戻す
@@ -297,18 +299,23 @@ public class AuctionView : MonoBehaviour
             }
             else
             {
+                // 落札状態をグローエフェクトで可視化
+                var bidState = result.IsPlayerWon ? CardView.CardBidState.PlayerBid : CardView.CardBidState.EnemyBid;
+                targetCardView.SetGrowEffect(bidState, enemyColor);
+
                 // 勝敗表示
                 bidInfoView.ShowResult(result.IsPlayerWon);
                 await UniTask.Delay(300);
 
                 // 落札者側へ移動
+                var rt = (RectTransform)targetCardView.transform;
                 if (result.IsPlayerWon)
                 {
-                    await targetCardView.PlayMoveToPlayerSideAsync();
+                    await MoveCardToPlayerSideAsync(rt);
                 }
                 else
                 {
-                    await targetCardView.PlayMoveToEnemySideAsync();
+                    await MoveCardToEnemySideAsync(rt);
                 }
             }
 
@@ -483,6 +490,26 @@ public class AuctionView : MonoBehaviour
             currentResources[emotion] = originalAmount - usedAmount;
         }
         emotionResourceDisplayView.UpdateResources(currentResources);
+    }
+
+    private static async UniTask MoveCardToPlayerSideAsync(RectTransform rt, float duration = 0.5f)
+    {
+        var startY = rt.anchoredPosition.y;
+        var targetY = startY - 1000f;
+        await LMotion.Create(startY, targetY, duration)
+            .WithEase(Ease.OutCubic)
+            .Bind(y => rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, y))
+            .ToUniTask();
+    }
+
+    private static async UniTask MoveCardToEnemySideAsync(RectTransform rt, float duration = 0.5f)
+    {
+        var startY = rt.anchoredPosition.y;
+        var targetY = startY + 1000f;
+        await LMotion.Create(startY, targetY, duration)
+            .WithEase(Ease.OutCubic)
+            .Bind(y => rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, y))
+            .ToUniTask();
     }
 
     private void OnDestroy()

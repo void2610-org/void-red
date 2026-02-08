@@ -274,7 +274,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var dialogueData = _currentAuctionData.DialogueData;
 
         var playerFirstChoice = await HandlePlayerFirstTurn(dialogueData);
-        await _battleUIPresenter.HideDialogueResultAsync();
 
         await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
 
@@ -294,7 +293,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await _battleUIPresenter.ShowEnemyDialogueAsync(response.DialogueText);
 
         var resultMessage = DialogueEffectApplier.ApplyEffect(response.Effect, _enemy, _auctionCards);
-        await _battleUIPresenter.ShowDialogueResultAsync(resultMessage);
+        await _battleUIPresenter.ShowEnemyNarration(resultMessage);
 
         return playerChoice;
     }
@@ -306,7 +305,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await UniTask.WhenAll(
             _battleUIPresenter.HidePlayerDialogueAsync(),
             _battleUIPresenter.HideEnemyDialogueAsync(),
-            _battleUIPresenter.HideDialogueResultAsync()
+            _battleUIPresenter.HideAllAsync()
         );
 
         await _battleUIPresenter.ShowEnemyDialogueAsync(initiation.EnemyDialogueText);
@@ -324,7 +323,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 効果を適用して結果を表示
         var resultMessage = DialogueEffectApplier.ApplyEffect(selectedOption.Effect, _player, _auctionCards);
-        await _battleUIPresenter.ShowDialogueResultAsync(resultMessage);
+        await _battleUIPresenter.ShowPlayerNarration(resultMessage);
     }
 
     // === 4. 落札者判定フェーズ ===
@@ -371,7 +370,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log($"[BattlePresenter] 落札結果: プレイヤー{_player.WonCards.Count}枚、敵{_enemy.WonCards.Count}枚");
 
         // 順次演出で結果を表示（価値順位も公開）
-        await _battleUIPresenter.ShowAuctionResultsSequentialAsync(results, _player.ValueRanking, _enemy.ValueRanking);
+        await _battleUIPresenter.ShowAuctionResultsSequentialAsync(results, _player.ValueRanking, _enemy.ValueRanking, _currentEnemyData.EnemyColor);
 
         await UniTask.Delay(1000);
         // オークション完全終了時にクリア
