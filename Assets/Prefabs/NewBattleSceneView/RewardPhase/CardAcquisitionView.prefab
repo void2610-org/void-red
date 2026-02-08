@@ -5193,7 +5193,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 850, y: 200}
+  m_SizeDelta: {x: 970, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8741282039197540289
 MonoBehaviour:
@@ -5448,8 +5448,9 @@ MonoBehaviour:
   cardPrefab: {fileID: 7383955479449652679, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
   textContainer: {fileID: 4725685669159206177}
   cardTextPrefab: {fileID: 2610911944171587868, guid: d0e99a736fa754670b9f43d45ec6f8b2, type: 3}
-  staggerDelay: 0.05
-  animDuration: 0.2
+  initialDelay: 0.3
+  staggerDelay: 0.15
+  animDuration: 0.3
   cardSlideOffset: -50
   textSlideOffset: 50
 --- !u!1 &8234326788108221482
