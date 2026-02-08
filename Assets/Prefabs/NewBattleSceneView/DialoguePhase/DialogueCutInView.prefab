@@ -275,8 +275,8 @@ GameObject:
   m_Component:
   - component: {fileID: 545032329588202734}
   - component: {fileID: 8797511044503666886}
-  - component: {fileID: 5590112734727461070}
   - component: {fileID: 6143048735707127520}
+  - component: {fileID: 5590112734727461070}
   m_Layer: 5
   m_Name: DialogueCutInView
   m_TagString: Untagged
@@ -313,6 +313,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6275267270233696108}
   m_CullTransparentMesh: 1
+--- !u!225 &6143048735707127520
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6275267270233696108}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &5590112734727461070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,6 +341,7 @@ MonoBehaviour:
   cutInImage: {fileID: 6184211166435321077}
   dialogueText: {fileID: 8783053521306992567}
   rectTransform: {fileID: 8327950005707174764}
+  backgroundCanvasGroup: {fileID: 0}
   playerStandingSprite: {fileID: 21300000, guid: 8b66d9934a13f45d1b8a027e4baabee7, type: 3}
   playerCutInSprite: {fileID: 21300000, guid: 106f6612eeafc4a2d91e0bd5ec70e163, type: 3}
   slideDuration: 0.4
@@ -336,18 +349,7 @@ MonoBehaviour:
   exitDuration: 0.3
   slideOffset: 1200
   intervalDuration: 0.3
---- !u!225 &6143048735707127520
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275267270233696108}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
+  fadeDuration: 0.3
 --- !u!1 &8363756311001279870
 GameObject:
   m_ObjectHideFlags: 0
