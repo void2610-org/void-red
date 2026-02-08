@@ -98,7 +98,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _enemy.SetEnemyData(_currentEnemyData);
         _battleUIPresenter.InitializeEnemy(_currentEnemyData);
         _battleUIPresenter.InitializeDialogueView(_currentEnemyData);
-        await _battleUIPresenter.ShowEnemy();
 
         // 敵情報をアナウンス
         await _battleUIPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
@@ -549,15 +548,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // Volumeエフェクトを全てデフォルトに戻す
         VolumeController.Instance.ResetToDefault();
 
-        // TODO: バトル結果表示（落札したカード・獲得した記憶テーマを表示）
-        // _battleUIPresenter.ShowBattleResult(_player.WonCards, _currentTheme);
-
         // 敵がアルヴならチュートリアルを表示
         // if (_currentEnemyData.EnemyId == "alv")
         //     await _battleUIPresenter.StartResultTutorial();
-
-        // TODO: 結果表示の完了待機
-        // await _battleUIPresenter.WaitForBattleResultClose();
 
         // 現在のノード情報を一旦キャッシュ
         var currentNode = _gameProgressService.GetCurrentNode();

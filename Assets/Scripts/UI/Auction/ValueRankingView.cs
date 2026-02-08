@@ -13,7 +13,7 @@ using Void2610.UnityTemplate;
 /// 価値順位設定UI
 /// プレイヤーがカードをドラッグ&ドロップして順位1-4を設定する
 /// </summary>
-public class ValueRankingView : MonoBehaviour
+public class ValueRankingView : BasePhaseView
 {
     [Header("スロット")]
     [SerializeField] private List<RankingSlotView> slots;
@@ -51,16 +51,16 @@ public class ValueRankingView : MonoBehaviour
     private bool _wasDroppedToSlot;
     private RectTransform _handContainerRect;
 
-    public void Show()
+    public override void Show()
     {
-        gameObject.SetActive(true);
+        base.Show();
         PlaySlotEnterAnimation();
     }
 
-    public void Hide()
+    public override void Hide()
     {
         _animHandles.CancelAll();
-        gameObject.SetActive(false);
+        base.Hide();
     }
 
     public void StartRanking(IReadOnlyList<CardModel> cards)
@@ -321,8 +321,9 @@ public class ValueRankingView : MonoBehaviour
         }
     }
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         _handContainerRect = handContainer as RectTransform;
         var canvas = GetComponentInParent<Canvas>().rootCanvas;
         dragLineView.Initialize(canvas);

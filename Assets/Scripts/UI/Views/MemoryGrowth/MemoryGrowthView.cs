@@ -7,17 +7,13 @@ using Void2610.UnityTemplate;
 
 /// <summary>
 /// 記憶育成フェーズのメインビュー
-/// BaseWindowViewを継承してウィンドウとして振る舞う
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class MemoryGrowthView : MonoBehaviour
+public class MemoryGrowthView : BasePhaseView
 {
     [SerializeField] private MemoryThemeListView themeListView;
     [SerializeField] private MemoryDetailView detailView;
     [SerializeField] private GameObject hideObject;
     [SerializeField] private Button nextButton;
-
-    private CanvasGroup _canvasGroup;
 
     public async UniTask WaitForContinueAsync() => await nextButton.OnClickAsync();
 
@@ -35,7 +31,7 @@ public class MemoryGrowthView : MonoBehaviour
             .AddTo(this);
 
         // ウィンドウを表示
-        _canvasGroup.FadeIn(0.5f);
+        CanvasGroup.FadeIn(0.5f);
     }
 
     private async UniTask HandleThemeSelected(AcquiredTheme theme)
@@ -45,11 +41,4 @@ public class MemoryGrowthView : MonoBehaviour
         hideObject.SetActive(true);
     }
 
-    private void Awake()
-    {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-    }
 }

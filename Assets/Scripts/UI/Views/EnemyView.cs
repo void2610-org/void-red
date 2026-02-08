@@ -83,29 +83,6 @@ public class EnemyView : MonoBehaviour
     }
 
     /// <summary>
-    /// 敵を表示
-    /// </summary>
-    public async UniTask Show()
-    {
-        if (!gameObject.activeSelf) gameObject.SetActive(true);
-
-        // フェードイン
-        await _canvasGroup.FadeIn(fadeDuration, Ease.OutQuad)
-            .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-    }
-
-    /// <summary>
-    /// 敵を非表示
-    /// </summary>
-    public async UniTask Hide()
-    {
-        await _canvasGroup.FadeOut(fadeDuration, Ease.InQuad)
-            .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-
-        gameObject.SetActive(false);
-    }
-
-    /// <summary>
     /// 2枚の画像を使った真のクロスフェードアニメーション
     /// </summary>
     private async UniTask PlaySpriteChangeAnimation(Sprite newSprite)

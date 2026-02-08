@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 // オークションフェーズの統合View
 // CardReveal, BiddingPhase, AuctionResultで共有
-public class AuctionView : MonoBehaviour
+public class AuctionView : BasePhaseView
 {
     [Header("カード表示")]
     [SerializeField] private Transform playerCardContainer;
@@ -24,6 +24,13 @@ public class AuctionView : MonoBehaviour
 
     [Header("結果表示")]
     [SerializeField] private CardBidInfoView cardBidInfoPrefab;
+
+    public override void Show()
+    {
+        CanvasGroup.alpha = 1f;
+        CanvasGroup.interactable = true;
+        CanvasGroup.blocksRaycasts = true;
+    }
 
     public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
 
@@ -43,9 +50,6 @@ public class AuctionView : MonoBehaviour
     public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
 
     public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
-
-    public void Show() => gameObject.SetActive(true);
-    public void Hide() => gameObject.SetActive(false);
 
     // カード表示のみ（CardReveal用）
     public void ShowCards(
