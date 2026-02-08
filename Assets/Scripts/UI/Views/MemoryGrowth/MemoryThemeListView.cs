@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using LitMotion;
 using R3;
 using UnityEngine;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 記憶テーマリストビュー
@@ -10,6 +13,11 @@ public class MemoryThemeListView : MonoBehaviour
 {
     [SerializeField] private List<MemoryThemeListItemView> items = new();
 
+    [Header("アニメーション設定")]
+    [SerializeField] private float staggerDelay = 0.05f;
+    [SerializeField] private float animDuration = 0.2f;
+    [SerializeField] private float slideOffset = 50f;
+
     /// <summary>
     /// テーマ選択イベント
     /// </summary>
@@ -17,6 +25,7 @@ public class MemoryThemeListView : MonoBehaviour
 
     private readonly Subject<AcquiredTheme> _onThemeSelected = new();
     private readonly CompositeDisposable _itemDisposables = new();
+    private readonly List<MotionHandle> _animHandles = new();
     private MemoryThemeListItemView _selectedItem;
 
     /// <summary>
@@ -44,6 +53,8 @@ public class MemoryThemeListView : MonoBehaviour
                 item.SetLocked();
             }
         }
+
+        PlayEnterAnimation();
     }
 
     /// <summary>
@@ -63,8 +74,21 @@ public class MemoryThemeListView : MonoBehaviour
         _onThemeSelected.OnNext(item.Theme);
     }
 
+    private void PlayEnterAnimation()
+    {
+        _animHandles.CancelAll();
+        Canvas.ForceUpdateCanvases();
+
+        var targets = items
+            .Where(item => item && item.gameObject.activeSelf)
+            .Select(item => ((RectTransform)item.transform, item.gameObject.GetOrAddComponent<CanvasGroup>()))
+            .ToList();
+        targets.StaggeredSlideIn(new Vector2(0, slideOffset), animDuration, staggerDelay, _animHandles);
+    }
+
     private void OnDestroy()
     {
+        _animHandles.CancelAll();
         _itemDisposables.Dispose();
         _onThemeSelected?.Dispose();
     }
