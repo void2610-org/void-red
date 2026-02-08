@@ -194,7 +194,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
             DialogueChoiceType.Silence.ToJapaneseName() + "する"
         };
 
-        await _dialoguePhaseView.SetupChoices(labels);
+        _dialoguePhaseView.SetupChoices(labels);
         _dialoguePhaseView.Show();
 
         var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
@@ -206,7 +206,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
     public async UniTask<int> WaitForThreeResponseAsync(List<string> options)
     {
-        await _dialoguePhaseView.SetupChoices(options);
+        _dialoguePhaseView.SetupChoices(options);
 
         var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
 

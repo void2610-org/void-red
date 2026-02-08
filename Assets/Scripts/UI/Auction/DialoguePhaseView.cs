@@ -36,9 +36,10 @@ public class DialoguePhaseView : MonoBehaviour
         _enemyCutInSprite = enemyData.CutInSprite;
     }
 
-    public async UniTask SetupChoices(List<string> labels)
+    public void SetupChoices(List<string> labels)
     {
-        await portraitView.ChangePortrait(playerPortraitSprite);
+        portraitView.SetPortraitImmediate(playerPortraitSprite);
+        portraitView.SlideIn();
         choicesView.Setup(labels);
     }
 
@@ -59,16 +60,12 @@ public class DialoguePhaseView : MonoBehaviour
     {
         portraitView.SlideOut();
         await cutInView.PlayPlayerCutInAsync(text);
-        portraitView.SetPortraitImmediate(playerPortraitSprite);
-        portraitView.SlideIn();
     }
 
     public async UniTask ShowEnemyDialogueAsync(string text)
     {
         portraitView.SlideOut();
         await cutInView.PlayCutInAsync(_enemyPortraitSprite, _enemyCutInSprite, text);
-        portraitView.SetPortraitImmediate(_enemyPortraitSprite);
-        portraitView.SlideIn();
     }
 
     public async UniTask HideAllAsync()
