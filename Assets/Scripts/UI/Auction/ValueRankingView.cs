@@ -3,7 +3,6 @@ using System.Linq;
 using Auction;
 using Cysharp.Threading.Tasks;
 using LitMotion;
-using LitMotion.Extensions;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,7 +45,6 @@ public class ValueRankingView : BasePhaseView
     private readonly List<CardModel> _rankedCards = new();
     private readonly Subject<Unit> _onRankingComplete = new();
     private readonly List<MotionHandle> _animHandles = new();
-    private readonly Dictionary<RankingSlotView, Vector2> _slotOriginalPositions = new();
     private CompositeDisposable _disposables = new();
     private bool _wasDroppedToSlot;
     private RectTransform _handContainerRect;
@@ -241,44 +239,9 @@ public class ValueRankingView : BasePhaseView
     private void PlaySlotEnterAnimation()
     {
         _animHandles.CancelAll();
-
         Canvas.ForceUpdateCanvases();
-
-        for (var i = 0; i < slots.Count; i++)
-        {
-            var slot = slots[i];
-            var slotRect = (RectTransform)slot.transform;
-            var canvasGroup = slot.CanvasGroup;
-
-            // 初回は現在位置を保存、2回目以降は保存済みの位置を使用
-            if (!_slotOriginalPositions.TryGetValue(slot, out var originalPos))
-            {
-                originalPos = slotRect.anchoredPosition;
-                _slotOriginalPositions[slot] = originalPos;
-            }
-
-            // 開始位置を上にオフセット、透明度を0に
-            var startPos = originalPos + new Vector2(0, slotSlideOffset);
-            slotRect.anchoredPosition = startPos;
-            canvasGroup.alpha = 0f;
-
-            // ディレイ付きでスライド+フェードイン
-            var delay = slotStaggerDelay * i;
-
-            var moveHandle = LMotion.Create(startPos, originalPos, animDuration)
-                .WithEase(Ease.OutCubic)
-                .WithDelay(delay)
-                .BindToAnchoredPosition(slotRect)
-                .AddTo(slotRect.gameObject);
-            _animHandles.Add(moveHandle);
-
-            var fadeHandle = LMotion.Create(0f, 1f, animDuration)
-                .WithEase(Ease.OutCubic)
-                .WithDelay(delay)
-                .BindToAlpha(canvasGroup)
-                .AddTo(canvasGroup.gameObject);
-            _animHandles.Add(fadeHandle);
-        }
+        var targets = slots.Select(s => ((RectTransform)s.transform, s.CanvasGroup)).ToList();
+        targets.StaggeredSlideIn(new Vector2(0, slotSlideOffset), animDuration, slotStaggerDelay, _animHandles);
     }
 
     /// <summary>
@@ -287,38 +250,8 @@ public class ValueRankingView : BasePhaseView
     private void PlayCardEnterAnimation()
     {
         Canvas.ForceUpdateCanvases();
-
-        for (var i = 0; i < _handCards.Count; i++)
-        {
-            var card = _handCards[i];
-            var cardRect = (RectTransform)card.transform;
-            var canvasGroup = card.CanvasGroup;
-
-            // ターゲット位置を取得
-            var targetPos = cardRect.anchoredPosition;
-
-            // 開始位置を下にオフセット、透明度を0に
-            var startPos = targetPos + new Vector2(0, cardSlideOffset);
-            cardRect.anchoredPosition = startPos;
-            canvasGroup.alpha = 0f;
-
-            // ディレイ付きでスライド+フェードイン
-            var delay = cardStaggerDelay * i;
-
-            var moveHandle = LMotion.Create(startPos, targetPos, animDuration)
-                .WithEase(Ease.OutCubic)
-                .WithDelay(delay)
-                .BindToAnchoredPosition(cardRect)
-                .AddTo(cardRect.gameObject);
-            _animHandles.Add(moveHandle);
-
-            var fadeHandle = LMotion.Create(0f, 1f, animDuration)
-                .WithEase(Ease.OutCubic)
-                .WithDelay(delay)
-                .BindToAlpha(canvasGroup)
-                .AddTo(canvasGroup.gameObject);
-            _animHandles.Add(fadeHandle);
-        }
+        var targets = _handCards.Select(c => ((RectTransform)c.transform, c.CanvasGroup)).ToList();
+        targets.StaggeredSlideIn(new Vector2(0, cardSlideOffset), animDuration, cardStaggerDelay, _animHandles);
     }
 
     protected override void Awake()
