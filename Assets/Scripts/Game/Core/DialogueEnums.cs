@@ -1,16 +1,23 @@
 public enum DialogueChoiceType
 {
-    Provoke,   // 挑発
-    Empathize, // 共感
-    Persuade,  // 説得
-    Silence    // 沈黙
+    /// <summary> 挑発 </summary>
+    Provoke,
+    /// <summary> 共感 </summary>
+    Empathize,
+    /// <summary> 説得 </summary>
+    Persuade,
+    /// <summary> 沈黙 </summary>
+    Silence
 }
 
 public enum DialogueActionType
 {
-    TargetChange,    // 対象変更
-    ResourceChange,  // リソース増減
-    BluffStrengthen  // ブラフ強化（失敗時のペナルティ）
+    /// <summary> 対象変更 </summary>
+    TargetChange,
+    /// <summary> リソース増減 </summary>
+    ResourceChange,
+    /// <summary> ブラフ強化（失敗時のペナルティ） </summary>
+    BluffStrengthen
 }
 
 public static class DialogueChoiceTypeExtensions

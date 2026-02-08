@@ -17,93 +17,11 @@ public class EnemyView : MonoBehaviour
 
     [Header("アニメーション設定")]
     [SerializeField] private Color imageColor = Color.white;
-    [SerializeField] private float fadeDuration = 0.3f;
     [SerializeField] private float crossFadeDuration = 0.4f;
 
     private EnemyData _enemyData;
-    private CanvasGroup _canvasGroup;
 
-    /// <summary>
-    /// 初期化処理
-    /// </summary>
-    public void Initialize(EnemyData enemyData)
-    {
-        _enemyData = enemyData;
-
-        // デフォルトスプライトを設定
-        enemyImage.sprite = _enemyData.DefaultSprite;
-        enemyImage.color = imageColor;
-
-        // 背面画像を透明に初期化
-        enemyImageBack.color = new Color(1, 1, 1, 0);
-
-        // 初期状態では非表示
-        gameObject.SetActive(false);
-
-        // アルヴだけサイズを変える
-        if (enemyData.EnemyId == "alv")
-        {
-            enemyImage.transform.localPosition = new Vector3(0f, 0f, 0f);
-            enemyImage.transform.localScale = Vector3.one;
-            enemyImageBack.transform.localPosition = new Vector3(0f, 0f, 0f);
-            enemyImageBack.transform.localScale = Vector3.one;
-        }
-        else
-        {
-            enemyImage.transform.localPosition = new Vector3(0f, -300f, 0f);
-            enemyImage.transform.localScale = Vector3.one * 1.4f;
-            enemyImageBack.transform.localPosition = new Vector3(0f, -300f, 0f);
-            enemyImageBack.transform.localScale = Vector3.one * 1.4f;
-        }
-    }
-
-    /// <summary>
-    /// 指定された属性に応じて敵のSpriteを更新
-    /// </summary>
-    public async UniTask UpdateSpriteForAttribute(CardAttribute attribute)
-    {
-        if (!_enemyData) return;
-
-        var newSprite = _enemyData.GetSpriteForAttribute(attribute);
-        if (!newSprite) return;
-
-        // スプライト切り替えアニメーション
-        await PlaySpriteChangeAnimation(newSprite);
-    }
-
-    /// <summary>
-    /// デフォルトスプライトに戻す（カード未選択時）
-    /// </summary>
-    public async UniTask ResetToDefaultSprite()
-    {
-        if (!_enemyData || !_enemyData.DefaultSprite) return;
-
-        // デフォルトスプライトに切り替え
-        await PlaySpriteChangeAnimation(_enemyData.DefaultSprite);
-    }
-
-    /// <summary>
-    /// 敵を表示
-    /// </summary>
-    public async UniTask Show()
-    {
-        if (!gameObject.activeSelf) gameObject.SetActive(true);
-
-        // フェードイン
-        await _canvasGroup.FadeIn(fadeDuration, Ease.OutQuad)
-            .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-    }
-
-    /// <summary>
-    /// 敵を非表示
-    /// </summary>
-    public async UniTask Hide()
-    {
-        await _canvasGroup.FadeOut(fadeDuration, Ease.InQuad)
-            .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-
-        gameObject.SetActive(false);
-    }
+    public void Initialize(EnemyData enemyData) => _enemyData = enemyData;
 
     /// <summary>
     /// 2枚の画像を使った真のクロスフェードアニメーション
@@ -139,7 +57,7 @@ public class EnemyView : MonoBehaviour
 
     private void Awake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;
+        enemyImage.color = imageColor;
+        enemyImageBack.color = new Color(1, 1, 1, 0);
     }
 }

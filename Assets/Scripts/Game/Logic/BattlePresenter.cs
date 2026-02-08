@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -98,7 +97,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _enemy.SetEnemyData(_currentEnemyData);
         _battleUIPresenter.InitializeEnemy(_currentEnemyData);
         _battleUIPresenter.InitializeDialogueView(_currentEnemyData);
-        await _battleUIPresenter.ShowEnemy();
 
         // 敵情報をアナウンス
         await _battleUIPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
@@ -109,60 +107,43 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         await UniTask.Delay(1000);
 
-        // ゲーム開始
-        ChangeState(GameState.ThemeAnnouncement).Forget();
-    }
+        // 1. 出品者フェーズ
+        _currentGameState.Value = GameState.ThemeAnnouncement;
+        await HandleThemeAnnouncement();
+        _currentGameState.Value = GameState.CardDistribution;
+        await HandleCardDistribution();
+        _currentGameState.Value = GameState.ValueRanking;
+        await HandleValueRanking();
+        _currentGameState.Value = GameState.CardReveal;
+        await HandleCardReveal();
 
-    private async UniTask ChangeState(GameState newState)
-    {
-        _currentGameState.Value = newState;
+        // 2. 入札者フェーズ
+        _currentGameState.Value = GameState.BiddingPhase;
+        await HandleBiddingPhase();
 
-        switch (newState)
-        {
-            // 1. 出品者フェーズ
-            case GameState.ThemeAnnouncement:
-                _battleUIPresenter.ResetEnemyToDefault().Forget();
-                await HandleThemeAnnouncement();
-                break;
-            case GameState.CardDistribution:
-                await HandleCardDistribution();
-                break;
-            case GameState.ValueRanking:
-                await HandleValueRanking();
-                break;
-            case GameState.CardReveal:
-                await HandleCardReveal();
-                break;
-            // 2. 入札者フェーズ
-            case GameState.BiddingPhase:
-                await HandleBiddingPhase();
-                break;
-            // 3. 対話フェーズ
-            case GameState.DialoguePhase:
-                await HandleDialoguePhase();
-                break;
-            // 4. 落札者判定フェーズ
-            case GameState.AuctionResult:
-                await HandleAuctionResult();
-                break;
-            // 5. 報酬フェーズ
-            case GameState.RewardPhase:
-                await HandleRewardPhase();
-                break;
-            // 6. 記憶育成フェーズ
-            case GameState.MemoryGrowth:
-                await HandleMemoryGrowth();
-                break;
-            // 終了
-            case GameState.BattleEnd:
-                await HandleBattleEnd();
-                break;
-        }
+        // 3. 対話フェーズ
+        _currentGameState.Value = GameState.DialoguePhase;
+        await HandleDialoguePhase();
+
+        // 4. 落札者判定フェーズ
+        _currentGameState.Value = GameState.AuctionResult;
+        await HandleAuctionResult();
+
+        // 5. 報酬フェーズ
+        _currentGameState.Value = GameState.RewardPhase;
+        await HandleRewardPhase();
+
+        // 6. 記憶育成フェーズ
+        _currentGameState.Value = GameState.MemoryGrowth;
+        await HandleMemoryGrowth();
+
+        // 終了
+        _currentGameState.Value = GameState.BattleEnd;
+        await HandleBattleEnd();
     }
 
     // === 1. 出品者フェーズ ===
 
-    // 記憶テーマを公開する
     private async UniTask HandleThemeAnnouncement()
     {
         // オークションデータからテーマを取得
@@ -174,11 +155,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 敵がアルヴならチュートリアルを表示
         // if (_currentEnemyData.EnemyId == "alv")
         //     await _battleUIPresenter.StartBattleTutorial();
-
-        await ChangeState(GameState.CardDistribution);
     }
 
-    // カードを配布する（主4枚 + 相4枚）
     private async UniTask HandleCardDistribution()
     {
         // Player/Enemyにカードを設定
@@ -190,10 +168,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // TODO: 配布アニメーション（UIPresenter経由）
 
         await UniTask.Delay(500);
-        await ChangeState(GameState.ValueRanking);
     }
 
-    // 価値順位を設定する（1〜4）
     private async UniTask HandleValueRanking()
     {
         Debug.Log("[BattlePresenter] 価値順位設定フェーズ開始");
@@ -213,10 +189,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log("[BattlePresenter] プレイヤーの価値順位設定完了");
 
         await UniTask.Delay(500);
-        await ChangeState(GameState.CardReveal);
     }
 
-    // カードを公開する
     private async UniTask HandleCardReveal()
     {
         Debug.Log("[BattlePresenter] カード公開フェーズ開始");
@@ -235,12 +209,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await _battleUIPresenter.PlayPhaseTransitionOpenAsync();
 
         await UniTask.Delay(1500);
-        await ChangeState(GameState.BiddingPhase);
     }
 
     // === 2. 入札者フェーズ ===
 
-    // 感情リソースで入札する
     private async UniTask HandleBiddingPhase()
     {
         Debug.Log("[BattlePresenter] 入札フェーズ開始");
@@ -262,7 +234,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 入札対象カード公開演出（投入リソースは非公開、入札なしカードは順位非表示）
         await _battleUIPresenter.ShowBidTargetsAsync(_player.Bids, _enemy.Bids, 2f);
 
-        await ChangeState(GameState.DialoguePhase);
     }
 
     // === 3. 対話フェーズ ===
@@ -278,7 +249,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
 
         await _battleUIPresenter.HideDialogueViewAsync();
-        await ChangeState(GameState.AuctionResult);
     }
 
     private async UniTask<DialogueChoiceType> HandlePlayerFirstTurn(EnemyDialogueData dialogueData)
@@ -328,7 +298,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     // === 4. 落札者判定フェーズ ===
 
-    // 入札結果を開示し落札者を決定する
     private async UniTask HandleAuctionResult()
     {
         Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
@@ -375,7 +344,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await UniTask.Delay(1000);
         // オークション完全終了時にクリア
         _battleUIPresenter.ClearAuctionView();
-        await ChangeState(GameState.RewardPhase);
     }
 
     /// <summary>
@@ -393,7 +361,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     // === 5. 報酬フェーズ ===
 
-    // 報酬ポイントを算出し感情リソースを獲得する
     private async UniTask HandleRewardPhase()
     {
         Debug.Log("[BattlePresenter] 報酬フェーズ開始");
@@ -436,12 +403,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await UniTask.Delay(2000);
         _battleUIPresenter.HideRewardView();
 
-        await ChangeState(GameState.MemoryGrowth);
     }
 
     // === 6. 記憶育成フェーズ ===
 
-    // 記憶テーマを構成しキャラクターを表示する
     private async UniTask HandleMemoryGrowth()
     {
         Debug.Log("[BattlePresenter] 記憶育成フェーズ開始");
@@ -453,7 +418,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         if (allCardInfoList.Count == 0)
         {
             Debug.Log("[BattlePresenter] 入札カードなし - 記憶育成フェーズをスキップ");
-            await ChangeState(GameState.BattleEnd);
             return;
         }
 
@@ -480,8 +444,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // UIで記憶育成フェーズを表示
         await _battleUIPresenter.ShowMemoryGrowthAsync(allThemes);
-
-        await ChangeState(GameState.BattleEnd);
     }
 
     /// <summary>
@@ -541,7 +503,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     // === 終了 ===
 
-    // バトル終了フェーズ
     private async UniTask HandleBattleEnd()
     {
         await UniTask.Delay(500);
@@ -549,15 +510,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // Volumeエフェクトを全てデフォルトに戻す
         VolumeController.Instance.ResetToDefault();
 
-        // TODO: バトル結果表示（落札したカード・獲得した記憶テーマを表示）
-        // _battleUIPresenter.ShowBattleResult(_player.WonCards, _currentTheme);
-
         // 敵がアルヴならチュートリアルを表示
         // if (_currentEnemyData.EnemyId == "alv")
         //     await _battleUIPresenter.StartResultTutorial();
-
-        // TODO: 結果表示の完了待機
-        // await _battleUIPresenter.WaitForBattleResultClose();
 
         // 現在のノード情報を一旦キャッシュ
         var currentNode = _gameProgressService.GetCurrentNode();
@@ -580,7 +535,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     public void Start()
     {
-        // UIPresenterにBattlePresenterを設定（循環依存を避けるため）
         _battleUIPresenter.SetBattlePresenter(this);
 
         InitializeGameAsync().Forget();

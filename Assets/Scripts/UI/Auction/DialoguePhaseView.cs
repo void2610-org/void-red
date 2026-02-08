@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 
-public class DialoguePhaseView : MonoBehaviour
+public class DialoguePhaseView : BasePhaseView
 {
     [SerializeField] private DialogueChoicesView choicesView;
     [SerializeField] private DialogueCutInView cutInView;
@@ -43,17 +43,17 @@ public class DialoguePhaseView : MonoBehaviour
         choicesView.Setup(labels);
     }
 
-    public void Show()
+    public override void Show()
     {
         portraitView.SetPortraitImmediate(playerPortraitSprite);
-        gameObject.SetActive(true);
+        base.Show();
         portraitView.SlideIn();
     }
 
-    public void Hide()
+    public override void Hide()
     {
         portraitView.SlideOut();
-        gameObject.SetActive(false);
+        base.Hide();
     }
 
     public async UniTask ShowPlayerDialogueAsync(string text)

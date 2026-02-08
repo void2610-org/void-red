@@ -41,21 +41,11 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
-
         _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
-        _valueRankingView.Hide();
-
         _auctionView = Object.FindFirstObjectByType<AuctionView>();
-        _auctionView.Hide();
-
         _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>();
-        _dialoguePhaseView.Hide();
-
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
-        _rewardPhaseView.Hide();
-
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
-
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
         _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
 
@@ -63,16 +53,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
-    public void InitializeEnemyFace(EnemyData enemyData) => _enemyFaceView.Initialize(enemyData);
     public void UpdatePlayerPainGauge(float value) => _playerFaceView.UpdatePainGauge(value);
     public void UpdatePlayerDilutionGauge(float value) => _playerFaceView.UpdateDilutionGauge(value);
-    public async UniTask ShowEnemy() => await _enemyView.Show();
-    public async UniTask HideEnemy() => await _enemyView.Hide();
-    public async UniTask ResetEnemyToDefault() => await _enemyView.ResetToDefaultSprite();
-    public async UniTask UpdateEnemySprite(CardAttribute attribute) => await _enemyView.UpdateSpriteForAttribute(attribute);
-    public async UniTask ShowBlackOverlay() => await _blackOverlayView.FadeIn();
-    public async UniTask HideBlackOverlay() => await _blackOverlayView.FadeOut();
-    public async UniTask PlayPhaseTransitionAsync() => await _eyeBlinkTransitionView.PlayTransitionAsync();
     public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
     public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
     public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
@@ -84,29 +66,11 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowEnemyNarration(string message) => await _dialoguePhaseView.ShowEnemyNarrationAsync(message);
     public UniTask HideAllAsync() => _dialoguePhaseView.HideAllAsync();
     public void ShowDialogueView() => _dialoguePhaseView.Show();
-    /// <summary>
-    /// 対話フェーズViewを敵データで初期化
-    /// </summary>
     public void InitializeDialogueView(EnemyData enemyData) => _dialoguePhaseView.Initialize(enemyData);
-    // AuctionViewを表示（カードは再生成しない）
     public void ShowAuctionView() => _auctionView.Show();
-    // 結果表示（AuctionResultフェーズ）
-    public void ShowAuctionResults(IReadOnlyList<AuctionJudge.AuctionResultEntry> results) => _auctionView.ShowResults(results);
-    // 順次結果表示（各カードごとにアニメーション付き）
-    public async UniTask ShowAuctionResultsSequentialAsync(
-        IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
-        ValueRankingModel playerRanking,
-        ValueRankingModel enemyRanking,
-        Color enemyColor) =>
-        await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking, enemyColor);
-    // 入札対象カード公開演出
-    public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) =>
-        await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
-    // 全カードを再表示
-    public void ShowAllAuctionCards() => _auctionView.ShowAllCards();
-    // オークションView非表示
+    public async UniTask ShowAuctionResultsSequentialAsync(IReadOnlyList<AuctionJudge.AuctionResultEntry> results, ValueRankingModel playerRanking, ValueRankingModel enemyRanking, Color enemyColor) => await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking, enemyColor);
+    public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
-    // 報酬フェーズを非表示
     public void HideRewardView() => _rewardPhaseView.Hide();
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)

@@ -7,7 +7,7 @@ using UnityEngine;
 /// 報酬フェーズのコーディネーター
 /// CardAcquisitionView → ResourceRewardView の順にサブViewを呼び出す
 /// </summary>
-public class RewardPhaseView : MonoBehaviour
+public class RewardPhaseView : BasePhaseView
 {
     [SerializeField] private CardAcquisitionView cardAcquisitionView;
     [SerializeField] private ResourceRewardView resourceRewardView;
@@ -17,11 +17,11 @@ public class RewardPhaseView : MonoBehaviour
     /// </summary>
     public IReadOnlyDictionary<EmotionType, int> RewardedAmounts => resourceRewardView.RewardedAmounts;
 
-    public void Hide()
+    public override void Hide()
     {
         cardAcquisitionView.Hide();
         resourceRewardView.Hide();
-        gameObject.SetActive(false);
+        base.Hide();
     }
 
     public async UniTask ShowRewardsAsync(
@@ -29,7 +29,7 @@ public class RewardPhaseView : MonoBehaviour
         IReadOnlyDictionary<EmotionType, int> currentResources,
         IReadOnlyDictionary<EmotionType, int> maxResources)
     {
-        gameObject.SetActive(true);
+        Show();
 
         // 獲得カード一覧を表示
         var cardDataList = results.Keys.Select(card => card.Data);

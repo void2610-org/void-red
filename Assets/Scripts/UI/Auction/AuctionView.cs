@@ -5,10 +5,11 @@ using LitMotion;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 // オークションフェーズの統合View
 // CardReveal, BiddingPhase, AuctionResultで共有
-public class AuctionView : MonoBehaviour
+public class AuctionView : BasePhaseView
 {
     [Header("カード表示")]
     [SerializeField] private Transform playerCardContainer;
@@ -44,8 +45,7 @@ public class AuctionView : MonoBehaviour
 
     public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
 
-    public void Show() => gameObject.SetActive(true);
-    public void Hide() => gameObject.SetActive(false);
+    public override void Show() => CanvasGroup.Show();
 
     // カード表示のみ（CardReveal用）
     public void ShowCards(

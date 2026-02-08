@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 using VoidRed.UI.Views;
 
 /// <summary>
@@ -11,7 +12,6 @@ using VoidRed.UI.Views;
 [RequireComponent(typeof(CanvasGroup))]
 public class ResourceRewardView : MonoBehaviour
 {
-    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button nextButton;
     [SerializeField] private EmotionGaugeView[] emotionGauges;
 
@@ -21,11 +21,14 @@ public class ResourceRewardView : MonoBehaviour
     public IReadOnlyDictionary<EmotionType, int> RewardedAmounts => _rewardedAmounts;
 
     private readonly Subject<Unit> _onNextButtonClicked = new();
-    private Dictionary<EmotionType, EmotionGaugeView> _gaugeDict = new();
+    private readonly Dictionary<EmotionType, EmotionGaugeView> _gaugeDict = new();
     private Dictionary<EmotionType, int> _currentResourceValues = new();
     private Dictionary<EmotionType, int> _rewardedAmounts = new();
     private Dictionary<EmotionType, int> _maxResources = new();
     private EmotionType[] _emotionTypes;
+    private CanvasGroup _canvasGroup;
+
+    public void Hide() => _canvasGroup.Hide();
 
     /// <summary>
     /// リソース報酬をゲージアニメーションで表示
@@ -64,18 +67,9 @@ public class ResourceRewardView : MonoBehaviour
         Hide();
     }
 
-    public void Hide()
-    {
-        canvasGroup.alpha = 0f;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-    }
-
     private void Show()
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
+        _canvasGroup.Show();
     }
 
     private EmotionType GetRandomEmotion()
@@ -121,6 +115,9 @@ public class ResourceRewardView : MonoBehaviour
 
     private void Awake()
     {
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.Hide();
+
         nextButton.OnClickAsObservable()
             .Subscribe(_ => _onNextButtonClicked.OnNext(Unit.Default))
             .AddTo(this);

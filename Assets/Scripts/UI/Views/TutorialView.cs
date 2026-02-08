@@ -128,9 +128,7 @@ public class TutorialView : MonoBehaviour
         _canvasGroup = this.GetComponent<CanvasGroup>();
 
         // 初期状態は非表示
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
+        _canvasGroup.Hide();
         maskArea.anchoredPosition = Vector2.zero;
         maskArea.sizeDelta = Vector2.zero;
     }

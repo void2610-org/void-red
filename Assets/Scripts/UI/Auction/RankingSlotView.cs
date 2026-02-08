@@ -17,17 +17,17 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
     [SerializeField] private Image highlightImage;
 
     public int Rank => rank;
-    public DraggableCardView PlacedCard { get; private set; }
     public bool IsOccupied => PlacedCard;
     public Transform CardAnchor => this.transform;
-    public CanvasGroup CanvasGroup => _canvasGroup;
+    public DraggableCardView PlacedCard { get; private set; }
+    public CanvasGroup CanvasGroup { get; private set; }
+
     public Observable<(RankingSlotView slot, DraggableCardView card)> OnCardDropped => _onCardDropped;
 
     private const float FADE_DURATION = 0.15f;
 
     private readonly Subject<(RankingSlotView slot, DraggableCardView card)> _onCardDropped = new();
     private MotionHandle _fadeTween;
-    private CanvasGroup _canvasGroup;
 
     /// <summary>
     /// スロットにカードを配置
@@ -75,7 +75,7 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
 
     private void Awake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
+        CanvasGroup = GetComponent<CanvasGroup>();
         highlightImage.SetAlpha(0f);
     }
 

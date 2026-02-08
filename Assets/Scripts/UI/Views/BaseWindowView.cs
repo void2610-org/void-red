@@ -89,9 +89,7 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         if (_isInitialized) return;
         _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
+        _canvasGroup.Hide();
         _isInitialized = true;
     }
 

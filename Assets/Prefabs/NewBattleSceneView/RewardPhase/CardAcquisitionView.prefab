@@ -351,14 +351,14 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4290697196
   m_fontColor: {r: 0.9245283, g: 0.8425782, b: 0.745728, a: 1}
-  m_enableVertexGradient: 0
+  m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
     topLeft: {r: 1, g: 1, b: 1, a: 1}
     topRight: {r: 1, g: 1, b: 1, a: 1}
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
+  m_fontColorGradientPreset: {fileID: 11400000, guid: 1d3c8c3d529ba4030914980fc0fc5522, type: 2}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
@@ -496,6 +496,7 @@ MonoBehaviour:
   canvasGroup: {fileID: 2923211527616852343}
   nextButton: {fileID: 1913447475028633268}
   cardContainer: {fileID: 1780612484730660277}
+  cardPrefab: {fileID: 7383955479449652679, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
   textContainer: {fileID: 4725685669159206177}
   cardTextPrefab: {fileID: 2610911944171587868, guid: d0e99a736fa754670b9f43d45ec6f8b2, type: 3}
 --- !u!1 &8234326788108221482

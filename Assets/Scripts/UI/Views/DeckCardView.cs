@@ -9,10 +9,14 @@ using UnityEngine.UI;
 /// </summary>
 public enum CardDisplayState
 {
-    Normal,    // 通常状態
-    Veiled,    // 隠されている状態
-    Collapsed, // 崩壊状態
-    Backside   // 裏面状態
+    /// <summary> 通常状態 </summary>
+    Normal,
+    /// <summary> 隠されている状態 </summary>
+    Veiled,
+    /// <summary> 崩壊状態 </summary>
+    Collapsed,
+    /// <summary> 裏面状態 </summary>
+    Backside
 }
 
 /// <summary>
