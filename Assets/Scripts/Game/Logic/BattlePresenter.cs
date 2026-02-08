@@ -274,7 +274,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var dialogueData = _currentAuctionData.DialogueData;
 
         var playerFirstChoice = await HandlePlayerFirstTurn(dialogueData);
-        await _battleUIPresenter.HideDialogueResultAsync();
 
         await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
 
@@ -294,7 +293,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await _battleUIPresenter.ShowEnemyDialogueAsync(response.DialogueText);
 
         var resultMessage = DialogueEffectApplier.ApplyEffect(response.Effect, _enemy, _auctionCards);
-        await _battleUIPresenter.ShowDialogueResultAsync(resultMessage);
+        await _battleUIPresenter.ShowEnemyNarration(resultMessage);
 
         return playerChoice;
     }
@@ -306,7 +305,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await UniTask.WhenAll(
             _battleUIPresenter.HidePlayerDialogueAsync(),
             _battleUIPresenter.HideEnemyDialogueAsync(),
-            _battleUIPresenter.HideDialogueResultAsync()
+            _battleUIPresenter.HideAllAsync()
         );
 
         await _battleUIPresenter.ShowEnemyDialogueAsync(initiation.EnemyDialogueText);
@@ -324,7 +323,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 効果を適用して結果を表示
         var resultMessage = DialogueEffectApplier.ApplyEffect(selectedOption.Effect, _player, _auctionCards);
-        await _battleUIPresenter.ShowDialogueResultAsync(resultMessage);
+        await _battleUIPresenter.ShowPlayerNarration(resultMessage);
     }
 
     // === 4. 落札者判定フェーズ ===

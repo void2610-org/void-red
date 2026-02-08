@@ -17,7 +17,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 
     private readonly ThemeView _themeView;
     private readonly AnnouncementView _announcementView;
-    private readonly NarrationView _playerNarrationView;
     private EnemyView _enemyView;
     private readonly BlackOverlayView _blackOverlayView;
 
@@ -42,8 +41,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
-        _playerNarrationView = Object.FindFirstObjectByType<NarrationView>();
-
+        
         _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
         _valueRankingView.Hide();
 
@@ -65,7 +63,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
-    public async UniTask ShowPlayerNarration(string message, bool autoAdvance) => await _playerNarrationView.DisplayNarration(message, 2f, autoAdvance);
     public void InitializeEnemyFace(EnemyData enemyData) => _enemyFaceView.Initialize(enemyData);
     public void UpdatePlayerPainGauge(float value) => _playerFaceView.UpdatePainGauge(value);
     public void UpdatePlayerDilutionGauge(float value) => _playerFaceView.UpdateDilutionGauge(value);
@@ -83,8 +80,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public UniTask HidePlayerDialogueAsync() => _dialoguePhaseView.HidePlayerDialogueAsync();
     public UniTask ShowEnemyDialogueAsync(string text) => _dialoguePhaseView.ShowEnemyDialogueAsync(text);
     public UniTask HideEnemyDialogueAsync() => _dialoguePhaseView.HideEnemyDialogueAsync();
-    public UniTask ShowDialogueResultAsync(string message) => _dialoguePhaseView.ShowResultAsync(message);
-    public UniTask HideDialogueResultAsync() => _dialoguePhaseView.HideResultAsync();
+    public async UniTask ShowPlayerNarration(string message) => await _dialoguePhaseView.ShowPlayerNarrationAsync(message);
+    public async UniTask ShowEnemyNarration(string message) => await _dialoguePhaseView.ShowEnemyNarrationAsync(message);
+    public UniTask HideAllAsync() => _dialoguePhaseView.HideAllAsync();
     public void ShowDialogueView() => _dialoguePhaseView.Show();
     /// <summary>
     /// 対話フェーズViewを敵データで初期化

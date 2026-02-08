@@ -7,7 +7,8 @@ public class DialoguePhaseView : MonoBehaviour
 {
     [SerializeField] private DialogueChoicesView choicesView;
     [SerializeField] private DialogueCutInView cutInView;
-    [SerializeField] private NarrationView resultNarration;
+    [SerializeField] private NarrationView playerNarration;
+    [SerializeField] private NarrationView enemyNarration;
 
     [Header("立ち絵")]
     [SerializeField] private DialoguePortraitView portraitView;
@@ -21,8 +22,10 @@ public class DialoguePhaseView : MonoBehaviour
     public void HideChoices() => choicesView.Hide();
     public UniTask HidePlayerDialogueAsync() => UniTask.CompletedTask;
     public UniTask HideEnemyDialogueAsync() => UniTask.CompletedTask;
-    public UniTask ShowResultAsync(string message) => resultNarration.DisplayNarration(message, autoAdvance: false);
-    public UniTask HideResultAsync() => resultNarration.HideNarration();
+    public UniTask ShowPlayerNarrationAsync(string message) => playerNarration.DisplayNarration(message, autoAdvance: false);
+    public UniTask HidePlayerNarrationAsync() => playerNarration.HideNarration();
+    public UniTask ShowEnemyNarrationAsync(string message) => enemyNarration.DisplayNarration(message, autoAdvance: false);
+    public UniTask HideEnemyNarrationAsync() => enemyNarration.HideNarration();
 
     /// <summary>
     /// 敵データで初期化する
@@ -54,19 +57,24 @@ public class DialoguePhaseView : MonoBehaviour
 
     public async UniTask ShowPlayerDialogueAsync(string text)
     {
-        await portraitView.ChangePortrait(playerPortraitSprite);
+        portraitView.SlideOut();
         await cutInView.PlayPlayerCutInAsync(text);
+        portraitView.SetPortraitImmediate(playerPortraitSprite);
+        portraitView.SlideIn();
     }
 
     public async UniTask ShowEnemyDialogueAsync(string text)
     {
-        await portraitView.ChangePortrait(_enemyPortraitSprite);
+        portraitView.SlideOut();
         await cutInView.PlayCutInAsync(_enemyPortraitSprite, _enemyCutInSprite, text);
+        portraitView.SetPortraitImmediate(_enemyPortraitSprite);
+        portraitView.SlideIn();
     }
 
     public async UniTask HideAllAsync()
     {
         HideChoices();
-        await HideResultAsync();
+        await HidePlayerNarrationAsync();
+        await HideEnemyNarrationAsync();
     }
 }
