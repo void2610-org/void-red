@@ -116,7 +116,8 @@ public class ResourceRewardView : MonoBehaviour
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-        
+        _canvasGroup.Hide();
+
         nextButton.OnClickAsObservable()
             .Subscribe(_ => _onNextButtonClicked.OnNext(Unit.Default))
             .AddTo(this);

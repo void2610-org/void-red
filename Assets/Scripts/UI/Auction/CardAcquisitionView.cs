@@ -67,6 +67,8 @@ public class CardAcquisitionView : MonoBehaviour
 
     private void Awake()
     {
+        canvasGroup.Hide();
+
         nextButton.OnClickAsObservable()
             .Subscribe(_ => _onNextButtonClicked.OnNext(Unit.Default))
             .AddTo(this);
