@@ -1,11 +1,3 @@
-public enum BgmType
-{
-    Title, // タイトルBGM
-    Home,  // ホームBGM
-    Novel, // ノベルBGM
-    Battle, // バトルBGM
-}
-
 /// <summary>
 /// ゲームの状態を表すEnum
 /// </summary>
@@ -24,7 +16,6 @@ public enum GameState
     MemoryGrowth,           // 記憶テーマ構成・キャラクター表示
     BattleEnd,              // バトル終了
 }
-
 
 /// <summary>
 /// 感情リソースの8属性（プルチックの感情の輪に基づく）
