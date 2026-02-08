@@ -477,7 +477,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6096691227974815607}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -496,6 +496,7 @@ MonoBehaviour:
   canvasGroup: {fileID: 2923211527616852343}
   nextButton: {fileID: 1913447475028633268}
   cardContainer: {fileID: 1780612484730660277}
+  cardPrefab: {fileID: 7383955479449652679, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
   textContainer: {fileID: 4725685669159206177}
   cardTextPrefab: {fileID: 2610911944171587868, guid: d0e99a736fa754670b9f43d45ec6f8b2, type: 3}
 --- !u!1 &8234326788108221482

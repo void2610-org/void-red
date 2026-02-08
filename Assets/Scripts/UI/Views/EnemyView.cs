@@ -57,7 +57,6 @@ public class EnemyView : MonoBehaviour
 
     private void Awake()
     {
-        enemyImage.sprite = _enemyData.DefaultSprite;
         enemyImage.color = imageColor;
         enemyImageBack.color = new Color(1, 1, 1, 0);
     }
