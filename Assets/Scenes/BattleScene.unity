@@ -5820,17 +5820,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &700798270 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1917449612377719414, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
-  m_PrefabInstance: {fileID: 2419019051059038216}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &731645807 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3467409832636434117, guid: d0cbdd114ecec4150828a97e40b8b90c, type: 3}
@@ -7427,10 +7416,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 595253103}
     m_Modifications:
     - target: {fileID: 92328340160874941, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
-      propertyPath: enemyNarrationView
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 92328340160874941, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
       propertyPath: playerNarrationView
       value: 
       objectReference: {fileID: 3961447289890990791}
@@ -7514,17 +7499,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4668392839691177896, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
-      propertyPath: m_TargetGraphic
-      value: 
-      objectReference: {fileID: 700798270}
     - target: {fileID: 7238768428824122212, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
       propertyPath: m_Name
       value: TutorialView
-      objectReference: {fileID: 0}
-    - target: {fileID: 7403184293597522749, guid: 93d0e58e9bed6480eb7fbef5efeb30ca, type: 3}
-      propertyPath: m_TagString
-      value: IgnoreHoverSelection
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7858,6 +7835,14 @@ PrefabInstance:
       propertyPath: m_Alpha
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5037952669139927644, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
+      propertyPath: m_fontSize
+      value: 15.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5037952669139927644, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7823105220120858534, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -7944,6 +7929,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8662611474854455044, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
       propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9004008245799212039, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
+      propertyPath: m_fontSize
+      value: 15.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9004008245799212039, guid: 0d2896e227d114238bf292fc110e9a65, type: 3}
+      propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
