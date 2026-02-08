@@ -41,7 +41,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
-        
+
         _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
         _valueRankingView.Hide();
 

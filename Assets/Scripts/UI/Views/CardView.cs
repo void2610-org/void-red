@@ -13,10 +13,6 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class CardView : BaseCardView
 {
-    private static readonly int _alpha = Shader.PropertyToID("_Alpha");
-    private static readonly int _value = Shader.PropertyToID("_Value");
-    private static readonly int _color2 = Shader.PropertyToID("_Color2");
-
     public enum CardBidState
     {
         None,       // 入札なし
@@ -24,7 +20,7 @@ public class CardView : BaseCardView
         EnemyBid,   // 敵が入札
         DrawBid    // 引き分け入札
     }
-    
+
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
     [SerializeField] private Image cardFrame;
@@ -35,6 +31,10 @@ public class CardView : BaseCardView
 
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked { get; private set; }
+
+    private static readonly int _alpha = Shader.PropertyToID("_Alpha");
+    private static readonly int _value = Shader.PropertyToID("_Value");
+    private static readonly int _color2 = Shader.PropertyToID("_Color2");
 
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
@@ -86,7 +86,7 @@ public class CardView : BaseCardView
             .Bind(alpha => canvasGroup.alpha = alpha)
             .ToUniTask();
     }
-    
+
     public void SetGrowEffect(CardBidState state, Color enemyColor, float fadeDuration = 0.3f)
     {
         _growAlphaHandle.TryCancel();
