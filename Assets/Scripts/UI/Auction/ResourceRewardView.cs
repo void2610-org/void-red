@@ -12,7 +12,6 @@ using VoidRed.UI.Views;
 [RequireComponent(typeof(CanvasGroup))]
 public class ResourceRewardView : MonoBehaviour
 {
-    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button nextButton;
     [SerializeField] private EmotionGaugeView[] emotionGauges;
 
@@ -22,13 +21,14 @@ public class ResourceRewardView : MonoBehaviour
     public IReadOnlyDictionary<EmotionType, int> RewardedAmounts => _rewardedAmounts;
 
     private readonly Subject<Unit> _onNextButtonClicked = new();
-    private Dictionary<EmotionType, EmotionGaugeView> _gaugeDict = new();
+    private readonly Dictionary<EmotionType, EmotionGaugeView> _gaugeDict = new();
     private Dictionary<EmotionType, int> _currentResourceValues = new();
     private Dictionary<EmotionType, int> _rewardedAmounts = new();
     private Dictionary<EmotionType, int> _maxResources = new();
     private EmotionType[] _emotionTypes;
+    private CanvasGroup _canvasGroup;
 
-    public void Hide() => canvasGroup.Hide();
+    public void Hide() => _canvasGroup.Hide();
 
     /// <summary>
     /// リソース報酬をゲージアニメーションで表示
@@ -69,7 +69,7 @@ public class ResourceRewardView : MonoBehaviour
 
     private void Show()
     {
-        canvasGroup.Show();
+        _canvasGroup.Show();
     }
 
     private EmotionType GetRandomEmotion()
@@ -115,6 +115,8 @@ public class ResourceRewardView : MonoBehaviour
 
     private void Awake()
     {
+        _canvasGroup = GetComponent<CanvasGroup>();
+        
         nextButton.OnClickAsObservable()
             .Subscribe(_ => _onNextButtonClicked.OnNext(Unit.Default))
             .AddTo(this);
