@@ -270,6 +270,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardAcquisitionView
       objectReference: {fileID: 0}
+    - target: {fileID: 6324309476544568025, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

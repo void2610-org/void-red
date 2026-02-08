@@ -558,11 +558,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -350
+      value: 375
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 275
+      value: -285
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -575,6 +575,10 @@ PrefabInstance:
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9207652731163515229, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1316,7 +1320,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4721994944021476717, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
       propertyPath: ShapeModule.radiusThickness
-      value: 1.0000
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4721994944021476717, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
       propertyPath: InitialModule.startSize.scalar
@@ -1426,6 +1430,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RewardPhaseView
       objectReference: {fileID: 0}
+    - target: {fileID: 7952260598763614443, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 8754232786035169815, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
@@ -1447,7 +1455,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8426153450248272061, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a66b6b8d99ef4bddb292a3dbd0e238c, type: 3}
