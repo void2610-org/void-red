@@ -261,6 +261,7 @@ GameObject:
   - component: {fileID: 1025471365600806077}
   - component: {fileID: 6554519754583958714}
   - component: {fileID: 1912750906798753360}
+  - component: {fileID: 6055779407889766941}
   m_Layer: 5
   m_Name: TextBanner
   m_TagString: Untagged
@@ -326,6 +327,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6055779407889766941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727859303785171714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa6bf560f800412eb2d5c27423a00bdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shadowColor: {r: 0.8509804, g: 0.65882355, b: 0.40392157, a: 0.4}
+  shadowDistance: {x: 0, y: 0}
+  useGraphicAlpha: 1
+  iterations: 10
+  shadowSpread: {x: 2, y: 2}
 --- !u!1 &1867353964434569423
 GameObject:
   m_ObjectHideFlags: 0
@@ -5232,7 +5250,7 @@ GameObject:
   - component: {fileID: 3204506911115856023}
   - component: {fileID: 813956293716199208}
   - component: {fileID: 3216965759335865507}
-  - component: {fileID: 2483663481927077904}
+  - component: {fileID: 1106452577232336006}
   m_Layer: 5
   m_Name: PhaseHeader
   m_TagString: Untagged
@@ -5290,7 +5308,7 @@ MonoBehaviour:
   m_text: "\u30AA\u30FC\u30AF\u30B7\u30E7\u30F3\u7D50\u679C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
-  m_sharedMaterial: {fileID: 1947302341603136683, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: b9433133d781e46caac78c03bd83fdd5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5358,7 +5376,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &2483663481927077904
+--- !u!114 &1106452577232336006
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5367,12 +5385,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 3400837707613890184}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Script: {fileID: 11500000, guid: fa6bf560f800412eb2d5c27423a00bdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5019608}
-  m_EffectDistance: {x: 3, y: -3}
-  m_UseGraphicAlpha: 1
+  shadowColor: {r: 0, g: 0, b: 0, a: 0.8509804}
+  shadowDistance: {x: 2, y: -2}
+  useGraphicAlpha: 0
+  iterations: 10
+  shadowSpread: {x: 2, y: 2}
 --- !u!1 &6096691227974815607
 GameObject:
   m_ObjectHideFlags: 0
