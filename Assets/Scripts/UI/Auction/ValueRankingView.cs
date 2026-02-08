@@ -76,21 +76,10 @@ public class ValueRankingView : MonoBehaviour
             // 初期位置・回転を設定
             SetCardToFanPosition(draggableCard, i, cards.Count);
 
-            draggableCard.OnDragStarted
-                .Subscribe(OnCardDragStarted)
-                .AddTo(_disposables);
-
-            draggableCard.OnDragEnded
-                .Subscribe(OnCardDragEnded)
-                .AddTo(_disposables);
-
-            draggableCard.OnClicked
-                .Subscribe(OnCardClicked)
-                .AddTo(_disposables);
-
-            draggableCard.OnDragging
-                .Subscribe(OnCardDragging)
-                .AddTo(_disposables);
+            draggableCard.OnDragStarted.Subscribe(OnCardDragStarted).AddTo(_disposables);
+            draggableCard.OnDragEnded.Subscribe(OnCardDragEnded).AddTo(_disposables);
+            draggableCard.OnClicked.Subscribe(OnCardClicked).AddTo(_disposables);
+            draggableCard.OnDragging.Subscribe(OnCardDragging).AddTo(_disposables);
 
             _handCards.Add(draggableCard);
         }
@@ -105,9 +94,7 @@ public class ValueRankingView : MonoBehaviour
                 .AddTo(_disposables);
         }
 
-        confirmButton.OnClickAsObservable()
-            .Subscribe(_ => OnConfirmClicked())
-            .AddTo(_disposables);
+        confirmButton.OnClickAsObservable().Subscribe(_ => OnConfirmClicked()).AddTo(_disposables);
 
         UpdateConfirmButtonState();
     }
@@ -117,27 +104,19 @@ public class ValueRankingView : MonoBehaviour
         _rankedCards.Clear();
 
         foreach (var slot in slots.OrderBy(s => s.Rank).Where(s => s.IsOccupied))
-        {
             _rankedCards.Add(slot.PlacedCard.CardModel);
-        }
 
         return _rankedCards;
     }
 
-    public void Clear()
+    private void Clear()
     {
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
 
-        foreach (var slot in slots)
-        {
-            slot.RemoveCard();
-        }
-
-        foreach (var card in _handCards)
-        {
-            Destroy(card.gameObject);
-        }
+        foreach (var slot in slots) slot.RemoveCard();
+        foreach (var card in _handCards) Destroy(card.gameObject);
+        
         _handCards.Clear();
         _rankedCards.Clear();
     }
@@ -185,7 +164,7 @@ public class ValueRankingView : MonoBehaviour
         {
             var existingCard = slot.RemoveCard();
 
-            if (previousSlot != null)
+            if (previousSlot)
             {
                 previousSlot.PlaceCard(existingCard);
                 existingCard.PlaySnapToSlotAsync(previousSlot.CardAnchor, Vector2.zero).Forget();
@@ -252,7 +231,6 @@ public class ValueRankingView : MonoBehaviour
     {
         var (position, rotation) = CalculateFanPosition(index, totalCount);
         var cardRect = card.transform as RectTransform;
-
         cardRect.anchoredPosition = position;
         card.transform.localEulerAngles = new Vector3(0, 0, rotation);
     }

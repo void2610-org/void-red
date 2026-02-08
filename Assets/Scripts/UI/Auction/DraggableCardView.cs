@@ -18,12 +18,11 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     [SerializeField] private float dragAlpha = 0.8f;
     [SerializeField] private float dragScale = 1.05f;
 
-    public CardView CardView => cardView;
     public CardModel CardModel { get; private set; }
     public RankingSlotView CurrentSlot { get; private set; }
     public bool IsPlaced => CurrentSlot;
     public int HandIndex { get; private set; }
-    public CanvasGroup CanvasGroup => _canvasGroup;
+    public CanvasGroup CanvasGroup { get; private set; }
     public Observable<DraggableCardView> OnDragStarted => _onDragStarted;
     public Observable<DraggableCardView> OnDragEnded => _onDragEnded;
     public Observable<DraggableCardView> OnClicked => _onClicked;
@@ -37,7 +36,6 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private readonly Subject<DraggableCardView> _onClicked = new();
     private readonly Subject<Vector3> _onDragging = new();
     private RectTransform _rectTransform;
-    private CanvasGroup _canvasGroup;
     private Transform _originalParent;
     private Vector2 _originalPosition;
     private Canvas _rootCanvas;
@@ -104,20 +102,6 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         await _moveTween.ToUniTask();
     }
 
-    public async UniTask PlayReturnToOriginalAsync()
-    {
-        transform.SetParent(_originalParent);
-        transform.localScale = Vector3.one;
-
-        _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-        _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-        _rectTransform.pivot = new Vector2(0.5f, 0.5f);
-
-        _moveTween.TryCancel();
-        _moveTween = _rectTransform.MoveToAnchored(_originalPosition, RETURN_DURATION, Ease.OutBack);
-        await _moveTween.ToUniTask();
-    }
-
     public void OnBeginDrag(PointerEventData eventData)
     {
         _isDragging = true;
@@ -127,8 +111,8 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         transform.SetParent(_rootCanvas.transform);
         transform.SetAsLastSibling();
 
-        _canvasGroup.alpha = dragAlpha;
-        _canvasGroup.blocksRaycasts = false;
+        CanvasGroup.alpha = dragAlpha;
+        CanvasGroup.blocksRaycasts = false;
 
         // ドラッグ中は回転をリセット
         _rotateTween.TryCancel();
@@ -159,8 +143,8 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     {
         _isDragging = false;
 
-        _canvasGroup.alpha = 1f;
-        _canvasGroup.blocksRaycasts = true;
+        CanvasGroup.alpha = 1f;
+        CanvasGroup.blocksRaycasts = true;
 
         _scaleTween.TryCancel();
         _scaleTween = transform.ScaleTo(Vector3.one, 0.1f, Ease.OutQuad);
@@ -181,7 +165,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
-        _canvasGroup = GetComponent<CanvasGroup>();
+        CanvasGroup = GetComponent<CanvasGroup>();
         _rootCanvas = GetComponentInParent<Canvas>().rootCanvas;
     }
 
