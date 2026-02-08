@@ -72,6 +72,9 @@ MonoBehaviour:
   confirmBiddingButton: {fileID: 8462001119609464775}
   emotionResourceDisplayView: {fileID: 4318667104630866671}
   cardBidInfoPrefab: {fileID: 9134574364431770915, guid: e68a4e123d3de4df19bb1d9330ce530e, type: 3}
+  staggerDelay: 0.1
+  animDuration: 0.2
+  cardSlideOffset: 75
 --- !u!225 &5837306852137217465
 CanvasGroup:
   m_ObjectHideFlags: 0
