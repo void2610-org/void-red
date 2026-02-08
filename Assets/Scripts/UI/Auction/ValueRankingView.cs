@@ -116,7 +116,7 @@ public class ValueRankingView : BasePhaseView
 
         foreach (var slot in slots) slot.RemoveCard();
         foreach (var card in _handCards) Destroy(card.gameObject);
-        
+
         _handCards.Clear();
         _rankedCards.Clear();
     }

@@ -20,9 +20,9 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private float crossFadeDuration = 0.4f;
 
     private EnemyData _enemyData;
-    
+
     public void Initialize(EnemyData enemyData) => _enemyData = enemyData;
-    
+
     /// <summary>
     /// 2枚の画像を使った真のクロスフェードアニメーション
     /// </summary>
