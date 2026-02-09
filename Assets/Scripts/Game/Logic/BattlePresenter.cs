@@ -250,14 +250,21 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         _battleUIPresenter.HideAuctionView();
 
-        if (_currentEnemyData.EnemyId == "alv")
+        var isTutorial = _currentEnemyData.EnemyId == "alv";
+
+        if (isTutorial)
             await _battleUIPresenter.StartTutorial("DialoguePhase");
 
         var dialogueData = _currentAuctionData.DialogueData;
 
         var playerFirstChoice = await HandlePlayerFirstTurn(dialogueData);
 
-        await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
+        if (isTutorial)
+            await _battleUIPresenter.StartTutorial("DialoguePhase2");
+
+        // チュートリアルでは敵から始まる対話をスキップ
+        if (!isTutorial)
+            await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
 
         await _battleUIPresenter.HideDialogueViewAsync();
     }
