@@ -66,11 +66,21 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public UniTask HideAllAsync() => _dialoguePhaseView.HideAllAsync();
     public void ShowDialogueView() => _dialoguePhaseView.Show();
     public void InitializeDialogueView(EnemyData enemyData) => _dialoguePhaseView.Initialize(enemyData);
+    public async UniTask DisplayCardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) =>
+        await _rewardPhaseView.DisplayCardsAsync(results);
+    public async UniTask WaitForCardAcquisitionCompleteAsync() =>
+        await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
     public void ShowAuctionView() => _auctionView.Show();
     public async UniTask ShowAuctionResultsSequentialAsync(IReadOnlyList<AuctionJudge.AuctionResultEntry> results, ValueRankingModel playerRanking, ValueRankingModel enemyRanking, Color enemyColor) => await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking, enemyColor);
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
     public void HideRewardView() => _rewardPhaseView.Hide();
+    public void ShowMemoryGrowthView(IReadOnlyList<AcquiredTheme> allThemes) => _memoryGrowthView.ShowMemoryGrowth(allThemes);
+    public UniTask WaitForMemoryGrowthCompleteAsync() => _memoryGrowthView.WaitForContinueAsync();
+    public void DisplayResourceGauges(
+        IReadOnlyDictionary<EmotionType, int> currentResources,
+        IReadOnlyDictionary<EmotionType, int> maxResources) =>
+        _rewardPhaseView.DisplayResourceGauges(currentResources, maxResources);
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {
@@ -185,24 +195,11 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _dialoguePhaseView.Hide();
     }
 
-    // 報酬フェーズ：報酬計算結果を表示
-    public async UniTask<IReadOnlyDictionary<EmotionType, int>> ShowRewardsAsync(
-        Dictionary<CardModel, RewardCalculator.RewardResult> results,
-        IReadOnlyDictionary<EmotionType, int> currentResources,
-        IReadOnlyDictionary<EmotionType, int> maxResources)
+    public async UniTask<IReadOnlyDictionary<EmotionType, int>> AnimateResourceRewardsAsync(
+        Dictionary<CardModel, RewardCalculator.RewardResult> results)
     {
-        await _rewardPhaseView.ShowRewardsAsync(results, currentResources, maxResources);
+        await _rewardPhaseView.AnimateResourceRewardsAsync(results);
         return _rewardPhaseView.RewardedAmounts;
-    }
-
-    /// <summary>
-    /// 記憶育成フェーズを表示
-    /// </summary>
-    /// <param name="allThemes">全獲得テーマリスト</param>
-    public async UniTask ShowMemoryGrowthAsync(IReadOnlyList<AcquiredTheme> allThemes)
-    {
-        _memoryGrowthView.ShowMemoryGrowth(allThemes);
-        await _memoryGrowthView.WaitForContinueAsync();
     }
 
     // ルートボタンを初期選択

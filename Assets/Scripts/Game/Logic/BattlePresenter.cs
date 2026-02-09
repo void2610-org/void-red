@@ -386,8 +386,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 報酬フェーズ開始");
 
-        if (_currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartTutorial("RewardPhase");
+        var isTutorial = _currentEnemyData.EnemyId == "alv";
 
         // プレイヤーの報酬を計算
         var rewardResults = RewardCalculator.CalculateAll(
@@ -411,8 +410,19 @@ public class BattlePresenter : IStartable, ISceneInitializable
             maxResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE * 3;
         }
 
-        // 報酬演出表示（報酬加算前のリソース値を渡す）
-        var rewardedAmounts = await _battleUIPresenter.ShowRewardsAsync(rewardResults, _player.EmotionResources, maxResources);
+        await _battleUIPresenter.DisplayCardsAsync(rewardResults);
+
+        if (isTutorial)
+            await _battleUIPresenter.StartTutorial("RewardPhase");
+
+        await _battleUIPresenter.WaitForCardAcquisitionCompleteAsync();
+
+        _battleUIPresenter.DisplayResourceGauges(_player.EmotionResources, maxResources);
+
+        if (isTutorial)
+            await _battleUIPresenter.StartTutorial("RewardPhase2");
+
+        var rewardedAmounts = await _battleUIPresenter.AnimateResourceRewardsAsync(rewardResults);
 
         // 報酬を各感情リソースに加算（演出で決まったランダムな感情タイプごとに）
         foreach (var (emotion, amount) in rewardedAmounts)
@@ -426,7 +436,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         await UniTask.Delay(2000);
         _battleUIPresenter.HideRewardView();
-
     }
 
     // === 6. 記憶育成フェーズ ===
@@ -434,9 +443,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private async UniTask HandleMemoryGrowth()
     {
         Debug.Log("[BattlePresenter] 記憶育成フェーズ開始");
-
-        if (_currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartTutorial("MemoryGrowthPhase");
 
         // 全カードの獲得情報を構築（入札がないカードは除外）
         var allCardInfoList = BuildCardAcquisitionInfoList();
@@ -469,8 +475,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var allThemes = _gameProgressService.GetAcquiredThemes();
         Debug.Log($"[BattlePresenter] 全獲得テーマ数: {allThemes.Count}");
 
-        // UIで記憶育成フェーズを表示
-        await _battleUIPresenter.ShowMemoryGrowthAsync(allThemes);
+        _battleUIPresenter.ShowMemoryGrowthView(allThemes);
+
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("MemoryGrowthPhase");
+
+        await _battleUIPresenter.WaitForMemoryGrowthCompleteAsync();
     }
 
     /// <summary>

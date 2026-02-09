@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
+  m_Name: RewardPhase2
+  m_EditorClassIdentifier:
+  steps:
+  - message: "\u307E\u305F\u3001\u7279\u5B9A\u306E\u611F\u60C5\u5C5E\u6027\u306E\u7D44\u307F\u5408\u308F\u305B\u3067\u306F\u3055\u3089\u306B\u9AD8\u5831\u916C\u3092\u5F97\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u611F\u60C5\u30EA\u30BD\u30FC\u30B9\u306E\u91CF\u304C\u5897\u3048\u308C\u3070\u3042\u306A\u305F\u306E\u9078\u629E\u80A2\u306F\u5897\u3048\u308B\u3067\u3057\u3087\u3046\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u672C\u756A\u3067\u306F\u3088\u304F\u8003\u3048\u3066\u4F7F\u3063\u3066\u3044\u3063\u305F\u65B9\u304C\u3044\u3044\u3067\u3059\u3088\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
