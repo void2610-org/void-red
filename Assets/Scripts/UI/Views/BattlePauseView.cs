@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using LitMotion;
-using LitMotion.Extensions;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,7 +36,6 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
     private CanvasGroup _canvasGroup;
     private MotionHandle _slideHandle;
     private List<MotionHandle> _buttonAnimHandles = new();
-    private Dictionary<Transform, Vector2> _buttonOriginalPositions = new();
 
     public void Toggle()
     {
@@ -58,29 +56,16 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
         Canvas.ForceUpdateCanvases();
 
         // ボタンの順次スライドアニメーション
-        buttonsLayoutGroup.ForEachChildWithDelay((child, _, delay) =>
+        var targets = new List<(RectTransform, CanvasGroup)>();
+        for (var i = 0; i < buttonsLayoutGroup.transform.childCount; i++)
         {
-            var rect = child.GetComponent<RectTransform>();
+            var child = buttonsLayoutGroup.transform.GetChild(i);
+            if (!child.gameObject.activeInHierarchy) continue;
+            targets.Add((child.GetComponent<RectTransform>(), null));
+        }
 
-            // 初回は現在位置を保存、2回目以降は保存済みの位置を使用
-            if (!_buttonOriginalPositions.TryGetValue(child, out var targetPos))
-            {
-                targetPos = rect.anchoredPosition;
-                _buttonOriginalPositions[child] = targetPos;
-            }
-
-            var startPos = new Vector2(targetPos.x + buttonSlideOffset, targetPos.y);
-            rect.anchoredPosition = startPos;
-
-            var handle = LMotion.Create(startPos, targetPos, slideDuration)
-                .WithDelay(delay)
-                .WithEase(Ease.OutQuad)
-                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
-                .BindToAnchoredPosition(rect)
-                .AddTo(rect.gameObject);
-
-            _buttonAnimHandles.Add(handle);
-        }, buttonStaggerDelay);
+        targets.StaggeredSlideIn(new Vector2(buttonSlideOffset, 0), slideDuration, buttonStaggerDelay,
+            _buttonAnimHandles, moveEase: Ease.OutQuad, fadeEase: null, ignoreTimeScale: true);
     }
 
     public void Hide()
