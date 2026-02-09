@@ -30,6 +30,7 @@ public class TutorialPresenter : IDisposable
     /// 指定されたIDのチュートリアルを開始
     /// </summary>
     /// <param name="tutorialId">チュートリアルID</param>
+    /// <param name="args">メッセージのフォーマット引数</param>
     public async UniTask StartTutorial(string tutorialId, params string[] args)
     {
         var tutorialData = _allTutorialData.GetTutorialById(tutorialId);
