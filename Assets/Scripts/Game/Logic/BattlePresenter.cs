@@ -260,7 +260,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var playerFirstChoice = await HandlePlayerFirstTurn(dialogueData);
 
         if (isTutorial)
-            await _battleUIPresenter.StartTutorial("DialoguePhase2");
+            await _battleUIPresenter.StartTutorial("DialoguePhase2", playerFirstChoice.ToJapaneseName());
 
         // チュートリアルでは敵から始まる対話をスキップ
         if (!isTutorial)

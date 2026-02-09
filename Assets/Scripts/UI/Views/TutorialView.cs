@@ -31,7 +31,7 @@ public class TutorialView : MonoBehaviour
     /// <summary>
     /// チュートリアルステップを表示してクリック待機
     /// </summary>
-    public async UniTask ShowStepAndWaitForClick(TutorialStep step)
+    public async UniTask ShowStepAndWaitForClick(TutorialStep step, string messageOverride = null)
     {
         if (step == null) return;
 
@@ -60,7 +60,7 @@ public class TutorialView : MonoBehaviour
         _currentMaskSize = step.MaskSize;
 
         // メッセージテキストの更新
-        await UpdateMessageText(step.Message, step.IsProtagonist);
+        await UpdateMessageText(messageOverride ?? step.Message, step.IsProtagonist);
 
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));

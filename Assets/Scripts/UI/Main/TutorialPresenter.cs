@@ -30,7 +30,7 @@ public class TutorialPresenter : IDisposable
     /// 指定されたIDのチュートリアルを開始
     /// </summary>
     /// <param name="tutorialId">チュートリアルID</param>
-    public async UniTask StartTutorial(string tutorialId)
+    public async UniTask StartTutorial(string tutorialId, params string[] args)
     {
         var tutorialData = _allTutorialData.GetTutorialById(tutorialId);
 
@@ -43,7 +43,8 @@ public class TutorialPresenter : IDisposable
         for (var i = 0; i < tutorialData.StepCount; i++)
         {
             var step = tutorialData.GetStep(i);
-            await _tutorialView.ShowStepAndWaitForClick(step);
+            var message = args.Length > 0 ? string.Format(step.Message, args) : step.Message;
+            await _tutorialView.ShowStepAndWaitForClick(step, message);
         }
 
         await _simpleTutorialWindowView.HideNarration();

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DialoguePhase2
   m_EditorClassIdentifier:
   steps:
-  - message: "\u306A\u308B\u307B\u3069\u3002\u3042\u306A\u305F\u306F\"\u9078\u3093\u3060\u9078\u629E\u80A2\"\u3092\u9078\u3093\u3060\u306E\u3067\u3059\u306D\u3002"
+  - message: "\u306A\u308B\u307B\u3069\u3002\u3042\u306A\u305F\u306F\"{0}\"\u3092\u9078\u3093\u3060\u306E\u3067\u3059\u306D\u3002"
     isPlayerDialog: 0
     maskPosition: {x: 0, y: 0}
     maskSize: {x: 0, y: 0}
