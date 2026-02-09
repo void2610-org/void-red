@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7823105220120858534}
   - component: {fileID: 3900414466396751414}
   - component: {fileID: 6678202156017642166}
+  - component: {fileID: 7497644244616460810}
   m_Layer: 5
   m_Name: DialoguePhaseView
   m_TagString: Untagged
@@ -67,6 +68,18 @@ MonoBehaviour:
   enemyNarration: {fileID: 4064286096617389159}
   portraitView: {fileID: 5418870435854250288}
   playerPortraitSprite: {fileID: 21300000, guid: 8b66d9934a13f45d1b8a027e4baabee7, type: 3}
+--- !u!225 &7497644244616460810
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8156095410718661828}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1003492021843414750
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94,6 +107,10 @@ PrefabInstance:
     - target: {fileID: 5082526181909872633, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5705083265967378476, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_Pivot.x
@@ -186,6 +203,10 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149746649642998489, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
+      propertyPath: m_fontSize
+      value: 15.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -580,6 +601,10 @@ PrefabInstance:
     - target: {fileID: 7699951931037805012, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149746649642998489, guid: 3b8b968dcd7cd47a4be9c83ff98a72b7, type: 3}
+      propertyPath: m_fontSize
+      value: 15.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
