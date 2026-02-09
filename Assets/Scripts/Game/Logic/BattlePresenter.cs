@@ -320,15 +320,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
 
+        // AuctionViewを再表示（カードは既に存在する）
+        _battleUIPresenter.ShowAuctionView();
+
         if (_currentEnemyData.EnemyId == "alv")
             await _battleUIPresenter.StartTutorial("ResultDetermination");
 
         // 入札に使ったリソースを消費
         ConsumeBidResources(_player);
         ConsumeBidResources(_enemy);
-
-        // AuctionViewを再表示（カードは既に存在する）
-        _battleUIPresenter.ShowAuctionView();
 
         // 全カードの落札者を判定
         var results = AuctionJudge.JudgeAll(_auctionCards, _player.Bids, _enemy.Bids);
