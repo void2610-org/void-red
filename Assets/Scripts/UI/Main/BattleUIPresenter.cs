@@ -56,8 +56,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void UpdatePlayerPainGauge(float value) => _playerFaceView.UpdatePainGauge(value);
     public void UpdatePlayerDilutionGauge(float value) => _playerFaceView.UpdateDilutionGauge(value);
     public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
-    public async UniTask StartBattleTutorial() => await _tutorialPresenter.StartBattleTutorial();
-    public async UniTask StartResultTutorial() => await _tutorialPresenter.StartResultTutorial();
+    public async UniTask StartTutorial(string tutorialId) => await _tutorialPresenter.StartTutorial(tutorialId);
     public UniTask ShowPlayerDialogueAsync(string text) => _dialoguePhaseView.ShowPlayerDialogueAsync(text);
     public UniTask HidePlayerDialogueAsync() => _dialoguePhaseView.HidePlayerDialogueAsync();
     public UniTask ShowEnemyDialogueAsync(string text) => _dialoguePhaseView.ShowEnemyDialogueAsync(text);
