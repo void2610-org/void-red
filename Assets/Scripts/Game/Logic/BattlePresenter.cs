@@ -181,7 +181,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         if (_currentEnemyData.EnemyId == "alv")
         {
             await _battleUIPresenter.StartTutorial("ValueRanking");
-            await _battleUIPresenter.StartTutorial("SpecialMemoryCards");
             await _battleUIPresenter.StartTutorial("ThemeAndGauges");
         }
 
