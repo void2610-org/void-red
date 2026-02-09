@@ -435,7 +435,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         }
 
         await UniTask.Delay(2000);
-        _battleUIPresenter.HideRewardView();
     }
 
     // === 6. 記憶育成フェーズ ===
@@ -451,6 +450,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         if (allCardInfoList.Count == 0)
         {
             Debug.Log("[BattlePresenter] 入札カードなし - 記憶育成フェーズをスキップ");
+            _battleUIPresenter.HideRewardView();
             return;
         }
 
@@ -476,6 +476,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log($"[BattlePresenter] 全獲得テーマ数: {allThemes.Count}");
 
         _battleUIPresenter.ShowMemoryGrowthView(allThemes);
+        _battleUIPresenter.HideRewardView();
 
         if (_currentEnemyData.EnemyId == "alv")
             await _battleUIPresenter.StartTutorial("MemoryGrowthPhase");

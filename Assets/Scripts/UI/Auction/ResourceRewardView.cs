@@ -66,7 +66,6 @@ public class ResourceRewardView : MonoBehaviour
         }
 
         await _onNextButtonClicked.FirstAsync();
-        Hide();
     }
 
     private void Show()
