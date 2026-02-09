@@ -152,9 +152,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 記憶テーマを表示
         await _battleUIPresenter.SetTheme(_currentTheme, isMainTheme: true);
 
-        // 敵がアルヴならチュートリアルを表示
-        // if (_currentEnemyData.EnemyId == "alv")
-        //     await _battleUIPresenter.StartBattleTutorial();
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
     }
 
     private async UniTask HandleCardDistribution()
@@ -173,6 +172,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private async UniTask HandleValueRanking()
     {
         Debug.Log("[BattlePresenter] 価値順位設定フェーズ開始");
+
+        if (_currentEnemyData.EnemyId == "alv")
+        {
+            await _battleUIPresenter.StartTutorial("ValueRanking");
+            await _battleUIPresenter.StartTutorial("SpecialMemoryCards");
+            await _battleUIPresenter.StartTutorial("ThemeAndGauges");
+        }
 
         // 敵AIで順位をランダム設定
         _enemy.DecideValueRankings();
@@ -217,6 +223,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 入札フェーズ開始");
 
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("BiddingPhase");
+
         // 敵AIで入札を決定
         _enemy.DecideBids(_auctionCards, EmotionType.Joy);
         Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
@@ -241,6 +250,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private async UniTask HandleDialoguePhase()
     {
         _battleUIPresenter.HideAuctionView();
+
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("DialoguePhase");
 
         var dialogueData = _currentAuctionData.DialogueData;
 
@@ -301,6 +313,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private async UniTask HandleAuctionResult()
     {
         Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
+
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("ResultDetermination");
 
         // 入札に使ったリソースを消費
         ConsumeBidResources(_player);
@@ -365,6 +380,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 報酬フェーズ開始");
 
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("RewardPhase");
+
         // プレイヤーの報酬を計算
         var rewardResults = RewardCalculator.CalculateAll(
             _player.WonCards,
@@ -410,6 +428,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private async UniTask HandleMemoryGrowth()
     {
         Debug.Log("[BattlePresenter] 記憶育成フェーズ開始");
+
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("MemoryGrowthPhase");
 
         // 全カードの獲得情報を構築（入札がないカードは除外）
         var allCardInfoList = BuildCardAcquisitionInfoList();
@@ -509,10 +530,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // Volumeエフェクトを全てデフォルトに戻す
         VolumeController.Instance.ResetToDefault();
-
-        // 敵がアルヴならチュートリアルを表示
-        // if (_currentEnemyData.EnemyId == "alv")
-        //     await _battleUIPresenter.StartResultTutorial();
 
         // 現在のノード情報を一旦キャッシュ
         var currentNode = _gameProgressService.GetCurrentNode();
