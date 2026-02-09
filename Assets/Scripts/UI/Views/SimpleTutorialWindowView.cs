@@ -3,11 +3,14 @@ using Cysharp.Threading.Tasks;
 using LitMotion;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class SimpleTutorialWindowView : MonoBehaviour
 {
+    [SerializeField] private Image protagonistIconImage;
+    [SerializeField] private Image alvIconImage;
     [SerializeField] private TextMeshProUGUI tutorialText;
     private const float FADE_DURATION = 0.3f;
 
@@ -24,10 +27,10 @@ public class SimpleTutorialWindowView : MonoBehaviour
     /// <summary>
     /// ナレーションを表示
     /// </summary>
-    public async UniTask DisplayText(string message, float duration = 2f, bool autoAdvance = true)
+    public async UniTask DisplayText(string message, bool isProtagonist, float duration = 2f, bool autoAdvance = true)
     {
         // 現在実行中のナレーションをキャンセル
-        if (_currentNarrationCts != null && !_currentNarrationCts.IsCancellationRequested)
+        if (_currentNarrationCts is { IsCancellationRequested: false })
             _currentNarrationCts.Cancel();
         _currentNarrationCts?.Dispose();
 

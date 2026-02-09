@@ -12,16 +12,14 @@ public class TutorialPresenter : IDisposable
     private readonly TutorialView _tutorialView;
     private readonly InputActionsProvider _inputActionsProvider;
     private readonly CompositeDisposable _disposables = new();
-    private readonly Player _player;
     private readonly CardDetailView _cardDetailView;
     private readonly ThemeView _themeView;
     private readonly SimpleTutorialWindowView _simpleTutorialWindowView;
 
-    public TutorialPresenter(AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider, Player player)
+    public TutorialPresenter(AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
     {
         _allTutorialData = allTutorialData;
         _inputActionsProvider = inputActionsProvider;
-        _player = player;
         _cardDetailView = UnityEngine.Object.FindFirstObjectByType<CardDetailView>();
         _tutorialView = UnityEngine.Object.FindFirstObjectByType<TutorialView>();
         _simpleTutorialWindowView = UnityEngine.Object.FindFirstObjectByType<SimpleTutorialWindowView>();
@@ -34,7 +32,7 @@ public class TutorialPresenter : IDisposable
     /// </summary>
     public async UniTask StartBattleTutorial()
     {
-        await StartTutorial("Battle1", true);
+        await StartTutorial("Battle1");
 
         // テーマのキーワード表示
         _themeView.OnPointerEnter(null);
@@ -42,7 +40,7 @@ public class TutorialPresenter : IDisposable
         _themeView.OnPointerExit(null);
         await UniTask.Delay(500);
 
-        await StartTutorial("Battle2", true);
+        await StartTutorial("Battle2");
 
         // 手札の最初のカード（インデックス0）を自動選択
         await UniTask.Delay(500);
@@ -61,9 +59,9 @@ public class TutorialPresenter : IDisposable
         _cardDetailView.Hide();
         await UniTask.Delay(500);
 
-        await StartTutorial("Battle4", true);
-        await StartTutorial("Battle5", true);
-        await StartTutorial("Battle6", true);
+        await StartTutorial("Battle4");
+        await StartTutorial("Battle5");
+        await StartTutorial("Battle6");
     }
 
     public async UniTask StartResultTutorial()
@@ -77,8 +75,7 @@ public class TutorialPresenter : IDisposable
     /// 指定されたIDのチュートリアルを開始
     /// </summary>
     /// <param name="tutorialId">チュートリアルID</param>
-    /// <param name="isBattleTutorial">バトル画面の吹き出しを使った表示か？</param>
-    private async UniTask StartTutorial(string tutorialId, bool isBattleTutorial = false)
+    private async UniTask StartTutorial(string tutorialId)
     {
         var tutorialData = _allTutorialData.GetTutorialById(tutorialId);
 
@@ -91,14 +88,10 @@ public class TutorialPresenter : IDisposable
         for (var i = 0; i < tutorialData.StepCount; i++)
         {
             var step = tutorialData.GetStep(i);
-            await _tutorialView.ShowStepAndWaitForClick(step, isBattleTutorial);
+            await _tutorialView.ShowStepAndWaitForClick(step);
         }
 
-        if (!isBattleTutorial)
-        {
-            // SimpleTutorialWindowViewを明示的に閉じる
-            await _simpleTutorialWindowView.HideNarration();
-        }
+        await _simpleTutorialWindowView.HideNarration();
 
         await _tutorialView.Hide();
         await UniTask.Delay(500);

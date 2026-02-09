@@ -49,7 +49,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
         _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
 
-        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider, player);
+        _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
     }
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
