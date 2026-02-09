@@ -37,6 +37,10 @@ public class SimpleTutorialWindowView : MonoBehaviour
         // 新しいキャンセレーショントークンを作成
         _currentNarrationCts = new CancellationTokenSource();
         var cancellationToken = _currentNarrationCts.Token;
+        
+        // 画像を切り替え
+        protagonistIconImage.gameObject.SetActive(isProtagonist);
+        alvIconImage.gameObject.SetActive(!isProtagonist);
 
         try
         {
