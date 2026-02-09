@@ -173,6 +173,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 価値順位設定フェーズ開始");
 
+        _enemy.DecideValueRankings();
+        Debug.Log("[BattlePresenter] 敵の価値順位を設定完了");
+
+        _battleUIPresenter.ShowValueRankingView(_player.Cards);
+
         if (_currentEnemyData.EnemyId == "alv")
         {
             await _battleUIPresenter.StartTutorial("ValueRanking");
@@ -180,12 +185,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             await _battleUIPresenter.StartTutorial("ThemeAndGauges");
         }
 
-        // 敵AIで順位をランダム設定
-        _enemy.DecideValueRankings();
-        Debug.Log("[BattlePresenter] 敵の価値順位を設定完了");
-
-        // プレイヤーの価値順位設定（UI経由）
-        var rankedCards = await _battleUIPresenter.WaitForValueRankingAsync(_player.Cards);
+        var rankedCards = await _battleUIPresenter.WaitForValueRankingAsync();
 
         // 結果をPlayerのValueRankingに反映
         for (var i = 0; i < rankedCards.Count; i++)

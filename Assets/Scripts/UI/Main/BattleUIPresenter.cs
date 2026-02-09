@@ -91,13 +91,14 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView.Initialize(enemyData);
     }
 
-    // 価値順位設定UIを表示し、完了を待機
-    public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync(IReadOnlyList<CardModel> cards)
+    public void ShowValueRankingView(IReadOnlyList<CardModel> cards)
     {
         _valueRankingView.Show();
         _valueRankingView.StartRanking(cards);
+    }
 
-        // 完了を待機
+    public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync()
+    {
         await _valueRankingView.OnRankingComplete.FirstAsync();
 
         var result = _valueRankingView.GetRankedCards();
