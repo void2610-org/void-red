@@ -12,9 +12,9 @@ using Void2610.UnityTemplate;
 public class TitlePVView : MonoBehaviour
 {
     public bool IsPlaying => _videoPlayer && _videoPlayer.isPlaying;
-    
+
     private const float FADE_DURATION = 0.5f;
-    
+
     private CanvasGroup _canvasGroup;
     private VideoPlayer _videoPlayer;
     private MotionHandle _fadeHandle;
@@ -35,8 +35,9 @@ public class TitlePVView : MonoBehaviour
 
     private void Awake()
     {
+        _videoPlayer = GetComponent<VideoPlayer>();
+        _canvasGroup = GetComponent<CanvasGroup>();
         _canvasGroup.Hide();
-
         _videoPlayer.isLooping = true;
         _videoPlayer.Stop();
     }

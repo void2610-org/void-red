@@ -19,9 +19,9 @@ MonoBehaviour:
   - TitleScene
   - ThanksScene
   enableIdlePauseAndReturn: 1
-  idleToPauseSeconds: 5
+  idleToPauseSeconds: 30
   pauseToTitleSeconds: 5
   enableSessionTimeLimit: 1
   sessionTimeLimitSeconds: 600
   enableTitleIdlePV: 1
-  titleIdleToPVSeconds: 30
+  titleIdleToPVSeconds: 20

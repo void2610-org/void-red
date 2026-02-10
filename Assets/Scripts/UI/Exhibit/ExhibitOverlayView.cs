@@ -36,14 +36,16 @@ public class ExhibitOverlayView : MonoBehaviour, IExhibitOverlay
         _fadeHandle = _canvasGroup.FadeOut(FADE_DURATION, Ease.InQuart, ignoreTimeScale: true);
     }
 
-    private void CancelFade() => _fadeHandle.TryCancel();
+    private void CancelFade()
+    {
+        _fadeHandle.TryCancel();
+    }
 
     /// <summary>
     /// オーバーレイ用のCanvasと背景Imageをプログラムで生成
     /// </summary>
     private void InitializeCanvas()
     {
-        // Canvas設定
         var canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 9998;
@@ -53,20 +55,6 @@ public class ExhibitOverlayView : MonoBehaviour, IExhibitOverlay
         canvasScaler.referenceResolution = new Vector2(1920, 1080);
 
         gameObject.AddComponent<GraphicRaycaster>();
-
-        // 背景Image作成
-        var background = new GameObject("Background");
-        background.transform.SetParent(transform, false);
-
-        var image = background.AddComponent<Image>();
-        image.color = Color.black;
-
-        // RectTransformを全画面サイズに設定
-        var rectTransform = background.GetComponent<RectTransform>();
-        rectTransform.anchorMin = Vector2.zero;
-        rectTransform.anchorMax = Vector2.one;
-        rectTransform.sizeDelta = Vector2.zero;
-        rectTransform.anchoredPosition = Vector2.zero;
     }
 
     private void Awake()
