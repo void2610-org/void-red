@@ -14,5 +14,9 @@ public class TitleLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<TitleView>();
         builder.RegisterEntryPoint<TitlePresenter>();
         builder.RegisterComponentInHierarchy<DebugController>();
+
+        // 展示モード: タイトルPV
+        builder.RegisterComponentInHierarchy<TitlePVView>();
+        builder.RegisterEntryPoint<TitleIdlePVPresenter>();
     }
 }

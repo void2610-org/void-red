@@ -9,13 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b318df7dddb4f2dafecb491aed842c, type: 3}
+  m_Script: {fileID: 11500000, guid: eee8e9a6df8ed40f7adc2357ab11e98e, type: 3}
   m_Name: ExhibitSettings
   m_EditorClassIdentifier: 
-  enableExhibitMode: 0
+  enableExhibitMode: 1
+  idleReturnSceneName: TitleScene
+  sessionLimitSceneName: ThanksScene
+  idleSkipSceneNames:
+  - TitleScene
+  - ThanksScene
   enableIdlePauseAndReturn: 1
-  idleToPauseSeconds: 60
-  pauseToTitleSeconds: 30
+  idleToPauseSeconds: 5
+  pauseToTitleSeconds: 5
   enableSessionTimeLimit: 1
   sessionTimeLimitSeconds: 600
   enableTitleIdlePV: 1
