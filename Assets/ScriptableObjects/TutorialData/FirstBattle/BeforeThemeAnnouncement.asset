@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
+  m_Name: BeforeThemeAnnouncement
+  m_EditorClassIdentifier: 
+  steps:
+  - message: '!?'
+    isPlayerDialog: 1
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u3069\u3046\u3084\u3089\u9A5A\u304B\u305B\u3066\u3057\u307E\u3063\u305F\u307F\u305F\u3044\u3067\u3059\u306D\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u3053\u306E\u7A7A\u9593\u306F\u3042\u306A\u305F\u306E\u70BA\u306B\u7528\u610F\u3057\u305F\u30B7\u30DF\u30E5\u30EC\u30FC\u30B7\u30E7\u30F3\u30EB\u30FC\u30E0\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "VOID RED\u306E\u30B7\u30B9\u30C6\u30E0\u8AAC\u660E\u3092\u304B\u306D\u3066\u4ECA\u304B\u3089\u30DC\u30AF\u3068\u4E00\u7DD2\u306B\u30AA\u30FC\u30AF\u30B7\u30E7\u30F3\u3092\u4F53\u9A13\u3057\u3066\u3044\u305F\u3060\u304D\u307E\u3059\u3002\n"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u4E00\u5EA6\u3057\u304B\u8AAC\u660E\u3057\u306A\u3044\u306E\u3067\u304F\u308C\u3050\u308C\u3082\u805E\u304D\u9003\u3055\u306A\u3044\u3088\u3046\u306B\u304A\u9858\u3044\u3057\u307E\u3059\u306D\u3002\n"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "......\u3002\n\u5584\u51E6\u306F\u3057\u307E\u3059...\u3002\n"
+    isPlayerDialog: 1
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "(\u307E\u3060\u72B6\u6CC1\u98F2\u307F\u8FBC\u3081\u3066\u306A\u3044\u3093\u3060\u3051\u3069\u306A...)"
+    isPlayerDialog: 1
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}

@@ -36,6 +36,13 @@ public class CardAcquisitionView : MonoBehaviour
     /// </summary>
     public async UniTask ShowCardsAsync(IEnumerable<CardData> cards)
     {
+        await DisplayCardsAsync(cards);
+        await _onNextButtonClicked.FirstAsync();
+        Hide();
+    }
+
+    public async UniTask DisplayCardsAsync(IEnumerable<CardData> cards)
+    {
         Show();
         ClearInstantiatedItems();
 
@@ -57,7 +64,10 @@ public class CardAcquisitionView : MonoBehaviour
 
         await UniTask.Delay(System.TimeSpan.FromSeconds(initialDelay));
         PlayEnterAnimation();
+    }
 
+    public async UniTask WaitForNextAndHideAsync()
+    {
         await _onNextButtonClicked.FirstAsync();
         Hide();
     }

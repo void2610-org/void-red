@@ -33,8 +33,7 @@ public class ResourceRewardView : MonoBehaviour
     /// <summary>
     /// リソース報酬をゲージアニメーションで表示
     /// </summary>
-    public async UniTask ShowRewardsAsync(
-        Dictionary<CardModel, RewardCalculator.RewardResult> results,
+    public void DisplayGauges(
         IReadOnlyDictionary<EmotionType, int> currentResources,
         IReadOnlyDictionary<EmotionType, int> maxResources)
     {
@@ -52,7 +51,10 @@ public class ResourceRewardView : MonoBehaviour
 
         // 感情バーの初期化（報酬加算前の状態）
         InitializeEmotionGauges(currentResources, maxResources);
+    }
 
+    public async UniTask AnimateRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results)
+    {
         foreach (var (_, result) in results)
         {
             // 次へボタンを待つ
@@ -64,7 +66,6 @@ public class ResourceRewardView : MonoBehaviour
         }
 
         await _onNextButtonClicked.FirstAsync();
-        Hide();
     }
 
     private void Show()

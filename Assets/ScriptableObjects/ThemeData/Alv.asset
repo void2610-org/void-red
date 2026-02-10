@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e825166e0c2c14bab83629c2b18411fc, type: 3}
-  m_Name: Alv1
+  m_Name: Alv
   m_EditorClassIdentifier: 
   themeId: 
   title: "\u8A31\u3057\u305F\u304B\u3063\u305F\u3082\u306E"

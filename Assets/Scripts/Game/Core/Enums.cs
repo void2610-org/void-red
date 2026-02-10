@@ -11,7 +11,6 @@ public enum GameState
     ValueRanking,
     /// <summary> カード公開 </summary>
     CardReveal,
-
     /// <summary> 感情リソースで入札 </summary>
     BiddingPhase,
     /// <summary> 揺さぶり・入札変動 </summary>

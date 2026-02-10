@@ -152,9 +152,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 記憶テーマを表示
         await _battleUIPresenter.SetTheme(_currentTheme, isMainTheme: true);
 
-        // 敵がアルヴならチュートリアルを表示
-        // if (_currentEnemyData.EnemyId == "alv")
-        //     await _battleUIPresenter.StartBattleTutorial();
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
     }
 
     private async UniTask HandleCardDistribution()
@@ -174,12 +173,18 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 価値順位設定フェーズ開始");
 
-        // 敵AIで順位をランダム設定
         _enemy.DecideValueRankings();
         Debug.Log("[BattlePresenter] 敵の価値順位を設定完了");
 
-        // プレイヤーの価値順位設定（UI経由）
-        var rankedCards = await _battleUIPresenter.WaitForValueRankingAsync(_player.Cards);
+        _battleUIPresenter.ShowValueRankingView(_player.Cards);
+
+        if (_currentEnemyData.EnemyId == "alv")
+        {
+            await _battleUIPresenter.StartTutorial("ValueRanking");
+            await _battleUIPresenter.StartTutorial("ThemeAndGauges");
+        }
+
+        var rankedCards = await _battleUIPresenter.WaitForValueRankingAsync();
 
         // 結果をPlayerのValueRankingに反映
         for (var i = 0; i < rankedCards.Count; i++)
@@ -217,6 +222,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 入札フェーズ開始");
 
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("BiddingPhase");
+
         // 敵AIで入札を決定
         _enemy.DecideBids(_auctionCards, EmotionType.Joy);
         Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
@@ -242,11 +250,21 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         _battleUIPresenter.HideAuctionView();
 
+        var isTutorial = _currentEnemyData.EnemyId == "alv";
+
+        if (isTutorial)
+            await _battleUIPresenter.StartTutorial("DialoguePhase");
+
         var dialogueData = _currentAuctionData.DialogueData;
 
         var playerFirstChoice = await HandlePlayerFirstTurn(dialogueData);
 
-        await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
+        if (isTutorial)
+            await _battleUIPresenter.StartTutorial("DialoguePhase2", playerFirstChoice.ToJapaneseName());
+
+        // チュートリアルでは敵から始まる対話をスキップ
+        if (!isTutorial)
+            await HandleEnemyFirstTurn(dialogueData, playerFirstChoice);
 
         await _battleUIPresenter.HideDialogueViewAsync();
     }
@@ -302,12 +320,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
 
+        // AuctionViewを再表示（カードは既に存在する）
+        _battleUIPresenter.ShowAuctionView();
+
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("ResultDetermination");
+
         // 入札に使ったリソースを消費
         ConsumeBidResources(_player);
         ConsumeBidResources(_enemy);
-
-        // AuctionViewを再表示（カードは既に存在する）
-        _battleUIPresenter.ShowAuctionView();
 
         // 全カードの落札者を判定
         var results = AuctionJudge.JudgeAll(_auctionCards, _player.Bids, _enemy.Bids);
@@ -365,6 +386,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] 報酬フェーズ開始");
 
+        var isTutorial = _currentEnemyData.EnemyId == "alv";
+
         // プレイヤーの報酬を計算
         var rewardResults = RewardCalculator.CalculateAll(
             _player.WonCards,
@@ -387,8 +410,19 @@ public class BattlePresenter : IStartable, ISceneInitializable
             maxResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE * 3;
         }
 
-        // 報酬演出表示（報酬加算前のリソース値を渡す）
-        var rewardedAmounts = await _battleUIPresenter.ShowRewardsAsync(rewardResults, _player.EmotionResources, maxResources);
+        await _battleUIPresenter.DisplayCardsAsync(rewardResults);
+
+        if (isTutorial)
+            await _battleUIPresenter.StartTutorial("RewardPhase");
+
+        await _battleUIPresenter.WaitForCardAcquisitionCompleteAsync();
+
+        _battleUIPresenter.DisplayResourceGauges(_player.EmotionResources, maxResources);
+
+        if (isTutorial)
+            await _battleUIPresenter.StartTutorial("RewardPhase2");
+
+        var rewardedAmounts = await _battleUIPresenter.AnimateResourceRewardsAsync(rewardResults);
 
         // 報酬を各感情リソースに加算（演出で決まったランダムな感情タイプごとに）
         foreach (var (emotion, amount) in rewardedAmounts)
@@ -401,8 +435,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         }
 
         await UniTask.Delay(2000);
-        _battleUIPresenter.HideRewardView();
-
     }
 
     // === 6. 記憶育成フェーズ ===
@@ -418,6 +450,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         if (allCardInfoList.Count == 0)
         {
             Debug.Log("[BattlePresenter] 入札カードなし - 記憶育成フェーズをスキップ");
+            _battleUIPresenter.HideRewardView();
             return;
         }
 
@@ -442,8 +475,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var allThemes = _gameProgressService.GetAcquiredThemes();
         Debug.Log($"[BattlePresenter] 全獲得テーマ数: {allThemes.Count}");
 
-        // UIで記憶育成フェーズを表示
-        await _battleUIPresenter.ShowMemoryGrowthAsync(allThemes);
+        _battleUIPresenter.ShowMemoryGrowthView(allThemes);
+        _battleUIPresenter.HideRewardView();
+
+        if (_currentEnemyData.EnemyId == "alv")
+            await _battleUIPresenter.StartTutorial("MemoryGrowthPhase");
+
+        await _battleUIPresenter.WaitForMemoryGrowthCompleteAsync();
     }
 
     /// <summary>
@@ -509,10 +547,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // Volumeエフェクトを全てデフォルトに戻す
         VolumeController.Instance.ResetToDefault();
-
-        // 敵がアルヴならチュートリアルを表示
-        // if (_currentEnemyData.EnemyId == "alv")
-        //     await _battleUIPresenter.StartResultTutorial();
 
         // 現在のノード情報を一旦キャッシュ
         var currentNode = _gameProgressService.GetCurrentNode();

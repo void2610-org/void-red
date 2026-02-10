@@ -14,8 +14,6 @@ public class TutorialView : MonoBehaviour
 {
     [SerializeField] private RectTransform maskArea;
     [SerializeField] private SimpleTutorialWindowView simpleTutorialWindow;
-    [SerializeField] private NarrationView playerNarrationView;
-    [SerializeField] private NarrationView enemyNarrationView;
     [SerializeField] private Button clickAreaButton;
 
     private const float FADE_DURATION = 0.3f;
@@ -33,7 +31,7 @@ public class TutorialView : MonoBehaviour
     /// <summary>
     /// チュートリアルステップを表示してクリック待機
     /// </summary>
-    public async UniTask ShowStepAndWaitForClick(TutorialStep step, bool isBattleTutorial)
+    public async UniTask ShowStepAndWaitForClick(TutorialStep step, string messageOverride = null)
     {
         if (step == null) return;
 
@@ -62,7 +60,7 @@ public class TutorialView : MonoBehaviour
         _currentMaskSize = step.MaskSize;
 
         // メッセージテキストの更新
-        await UpdateMessageText(step.Message, step.IsPlayerDialog, isBattleTutorial);
+        await UpdateMessageText(messageOverride ?? step.Message, step.IsProtagonist);
 
         // アニメーション完了を待つ
         await UniTask.Delay(TimeSpan.FromSeconds(MASK_TRANSITION_DURATION));
@@ -94,10 +92,6 @@ public class TutorialView : MonoBehaviour
         // 現在のアニメーションをキャンセル
         _currentFadeHandle.TryCancel();
 
-        // NarrationViewも非表示にする
-        playerNarrationView.HideNarration().Forget();
-        enemyNarrationView.HideNarration().Forget();
-
         // フェードアウト
         _currentFadeHandle = _canvasGroup.FadeOut(FADE_DURATION);
 
@@ -107,20 +101,9 @@ public class TutorialView : MonoBehaviour
         _currentMaskSize = Vector2.zero;
     }
 
-    private async UniTask UpdateMessageText(string message, bool isPlayerDialog, bool isBattleTutorial)
+    private async UniTask UpdateMessageText(string message, bool isProtagonist)
     {
-        if (!isBattleTutorial)
-        {
-            // 戦闘チュートリアル以外の場合はSimpleTutorialWindowViewを使用
-            await simpleTutorialWindow.DisplayText(message, autoAdvance: false);
-            return;
-        }
-
-        var narrationView = isPlayerDialog ? playerNarrationView : enemyNarrationView;
-        var disableView = isPlayerDialog ? enemyNarrationView : playerNarrationView;
-        disableView.HideNarration().Forget();
-
-        await narrationView.DisplayNarration(message, autoAdvance: false);
+        await simpleTutorialWindow.DisplayText(message, isProtagonist, autoAdvance: false);
     }
 
     private void Awake()

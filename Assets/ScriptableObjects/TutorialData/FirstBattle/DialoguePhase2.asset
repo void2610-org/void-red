@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
+  m_Name: DialoguePhase2
+  m_EditorClassIdentifier:
+  steps:
+  - message: "\u306A\u308B\u307B\u3069\u3002\u3042\u306A\u305F\u306F\"{0}\"\u3092\u9078\u3093\u3060\u306E\u3067\u3059\u306D\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u672C\u6765\u306A\u3089\u305D\u308C\u306B\u5BFE\u3057\u3066\u76F8\u624B\u306F\u63FA\u3055\u3076\u3089\u308C\u884C\u52D5\u3092\u5909\u3048\u3066\u3057\u307E\u3046\u304B\u3082\u3057\u308C\u307E\u305B\u3093\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u3057\u304B\u3057\u30DC\u30AF\u306B\u306F\u3053\u308C\u3089\u306E\u8A18\u61B6\u306B\u4F55\u306E\u601D\u3044\u5165\u308C\u3082\u8981\u6C42\u3082\u306A\u3044\u306E\u3067\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u672C\u756A\u3067\u306F\u3042\u306A\u305F\u306E\u610F\u306E\u307E\u307E\u306B\u76F8\u624B\u3092\u52D5\u304B\u305B\u308B\u3068\u3044\u3044\u3067\u3059\u306D\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u3057\u304B\u3057\u76F8\u624B\u3082\u3042\u306A\u305F\u3068\u540C\u3058\u3088\u3046\u306A\u3053\u3068\u3092\u8003\u3048\u3066\u3044\u308B\u3053\u3068\u3092\u5FD8\u308C\u306A\u3044\u3088\u3046\u306B\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u305B\u3044\u305C\u3044\u76F8\u624B\u306B\u8E0A\u3089\u3055\u308C\u306A\u3044\u3088\u3046\u306B\u304A\u6C17\u3092\u4ED8\u3051\u3066\u3002"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}

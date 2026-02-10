@@ -17,6 +17,17 @@ public class RewardPhaseView : BasePhaseView
     /// </summary>
     public IReadOnlyDictionary<EmotionType, int> RewardedAmounts => resourceRewardView.RewardedAmounts;
 
+    public void DisplayResourceGauges(
+        IReadOnlyDictionary<EmotionType, int> currentResources,
+        IReadOnlyDictionary<EmotionType, int> maxResources) =>
+        resourceRewardView.DisplayGauges(currentResources, maxResources);
+
+    public async UniTask AnimateResourceRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) =>
+        await resourceRewardView.AnimateRewardsAsync(results);
+
+    public async UniTask WaitForCardAcquisitionCompleteAsync() =>
+        await cardAcquisitionView.WaitForNextAndHideAsync();
+
     public override void Hide()
     {
         cardAcquisitionView.Hide();
@@ -24,18 +35,10 @@ public class RewardPhaseView : BasePhaseView
         base.Hide();
     }
 
-    public async UniTask ShowRewardsAsync(
-        Dictionary<CardModel, RewardCalculator.RewardResult> results,
-        IReadOnlyDictionary<EmotionType, int> currentResources,
-        IReadOnlyDictionary<EmotionType, int> maxResources)
+    public async UniTask DisplayCardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results)
     {
         Show();
-
-        // 獲得カード一覧を表示
         var cardDataList = results.Keys.Select(card => card.Data);
-        await cardAcquisitionView.ShowCardsAsync(cardDataList);
-
-        // リソース報酬をゲージアニメーションで表示
-        await resourceRewardView.ShowRewardsAsync(results, currentResources, maxResources);
+        await cardAcquisitionView.DisplayCardsAsync(cardDataList);
     }
 }

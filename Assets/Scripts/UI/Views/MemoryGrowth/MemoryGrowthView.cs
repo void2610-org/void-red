@@ -30,8 +30,8 @@ public class MemoryGrowthView : BasePhaseView
             .Subscribe(theme => HandleThemeSelected(theme).Forget())
             .AddTo(this);
 
-        // ウィンドウを表示
-        CanvasGroup.FadeIn(0.5f);
+        // トランジション中に準備するため即時表示
+        CanvasGroup.Show();
     }
 
     private async UniTask HandleThemeSelected(AcquiredTheme theme)
