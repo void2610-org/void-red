@@ -40,13 +40,13 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Speed: 1
+    - _Speed: 0.9
     - _TimeOffset: 0
     - _Value: 1.5
     m_Colors:
     - _Color1: {r: 1, g: 0.1745283, b: 0.3928452, a: 1}
     - _Color2: {r: 1, g: 0.72156864, b: 0.80905706, a: 1}
-    - _Tilling: {r: 0.5, g: 3, b: 0, a: 0}
+    - _Tilling: {r: 0.4, g: 3, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &3091635510444005595
