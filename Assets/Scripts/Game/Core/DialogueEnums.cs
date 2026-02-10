@@ -12,6 +12,8 @@ public enum DialogueChoiceType
 
 public enum DialogueActionType
 {
+    /// <summary> 効果なし </summary>
+    None,
     /// <summary> 対象変更 </summary>
     TargetChange,
     /// <summary> リソース増減 </summary>

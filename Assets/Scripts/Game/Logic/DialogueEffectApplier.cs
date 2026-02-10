@@ -10,6 +10,7 @@ public static class DialogueEffectApplier
 
         return effect.ActionType switch
         {
+            DialogueActionType.None => "効果なし",
             DialogueActionType.TargetChange => ApplyTargetChange(target, auctionCards),
             DialogueActionType.ResourceChange => ApplyResourceChange(effect, target),
             DialogueActionType.BluffStrengthen => ApplyBluffStrengthen(effect, target),
