@@ -408,6 +408,7 @@ GameObject:
   - component: {fileID: 5181531463108201010}
   - component: {fileID: 6375842604015696395}
   - component: {fileID: 5782363331818866303}
+  - component: {fileID: 2557049344710433139}
   m_Layer: 5
   m_Name: ValueRankingView
   m_TagString: Untagged
@@ -476,6 +477,18 @@ MonoBehaviour:
   animDuration: 0.5
   slotSlideOffset: 200
   cardSlideOffset: -150
+--- !u!225 &2557049344710433139
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8674354332682970608}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1221693844635984270
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -757,7 +770,7 @@ PrefabInstance:
     - target: {fileID: 4664853198953445674, guid: b2f2f477385e14c9bbbbe8f7edf10b6c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: cf21bcb9921d94ca787376c05585468a, type: 3}
+      objectReference: {fileID: 21300000, guid: 8961d0b8c6f234315bb6010b68562936, type: 3}
     - target: {fileID: 8634084020591558220, guid: b2f2f477385e14c9bbbbe8f7edf10b6c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -894,7 +907,7 @@ PrefabInstance:
     - target: {fileID: 4664853198953445674, guid: b2f2f477385e14c9bbbbe8f7edf10b6c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: f66ddf0fa59254212b6d7e7279559450, type: 3}
+      objectReference: {fileID: 21300000, guid: 66ed3da9059f44560b9031c75ab469bd, type: 3}
     - target: {fileID: 8634084020591558220, guid: b2f2f477385e14c9bbbbe8f7edf10b6c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1031,7 +1044,7 @@ PrefabInstance:
     - target: {fileID: 4664853198953445674, guid: b2f2f477385e14c9bbbbe8f7edf10b6c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: a005dad2ffa0641159c50ef104706901, type: 3}
+      objectReference: {fileID: 21300000, guid: 60186f608b26544318b79b48175059fb, type: 3}
     - target: {fileID: 8634084020591558220, guid: b2f2f477385e14c9bbbbe8f7edf10b6c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
