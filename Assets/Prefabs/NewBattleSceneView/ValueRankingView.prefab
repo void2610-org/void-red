@@ -395,7 +395,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   points: []
-  thickness: 100
+  thickness: 40
   center: 0
 --- !u!1 &8674354332682970608
 GameObject:
