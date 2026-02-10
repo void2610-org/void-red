@@ -312,7 +312,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8A31\u3057\u305F\u304B\u3063\u305F\u3082\u306E"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
   m_sharedMaterial: {fileID: 1947302341603136683, guid: ab12ebeeedda341c9ad4c1e3f4368cf4, type: 2}
@@ -339,7 +339,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 31.05
+  m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 1
