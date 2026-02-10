@@ -91,23 +91,19 @@ jobs:
 
       - name: Prepare artifact for deployment 🎯
         run: |
-          # ブランチ名取得
-          BRANCH=${GITHUB_REF_NAME#refs/heads/}
-          # 出力先フォルダを決定
-          if [ "$BRANCH" = "main" ]; then
-            DEST_DIR="public"
+          # デプロイ先ディレクトリを決定（PRはPR番号のみ、mainは空）
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            PUBLISH_DEST="${{ github.event.pull_request.number }}"
+          elif [ "$GITHUB_REF_NAME" = "main" ]; then
             PUBLISH_DEST=""
           else
-            DEST_DIR="public/$BRANCH"
-            PUBLISH_DEST="$BRANCH"
+            PUBLISH_DEST="$GITHUB_REF_NAME"
           fi
-          echo "Branch=$BRANCH -> DEST_DIR=$DEST_DIR PUBLISH_DEST=$PUBLISH_DEST"
-          # 環境変数として後続ステップに渡す
+          echo "PUBLISH_DEST=$PUBLISH_DEST"
           echo "PUBLISH_DEST=$PUBLISH_DEST" >> $GITHUB_ENV
-          # root 権限でディレクトリ作成・移動
-          sudo mkdir -p "$DEST_DIR"
-          sudo mv CIBuilds/WebGL/build/* "$DEST_DIR/"
-          # public 以下を現在のユーザー所有に変更
+          # ビルドファイルは常にpublic/直下に配置（サブディレクトリ振り分けはdestination_dirに任せる）
+          sudo mkdir -p public
+          sudo mv CIBuilds/WebGL/build/* public/
           sudo chown -R $USER:$USER public
 
       - name: Deploy to gh-pages branch 📤
@@ -140,23 +136,32 @@ jobs:
 
     environment:
       name: preview
-      # PR 番号＋mergeフォルダ構造に合わせたプレビュー URL を返す
-      url: https://void2610.github.io/void-red/${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge/
-    
+      url: https://void2610.github.io/void-red/${{ github.event.pull_request.number }}/
+
     steps:
       - name: Download Pages artifact 📥
         uses: actions/download-artifact@v4
         with:
-          name: github-pages    # upload-pages-artifact のデフォルト名
+          name: github-pages
           path: public
+
+      - name: Extract artifact 📦
+        run: |
+          # upload-pages-artifactはtar形式で保存するため展開が必要
+          if [ -f "public/artifact.tar" ]; then
+            cd public
+            tar -xf artifact.tar
+            rm artifact.tar
+            cd ..
+          fi
 
       - name: Deploy Preview to gh-pages 📤
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token:    ${{ secrets.GITHUB_TOKEN }}
-          publish_dir:     public/${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge
+          publish_dir:     public
           publish_branch:  gh-pages
-          destination_dir: ${{ github.event.pull_request.number }}/merge/${{ github.event.pull_request.number }}/merge
+          destination_dir: ${{ github.event.pull_request.number }}
           keep_files:      true
 
   deploy:
@@ -225,7 +230,7 @@ jobs:
           if [ "$REF_DIR" = "main" ] || [ -z "$REF_DIR" ]; then
             URL="https://void2610.github.io/void-red/"
           else
-            URL="https://void2610.github.io/void-red/$REF_DIR/merge/$REF_DIR/merge/"
+            URL="https://void2610.github.io/void-red/$REF_DIR/"
           fi
           curl -X POST -H "Content-Type: application/json" -d "{
             \"content\": \"💬 タイトル: ${COMMIT_MESSAGE} \n🔥 ビルド結果: <${URL}> \n👤 作成者: ${GITHUB_ACTOR} \n🌲ブランチ: ${BRANCH}\"
