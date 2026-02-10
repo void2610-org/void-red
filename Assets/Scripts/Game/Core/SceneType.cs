@@ -15,7 +15,9 @@ public enum SceneType
     /// <summary>バトル画面</summary>
     Battle,
     /// <summary>ノベル画面</summary>
-    Novel
+    Novel,
+    /// <summary>展示モード感謝画面</summary>
+    Thanks
 }
 
 /// <summary>
@@ -32,7 +34,8 @@ public static class SceneTypeExtensions
         { SceneType.Title, "TitleScene" },
         { SceneType.Home, "HomeScene" },
         { SceneType.Battle, "BattleScene" },
-        { SceneType.Novel, "NovelScene" }
+        { SceneType.Novel, "NovelScene" },
+        { SceneType.Thanks, "ThanksScene" }
     };
 
     /// <summary>
