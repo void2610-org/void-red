@@ -23,7 +23,7 @@ public class ChoiceData
     /// <summary>
     /// 選択肢の数
     /// </summary>
-    public int OptionCount => options?.Count ?? 0;
+    public int OptionCount => options.Count;
 
     /// <summary>
     /// コンストラクタ

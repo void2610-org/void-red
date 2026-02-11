@@ -33,7 +33,7 @@ public class TutorialData : ScriptableObject
 
     public string TutorialId => this.name;
     public List<TutorialStep> Steps => steps;
-    public int StepCount => steps?.Count ?? 0;
+    public int StepCount => steps.Count;
 
     public TutorialStep GetStep(int index)
     {

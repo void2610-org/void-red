@@ -89,10 +89,7 @@ namespace VoidRed.UI.Views
 
         private void UpdateValueText()
         {
-            if (valueText != null)
-            {
-                valueText.text = _currentValue.ToString();
-            }
+            valueText.text = _currentValue.ToString();
         }
 
         private void CancelAnimation()
