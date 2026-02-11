@@ -1,5 +1,5 @@
-using Cysharp.Threading.Tasks;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// テキスト表示の進行状態を管理するpure C#クラス
@@ -7,16 +7,16 @@ using System.Threading;
 /// </summary>
 public class TextProgressController
 {
+    /// <summary>
+    /// SEループ用のキャンセルトークン
+    /// </summary>
+    public CancellationToken DialogSeToken => _dialogSeCancellationTokenSource?.Token ?? CancellationToken.None;
+
     private CancellationTokenSource _typingCancellationTokenSource;
     private CancellationTokenSource _dialogSeCancellationTokenSource;
     private CancellationTokenSource _waitCancellationTokenSource;
     private bool _isTyping;
     private bool _isWaitingForNext;
-
-    /// <summary>
-    /// SEループ用のキャンセルトークン
-    /// </summary>
-    public CancellationToken DialogSeToken => _dialogSeCancellationTokenSource?.Token ?? CancellationToken.None;
 
     /// <summary>
     /// タイピングを開始し、キャンセルトークンを返す
@@ -53,25 +53,6 @@ public class TextProgressController
         _dialogSeCancellationTokenSource?.Cancel();
         _dialogSeCancellationTokenSource?.Dispose();
         _dialogSeCancellationTokenSource = null;
-    }
-
-    /// <summary>
-    /// タイピングアニメーションをスキップ
-    /// </summary>
-    private void SkipTyping()
-    {
-        if (!_isTyping) return;
-
-        _typingCancellationTokenSource?.Cancel();
-        _typingCancellationTokenSource?.Dispose();
-        _typingCancellationTokenSource = null;
-
-        // SEループを停止
-        _dialogSeCancellationTokenSource?.Cancel();
-        _dialogSeCancellationTokenSource?.Dispose();
-        _dialogSeCancellationTokenSource = null;
-
-        _isTyping = false;
     }
 
     /// <summary>
@@ -142,6 +123,25 @@ public class TextProgressController
 
         // 次へ進む
         _isWaitingForNext = false;
+    }
+
+    /// <summary>
+    /// タイピングアニメーションをスキップ
+    /// </summary>
+    private void SkipTyping()
+    {
+        if (!_isTyping) return;
+
+        _typingCancellationTokenSource?.Cancel();
+        _typingCancellationTokenSource?.Dispose();
+        _typingCancellationTokenSource = null;
+
+        // SEループを停止
+        _dialogSeCancellationTokenSource?.Cancel();
+        _dialogSeCancellationTokenSource?.Dispose();
+        _dialogSeCancellationTokenSource = null;
+
+        _isTyping = false;
     }
 
     /// <summary>

@@ -1,6 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using R3;
 using UnityEngine;
-using Game.PersonalityLog;
 
 /// <summary>
 /// ゲーム状態データの保持とI/Oを担当するリポジトリ
@@ -11,28 +13,36 @@ public class GameStateRepository
     public StoryProgressData StoryProgress { get; } = new();
     public PlayerProgressData PlayerProgress { get; } = new();
     public NovelProgressData NovelProgress { get; } = new();
-    public PersonalityLogData PersonalityLogData { get; } = new();
+    public MemoryProgressData MemoryProgress { get; } = new();
+    public Observable<Unit> OnDataSaved => _onDataSaved;
 
     // 依存サービス
     private readonly SaveDataManager _saveDataManager;
     private readonly CardPoolService _cardPoolService;
+    private readonly AllThemeData _allThemeData;
 
     private readonly Subject<Unit> _onDataSaved = new();
-
-    public Observable<Unit> OnDataSaved => _onDataSaved;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public GameStateRepository(SaveDataManager saveDataManager, CardPoolService cardPoolService)
+    public GameStateRepository(SaveDataManager saveDataManager, CardPoolService cardPoolService, AllThemeData allThemeData)
     {
         _saveDataManager = saveDataManager;
         _cardPoolService = cardPoolService;
+        _allThemeData = allThemeData;
 
         // 起動時に自動ロード
         LoadAll();
     }
-    
+
+    /// <summary>
+    /// 有効なセーブデータが存在するかチェック
+    /// </summary>
+    public bool HasSaveData() =>
+        _saveDataManager.SaveFileExists() &&
+        (StoryProgress.CurrentStep > 0 || StoryProgress.BattleResults.Count > 0);
+
     /// <summary>
     /// 全データをセーブ
     /// </summary>
@@ -41,6 +51,21 @@ public class GameStateRepository
         var saveData = CreateGameSaveData();
         _saveDataManager.SaveGameData(saveData);
         _onDataSaved.OnNext(Unit.Default);
+    }
+
+    /// <summary>
+    /// 全データをリセット
+    /// </summary>
+    public void ResetAll()
+    {
+        StoryProgress.Reset();
+        PlayerProgress.Reset();
+        NovelProgress.Reset();
+        MemoryProgress.Reset();
+
+        SaveAll();
+
+        Debug.Log("[GameStateRepository] 全データを初期状態にリセット完了");
     }
 
     /// <summary>
@@ -60,10 +85,6 @@ public class GameStateRepository
         }
 
         // プレイヤー進行データのロード
-        PlayerProgress.Deck.Clear();
-        PlayerProgress.Deck.AddRange(loadedData.SavedDeck);
-        PlayerProgress.EvolutionStats = loadedData.EvolutionStats ?? new EvolutionStatsData();
-
         PlayerProgress.ViewedCardIds.Clear();
         var viewedIds = loadedData.GetViewedCardIds();
         foreach (var id in viewedIds)
@@ -74,14 +95,22 @@ public class GameStateRepository
         // ノベル進行データのロード
         NovelProgress.LoadFrom(loadedData.GetAllChoiceResults());
 
-        // 人格ログのロード
-        PersonalityLogData.LoadFrom(loadedData.PersonalityLog);
+        // 獲得テーマデータのロード
+        MemoryProgress.Reset();
+        foreach (var savedTheme in loadedData.AcquiredThemes)
+        {
+            var acquiredTheme = ConvertSavedThemeToAcquiredTheme(savedTheme);
+            if (acquiredTheme != null)
+            {
+                MemoryProgress.AddAcquiredTheme(acquiredTheme);
+            }
+        }
 
         // 新規データかどうかを判定
         var isNewData = StoryProgress.CurrentStep == 0 && StoryProgress.BattleResults.Count == 0;
         var dataType = isNewData ? "新規データ" : "既存データ";
 
-        Debug.Log($"[GameStateRepository] {dataType}自動ロード: Step {StoryProgress.CurrentStep}");
+        Debug.Log($"[GameStateRepository] {dataType}自動ロード: Step {StoryProgress.CurrentStep}, Themes {MemoryProgress.AcquiredThemes.Count}");
     }
 
     /// <summary>
@@ -93,10 +122,6 @@ public class GameStateRepository
 
         // ストーリー進行データを設定
         saveData.UpdateGameProgress(StoryProgress.CurrentStep, StoryProgress.BattleResults);
-
-        // プレイヤー進行データを設定
-        saveData.UpdateDeck(PlayerProgress.Deck);
-        saveData.UpdateEvolutionStats(PlayerProgress.EvolutionStats);
 
         // 閲覧済みカードをセーブデータに追加
         foreach (var cardId in PlayerProgress.ViewedCardIds)
@@ -110,74 +135,57 @@ public class GameStateRepository
             saveData.AddNovelChoiceResult(choiceResult);
         }
 
-        // 人格ログデータを設定
-        saveData.UpdatePersonalityLog(PersonalityLogData);
+        // 獲得テーマをセーブデータに追加
+        var savedThemes = MemoryProgress.AcquiredThemes.Select(theme => theme.ToSavedData());
+        saveData.UpdateAcquiredThemes(savedThemes);
 
         return saveData;
     }
 
     /// <summary>
-    /// 有効なセーブデータが存在するかチェック
+    /// 保存されたテーマデータをAcquiredThemeに変換
     /// </summary>
-    public bool HasSaveData()
+    /// <param name="savedTheme">保存されたテーマデータ</param>
+    /// <returns>変換されたAcquiredTheme、変換失敗時はnull</returns>
+    private AcquiredTheme ConvertSavedThemeToAcquiredTheme(SavedAcquiredTheme savedTheme)
     {
-        return _saveDataManager.SaveFileExists() &&
-               (StoryProgress.CurrentStep > 0 || StoryProgress.BattleResults.Count > 0);
-    }
-
-    /// <summary>
-    /// 全データをリセット
-    /// </summary>
-    public void ResetAll()
-    {
-        StoryProgress.Reset();
-        PlayerProgress.Reset();
-        NovelProgress.Reset();
-        PersonalityLogData.Reset();
-
-        SaveAll();
-
-        Debug.Log("[GameStateRepository] 全データを初期状態にリセット完了");
-    }
-
-    /// <summary>
-    /// CardModelsからデッキを更新
-    /// </summary>
-    public void UpdateDeckFromCardModels(System.Collections.Generic.IReadOnlyList<CardModel> cardModels)
-    {
-        PlayerProgress.Deck.Clear();
-        foreach (var cardModel in cardModels)
+        // テーマデータを取得
+        var themeData = _allThemeData.GetThemeById(savedTheme.ThemeId);
+        if (!themeData)
         {
-            if (cardModel?.Data)
-            {
-                PlayerProgress.Deck.Add(new SavedCard(
-                    cardModel.Data.CardId,
-                    cardModel.InstanceId,
-                    cardModel.IsCollapsed
-                ));
-            }
+            Debug.LogWarning($"[GameStateRepository] テーマID '{savedTheme.ThemeId}' が見つかりませんでした");
+            return null;
         }
-    }
 
-    /// <summary>
-    /// デッキをCardModelsに変換
-    /// </summary>
-    public System.Collections.Generic.List<CardModel> ConvertDeckToCardModels()
-    {
-        var cardModels = new System.Collections.Generic.List<CardModel>();
-        foreach (var savedCard in PlayerProgress.Deck)
+        // カード獲得情報を復元
+        var allCardInfoList = new List<CardAcquisitionInfo>();
+        foreach (var savedCardInfo in savedTheme.CardInfoList)
         {
-            var cardData = _cardPoolService.GetCardById(savedCard.cardId);
+            var cardData = _cardPoolService.GetCardById(savedCardInfo.CardId);
             if (cardData)
             {
-                var cardModel = new CardModel(cardData, savedCard.instanceId, savedCard.isCollapsed);
-                cardModels.Add(cardModel);
+                // セーブデータにはinstanceIdがないので新規生成
+                var cardModel = new CardModel(cardData);
+                var cardInfo = new CardAcquisitionInfo(
+                    cardModel,
+                    savedCardInfo.GetPlayerBidsByEmotion(),
+                    savedCardInfo.GetEnemyBidsByEmotion(),
+                    savedCardInfo.PlayerValueRank,
+                    savedCardInfo.EnemyValueRank,
+                    savedCardInfo.PlayerWon
+                );
+                allCardInfoList.Add(cardInfo);
             }
             else
             {
-                Debug.LogWarning($"[GameStateRepository] カードID '{savedCard.cardId}' が見つかりませんでした");
+                Debug.LogWarning($"[GameStateRepository] カードID '{savedCardInfo.CardId}' が見つかりませんでした");
             }
         }
-        return cardModels;
+
+        return new AcquiredTheme(
+            themeData,
+            allCardInfoList,
+            savedTheme.GetUsedEmotions()
+        );
     }
 }

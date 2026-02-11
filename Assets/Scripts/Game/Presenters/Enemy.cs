@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// NPCクラス
@@ -9,22 +8,63 @@ using Void2610.UnityTemplate;
 public class Enemy : PlayerPresenter
 {
     private EnemyData _data;
-    
-    public Enemy(HandView handView, GameProgressService gameProgressService = null, int maxHandSize = 3) : base(handView, gameProgressService, maxHandSize) { }
-    
+
+    public Enemy(GameProgressService gameProgressService = null) : base(gameProgressService) { }
+
     public void SetEnemyData(EnemyData data) => _data = data;
 
-    public PlayStyle DecidePlayStyle()
+    // 敵AIで価値順位をランダム設定（自身のCardsに対してValueRankingを設定）
+    public void DecideValueRankings()
     {
-        var all = _data.PlaystyleWeights.Keys.ToList();
-        return all.ChooseByWeight(p => _data.PlaystyleWeights[p]);
+        ValueRanking.Clear();
+        if (Cards.Count == 0) return;
+
+        var maxRank = GameConstants.CARDS_PER_PLAYER;
+        var ranks = Enumerable.Range(1, System.Math.Min(Cards.Count, maxRank)).ToList();
+        ShuffleList(ranks);
+
+        for (var i = 0; i < System.Math.Min(Cards.Count, ranks.Count); i++)
+        {
+            ValueRanking.TrySetRanking(Cards[i], ranks[i]);
+        }
     }
-    
-    /// <summary>
-    /// 敵はセーブしない（オーバーライドして無効化）
-    /// </summary>
-    public override void SaveDeckChanges()
+
+    // 敵AIで入札を決定（自身のValueRankingに基づいてBidsを設定）
+    public void DecideBids(IReadOnlyList<CardModel> auctionCards, EmotionType emotion)
     {
-        // 敵のデッキ変更はセーブデータに影響しない
+        Bids.Clear();
+
+        var totalResource = GetEmotionAmount(emotion);
+        if (auctionCards.Count == 0 || totalResource <= 0) return;
+
+        // 8枚のカードからランダムに選んで入札
+        var shuffledCards = auctionCards.OrderBy(_ => UnityEngine.Random.value).ToList();
+        var remaining = totalResource;
+
+        foreach (var card in shuffledCards)
+        {
+            if (remaining <= 0) break;
+
+            // ランダムな入札額（1〜残りリソースの半分程度）
+            var maxBid = System.Math.Max(1, remaining / 2);
+            var amount = UnityEngine.Random.Range(1, maxBid + 1);
+            amount = System.Math.Min(amount, remaining);
+
+            if (amount > 0)
+            {
+                Bids.SetBid(card, emotion, amount);
+                remaining -= amount;
+            }
+        }
+    }
+
+    private static void ShuffleList<T>(IList<T> list)
+    {
+        var random = new System.Random();
+        for (var i = list.Count - 1; i > 0; i--)
+        {
+            var j = random.Next(i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
     }
 }

@@ -89,7 +89,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 277754951790194367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abb52b1a925d94b5c87565507a70d245, type: 3}
+  m_Script: {fileID: 11500000, guid: 25b7567fb2ef54fcc961add5a6cb3f97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 277754951790194367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f7da71234e2b4ff4b7a25d8714f9f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   hoverSe: {fileID: 8300000, guid: 0523a9b80961b4235947ab2c1b4e918f, type: 3}
@@ -322,7 +322,7 @@ RectTransform:
   m_GameObject: {fileID: 7864141931591264279}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 9037413902010202566}

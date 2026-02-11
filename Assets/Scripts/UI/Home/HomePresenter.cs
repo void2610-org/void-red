@@ -1,8 +1,8 @@
 using System;
-using UnityEngine;
-using R3;
-using VContainer.Unity;
 using Cysharp.Threading.Tasks;
+using R3;
+using UnityEngine;
+using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
 
@@ -38,42 +38,6 @@ public class HomePresenter : IStartable, IDisposable
         _confirmationDialogService = confirmationDialogService;
     }
 
-    public void Start()
-    {
-        // Viewを初期化
-        _homeView.Initialize();
-
-        _homeView.TitleButtonClicked
-            .Subscribe(_ => OnTitleButtonClicked())
-            .AddTo(_disposables);
-
-        _homeView.StoryButtonClicked
-            .Subscribe(_ => StartCurrentNodeAsync().Forget())
-            .AddTo(_disposables);
-
-        _homeView.DeckButtonClicked
-            .Subscribe(_ => ShowDeckData())
-            .AddTo(_disposables);
-
-        _homeView.LibraryButtonClicked
-            .Subscribe(_ => ShowCardLibrary())
-            .AddTo(_disposables);
-
-        // カードクリックイベントの購読
-        _homeView.DeckCardClicked
-            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
-            .AddTo(_disposables);
-
-        _homeView.LibraryCardClicked
-            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
-            .AddTo(_disposables);
-
-        // ホームBGMを再生
-        BgmManager.Instance.PlayBGMBySceneType(BgmType.Home);
-
-        SafeNavigationManager.SelectRootForceSelectable().Forget();
-    }
-
     /// <summary>
     /// タイトルボタンがクリックされた時の処理
     /// </summary>
@@ -105,7 +69,7 @@ public class HomePresenter : IStartable, IDisposable
     /// </summary>
     private async UniTask StartBattleNode(BattleNode battleNode)
     {
-        Debug.Log($"[HomePresenter] バトル開始: 敵ID {battleNode.EnemyId}");
+        Debug.Log($"[HomePresenter] バトル開始: オークションID {battleNode.AuctionId}");
 
         // 単純にBattleSceneに遷移（敵情報はGameProgressServiceから取得）
         await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle);
@@ -123,15 +87,6 @@ public class HomePresenter : IStartable, IDisposable
     }
 
     /// <summary>
-    /// デッキデータを表示
-    /// </summary>
-    private void ShowDeckData()
-    {
-        var cardModels = _gameProgressService.GetDeckCardModels();
-        _homeView.ShowDeckData(cardModels);
-    }
-
-    /// <summary>
     /// カード図鑑を表示
     /// </summary>
     private void ShowCardLibrary()
@@ -139,7 +94,39 @@ public class HomePresenter : IStartable, IDisposable
         var viewedCardIds = _gameProgressService.GetViewedCardIds();
         _homeView.ShowCardLibrary(_allCardData, viewedCardIds);
     }
-    
+
+    public void Start()
+    {
+        // Viewを初期化
+        _homeView.Initialize();
+
+        _homeView.TitleButtonClicked
+            .Subscribe(_ => OnTitleButtonClicked())
+            .AddTo(_disposables);
+
+        _homeView.StoryButtonClicked
+            .Subscribe(_ => StartCurrentNodeAsync().Forget())
+            .AddTo(_disposables);
+
+        _homeView.LibraryButtonClicked
+            .Subscribe(_ => ShowCardLibrary())
+            .AddTo(_disposables);
+
+        // カードクリックイベントの購読
+        _homeView.DeckCardClicked
+            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
+            .AddTo(_disposables);
+
+        _homeView.LibraryCardClicked
+            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
+            .AddTo(_disposables);
+
+        // ホームBGMを再生
+        BgmManager.Instance.PlayBGM("Home");
+
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
+    }
+
     public void Dispose()
     {
         _disposables.Dispose();

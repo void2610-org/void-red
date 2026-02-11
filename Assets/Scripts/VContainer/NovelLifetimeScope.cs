@@ -9,9 +9,9 @@ using VContainer.Unity;
 public class NovelLifetimeScope : LifetimeScope
 {
     [SerializeField] private NovelSeManager novelSeManager;
-    
+
     [SerializeField] private bool useLocalExcel = true; // trueでExcel、falseでスプレッドシート（useAlphaHardcode=falseの時に有効）
-    
+
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterInstance(novelSeManager);

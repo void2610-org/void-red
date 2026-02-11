@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UnityEngine;
-using VContainer;
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
+using VContainer;
 using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
@@ -38,21 +38,26 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     private string _currentScenarioId;
     private readonly CompositeDisposable _disposables = new();
 
+    public NovelPresenter(bool useLocalExcel)
+    {
+        // ビルドでは必ずローカルExcelを使用
+#if !UNITY_EDITOR
+        useLocalExcel = true;
+#endif
+
+        _novelDialogService = new NovelDialogService(useLocalExcel);
+    }
+
     /// <summary>
     /// シーンの初期化完了を待つ（ISceneInitializable実装）
     /// </summary>
     public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
 
-    public NovelPresenter(bool useLocalExcel)
-    {
-        // ビルドでは必ずローカルExcelを使用
-        #if !UNITY_EDITOR
-        useLocalExcel = true;
-        #endif
-        
-        _novelDialogService = new NovelDialogService(useLocalExcel);
-    }
-    
+    /// <summary>
+    /// 全ダイアログをスキップして即座に完了（InputSystem用の公開メソッド）
+    /// </summary>
+    public void RequestSkipAllDialogs() => SkipAllDialogsInternal().Forget();
+
     [Inject]
     public void Construct(
         NovelSeManager novelSeManager,
@@ -72,14 +77,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         _inputActionsProvider = inputActionsProvider;
         _addressableImageLoader = new AddressableImageLoader();
     }
-    
-    public void Start()
-    {
-        Initialize().Forget();
-        SafeNavigationManager.SelectRootForceSelectable().Forget();
-        BgmManager.Instance.PlayBGMBySceneType(BgmType.Novel);
-    }
-    
+
     private async UniTaskVoid Initialize()
     {
         _dialogView = Object.FindAnyObjectByType<DialogView>();
@@ -109,7 +107,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
 
         await OnDialogCompleted();
     }
-    
+
     /// <summary>
     /// シナリオIDに応じてシナリオを開始（Excel/スプレッドシート読み込み）
     /// </summary>
@@ -125,7 +123,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
-        
+
         // キャラクター画像を事前に読み込み
         Debug.Log("[NovelUIPresenter] キャラクター画像を事前読み込み中...");
         await PreloadCharacterImages(dialogList);
@@ -137,7 +135,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         Debug.Log("[NovelUIPresenter] ダイアログシーケンスを開始");
         await StartDialogSequence(dialogList);
     }
-    
+
     /// <summary>
     /// ダイアログシーケンスを開始（Presenterが制御）
     /// </summary>
@@ -146,24 +144,24 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         _currentDialogList = dialogList;
         _currentDialogIndex = 0;
         _choiceCounter = 0;
-        
+
         // 全てのダイアログを順番に処理
         while (_currentDialogIndex < _currentDialogList.Count)
         {
             var currentDialog = _currentDialogList[_currentDialogIndex];
-            
+
             // ダイアログを表示（完了まで待機）
             await ShowSingleDialog(currentDialog);
-            
+
             if (currentDialog.HasGetItem) await ShowItemGetEffect(currentDialog.GetItemData);
             if (currentDialog.HasChoice) await ShowChoiceEffect(currentDialog.ChoiceData);
             if (currentDialog.HasCardChoice) await ShowCardChoiceEffect(currentDialog.CardChoiceData);
             if (currentDialog.HasGetCard) await ShowCardGetEffect();
-            
+
             _currentDialogIndex++;
         }
     }
-    
+
     /// <summary>
     /// 単一のダイアログを表示（完了まで待機）
     /// </summary>
@@ -173,15 +171,19 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         if (!string.IsNullOrEmpty(dialogData.BackgroundImageName))
         {
             var backgroundSprite = await _addressableImageLoader.LoadBackgroundImageAsync(dialogData.BackgroundImageName);
+            if (!_dialogBackgroundView) return;
             await _dialogBackgroundView.SetBackground(backgroundSprite);
         }
-        
+
         // キャラクター画像を読み込み（事前読み込み済みなのでキャッシュから取得）
         if (!string.IsNullOrEmpty(dialogData.CharacterImageName))
         {
             var characterSprite = await _addressableImageLoader.LoadCharacterImageAsync(dialogData.CharacterImageName);
-            _dialogCharacterView.SetCharacterImage(characterSprite, dialogData.CharacterImageName.Contains("Alv"));
+            if (!_dialogCharacterView) return;
+            _dialogCharacterView.SetCharacterImage(characterSprite);
         }
+
+        if (!_dialogView) return;
 
         // SE再生と再生時間の取得
         _novelSeManager.StopSe();
@@ -195,7 +197,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // ダイアログを表示（完了まで待機）
         await _dialogView.ShowSingleDialog(dialogData, seWaitTime);
     }
-    
+
     /// <summary>
     /// アイテム取得演出を表示
     /// </summary>
@@ -208,12 +210,12 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             // アイテム画像を読み込み
             itemSprite = await _addressableImageLoader.LoadItemImageAsync(itemGetData.ItemImageName);
         }
-        
+
         // アイテム取得演出を実行
-        _novelSeManager.WaitAndPlaySe("ItemGet", delayTime:1f, pitch: 1f);
+        _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
         await _itemGetEffectView.ShowItemGetEffect(itemGetData, itemSprite);
     }
-    
+
     /// <summary>
     /// 選択肢表示を実行
     /// </summary>
@@ -221,18 +223,18 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     {
         // 選択肢を表示して結果を取得
         var selectedIndex = await _choiceView.ShowChoice(choiceData);
-        
+
         // 選択結果をGameProgressServiceに記録
         var novelRes = new NovelChoiceResult(_currentScenarioId, _choiceCounter, selectedIndex);
         _gameProgressService.RecordNovelChoice(novelRes);
-        
+
         // 選択肢番号をインクリメント
         _choiceCounter++;
-        
+
         // 選択結果をログ出力
         Debug.Log($"[NovelUIPresenter] ユーザーが選択した選択肢: {selectedIndex} - {choiceData.GetOption(selectedIndex)}");
     }
-    
+
     /// <summary>
     /// カード風選択肢表示を実行
     /// </summary>
@@ -241,31 +243,31 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // ダイアログパネルと立ち絵を非表示
         _dialogCharacterView.FadeOut().Forget();
         await _dialogView.SetDialogPanelVisible(false);
-        
+
         // カード画像を並列で読み込み（待機時間短縮）
         var (cardImage1, cardImage2) = await UniTask.WhenAll(
             _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName1),
             _addressableImageLoader.LoadItemImageAsync(cardChoiceData.ImageName2)
         );
-        
+
         // カード風選択肢を表示して結果を取得
         var selectedIndex = await _cardChoiceView.ShowCardChoice(cardChoiceData, cardImage1, cardImage2);
-        
+
         // 選択結果をGameProgressServiceに記録
         var novelRes = new NovelChoiceResult(_currentScenarioId, _choiceCounter, selectedIndex);
         _gameProgressService.RecordNovelChoice(novelRes);
-        
+
         // 選択肢番号をインクリメント
         _choiceCounter++;
-        
+
         // 選択結果をログ出力
         Debug.Log($"[NovelPresenter] ユーザーが選択したカード選択肢: {selectedIndex} - {cardChoiceData.GetOption(selectedIndex)}");
-        
+
         // ダイアログパネルと立ち絵を再表示
         _dialogCharacterView.FadeIn().Forget();
         await _dialogView.SetDialogPanelVisible(true);
     }
-    
+
     /// <summary>
     /// カード獲得演出を実行
     /// 選択結果に基づいてカードを決定し、DeckCardViewを使用してカード表示
@@ -274,12 +276,12 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
     {
         // 現在のシナリオの選択結果を取得
         var choiceResults = _gameProgressService.GetChoiceResultsByScenario(_currentScenarioId);
-        
+
         // 選択結果に基づいてカードIDを決定
         var selectedCardId = NovelCardSelectionService.SelectCardByChoices(_currentScenarioId, choiceResults);
-        
+
         if (string.IsNullOrEmpty(selectedCardId)) return;
-        
+
         // CardPoolServiceから実際のCardDataを取得
         var cardData = _cardPoolService.GetCardById(selectedCardId);
         if (cardData == null)
@@ -287,28 +289,15 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             Debug.LogWarning($"[NovelUIPresenter] カードID '{selectedCardId}' が見つかりません");
             return;
         }
-        
-        var cardModel =  new CardModel(cardData);
-        // カード詳細な説明を生成
-        var cardDescription = cardData.GetCardDescription();
+
+        var cardModel = new CardModel(cardData);
 
         // ItemGetDataとしてカード獲得演出データを作成
-        var cardGetData = new ItemGetData("", cardData.CardName, cardDescription);
-        
+        var cardGetData = new ItemGetData("", cardData.CardName, "");
+
         // カード専用演出を実行（DeckCardViewを使用）
         _novelSeManager.WaitAndPlaySe("ItemGet", delayTime: 1f, pitch: 1f);
         await _itemGetEffectView.ShowCardGetEffect(cardGetData, cardModel);
-
-        // カードをデッキに追加（セーブはシナリオ完了時にまとめて実行）
-        _gameProgressService.AddCardToDeck(cardModel);
-    }
-
-    /// <summary>
-    /// 全ダイアログをスキップして即座に完了（InputSystem用の公開メソッド）
-    /// </summary>
-    public void RequestSkipAllDialogs()
-    {
-        SkipAllDialogsInternal().Forget();
     }
 
     /// <summary>
@@ -330,12 +319,12 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         // 選択肢またはカード獲得が見つかるまでインデックスを進める
         _currentDialogIndex = FindNextInteractionPoint(_currentDialogIndex);
     }
-    
+
     /// <summary>
     /// 次の選択肢またはカード獲得までのインデックスを探索
     /// </summary>
     private int FindNextInteractionPoint(int startIndex)
-    {        
+    {
         // その先の選択肢/カード獲得を探索
         for (var i = startIndex + 1; i < _currentDialogList.Count; i++)
         {
@@ -345,11 +334,11 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
                 return i - 1;
             }
         }
-        
+
         // 見つからない場合はシナリオ完了
         return _currentDialogList.Count;
     }
-    
+
     /// <summary>
     /// ダイアログリストに含まれるキャラクター画像、背景画像、アイテム画像を事前に読み込み
     /// </summary>
@@ -358,7 +347,7 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
         var characterImageNames = new HashSet<string>();
         var backgroundImageNames = new HashSet<string>();
         var itemImageNames = new HashSet<string>();
-        
+
         // ダイアログリストから使用される画像名を抽出
         foreach (var dialog in dialogList)
         {
@@ -366,70 +355,63 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             {
                 characterImageNames.Add(dialog.CharacterImageName);
             }
-            
+
             if (!string.IsNullOrEmpty(dialog.BackgroundImageName))
             {
                 backgroundImageNames.Add(dialog.BackgroundImageName);
             }
-            
+
             // アイテム画像名を抽出
             if (dialog.HasGetItem && !string.IsNullOrEmpty(dialog.GetItemData.ItemImageName))
             {
                 itemImageNames.Add(dialog.GetItemData.ItemImageName);
             }
         }
-        
+
         // 画像を並列で読み込み
         var loadTasks = new List<UniTask>();
-        
+
         // キャラクター画像の読み込み
         foreach (var imageName in characterImageNames)
         {
             loadTasks.Add(_addressableImageLoader.LoadCharacterImageAsync(imageName).AsUniTask());
         }
-        
+
         // 背景画像の読み込み
         foreach (var imageName in backgroundImageNames)
         {
             loadTasks.Add(_addressableImageLoader.LoadBackgroundImageAsync(imageName).AsUniTask());
         }
-        
+
         // アイテム画像の読み込み
         foreach (var imageName in itemImageNames)
         {
             loadTasks.Add(_addressableImageLoader.LoadItemImageAsync(imageName).AsUniTask());
         }
-        
+
         if (loadTasks.Count > 0)
         {
             await UniTask.WhenAll(loadTasks);
         }
     }
-    
+
     /// <summary>
     /// ダイアログ完了時の処理
     /// </summary>
     private async UniTask OnDialogCompleted()
     {
         // プロローグ終了後に初期デッキを受け取る
-        if (_currentScenarioId == "prologue1")
-        {
-            var deck = _cardPoolService.GetRandomCards(5);
-            foreach (var card in deck)
-                _gameProgressService.AddCardToDeck(new CardModel(card));
-        }
-        
         // エンディング終了後にSteamストアページを開く
         if (_currentScenarioId == "ending")
             Application.OpenURL("https://store.steampowered.com/app/3997140/");
-        
+
         await UniTask.Delay(1000);
-        
+
         // 現在のノードを結果記録前に取得
         var currentNode = _gameProgressService.GetCurrentNode();
 
         _gameProgressService.RecordNovelResultAndSave();
-        
+
         // 記録前に取得したノードの設定を確認
         if (currentNode.ReturnToHome)
         {
@@ -443,7 +425,14 @@ public class NovelPresenter : IStartable, ISceneInitializable, System.IDisposabl
             await _sceneTransitionManager.TransitionToSceneWithFade(nextScene);
         }
     }
-    
+
+    public void Start()
+    {
+        Initialize().Forget();
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
+        BgmManager.Instance.PlayBGM("Novel");
+    }
+
     public void Dispose()
     {
         // 購読を一括解除

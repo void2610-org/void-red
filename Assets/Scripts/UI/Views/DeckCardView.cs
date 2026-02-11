@@ -1,18 +1,22 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using Coffee.UIEffects;
 using R3;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// カードの表示状態
 /// </summary>
 public enum CardDisplayState
 {
-    Normal,    // 通常状態
-    Veiled,    // 隠されている状態
-    Collapsed, // 崩壊状態
-    Backside   // 裏面状態
+    /// <summary> 通常状態 </summary>
+    Normal,
+    /// <summary> 隠されている状態 </summary>
+    Veiled,
+    /// <summary> 崩壊状態 </summary>
+    Collapsed,
+    /// <summary> 裏面状態 </summary>
+    Backside
 }
 
 /// <summary>
@@ -28,8 +32,7 @@ public class DeckCardView : BaseCardView
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image cardTextBanner;
     [SerializeField] private Image cardFrame;
-    [SerializeField] private UIEffect backUIEffect;
-    [SerializeField] private UIEffect edgeUIEffect;
+    [SerializeField] private Image gaugeImage;
 
     [Header("色設定")]
     [SerializeField] private Color activeColor = Color.white;
@@ -38,15 +41,6 @@ public class DeckCardView : BaseCardView
 
     public CardModel CardModel { get; private set; }
     public Observable<CardData> OnCardClicked => _onCardClicked;
-
-    // BaseCardView 抽象プロパティの実装
-    protected override Image CardImage => cardImage;
-    protected override TextMeshProUGUI CardNameText => cardNameText;
-    protected override Image CardBanner => cardTextBanner;
-    protected override Image CardFrame => cardFrame;
-    protected override UIEffect BackUIEffect => backUIEffect;
-    protected override UIEffect EdgeUIEffect => edgeUIEffect;
-    protected override CardData GetCardData() => CardModel?.Data;
 
     private readonly Subject<CardData> _onCardClicked = new();
 
@@ -60,6 +54,13 @@ public class DeckCardView : BaseCardView
         CardModel = cardModel;
         UpdateDisplay(displayState);
     }
+
+    // BaseCardView 抽象プロパティの実装
+    protected override Image CardImage => cardImage;
+    protected override TextMeshProUGUI CardNameText => cardNameText;
+    protected override Image CardFrame => cardFrame;
+    protected override Image GaugeImage => gaugeImage;
+    protected override CardData GetCardData() => CardModel?.Data;
 
     /// <summary>
     /// 表示を更新
@@ -90,17 +91,6 @@ public class DeckCardView : BaseCardView
         }
     }
 
-    private void Awake()
-    {
-        // カードボタンのクリックイベントを購読
-        if (cardButton)
-        {
-            cardButton.OnClickAsObservable()
-                .Subscribe(_ => OnCardButtonClicked())
-                .AddTo(this);
-        }
-    }
-
     /// <summary>
     /// カードボタンがクリックされた時の処理
     /// </summary>
@@ -109,6 +99,17 @@ public class DeckCardView : BaseCardView
         if (CardModel?.Data)
         {
             _onCardClicked.OnNext(CardModel.Data);
+        }
+    }
+
+    private void Awake()
+    {
+        // カードボタンのクリックイベントを購読
+        if (cardButton)
+        {
+            cardButton.OnClickAsObservable()
+                .Subscribe(_ => OnCardButtonClicked())
+                .AddTo(this);
         }
     }
 

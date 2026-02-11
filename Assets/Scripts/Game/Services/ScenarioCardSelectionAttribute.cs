@@ -10,7 +10,7 @@ public class ScenarioCardSelectionAttribute : Attribute
     /// 対応するシナリオID
     /// </summary>
     public string ScenarioId { get; }
-    
+
     /// <summary>
     /// コンストラクタ
     /// </summary>

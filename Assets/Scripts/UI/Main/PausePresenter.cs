@@ -9,7 +9,7 @@ using VContainer.Unity;
 /// </summary>
 public class PausePresenter : IStartable, System.IDisposable
 {
-    private PauseView _pauseView;
+    private IPauseView _pauseView;
     private PauseButtonView _pauseButtonView;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly InputActionsProvider _inputActionsProvider;
@@ -21,15 +21,28 @@ public class PausePresenter : IStartable, System.IDisposable
         _inputActionsProvider = inputActionsProvider;
     }
 
+    private void ShowHelp()
+    {
+        var helpView = Object.FindFirstObjectByType<HelpView>();
+        helpView.Show();
+    }
+
+    private void ShowOptions()
+    {
+        var settingsView = Object.FindFirstObjectByType<SettingsWindowView>();
+        settingsView.Show();
+    }
+
     public void Start()
     {
-        // ビューの取得
-        _pauseView = Object.FindFirstObjectByType<PauseView>();
+        // ビューの取得（BattlePauseViewを優先、なければPauseViewを使用）
+        _pauseView = (IPauseView)Object.FindFirstObjectByType<BattlePauseView>(FindObjectsInactive.Include)
+                     ?? Object.FindFirstObjectByType<PauseView>(FindObjectsInactive.Include);
         _pauseButtonView = Object.FindFirstObjectByType<PauseButtonView>();
 
         // Pauseアクションの購読
         _inputActionsProvider.UI.Pause.OnPerformedAsObservable()
-            .Subscribe(_ => TogglePause())
+            .Subscribe(_ => _pauseView.Toggle())
             .AddTo(_disposables);
 
         // ポーズボタンのイベント設定
@@ -42,18 +55,22 @@ public class PausePresenter : IStartable, System.IDisposable
             _ => _pauseView.Hide())
             .AddTo(_disposables);
 
-        // タイトルボタンのイベント設定
-        _pauseView.OnTitleButtonClicked.Subscribe(
+        // ホームボタンのイベント設定
+        _pauseView.OnHomeButtonClicked.Subscribe(
             _ => _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home).Forget()
         ).AddTo(_disposables);
-    }
 
-    private void TogglePause()
-    {
-        if (_pauseView.IsShowing)
-            _pauseView.Hide();
-        else
-            _pauseView.Show();
+        // BattlePauseView固有のボタン処理
+        if (_pauseView is BattlePauseView battlePauseView)
+        {
+            battlePauseView.OnHelpButtonClicked
+                .Subscribe(_ => ShowHelp())
+                .AddTo(_disposables);
+
+            battlePauseView.OnOptionButtonClicked
+                .Subscribe(_ => ShowOptions())
+                .AddTo(_disposables);
+        }
     }
 
     public void Dispose()

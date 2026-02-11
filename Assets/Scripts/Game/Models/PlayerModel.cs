@@ -1,64 +1,55 @@
 using System;
-using R3;
-using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// プレイヤーの属性データモデル（Model Layer）
-/// 精神力などカードに関係ないプレイヤー固有の属性を管理
+/// 感情リソース（8属性）を管理
 /// </summary>
 public class PlayerModel : IDisposable
 {
     // 公開プロパティ（読み取り専用）
-    public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
-    
+    public IReadOnlyDictionary<EmotionType, int> EmotionResources => _emotionResources;
+
     // プライベートフィールド
-    private readonly ReactiveProperty<int> _mentalPower = new();
-    
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
+    private readonly Dictionary<EmotionType, int> _emotionResources = new();
+
     public PlayerModel()
     {
-        _mentalPower.Value = GameConstants.MAX_MENTAL_POWER;
+        InitializeEmotionResources();
     }
-    
-    // === 精神力関連メソッド ===
-    
+
     /// <summary>
-    /// 精神力を消費
+    /// 感情リソースを追加
     /// </summary>
-    /// <param name="amount">消費量</param>
-    /// <returns>消費に成功したかどうか</returns>
-    public bool TryConsumeMentalPower(int amount)
+    public void AddEmotion(EmotionType emotion, int amount) => _emotionResources[emotion] += amount;
+
+    /// <summary>
+    /// 感情リソースをリセット
+    /// </summary>
+    public void ResetEmotionResources() => InitializeEmotionResources();
+
+    /// <summary>
+    /// 特定の感情リソース量を取得
+    /// </summary>
+    public int GetEmotionAmount(EmotionType emotion) => _emotionResources[emotion];
+
+    /// <summary>
+    /// 感情リソースを消費
+    /// </summary>
+    public bool TryConsumeEmotion(EmotionType emotion, int amount)
     {
-        if (_mentalPower.Value < amount) return false;
-        _mentalPower.Value -= amount;
+        if (_emotionResources[emotion] < amount) return false;
+        _emotionResources[emotion] -= amount;
         return true;
     }
-    
-    /// <summary>
-    /// 精神力を回復
-    /// </summary>
-    /// <param name="amount">回復量</param>
-    public void RestoreMentalPower(int amount)
+
+    private void InitializeEmotionResources()
     {
-        _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, GameConstants.MAX_MENTAL_POWER);
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            _emotionResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE;
+        }
     }
-    
-    /// <summary>
-    /// 精神力を強制設定
-    /// </summary>
-    /// <param name="value">設定する値</param>
-    public void SetMentalPower(int value)
-    {
-        _mentalPower.Value = Mathf.Clamp(value, 0, GameConstants.MAX_MENTAL_POWER);
-    }
-    
-    /// <summary>
-    /// リソースの解放
-    /// </summary>
-    public void Dispose()
-    {
-        _mentalPower?.Dispose();
-    }
+
+    public void Dispose() { }
 }

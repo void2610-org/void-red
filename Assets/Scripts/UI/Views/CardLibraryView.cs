@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using R3;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -63,7 +63,7 @@ public class CardLibraryView : BaseWindowView
         UpdateLibraryDisplay(_viewedCardIds);
         base.Show();
     }
-    
+
     /// <summary>
     /// カード図鑑表示を更新
     /// </summary>
@@ -105,7 +105,7 @@ public class CardLibraryView : BaseWindowView
         // ナビゲーションを設定
         SetupNavigation();
     }
-    
+
     /// <summary>
     /// カードViewを生成
     /// </summary>
@@ -198,7 +198,7 @@ public class CardLibraryView : BaseWindowView
     private void SetupCloseButtonNavigation(List<Selectable> cardButtons)
     {
         var lastRowStartIndex = ((cardButtons.Count - 1) / CARDS_PER_PAGE_COLS) * CARDS_PER_PAGE_COLS;
-        
+
         var closeNav = closeButton.navigation;
         closeNav.mode = Navigation.Mode.Explicit;
         closeNav.selectOnUp = cardButtons[lastRowStartIndex + CARDS_PER_PAGE_COLS / 2];

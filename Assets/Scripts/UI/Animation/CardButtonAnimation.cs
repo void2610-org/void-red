@@ -1,8 +1,7 @@
+using LitMotion;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using LitMotion;
-using LitMotion.Extensions;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -14,17 +13,17 @@ public class CardButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHandl
 {
     [SerializeField] private RectTransform target;
     [SerializeField] private float selectedScale;
-    
-    private MotionHandle _scaleMotion;
-    private float _defaultScale;
-    
+
     private const float DURATION = 0.1f;
     private const Ease EASE = Ease.OutCubic;
+
+    private MotionHandle _scaleMotion;
+    private float _defaultScale;
 
     private void Awake()
     {
         _defaultScale = target.transform.localScale.x;
-        
+
         if (SafeNavigationManager.GetCurrentSelected() != this.gameObject)
             OnDeselect(new BaseEventData(EventSystem.current));
     }
@@ -37,7 +36,7 @@ public class CardButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHandl
         _scaleMotion.TryCancel();
         _scaleMotion = target.ScaleTo(Vector3.one * _defaultScale * selectedScale, DURATION, EASE, ignoreTimeScale: true);
     }
-    
+
     /// <summary>
     /// Selectableの選択が解除された時の処理
     /// </summary>
@@ -46,7 +45,7 @@ public class CardButtonAnimation : MonoBehaviour, ISelectHandler, IDeselectHandl
         _scaleMotion.TryCancel();
         _scaleMotion = target.ScaleTo(Vector3.one * _defaultScale, DURATION, EASE, ignoreTimeScale: true);
     }
-    
+
     private void OnDestroy()
     {
         _scaleMotion.TryCancel();

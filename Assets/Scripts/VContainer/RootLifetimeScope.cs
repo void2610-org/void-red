@@ -3,6 +3,8 @@ using VContainer;
 using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
+using Void2610.UnityTemplate.Discord;
+using Void2610.UnityTemplate.Steam;
 
 /// <summary>
 /// ルートレベルのLifetimeScope
@@ -19,7 +21,11 @@ public class RootLifetimeScope : LifetimeScope
     [SerializeField] private AllTutorialData allTutorialData;
     [SerializeField] private AllHelpData allHelpData;
     [SerializeField] private ConfirmationDialogView confirmationDialogView;
-    
+
+    [Header("展示モード")]
+    [SerializeField] private ExhibitSettings exhibitSettings;
+    [SerializeField] private ExhibitOverlayView exhibitOverlayViewPrefab;
+
     protected override void Configure(IContainerBuilder builder)
     {
         // データの登録と初期化
@@ -37,7 +43,7 @@ public class RootLifetimeScope : LifetimeScope
         builder.Register<SaveDataManager>(Lifetime.Singleton);
 
         // シーン遷移管理（クロスフェード機能付き）
-        builder.Register<SceneTransitionManager>(Lifetime.Singleton);
+        builder.Register<SceneTransitionManager>(Lifetime.Singleton).AsSelf().As<ISceneTransitionService>();
 
         // ゲーム進行管理（全機能統合）
         builder.Register<GameProgressService>(Lifetime.Singleton);
@@ -58,24 +64,42 @@ public class RootLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<SettingsManager>().AsSelf();
 
         // Steam統合サービス
-        builder.RegisterEntryPoint<SteamService>().AsSelf();
+        builder.RegisterEntryPoint<SteamService>().WithParameter(3997140).AsSelf();
+        // 展示モード
+        builder.RegisterInstance(exhibitSettings);
+        builder.Register<IdleDetector>(Lifetime.Singleton);
+        builder.RegisterEntryPoint<ExhibitSessionTimerService>().AsSelf();
+
+        // ExhibitIdleServiceはIExhibitOverlayが必要なため、展示モード有効時のみ登録
+        if (exhibitSettings.EnableExhibitMode)
+        {
+            var overlay = Instantiate(exhibitOverlayViewPrefab);
+            DontDestroyOnLoad(overlay.gameObject);
+            builder.RegisterInstance<IExhibitOverlay>(overlay);
+            builder.RegisterEntryPoint<ExhibitIdleService>();
+        }
+
         // Discord統合サービス
-        builder.Register<DiscordService>(Lifetime.Singleton);
+        builder.Register<DiscordService>(Lifetime.Singleton)
+            .WithParameter(1415132179377160262UL)   // clientId
+            .WithParameter("Void Red")               // gameName
+            .WithParameter("https://void-red.void2610.dev/") // url
+            .WithParameter("プレイ中");              // defaultDetails
 
         InitializeSingletonMonoBehaviour();
     }
-    
+
     private void RegisterAllData()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         allCardData.RegisterAllCards();
         allThemeData.RegisterAllThemes();
         allEnemyData.RegisterAllEnemies();
         allTutorialData.RegisterAllTutorials();
         allHelpData.RegisterAllHelps();
-        #endif
+#endif
     }
-    
+
     private void InitializeSingletonMonoBehaviour()
     {
         DontDestroyOnLoad(Instantiate(bgmManager).gameObject);

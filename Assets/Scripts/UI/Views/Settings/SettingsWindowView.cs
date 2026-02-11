@@ -15,23 +15,25 @@ public class SettingsWindowView : BaseWindowView
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Initialize(SettingsPresenter settingsPresenter, InputActionsProvider inputProvider, SettingButtonView settingButtonView)
+    public void Initialize(SettingsPresenter settingsPresenter, InputActionsProvider inputProvider, SettingButtonView settingButtonView, bool isBattleScene)
     {
         _settingsPresenter = settingsPresenter;
 
         // トグル入力（Pauseキー）
-        inputProvider.UI.Pause.OnPerformedAsObservable()
-            .Subscribe(_ =>
-            {
-                if (IsShowing) Hide();
-                else Show();
-            })
-            .AddTo(Disposables);
+        if (!isBattleScene)
+        {
+            inputProvider.UI.Pause.OnPerformedAsObservable()
+                .Subscribe(_ => Toggle())
+                .AddTo(Disposables);
+        }
 
-        // 設定ボタンクリック
-        settingButtonView.OnButtonClicked
-            .Subscribe(_ => Show())
-            .AddTo(Disposables);
+        // 設定ボタンがある場合のみ購読
+        if (settingButtonView)
+        {
+            settingButtonView.OnButtonClicked
+                .Subscribe(_ => Show())
+                .AddTo(Disposables);
+        }
 
         // 閉じるボタン（SettingsPresenter経由）
         _settingsPresenter.OnHideRequested

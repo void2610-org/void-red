@@ -6,7 +6,7 @@ using VContainer.Unity;
 public class MouseHoverUISelector : ITickable
 {
     private const string IGNORE_TAG = "IgnoreHoverSelection";
-    
+
     public void Tick()
     {
         var eventSystem = EventSystem.current;
@@ -28,7 +28,7 @@ public class MouseHoverUISelector : ITickable
             // 最初に適切なUIを見つけたら、それを選択
             if (eventSystem.currentSelectedGameObject != hoveredObject)
                 SafeNavigationManager.SetSelectedGameObjectSafe(hoveredObject);
-            
+
             break; // 最初の適切なUIだけを選択する
         }
     }

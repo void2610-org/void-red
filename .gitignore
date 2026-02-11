@@ -43,6 +43,8 @@
 ExportedObj/
 .consulo/
 *.csproj
+!FormatCheck.csproj
+!tools/**/*.csproj
 *.unityproj
 *.sln
 *.suo
@@ -99,6 +101,10 @@ Assets/Resources/PerformanceTestRunInfo.json.meta
 Assets/Resources/PerformanceTestRunSettings.json
 Assets/Resources/PerformanceTestRunSettings.json.meta
 /Screenshots
+
+# アナライザーのビルド成果物
+tools/**/bin/
+tools/**/obj/
 
 # IDE
 .idea/

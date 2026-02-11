@@ -1,6 +1,5 @@
 using VContainer;
 using VContainer.Unity;
-using Void2610.SettingsSystem;
 
 /// <summary>
 /// タイトルシーン用のLifetimeScope
@@ -15,5 +14,9 @@ public class TitleLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<TitleView>();
         builder.RegisterEntryPoint<TitlePresenter>();
         builder.RegisterComponentInHierarchy<DebugController>();
+
+        // 展示モード: タイトルPV
+        builder.RegisterComponentInHierarchy<TitlePVView>();
+        builder.RegisterEntryPoint<TitleIdlePVPresenter>();
     }
 }

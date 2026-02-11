@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using R3;
-using Cysharp.Threading.Tasks;
-using TMPro;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -34,6 +34,31 @@ public class HomeView : MonoBehaviour
     public Observable<CardData> LibraryCardClicked => cardLibraryView.OnCardClicked;
 
     /// <summary>
+    /// デッキデータを表示
+    /// </summary>
+    public void ShowDeckData(List<CardModel> cardModels) => deckView.Show(cardModels);
+
+    /// <summary>
+    /// カード図鑑を表示
+    /// </summary>
+    public void ShowCardLibrary(AllCardData allCardData, HashSet<string> viewedCardIds) => cardLibraryView.Show(allCardData, viewedCardIds);
+
+    /// <summary>
+    /// カード詳細を表示
+    /// </summary>
+    public void ShowCardDetail(CardData cardData) => cardDetailView.ShowCardDetail(cardData, false);
+
+    /// <summary>
+    /// Personボタンのinteractable設定
+    /// </summary>
+    public void SetPersonButtonInteractable(bool interactable) => personButton.interactable = interactable;
+
+    /// <summary>
+    /// Dreamボタンのinteractable設定
+    /// </summary>
+    public void SetDreamButtonInteractable(bool interactable) => dreamButton.interactable = interactable;
+
+    /// <summary>
     /// 初期化
     /// </summary>
     public void Initialize()
@@ -43,46 +68,6 @@ public class HomeView : MonoBehaviour
         dreamButton.interactable = false;
 
         InitSpeaking().Forget();
-    }
-
-    /// <summary>
-    /// デッキデータを表示
-    /// </summary>
-    public void ShowDeckData(List<CardModel> cardModels)
-    {
-        deckView.Show(cardModels);
-    }
-
-    /// <summary>
-    /// カード図鑑を表示
-    /// </summary>
-    public void ShowCardLibrary(AllCardData allCardData, HashSet<string> viewedCardIds)
-    {
-        cardLibraryView.Show(allCardData, viewedCardIds);
-    }
-
-    /// <summary>
-    /// カード詳細を表示
-    /// </summary>
-    public void ShowCardDetail(CardData cardData)
-    {
-        cardDetailView.ShowCardDetail(cardData, false);
-    }
-
-    /// <summary>
-    /// Personボタンのinteractable設定
-    /// </summary>
-    public void SetPersonButtonInteractable(bool interactable)
-    {
-        personButton.interactable = interactable;
-    }
-
-    /// <summary>
-    /// Dreamボタンのinteractable設定
-    /// </summary>
-    public void SetDreamButtonInteractable(bool interactable)
-    {
-        dreamButton.interactable = interactable;
     }
 
     /// <summary>

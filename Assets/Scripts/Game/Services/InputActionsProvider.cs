@@ -1,5 +1,4 @@
 using System;
-using VContainer.Unity;
 
 /// <summary>
 /// InputSystem_Actionsのシングルトンプロバイダー
@@ -7,8 +6,6 @@ using VContainer.Unity;
 /// </summary>
 public class InputActionsProvider : IDisposable
 {
-    private InputSystem_Actions _inputActions;
-
     /// <summary>
     /// Battle アクションマップへのアクセス
     /// </summary>
@@ -23,6 +20,8 @@ public class InputActionsProvider : IDisposable
     /// Novel アクションマップへのアクセス
     /// </summary>
     public InputSystem_Actions.NovelActions Novel => _inputActions.Novel;
+
+    private InputSystem_Actions _inputActions;
 
     public InputActionsProvider()
     {
@@ -58,9 +57,9 @@ public class InputActionsProvider : IDisposable
         }
     }
 
+    // InputActionsのクリーンアップ
     public void Dispose()
     {
-        // InputActionsのクリーンアップ
         _inputActions?.Dispose();
     }
 }

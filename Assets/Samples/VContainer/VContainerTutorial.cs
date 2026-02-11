@@ -1,5 +1,4 @@
 using UnityEngine;
-using VContainer;
 using VContainer.Unity;
 
 namespace void2610.UnityTemplate.Tutorials

@@ -10,22 +10,22 @@ public class NovelChoiceResult
     [SerializeField] private string scenarioId;
     [SerializeField] private int choiceIndex;
     [SerializeField] private int selectedOptionIndex;
-    
+
     /// <summary>
     /// シナリオID（どのシナリオでの選択か）
     /// </summary>
     public string ScenarioId => scenarioId;
-    
+
     /// <summary>
     /// 選択肢番号（そのシナリオ内での何番目の選択肢か）
     /// </summary>
     public int ChoiceIndex => choiceIndex;
-    
+
     /// <summary>
     /// 選択された選択肢のインデックス（0から始まる）
     /// </summary>
     public int SelectedOptionIndex => selectedOptionIndex;
-    
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -38,12 +38,9 @@ public class NovelChoiceResult
         this.choiceIndex = choiceIndex;
         this.selectedOptionIndex = selectedOptionIndex;
     }
-    
+
     /// <summary>
     /// デバッグ用の文字列表現
     /// </summary>
-    public override string ToString()
-    {
-        return $"[{scenarioId}] Choice{choiceIndex}: Index{selectedOptionIndex}";
-    }
+    public override string ToString() => $"[{scenarioId}] Choice{choiceIndex}: Index{selectedOptionIndex}";
 }

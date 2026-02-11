@@ -1,7 +1,5 @@
 using System;
 using R3;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using VContainer.Unity;
 
 /// <summary>
@@ -21,32 +19,6 @@ public class HelpPresenter : IStartable, IDisposable
     {
         _allHelpData = allHelpData;
         _inputActionsProvider = inputActionsProvider;
-    }
-
-    public void Start()
-    {
-        // ビューの取得
-        _helpView = UnityEngine.Object.FindFirstObjectByType<HelpView>();
-        _helpButtonView = UnityEngine.Object.FindFirstObjectByType<HelpButtonView>();
-
-        // Helpアクションの購読（トグル処理）
-        _inputActionsProvider.UI.Help.OnPerformedAsObservable()
-            .Subscribe(_ => ToggleHelp())
-            .AddTo(_disposables);
-
-        // ヘルプボタンのイベント購読
-        _helpButtonView.OnButtonClicked
-            .Subscribe(_ => ShowHelp())
-            .AddTo(_disposables);
-
-        // イベント購読
-        _helpView.OnPreviousClicked
-            .Subscribe(_ => ShowPreviousHelp())
-            .AddTo(_disposables);
-
-        _helpView.OnNextClicked
-            .Subscribe(_ => ShowNextHelp())
-            .AddTo(_disposables);
     }
 
     /// <summary>
@@ -101,8 +73,34 @@ public class HelpPresenter : IStartable, IDisposable
     {
         var helpData = _allHelpData.GetHelpByIndex(_currentIndex);
         if (!helpData) return;
-        
+
         _helpView.DisplayHelp(helpData, _currentIndex, _allHelpData.Count);
+    }
+
+    public void Start()
+    {
+        // ビューの取得
+        _helpView = UnityEngine.Object.FindFirstObjectByType<HelpView>();
+        _helpButtonView = UnityEngine.Object.FindFirstObjectByType<HelpButtonView>();
+
+        // Helpアクションの購読（トグル処理）
+        _inputActionsProvider.UI.Help.OnPerformedAsObservable()
+            .Subscribe(_ => ToggleHelp())
+            .AddTo(_disposables);
+
+        // ヘルプボタンのイベント購読
+        _helpButtonView.OnButtonClicked
+            .Subscribe(_ => ShowHelp())
+            .AddTo(_disposables);
+
+        // イベント購読
+        _helpView.OnPreviousClicked
+            .Subscribe(_ => ShowPreviousHelp())
+            .AddTo(_disposables);
+
+        _helpView.OnNextClicked
+            .Subscribe(_ => ShowNextHelp())
+            .AddTo(_disposables);
     }
 
     public void Dispose()

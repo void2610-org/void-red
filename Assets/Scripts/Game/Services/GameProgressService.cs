@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using Game.PersonalityLog;
 using R3;
+using UnityEngine;
 
 /// <summary>
 /// ゲーム全体の進行度を管理するサービス（ファサード）
@@ -10,16 +9,16 @@ using R3;
 /// </summary>
 public class GameProgressService
 {
-    private readonly GameStateRepository _repository;
-
     /// <summary>
     /// データセーブ時のイベント
     /// </summary>
     public Observable<Unit> OnDataSaved => _repository.OnDataSaved;
 
-    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService)
+    private readonly GameStateRepository _repository;
+
+    public GameProgressService(SaveDataManager saveDataManager, CardPoolService cardPoolService, AllThemeData allThemeData)
     {
-        _repository = new GameStateRepository(saveDataManager, cardPoolService);
+        _repository = new GameStateRepository(saveDataManager, cardPoolService, allThemeData);
 
         // 現在のノードを初期化
         _repository.StoryProgress.CurrentNode = GetNextNode();
@@ -28,10 +27,39 @@ public class GameProgressService
     /// <summary>
     /// 有効なセーブデータが存在するかチェック（ストーリー進行ベース）
     /// </summary>
-    public bool HasSaveData()
-    {
-        return _repository.HasSaveData();
-    }
+    public bool HasSaveData() => _repository.HasSaveData();
+
+    /// <summary>
+    /// 現在のストーリーノードを取得
+    /// </summary>
+    public StoryNode GetCurrentNode() => _repository.StoryProgress.CurrentNode;
+
+    public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
+
+    /// <summary>
+    /// カード閲覧をリストで記録
+    /// </summary>
+    public void RecordCardViews(List<CardData> cardDataList) =>
+        cardDataList.ForEach(RecordCardView);
+
+    /// <summary>
+    /// 閲覧済みカードIDリストを取得
+    /// </summary>
+    public HashSet<string> GetViewedCardIds() =>
+        new HashSet<string>(_repository.PlayerProgress.ViewedCardIds);
+
+    /// <summary>
+    /// 特定のシナリオの選択結果を取得
+    /// </summary>
+    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) =>
+        _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
+
+    /// <summary>
+    /// 獲得済みテーマリストを取得
+    /// </summary>
+    /// <returns>獲得済みテーマのリスト</returns>
+    public IReadOnlyList<AcquiredTheme> GetAcquiredThemes() =>
+        _repository.MemoryProgress.AcquiredThemes;
 
     /// <summary>
     /// 全データを初期状態にリセット（デバッグ用）
@@ -41,11 +69,6 @@ public class GameProgressService
         _repository.ResetAll();
         _repository.StoryProgress.CurrentNode = GetNextNode();
     }
-
-    /// <summary>
-    /// 現在のストーリーノードを取得
-    /// </summary>
-    public StoryNode GetCurrentNode() => _repository.StoryProgress.CurrentNode;
 
     /// <summary>
     /// 次に発生するストーリーノードを決定（結果辞書による分岐対応）
@@ -90,21 +113,6 @@ public class GameProgressService
         return nextNode;
     }
 
-    public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
-
-    /// <summary>
-    /// StoryNodeから対応するSceneTypeを取得
-    /// </summary>
-    private SceneType GetSceneTypeForNode(StoryNode node)
-    {
-        return node switch
-        {
-            BattleNode => SceneType.Battle,
-            NovelNode => SceneType.Novel,
-            _ => SceneType.Home
-        };
-    }
-
     /// <summary>
     /// 現在のバトル結果を記録
     /// </summary>
@@ -137,52 +145,6 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// デッキ情報を更新（CardModelから変換）
-    /// </summary>
-    public void UpdateDeckFromCardModels(IReadOnlyList<CardModel> cardModels)
-    {
-        _repository.UpdateDeckFromCardModels(cardModels);
-    }
-
-    /// <summary>
-    /// CardIdのリストからCardModelのリストに変換
-    /// </summary>
-    public List<CardModel> ConvertDeckToCardModels()
-    {
-        return _repository.ConvertDeckToCardModels();
-    }
-
-    /// <summary>
-    /// デッキ表示用の詳細情報を取得
-    /// </summary>
-    public (List<CardData> allCards, List<CardData> activeCards, List<CardData> collapsedCards) GetDeckDisplayData()
-    {
-        var cardModels = ConvertDeckToCardModels();
-        var allCards = cardModels.Select(cm => cm.Data).ToList();
-        var activeCards = cardModels.Where(cm => !cm.IsCollapsed).Select(cm => cm.Data).ToList();
-        var collapsedCards = cardModels.Where(cm => cm.IsCollapsed).Select(cm => cm.Data).ToList();
-
-        return (allCards, activeCards, collapsedCards);
-    }
-
-    /// <summary>
-    /// デッキ表示用のCardModelリストを取得
-    /// </summary>
-    public List<CardModel> GetDeckCardModels()
-    {
-        return ConvertDeckToCardModels();
-    }
-
-    /// <summary>
-    /// カード閲覧をリストで記録
-    /// </summary>
-    public void RecordCardViews(List<CardData> cardDataList)
-    {
-        foreach (var cardData in cardDataList)
-            RecordCardView(cardData);
-    }
-
-    /// <summary>
     /// カード閲覧を記録
     /// </summary>
     public void RecordCardView(CardData cardData)
@@ -192,69 +154,26 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// 閲覧済みカードIDリストを取得
+    /// 獲得テーマを記録して保存
     /// </summary>
-    public HashSet<string> GetViewedCardIds()
+    /// <param name="theme">獲得したテーマ</param>
+    public void RecordAcquiredThemeAndSave(AcquiredTheme theme)
     {
-        return new HashSet<string>(_repository.PlayerProgress.ViewedCardIds);
+        _repository.MemoryProgress.AddAcquiredTheme(theme);
+        _repository.SaveAll();
+        Debug.Log($"[GameProgressService] 獲得テーマを記録: {theme.ThemeName} ({theme.AcquiredCards.Count}枚, 感情: {theme.DominantEmotionResult})");
     }
 
     /// <summary>
-    /// 特定のシナリオの選択結果を取得
+    /// StoryNodeから対応するSceneTypeを取得
     /// </summary>
-    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId)
+    private SceneType GetSceneTypeForNode(StoryNode node)
     {
-        return _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-    }
-
-    /// <summary>
-    /// ゲーム結果を記録（プレイヤー分）
-    /// </summary>
-    public void RecordPlayerGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
-    {
-        _repository.PlayerProgress.EvolutionStats.RecordGameResult(playerWon, playerMove, playerCollapsed);
-    }
-
-    /// <summary>
-    /// カード進化チェック（プレイヤー分）
-    /// </summary>
-    public CardData CheckPlayerCardEvolution(CardData card)
-    {
-        if (_repository.PlayerProgress.EvolutionStats.CheckAllEvolutionConditions(card))
+        return node switch
         {
-            return card.EvolutionTarget;
-        }
-
-        if (_repository.PlayerProgress.EvolutionStats.CheckAllDegradationConditions(card))
-        {
-            return card.DegradationTarget;
-        }
-
-        return card;
-    }
-
-    /// <summary>
-    /// 人格ログデータを更新（PersonalityLogServiceから取得してセーブ用に保持）
-    /// </summary>
-    public void UpdatePersonalityLogData(PersonalityLogData personalityLogData)
-    {
-        _repository.PersonalityLogData.LoadFrom(personalityLogData);
-    }
-
-    /// <summary>
-    /// 人格ログデータを取得（PersonalityLogServiceの初期化用）
-    /// </summary>
-    public PersonalityLogData GetPersonalityLogData()
-    {
-        return _repository.PersonalityLogData;
-    }
-
-    /// <summary>
-    /// 新しいカードをプレイヤーのデッキに追加
-    /// </summary>
-    public void AddCardToDeck(CardModel cardModel)
-    {
-        _repository.PlayerProgress.Deck.Add(new SavedCard(cardModel));
-        Debug.Log($"[GameProgressService] カードをデッキに追加: {cardModel.Data.CardName}");
+            BattleNode => SceneType.Battle,
+            NovelNode => SceneType.Novel,
+            _ => SceneType.Home
+        };
     }
 }

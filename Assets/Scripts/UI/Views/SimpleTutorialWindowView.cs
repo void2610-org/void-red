@@ -1,14 +1,16 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using TMPro;
 using UnityEngine;
-using LitMotion;
-using LitMotion.Extensions;
-using System.Threading;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class SimpleTutorialWindowView : MonoBehaviour
 {
+    [SerializeField] private Image protagonistIconImage;
+    [SerializeField] private Image alvIconImage;
     [SerializeField] private TextMeshProUGUI tutorialText;
     private const float FADE_DURATION = 0.3f;
 
@@ -17,18 +19,28 @@ public class SimpleTutorialWindowView : MonoBehaviour
     private TextProgressController _textProgressController;
 
     /// <summary>
+    /// クリック時の処理（キーボード入力でも使用）
+    /// </summary>
+    // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
+    public void OnClick() => _textProgressController.AdvanceToNext();
+
+    /// <summary>
     /// ナレーションを表示
     /// </summary>
-    public async UniTask DisplayText(string message, float duration = 2f, bool autoAdvance = true)
+    public async UniTask DisplayText(string message, bool isProtagonist, float duration = 2f, bool autoAdvance = true)
     {
         // 現在実行中のナレーションをキャンセル
-        if (_currentNarrationCts != null && !_currentNarrationCts.IsCancellationRequested)
+        if (_currentNarrationCts is { IsCancellationRequested: false })
             _currentNarrationCts.Cancel();
         _currentNarrationCts?.Dispose();
 
         // 新しいキャンセレーショントークンを作成
         _currentNarrationCts = new CancellationTokenSource();
         var cancellationToken = _currentNarrationCts.Token;
+
+        // 画像を切り替え
+        protagonistIconImage.gameObject.SetActive(isProtagonist);
+        alvIconImage.gameObject.SetActive(!isProtagonist);
 
         try
         {
@@ -78,15 +90,6 @@ public class SimpleTutorialWindowView : MonoBehaviour
             _canvasGroup.alpha = 0f;
         }
     }
-    
-    /// <summary>
-    /// クリック時の処理（キーボード入力でも使用）
-    /// </summary>
-    public void OnClick()
-    {
-        // 進行処理（SEループの停止も含めてTextProgressControllerが管理）
-        _textProgressController.AdvanceToNext();
-    }
 
     /// <summary>
     /// ナレーションを非表示にする
@@ -104,7 +107,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
 
         tutorialText.gameObject.SetActive(false);
     }
-    
+
     private void Awake()
     {
         // 初期状態の設定
@@ -115,7 +118,7 @@ public class SimpleTutorialWindowView : MonoBehaviour
         // TextProgressControllerの初期化
         _textProgressController = new TextProgressController();
     }
-    
+
     private void OnDestroy()
     {
         // ナレーションのキャンセレーショントークンをクリーンアップ

@@ -1,106 +1,92 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// プレイヤー固有のセーブデータ（統計データ + 将来の章クリア状況等）
+/// 感情リソースのセーブデータ（シリアライズ用）
 /// </summary>
 [Serializable]
-public class PlayerSaveData : IEvolutionStatsData
+public class EmotionResourceData
 {
-    [Header("進化統計データ")]
-    [SerializeField] private EvolutionStatsData evolutionStatsData = new EvolutionStatsData();
-    
+    public EmotionType emotionType;
+    public int amount;
+
+    public EmotionResourceData(EmotionType type, int value)
+    {
+        emotionType = type;
+        amount = value;
+    }
+}
+
+/// <summary>
+/// プレイヤー固有のセーブデータ（感情リソース + 将来の章クリア状況等）
+/// </summary>
+[Serializable]
+public class PlayerSaveData
+{
     [Header("ゲーム進行データ")]
-    [SerializeField] private int currentChapter = 0; // 現在のチャプター
-    
-    [Header("プレイヤー関連データ")]
-    [SerializeField] private int currentMentalPower = GameConstants.MAX_MENTAL_POWER; // 現在の精神力
-    
-    // EvolutionStatsDataの主要プロパティのラッパー
-    public int TotalGames => evolutionStatsData.TotalGames;
-    public int TotalWins => evolutionStatsData.TotalWins;
-    public int TotalLosses => evolutionStatsData.TotalLosses;
-    public float WinRate => evolutionStatsData.WinRate;
+    [SerializeField] private int currentChapter;
+
+    [Header("感情リソースデータ")]
+    [SerializeField] private List<EmotionResourceData> emotionResources = new();
+
     public int CurrentChapter => currentChapter;
-    public int CurrentMentalPower => currentMentalPower;
-    
-    /// <summary>
-    /// 指定したカードの統計を取得
-    /// </summary>
-    /// <param name="cardId">カードID</param>
-    /// <returns>カード統計</returns>
-    public CardStats GetCardStats(string cardId)
+
+    public PlayerSaveData()
     {
-        return evolutionStatsData.GetCardStats(cardId);
+        InitializeEmotionResources();
     }
-    
+
     /// <summary>
-    /// ゲーム結果を記録
+    /// 感情リソースを更新
     /// </summary>
-    /// <param name="playerWon">プレイヤーが勝利したかどうか</param>
-    /// <param name="playerMove">プレイヤーの手</param>
-    /// <param name="playerCollapsed">プレイヤーのカードが崩壊したかどうか</param>
-    public void RecordGameResult(bool playerWon, PlayerMove playerMove, bool playerCollapsed)
+    public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources)
     {
-        evolutionStatsData.RecordGameResult(playerWon, playerMove, playerCollapsed);
-    }
-    
-    /// <summary>
-    /// 現在の精神力を更新
-    /// </summary>
-    /// <param name="mentalPower">新しい精神力の値</param>
-    public void UpdateMentalPower(int mentalPower)
-    {
-        currentMentalPower = Mathf.Clamp(mentalPower, 0, GameConstants.MAX_MENTAL_POWER);
-    }
-    
-    /// <summary>
-    /// 全ての進化条件をチェック
-    /// </summary>
-    /// <param name="cardData">チェック対象のカード</param>
-    /// <returns>いずれかのグループの条件を全て満たしているかどうか</returns>
-    public bool CheckAllEvolutionConditions(CardData cardData)
-    {
-        return evolutionStatsData.CheckAllEvolutionConditions(cardData);
-    }
-    
-    /// <summary>
-    /// 全ての劣化条件をチェック
-    /// </summary>
-    /// <param name="cardData">チェック対象のカード</param>
-    /// <returns>いずれかのグループの条件を全て満たしているかどうか</returns>
-    public bool CheckAllDegradationConditions(CardData cardData)
-    {
-        return evolutionStatsData.CheckAllDegradationConditions(cardData);
-    }
-    
-    /// <summary>
-    /// 単一カードの進化チェック（即時進化用）
-    /// </summary>
-    /// <param name="card">チェックするカード</param>
-    /// <returns>進化先カード（進化しない場合は元のカード）</returns>
-    public CardData CheckCardEvolution(CardData card)
-    {
-        if (CheckAllEvolutionConditions(card))
+        emotionResources.Clear();
+        foreach (var kvp in resources)
         {
-            return card.EvolutionTarget;
+            emotionResources.Add(new EmotionResourceData(kvp.Key, kvp.Value));
         }
-        
-        // 進化しない場合は劣化チェック
-        if (CheckAllDegradationConditions(card))
-        {
-            return card.DegradationTarget;
-        }
-        
-        // 変化なしの場合は元のカードを返す
-        return card;
     }
-    
+
+    /// <summary>
+    /// 感情リソースをDictionary形式で取得
+    /// </summary>
+    public Dictionary<EmotionType, int> GetEmotionResources()
+    {
+        var result = new Dictionary<EmotionType, int>();
+        foreach (var data in emotionResources)
+        {
+            result[data.emotionType] = data.amount;
+        }
+
+        // 不足している感情タイプがあればデフォルト値で補完
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            if (!result.ContainsKey(emotion))
+            {
+                result[emotion] = GameConstants.DEFAULT_EMOTION_VALUE;
+            }
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// デバッグ用：統計情報を文字列で取得
     /// </summary>
     public string GetStatsString()
     {
-        return $"Chapter: {currentChapter}, MentalPower: {currentMentalPower}, {evolutionStatsData.GetStatsString()}";
+        var emotionStr = string.Join(", ", emotionResources.ConvertAll(e => $"{e.emotionType}:{e.amount}"));
+        return $"Chapter: {currentChapter}, Emotions: [{emotionStr}]";
+    }
+
+    private void InitializeEmotionResources()
+    {
+        emotionResources.Clear();
+        foreach (EmotionType emotion in Enum.GetValues(typeof(EmotionType)))
+        {
+            emotionResources.Add(new EmotionResourceData(emotion, GameConstants.DEFAULT_EMOTION_VALUE));
+        }
     }
 }

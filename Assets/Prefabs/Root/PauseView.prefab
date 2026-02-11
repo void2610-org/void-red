@@ -263,7 +263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   closeButton: {fileID: 5984631764413849503}
   resumeButton: {fileID: 5984631764413849503}
-  titleButton: {fileID: 8282290358405290812}
+  homeButton: {fileID: 8282290358405290812}
 --- !u!225 &7983642213163210908
 CanvasGroup:
   m_ObjectHideFlags: 0

@@ -1,10 +1,8 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using Cysharp.Threading.Tasks;
 using R3;
-using LitMotion;
-using Void2610.UnityTemplate;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// カード風選択肢表示を担当するViewクラス
@@ -21,7 +19,7 @@ public class CardChoiceView : BaseWindowView
     [SerializeField] private Image choice2CardImage;
 
     private readonly Subject<int> _choiceSelectedSubject = new();
-    
+
     /// <summary>
     /// カード風選択肢を表示して選択を待つ
     /// </summary>
@@ -45,7 +43,7 @@ public class CardChoiceView : BaseWindowView
     {
         return choice1Button ? choice1Button.gameObject : null;
     }
-    
+
     /// <summary>
     /// UI要素を設定
     /// </summary>
@@ -63,9 +61,7 @@ public class CardChoiceView : BaseWindowView
     /// </summary>
     private void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (!IsShowing)
-            return;
-
+        if (!IsShowing) return;
         _choiceSelectedSubject.OnNext(choiceIndex);
     }
 

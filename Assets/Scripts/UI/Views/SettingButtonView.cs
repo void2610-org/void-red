@@ -1,6 +1,6 @@
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
-using R3;
 
 /// <summary>
 /// 設定ボタンのViewコンポーネント

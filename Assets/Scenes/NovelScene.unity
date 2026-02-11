@@ -328,7 +328,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8ea2a2c5f4224d0faca4f12a5d410e9, type: 3}
+  m_Script: {fileID: 11500000, guid: 86b9ae5b3a4b44067973c0b32c71892d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   aspectWidth: 16
@@ -614,7 +614,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1056408826}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbb52015d3d63486e9d606422e470691, type: 3}
+  m_Script: {fileID: 11500000, guid: 09b5a1a0609ed4ee5b733c0a7a41eec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   targetCamera: {fileID: 519420031}
@@ -722,6 +722,10 @@ PrefabInstance:
     - target: {fileID: 4107963480110281205, guid: 8b7e0c8942aea479fb2d24460e39ece2, type: 3}
       propertyPath: m_Name
       value: PauseView
+      objectReference: {fileID: 0}
+    - target: {fileID: 4107963480110281205, guid: 8b7e0c8942aea479fb2d24460e39ece2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -853,6 +857,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PauseButton
       objectReference: {fileID: 0}
+    - target: {fileID: 2388141028732612707, guid: b41619f9c66f540bb9c8304d07983bfa, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6887676441548646170, guid: b41619f9c66f540bb9c8304d07983bfa, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -955,6 +963,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VersionText
       objectReference: {fileID: 0}
+    - target: {fileID: 2748508848187296338, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -989,15 +1001,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.0002
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0002
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.0002
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1029,11 +1041,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -349.99997
+      value: 375
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 275
+      value: -285
       objectReference: {fileID: 0}
     - target: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1057,52 +1069,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8738440582534952613, guid: 93e0dd72d1baa49a5a7b86861fa300ff, type: 3}
   m_PrefabInstance: {fileID: 1953152429}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2133197122
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2133197124}
-  - component: {fileID: 2133197123}
-  m_Layer: 0
-  m_Name: SeManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2133197123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2133197122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e269267125da74c4da6cae5ce777e353, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  seMixerGroup: {fileID: 0}
-  soundData: []
---- !u!4 &2133197124
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2133197122}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &894601235224100697
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1181,7 +1147,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9221868408885396068, guid: b6373f6819e0f4d8091604738042b445, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 40
+      value: -240
       objectReference: {fileID: 0}
     - target: {fileID: 9221868408885396068, guid: b6373f6819e0f4d8091604738042b445, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1221,6 +1187,10 @@ PrefabInstance:
     - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Name
       value: DialogView
+      objectReference: {fileID: 0}
+    - target: {fileID: 4673212540328246316, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8503395000404048060, guid: e43779441e82e4b7cbc037484a508a22, type: 3}
       propertyPath: m_Pivot.x
@@ -1399,6 +1369,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: ItemGetEffectView
       objectReference: {fileID: 0}
+    - target: {fileID: 2143870529256237546, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2563014622394645187, guid: 0dbca01867cb8e24fb0623d6fd3396ef, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1412,9 +1398,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2131128357837662931, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5052638610521521187, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
       propertyPath: m_Name
       value: ChoiceView
+      objectReference: {fileID: 0}
+    - target: {fileID: 5052638610521521187, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5393066055707613523, guid: fc739503593a8b94abf2e0a06dd06b0e, type: 3}
       propertyPath: m_Pivot.x
@@ -1678,9 +1680,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1056408830}
     m_Modifications:
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2271619381025066616, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6116264079152724370, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
       propertyPath: m_Name
       value: CardChoiceView
+      objectReference: {fileID: 0}
+    - target: {fileID: 6116264079152724370, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8581034581683863317, guid: b7f5abcd4f027c84dab4c9e0c28f1fad, type: 3}
       propertyPath: m_Pivot.x
@@ -1778,4 +1796,3 @@ SceneRoots:
   - {fileID: 4256922537022158700}
   - {fileID: 183856536}
   - {fileID: 1324742070}
-  - {fileID: 2133197124}

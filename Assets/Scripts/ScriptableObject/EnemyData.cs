@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -11,47 +11,29 @@ public class EnemyData : ScriptableObject
     [Header("基本情報")]
     [SerializeField] private string enemyId;
     [SerializeField] private string enemyName;
-    
+
+    [SerializeField] private Color enemyColor = Color.red;
+
     [Header("敵画像")]
     [SerializeField] private Sprite defaultSprite;
+    [SerializeField] private Sprite cutInSprite;
     [SerializeField] private Sprite iconSprite;
     [SerializeField] private Sprite frameSprite;
-    
+
     [Header("属性別画像")]
-    [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new ();
-    
-    [SerializeField] private SerializableDictionary<PlayStyle, float> playstyleWeights = new ();
-    
-    [Header("デッキ構成")]
-    [SerializeField] private List<CardData> initialDeck = new ();
-    
-    [Header("共鳴システム")]
-    [SerializeField] private CardData resonanceCard;
+    [SerializeField] private SerializableDictionary<CardAttribute, Sprite> attributeSprites = new();
 
-    [Header("テーマ設定")]
-    [SerializeField] private List<ThemeData> themes = new(); // 各ターンのテーマ（3つ固定）
-
-    // プロパティ
     public string EnemyId => enemyId;
     public string EnemyName => enemyName;
+    public Color EnemyColor => enemyColor;
     public Sprite DefaultSprite => defaultSprite;
+    public Sprite CutInSprite => cutInSprite;
     public Sprite IconSprite => iconSprite;
     public Sprite FrameSprite => frameSprite;
-    public SerializableDictionary<PlayStyle, float> PlaystyleWeights => playstyleWeights;
-    public List<CardData> InitialDeck => initialDeck;
-    public CardData ResonanceCard => resonanceCard;
-    public List<ThemeData> Themes => themes;
-    
+
     /// <summary>
     /// 指定された属性に対応するSpriteを取得
     /// 対応するSpriteがない場合はnullを返す
     /// </summary>
-    public Sprite GetSpriteForAttribute(CardAttribute attribute)
-    {
-        if (attributeSprites.TryGetValue(attribute, out var sprite))
-        {
-            return sprite;
-        }
-        return null;
-    }
+    public Sprite GetSpriteForAttribute(CardAttribute attribute) => attributeSprites.GetValueOrDefault(attribute);
 }

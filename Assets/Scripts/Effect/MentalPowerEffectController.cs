@@ -7,13 +7,14 @@ using VContainer.Unity;
 /// </summary>
 public class MentalPowerEffectController : IStartable, IDisposable
 {
+    private const float DIZZY_EFFECT_THRESHOLD = 0.6f;
+
     private readonly Player _player;
     private readonly VolumeController _volumeController;
     private readonly CompositeDisposable _disposables = new();
 
     // めまいエフェクト制御用
     private bool _isDizzyEffectActive;
-    private const float DIZZY_EFFECT_THRESHOLD = 0.6f;
 
     public MentalPowerEffectController(Player player)
     {
@@ -22,24 +23,14 @@ public class MentalPowerEffectController : IStartable, IDisposable
     }
 
     /// <summary>
-    /// 初期化処理（精神力の購読開始）
-    /// </summary>
-    public void Start()
-    {
-        _player.MentalPower
-            .Subscribe(OnMentalPowerChanged)
-            .AddTo(_disposables);
-    }
-
-    /// <summary>
     /// 精神力変化時のコールバック
     /// </summary>
     private void OnMentalPowerChanged(int mentalPower)
     {
         // 精神力割合を計算（0.0～1.0）
-        var ratio = mentalPower / (float)GameConstants.MAX_MENTAL_POWER;
+        var ratio = mentalPower / 7f;
         if (ratio > 0.7) return;
-        
+
         var inverseRatio = 1f - ratio; // 精神力が低いほど大きい値
 
         // エフェクト強度を設定
@@ -58,6 +49,17 @@ public class MentalPowerEffectController : IStartable, IDisposable
             _volumeController.StopDizzyEffect();
             _isDizzyEffectActive = false;
         }
+    }
+
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
+    public void Start()
+    {
+        // TODO: 感情リソースシステムに移行後、エフェクト制御を更新する
+        // _player.MentalPower
+        //     .Subscribe(OnMentalPowerChanged)
+        //     .AddTo(_disposables);
     }
 
     /// <summary>

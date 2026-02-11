@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdcfb148a1da14a798321691be66286c, type: 3}
+  m_Name: Cerica
+  m_EditorClassIdentifier:
+  responses:
+  - targetChoice: 0
+    dialogueText: "あら、怒らせようとしてるの？可愛いわね。でも、そんな手には乗らないわ。"
+    effect:
+      actionType: 0
+      resourceChangeAmount: 0
+  - targetChoice: 1
+    dialogueText: "ふふ、優しいのね。そういう人、嫌いじゃないわ。"
+    effect:
+      actionType: 1
+      resourceChangeAmount: 2
+  - targetChoice: 2
+    dialogueText: "なるほどね...あなたの言うことにも一理あるわ。考えてみる。"
+    effect:
+      actionType: 1
+      resourceChangeAmount: 1
+  - targetChoice: 3
+    dialogueText: "静かね。何を考えているのかしら...まあ、それもいいわ。"
+    effect:
+      actionType: 1
+      resourceChangeAmount: 1
+  initiations:
+  - triggerChoice: 0
+    enemyDialogueText: "あなた、強気なのね。でも、本当の強さって何だと思う？"
+    playerOptions:
+    - optionText: "勝ち続けることに決まってるでしょ"
+      resultText: "単純ね。でも、そういうの嫌いじゃないわ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: -1
+    - optionText: "何があっても折れないことよ"
+      resultText: "いい答えね。私も同感よ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 1
+    - optionText: "弱さを認めた上で立ち向かうことよ"
+      resultText: "...深いわね。見直したわ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 2
+  - triggerChoice: 1
+    enemyDialogueText: "あなたって、見た目より優しいのね。誰かを守りたいとか、そういう気持ちがあるでしょ？"
+    playerOptions:
+    - optionText: "別に...そんなんじゃないわ"
+      resultText: "嘘。目を見ればわかるわ。"
+      effect:
+        actionType: 0
+        resourceChangeAmount: 0
+    - optionText: "...いるわよ、守りたい人"
+      resultText: "素直ね。そういうの、好きよ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 2
+    - optionText: "まずは自分のことで精一杯なの"
+      resultText: "正直ね。でも、それも大事よ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 1
+  - triggerChoice: 2
+    enemyDialogueText: "論理的なのね。でも、時には感情で動くことも大切よ。今のあなたは、どっち？"
+    playerOptions:
+    - optionText: "冷静よ。いつだってね"
+      resultText: "そう見えるわね。"
+      effect:
+        actionType: 0
+        resourceChangeAmount: 0
+    - optionText: "正直、ちょっと焦ってるかも"
+      resultText: "素直ね。それでいいのよ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 1
+    - optionText: "両方よ。使い分けてるの"
+      resultText: "大人ね。私もそうありたいわ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 1
+  - triggerChoice: 3
+    enemyDialogueText: "黙っているのね...言葉にしなくても、伝わることってあるわよね。"
+    playerOptions:
+    - optionText: "言葉が必要ない時もあるでしょ"
+      resultText: "わかるわ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 1
+    - optionText: "何言えばいいか分かんないのよ"
+      resultText: "ふふ、正直ね。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: 1
+    - optionText: "あんたの出方を見てたの"
+      resultText: "策士ね。油断ならないわ。"
+      effect:
+        actionType: 1
+        resourceChangeAmount: -1

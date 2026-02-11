@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 using Void2610.UnityTemplate;
 
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 /// <summary>
@@ -13,12 +12,10 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "AllCardData", menuName = "VoidRed/All Card Data")]
 public class AllCardData : ScriptableObject
 {
-    [SerializeField] private List<CardData> cardList = new ();
-    
-    // プロパティ
+    [SerializeField] private List<CardData> cardList = new();
+
     public List<CardData> CardList => cardList;
-    public int Count => cardList.Count;
-    
+
     /// <summary>
     /// 同じディレクトリ内の全てのCardDataを自動的に登録
     /// </summary>
@@ -28,7 +25,7 @@ public class AllCardData : ScriptableObject
         this.RegisterAssetsInSameDirectory(cardList, x => x.CardName);
 #endif
     }
-    
+
     /// <summary>
     /// ランダムなカードを取得
     /// </summary>
@@ -37,7 +34,7 @@ public class AllCardData : ScriptableObject
         if (cardList.Count == 0) return null;
         return cardList[Random.Range(0, cardList.Count)];
     }
-    
+
     /// <summary>
     /// 複数のランダムなカードを取得（重複なし）
     /// </summary>
@@ -47,17 +44,17 @@ public class AllCardData : ScriptableObject
         {
             return new List<CardData>(cardList);
         }
-        
+
         var shuffled = new List<CardData>(cardList);
-        for (int i = 0; i < shuffled.Count; i++)
+        for (var i = 0; i < shuffled.Count; i++)
         {
             var temp = shuffled[i];
             var randomIndex = Random.Range(i, shuffled.Count);
             shuffled[i] = shuffled[randomIndex];
             shuffled[randomIndex] = temp;
         }
-        
+
         return shuffled.Take(count).ToList();
     }
-    
+
 }

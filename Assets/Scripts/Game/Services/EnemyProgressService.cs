@@ -1,13 +1,9 @@
-using UnityEngine;
-
 /// <summary>
 /// 敵の進行を管理するサービスクラス
 /// VContainerによりシングルトンとして管理される
 /// </summary>
 public class EnemyProgressService
 {
-    public bool IsAllEnemiesDefeated(int chapter) => chapter >= _allEnemyData.Count;
-    
     private readonly AllEnemyData _allEnemyData;
 
     /// <summary>
@@ -19,7 +15,9 @@ public class EnemyProgressService
         _allEnemyData = allEnemyData;
         _allEnemyData.RegisterAllEnemies();
     }
-    
+
+    public bool IsAllEnemiesDefeated(int chapter) => chapter >= _allEnemyData.Count;
+
     /// <summary>
     /// 指定チャプターの敵データを取得
     /// </summary>

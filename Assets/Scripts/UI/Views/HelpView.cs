@@ -1,8 +1,7 @@
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using R3;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// ヘルプ画面を表示するViewクラス
@@ -17,26 +16,12 @@ public class HelpView : BaseWindowView
     [SerializeField] private Button nextButton;
     [SerializeField] private TextMeshProUGUI pageText;
 
-    private readonly Subject<Unit> _onPreviousClicked = new();
-    private readonly Subject<Unit> _onNextClicked = new();
-
     // イベント
     public Observable<Unit> OnPreviousClicked => _onPreviousClicked;
     public Observable<Unit> OnNextClicked => _onNextClicked;
 
-    protected override void Awake()
-    {
-        base.Awake();
-
-        // ボタンイベントの購読
-        previousButton.OnClickAsObservable()
-            .Subscribe(_ => _onPreviousClicked.OnNext(Unit.Default))
-            .AddTo(Disposables);
-
-        nextButton.OnClickAsObservable()
-            .Subscribe(_ => _onNextClicked.OnNext(Unit.Default))
-            .AddTo(Disposables);
-    }
+    private readonly Subject<Unit> _onPreviousClicked = new();
+    private readonly Subject<Unit> _onNextClicked = new();
 
     /// <summary>
     /// ヘルプデータを表示
@@ -56,13 +41,27 @@ public class HelpView : BaseWindowView
         pageText.text = $"{currentIndex + 1} / {totalCount}";
 
         var currentSelected = SafeNavigationManager.GetCurrentSelected();
-        
+
         // 前へ/次へボタンの有効/無効
         previousButton.interactable = currentIndex > 0;
         nextButton.interactable = currentIndex < totalCount - 1;
 
         // 選択が外れた場合に再選択
         SafeNavigationManager.SetSelectedGameObjectSafe(currentSelected);
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        // ボタンイベントの購読
+        previousButton.OnClickAsObservable()
+            .Subscribe(_ => _onPreviousClicked.OnNext(Unit.Default))
+            .AddTo(Disposables);
+
+        nextButton.OnClickAsObservable()
+            .Subscribe(_ => _onNextClicked.OnNext(Unit.Default))
+            .AddTo(Disposables);
     }
 
     protected override void OnDestroy()

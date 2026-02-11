@@ -30,7 +30,7 @@ public class ConfirmationDialogService : IConfirmationDialog
             var canvas = Object.FindAnyObjectByType<Canvas>();
             _dialogInstance = Object.Instantiate(_confirmationDialogViewPrefab, canvas.transform);
         }
-        
+
         return await _dialogInstance.ShowDialog(message, confirmText, cancelText);
     }
 }

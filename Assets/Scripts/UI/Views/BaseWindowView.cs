@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using R3;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using R3;
+using UnityEngine;
+using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -16,24 +16,6 @@ public abstract class BaseWindowView : MonoBehaviour
     [Header("基本コンポーネント")]
     [SerializeField] protected Button closeButton;
 
-    private const float FADE_ANIMATION_DURATION = 0.15f;
-
-    protected readonly CompositeDisposable Disposables = new();
-
-    private CanvasGroup _canvasGroup;
-    private MotionHandle _currentFadeHandle;
-    private readonly Subject<Unit> _onClosed = new();
-
-    // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
-    private static readonly List<BaseWindowView> _activeWindows = new();
-    
-    public static GameObject GetTopActiveWindowCloseButton()
-    {
-        if (_activeWindows.Count == 0) return null;
-        var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
-        return topWindow ? topWindow.GetPreferredNavigationTarget() : null;
-    }
-
     /// <summary>
     /// アクティブなウィンドウが存在するか
     /// </summary>
@@ -42,7 +24,57 @@ public abstract class BaseWindowView : MonoBehaviour
     /// <summary>
     /// ウィンドウの表示状態
     /// </summary>
-    public bool IsShowing => _canvasGroup.interactable;
+    public bool IsShowing
+    {
+        get
+        {
+            EnsureInitialized();
+            return _canvasGroup.interactable;
+        }
+    }
+
+    private const float FADE_ANIMATION_DURATION = 0.15f;
+
+    // アクティブなウィンドウをリストで管理（任意の順序で閉じられるように）
+    private static readonly List<BaseWindowView> _activeWindows = new();
+
+    protected readonly CompositeDisposable Disposables = new();
+
+    private CanvasGroup _canvasGroup;
+    private MotionHandle _currentFadeHandle;
+    private readonly Subject<Unit> _onClosed = new();
+    private bool _isInitialized;
+
+    /// <summary>
+    /// ウィンドウを表示
+    /// </summary>
+    public virtual void Show() => ShowWithAnimation().Forget();
+
+    /// <summary>
+    /// ウィンドウを非表示
+    /// </summary>
+    public virtual void Hide() => HideWithAnimation().Forget();
+
+    /// <summary>
+    /// ウィンドウが閉じられるまで待機
+    /// </summary>
+    public async UniTask WaitForClose() => await _onClosed.FirstAsync();
+
+    public static GameObject GetTopActiveWindowCloseButton()
+    {
+        if (_activeWindows.Count == 0) return null;
+        var topWindow = _activeWindows[^1]; // 最後の要素（最新のウィンドウ）
+        return topWindow ? topWindow.GetPreferredNavigationTarget() : null;
+    }
+
+    /// <summary>
+    /// ウィンドウの表示/非表示を切り替え
+    /// </summary>
+    public void Toggle()
+    {
+        if (IsShowing) Hide();
+        else Show();
+    }
 
     /// <summary>
     /// このウィンドウが再アクティブになったときに選択すべきGameObject
@@ -53,32 +85,17 @@ public abstract class BaseWindowView : MonoBehaviour
         return closeButton ? closeButton.gameObject : null;
     }
 
-    /// <summary>
-    /// ウィンドウを表示
-    /// </summary>
-    public virtual void Show()
+    private void EnsureInitialized()
     {
-        ShowWithAnimation().Forget();
-    }
-
-    /// <summary>
-    /// ウィンドウを非表示
-    /// </summary>
-    public virtual void Hide()
-    {
-        HideWithAnimation().Forget();
-    }
-
-    /// <summary>
-    /// ウィンドウが閉じられるまで待機
-    /// </summary>
-    public async UniTask WaitForClose()
-    {
-        await _onClosed.FirstAsync();
+        if (_isInitialized) return;
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.Hide();
+        _isInitialized = true;
     }
 
     private async UniTaskVoid ShowWithAnimation()
     {
+        EnsureInitialized();
         _currentFadeHandle.TryCancel();
 
         _canvasGroup.interactable = true;
@@ -98,6 +115,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
     private async UniTaskVoid HideWithAnimation()
     {
+        EnsureInitialized();
         _currentFadeHandle.TryCancel();
 
         _canvasGroup.interactable = false;
@@ -133,10 +151,7 @@ public abstract class BaseWindowView : MonoBehaviour
 
     protected virtual void Awake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
+        EnsureInitialized();
 
         if (closeButton)
         {

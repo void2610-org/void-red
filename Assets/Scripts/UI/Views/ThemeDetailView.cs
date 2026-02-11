@@ -1,7 +1,5 @@
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// テーマ詳細情報を表示するモーダルViewクラス
