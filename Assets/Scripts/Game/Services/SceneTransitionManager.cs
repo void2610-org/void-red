@@ -12,7 +12,7 @@ using DelayType = Cysharp.Threading.Tasks.DelayType;
 /// シーン遷移とクロスフェード演出を管理するマネージャー
 /// VContainerでSingletonとして登録され、全シーンで共有される
 /// </summary>
-public class SceneTransitionManager : IDisposable
+public class SceneTransitionManager : ISceneTransitionService, IDisposable
 {
     /// <summary>
     /// 現在フェード中かどうか
@@ -42,12 +42,15 @@ public class SceneTransitionManager : IDisposable
     }
 
     /// <summary>
-    /// クロスフェード演出付きでシーンを遷移
+    /// クロスフェード演出付きでシーンを遷移（SceneType版）
     /// </summary>
-    /// <param name="targetScene">遷移先のシーンタイプ</param>
-    /// <param name="fadeDuration">フェードの時間（省略時はデフォルト値）</param>
-    /// <returns>遷移完了のUniTask</returns>
-    public async UniTask TransitionToSceneWithFade(SceneType targetScene, float fadeDuration = DEFAULT_FADE_DURATION)
+    public UniTask TransitionToSceneWithFade(SceneType targetScene, float fadeDuration = DEFAULT_FADE_DURATION)
+        => TransitionToSceneWithFade(targetScene.ToSceneName(), fadeDuration);
+
+    /// <summary>
+    /// クロスフェード演出付きでシーンを遷移（string版、ISceneTransitionService実装）
+    /// </summary>
+    public async UniTask TransitionToSceneWithFade(string sceneName, float fadeDuration = DEFAULT_FADE_DURATION)
     {
         if (IsFading) return;
 
@@ -61,7 +64,6 @@ public class SceneTransitionManager : IDisposable
             await FadeIn(fadeDuration);
 
             // シーンをロード
-            var sceneName = targetScene.ToSceneName();
             var asyncOperation = SceneManager.LoadSceneAsync(sceneName);
             asyncOperation.allowSceneActivation = false;
             // ロード完了を待つ（90%まで）
@@ -72,15 +74,17 @@ public class SceneTransitionManager : IDisposable
             await UniTask.Delay(100, DelayType.UnscaledDeltaTime);
 
             // InputSystemを更新
-            _inputActionsProvider.EnableActionMapsForScene(targetScene);
+            var sceneType = SceneUtility.GetSceneType(sceneName);
+            _inputActionsProvider.EnableActionMapsForScene(sceneType);
 
             // Discord Rich Presence更新
-            var discordState = targetScene switch
+            var discordState = sceneType switch
             {
                 SceneType.Title => "タイトル画面",
                 SceneType.Home => "ホーム画面",
                 SceneType.Battle => "バトル中",
                 SceneType.Novel => "ストーリー",
+                SceneType.Thanks => "展示モード",
                 _ => "プレイ中"
             };
             _discordService.SetCurrentStage(discordState);
