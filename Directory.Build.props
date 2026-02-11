@@ -8,7 +8,7 @@
     <ItemGroup>
         <!-- カスタムアナライザー（DLLが存在する場合のみ） -->
         <Analyzer
-            Include="$(MSBuildThisFileDirectory)tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll"
-            Condition="Exists('$(MSBuildThisFileDirectory)tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll')" />
+            Include="$(MSBuildThisFileDirectory)unity-analyzers/src/Void2610.Unity.Analyzers/bin/Release/netstandard2.0/Void2610.Unity.Analyzers.dll"
+            Condition="Exists('$(MSBuildThisFileDirectory)unity-analyzers/src/Void2610.Unity.Analyzers/bin/Release/netstandard2.0/Void2610.Unity.Analyzers.dll')" />
     </ItemGroup>
 </Project>

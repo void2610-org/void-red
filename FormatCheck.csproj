@@ -12,7 +12,7 @@
     <Compile Remove="Assets/Scripts/Utils/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll"
-              Condition="Exists('tools/UnityNamingAnalyzer/bin/Release/netstandard2.0/UnityNamingAnalyzer.dll')" />
+    <Analyzer Include="unity-analyzers/src/Void2610.Unity.Analyzers/bin/Release/netstandard2.0/Void2610.Unity.Analyzers.dll"
+              Condition="Exists('unity-analyzers/src/Void2610.Unity.Analyzers/bin/Release/netstandard2.0/Void2610.Unity.Analyzers.dll')" />
   </ItemGroup>
 </Project>

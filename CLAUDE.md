@@ -45,7 +45,7 @@ void-red is a Unity card game project using Unity 6000.0.50f1 with VContainer fo
 # Check compilation errors only
 ./unity-tools/unity-compile.sh check .
 
-# Format check (whitespace + code style + custom analyzers UNA0001-UNA0006)
+# Format check (whitespace + code style + custom analyzers VUA0001-VUA0006)
 dotnet format whitespace FormatCheck.csproj
 dotnet format style FormatCheck.csproj --severity warn
 dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn

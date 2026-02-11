@@ -114,7 +114,7 @@ csharp_preserve_single_line_blocks = true
 #### 命名規則 ####
 
 # プライベートフィールド: _camelCase
-# UNA0001/UNA0002カスタムアナライザーで管理するためnoneに設定
+# VUA0001/VUA0002カスタムアナライザーで管理するためnoneに設定
 dotnet_naming_rule.private_fields_should_be_camel_case.severity = none
 dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
 dotnet_naming_rule.private_fields_should_be_camel_case.style = private_field_style
@@ -168,13 +168,13 @@ dotnet_naming_style.camel_case_style.capitalization = camel_case
 # IDE1006（標準命名規則）: privateフィールドのみnoneで除外済みのためwarningで有効化
 dotnet_diagnostic.IDE1006.severity = warning
 
-# カスタムアナライザー: UnityNamingAnalyzer
-dotnet_diagnostic.UNA0001.severity = warning
-dotnet_diagnostic.UNA0002.severity = warning
-dotnet_diagnostic.UNA0003.severity = warning
-dotnet_diagnostic.UNA0004.severity = warning
-dotnet_diagnostic.UNA0005.severity = warning
-dotnet_diagnostic.UNA0006.severity = warning
+# カスタムアナライザー: Void2610.Unity.Analyzers
+dotnet_diagnostic.VUA0001.severity = warning
+dotnet_diagnostic.VUA0002.severity = warning
+dotnet_diagnostic.VUA0003.severity = warning
+dotnet_diagnostic.VUA0004.severity = warning
+dotnet_diagnostic.VUA0005.severity = warning
+dotnet_diagnostic.VUA0006.severity = warning
 
 # XML, JSON
 [*.{xml,json,yml,yaml}]
