@@ -38,16 +38,18 @@ public static class NovelKeyBindings
         inputActionsProvider.UI.Advance.OnPerformedAsObservable()
             .Subscribe(_ =>
             {
-                // マウスクリックの場合、UIボタン上かチェック
-                if (IsPointerOverUI()) return;
-
-                // アイテム取得演出が表示中ならそちらを優先
+                // アイテム取得演出が表示中ならそちらを優先（演出自体がUIなのでIsPointerOverUIより先に判定）
                 if (itemGetEffectView.IsShowing)
                 {
                     itemGetEffectView.OnClick();
+                    return;
                 }
+
+                // マウスクリックの場合、UIボタン上かチェック
+                if (IsPointerOverUI()) return;
+
                 // ウィンドウが開いていない場合はダイアログを進める
-                else if (!BaseWindowView.HasActiveWindows)
+                if (!BaseWindowView.HasActiveWindows)
                 {
                     dialogView.OnClick();
                 }
