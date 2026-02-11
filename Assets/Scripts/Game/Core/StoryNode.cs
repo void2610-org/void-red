@@ -54,3 +54,12 @@ public class NovelNode : StoryNode
         ReturnToHome = returnToHome;
     }
 }
+
+public class DemoEnding : StoryNode
+{
+    public DemoEnding()
+    {
+        NodeId = "demo_ending";
+        ReturnToHome = true;
+    }
+}

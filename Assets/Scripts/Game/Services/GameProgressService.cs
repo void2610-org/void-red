@@ -102,11 +102,12 @@ public class GameProgressService
                 break;
             // セリカバトル
             case 5:
-                nextNode = new BattleNode("cerica", false);
+                nextNode = new DemoEnding();
+                // nextNode = new BattleNode("cerica", false);
                 break;
             // この先は未定
             default:
-                nextNode = new NovelNode("ending");
+                nextNode = new DemoEnding();
                 break;
         }
 
@@ -173,6 +174,7 @@ public class GameProgressService
         {
             BattleNode => SceneType.Battle,
             NovelNode => SceneType.Novel,
+            DemoEnding => SceneType.Thanks,
             _ => SceneType.Home
         };
     }

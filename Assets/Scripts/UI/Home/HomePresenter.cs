@@ -56,34 +56,15 @@ public class HomePresenter : IStartable, IDisposable
         switch (_currentNode)
         {
             case BattleNode battleNode:
-                await StartBattleNode(battleNode);
+                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle);
                 break;
             case NovelNode novelNode:
-                await StartNovelNode(novelNode);
+                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Novel);
+                break;
+            default:
+                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Thanks);
                 break;
         }
-    }
-
-    /// <summary>
-    /// バトルノード開始
-    /// </summary>
-    private async UniTask StartBattleNode(BattleNode battleNode)
-    {
-        Debug.Log($"[HomePresenter] バトル開始: オークションID {battleNode.AuctionId}");
-
-        // 単純にBattleSceneに遷移（敵情報はGameProgressServiceから取得）
-        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle);
-    }
-
-    /// <summary>
-    /// ノベルノード開始
-    /// </summary>
-    private async UniTask StartNovelNode(NovelNode novelNode)
-    {
-        Debug.Log($"[HomePresenter] ノベル開始: {novelNode.ScenarioId}");
-
-        // ノベルシーンに遷移（シナリオ情報はGameProgressServiceから取得）
-        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Novel);
     }
 
     /// <summary>
