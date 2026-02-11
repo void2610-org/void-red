@@ -32,7 +32,7 @@ public class BlackOverlayView : MonoBehaviour
         if (IsVisible) return;
 
         // 現在のアニメーションをキャンセル
-        if (_currentFadeHandle.IsActive()) _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
 
         gameObject.SetActive(true);
         IsVisible = true;
@@ -50,7 +50,7 @@ public class BlackOverlayView : MonoBehaviour
         if (!IsVisible) return;
 
         // 現在のアニメーションをキャンセル
-        if (_currentFadeHandle.IsActive()) _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
 
         IsVisible = false;
 
@@ -74,6 +74,6 @@ public class BlackOverlayView : MonoBehaviour
     private void OnDestroy()
     {
         // アニメーションのクリーンアップ
-        if (_currentFadeHandle.IsActive()) _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
     }
 }

@@ -97,10 +97,7 @@ namespace VoidRed.UI.Views
 
         private void CancelAnimation()
         {
-            if (_currentAnimation.IsActive())
-            {
-                _currentAnimation.Cancel();
-            }
+            _currentAnimation.TryCancel();
         }
 
         private void OnDestroy()

@@ -165,8 +165,7 @@ public class SceneTransitionManager : ISceneTransitionService, IDisposable
     /// <returns>完了のUniTask</returns>
     private async UniTask FadeIn(float duration)
     {
-        if (_currentFadeHandle.IsActive())
-            _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
 
         _fadeCanvas.SetActive(true);
         _fadeImage.color = new Color(0, 0, 0, 0); // 完全に透明な黒から開始
@@ -183,8 +182,7 @@ public class SceneTransitionManager : ISceneTransitionService, IDisposable
     /// <returns>完了のUniTask</returns>
     private async UniTask FadeOut(float duration)
     {
-        if (_currentFadeHandle.IsActive())
-            _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
 
         _currentFadeHandle = _fadeImage.FadeOut(duration, Ease.InQuart, ignoreTimeScale: true);
 
@@ -198,8 +196,7 @@ public class SceneTransitionManager : ISceneTransitionService, IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (_currentFadeHandle.IsActive())
-            _currentFadeHandle.Cancel();
+        _currentFadeHandle.TryCancel();
 
         if (_fadeCanvas) UnityEngine.Object.Destroy(_fadeCanvas);
     }
