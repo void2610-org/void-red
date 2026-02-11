@@ -114,7 +114,7 @@ csharp_preserve_single_line_blocks = true
 #### 命名規則 ####
 
 # プライベートフィールド: _camelCase
-# VUA0001/VUA0002カスタムアナライザーで管理するためnoneに設定
+# VUA0008/VUA0002カスタムアナライザーで管理するためnoneに設定
 dotnet_naming_rule.private_fields_should_be_camel_case.severity = none
 dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
 dotnet_naming_rule.private_fields_should_be_camel_case.style = private_field_style
