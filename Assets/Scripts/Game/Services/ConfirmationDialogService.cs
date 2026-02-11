@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using Void2610.SettingsSystem;
 
 /// <summary>
@@ -10,6 +11,7 @@ public class ConfirmationDialogService : IConfirmationDialog
 {
     private readonly ConfirmationDialogView _confirmationDialogViewPrefab;
     private ConfirmationDialogView _dialogInstance;
+    private GameObject _dialogCanvas;
 
     public ConfirmationDialogService(ConfirmationDialogView confirmationDialogView)
     {
@@ -27,8 +29,21 @@ public class ConfirmationDialogService : IConfirmationDialog
     {
         if (!_dialogInstance)
         {
-            var canvas = Object.FindAnyObjectByType<Canvas>();
-            _dialogInstance = Object.Instantiate(_confirmationDialogViewPrefab, canvas.transform);
+            // 専用Canvasを作成（DontDestroyOnLoadでシーン遷移しても破棄されない）
+            _dialogCanvas = new GameObject("ConfirmationDialogCanvas");
+            Object.DontDestroyOnLoad(_dialogCanvas);
+
+            var canvas = _dialogCanvas.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 100;
+
+            var scaler = _dialogCanvas.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+
+            _dialogCanvas.AddComponent<GraphicRaycaster>();
+
+            _dialogInstance = Object.Instantiate(_confirmationDialogViewPrefab, _dialogCanvas.transform);
         }
 
         return await _dialogInstance.ShowDialog(message, confirmText, cancelText);
