@@ -1,23 +1,19 @@
 using System;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using UnityEngine.InputSystem;
 using VContainer.Unity;
 using Void2610.UnityTemplate;
 
 /// <summary>
 /// 展示モード感謝画面のPresenter
-/// 一定時間後またはタッチでタイトルに戻る
+/// クリック/タッチでタイトルに戻る
 /// </summary>
 public class ThanksPresenter : IStartable, IDisposable
 {
-    private const float AUTO_RETURN_SECONDS = 10f;
-
     private readonly ExhibitSettings _settings;
     private readonly ISceneTransitionService _sceneTransitionService;
     private readonly IdleDetector _idleDetector;
     private readonly ExhibitSessionTimerService _sessionTimerService;
-
-    private bool _isTransitioning;
 
     public ThanksPresenter(
         ExhibitSettings settings,
@@ -31,27 +27,22 @@ public class ThanksPresenter : IStartable, IDisposable
         _sessionTimerService = sessionTimerService;
     }
 
-    private async UniTaskVoid WaitAndReturnToTitle()
+    private async UniTaskVoid WaitForClickAndReturn()
     {
-        var startTime = Time.realtimeSinceStartup;
+        // シーン遷移直後の入力を無視するため待機
+        await UniTask.Delay(TimeSpan.FromSeconds(1));
 
-        // 一定時間経過または入力があるまで待機
+        // クリック/タッチ入力を待機
         await UniTask.WaitUntil(() =>
-        {
-            var elapsed = Time.realtimeSinceStartup - startTime;
-            return elapsed >= AUTO_RETURN_SECONDS || _idleDetector.IdleSeconds < 1f;
-        });
+            Pointer.current != null && Pointer.current.press.wasPressedThisFrame);
 
-        if (_isTransitioning) return;
-        _isTransitioning = true;
-
-        // セッションタイマーをリセットしてタイトルへ
+        // セッションをリセットしてタイトルへ
         _sessionTimerService.ResetSession();
         _idleDetector.ResetIdleTimer();
         await _sceneTransitionService.TransitionToSceneWithFade(_settings.IdleReturnSceneName);
     }
 
-    public void Start() => WaitAndReturnToTitle().Forget();
+    public void Start() => WaitForClickAndReturn().Forget();
 
     public void Dispose() { }
 }
