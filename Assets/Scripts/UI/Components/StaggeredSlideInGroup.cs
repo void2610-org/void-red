@@ -202,12 +202,13 @@ public class StaggeredSlideInGroup : MonoBehaviour
 
     private List<Vector2> CalculateGridPositions(List<RectTransform> children)
     {
+        if (children.Count == 0) return new List<Vector2>();
+
         var positions = new List<Vector2>();
         var parentRect = transform as RectTransform;
         var parentSize = parentRect.rect.size;
 
         // グリッドのセルサイズを最初の子要素から決定
-        if (children.Count == 0) return positions;
         var cellSize = children[0].sizeDelta;
 
         var cols = Mathf.Max(1, gridConstraintCount);
