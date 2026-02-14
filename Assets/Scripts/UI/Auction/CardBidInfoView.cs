@@ -94,4 +94,12 @@ public class CardBidInfoView : MonoBehaviour
         resultText.text = isPlayerWon ? "WIN" : "LOSE";
         resultText.color = isPlayerWon ? PLAYER_COLOR : ENEMY_COLOR;
     }
+
+    // 引き分け結果を表示
+    public void ShowDraw()
+    {
+        resultText.gameObject.SetActive(true);
+        resultText.text = "DRAW";
+        resultText.color = Color.yellow;
+    }
 }

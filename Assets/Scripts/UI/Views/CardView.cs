@@ -97,17 +97,27 @@ public class CardView : BaseCardView
                 _instancedGrowMaterial.SetFloat(_value, 1.5f);
                 break;
             case CardBidState.EnemyBid:
-                _instancedGrowMaterial.SetColor(_color2, enemyColor * 2);
+                _instancedGrowMaterial.SetColor(_color2, enemyColor * CalculateHdrIntensity(enemyColor));
                 _instancedGrowMaterial.SetFloat(_value, 0f);
                 break;
             case CardBidState.DrawBid:
-                _instancedGrowMaterial.SetColor(_color2, enemyColor * 2);
+                _instancedGrowMaterial.SetColor(_color2, enemyColor * CalculateHdrIntensity(enemyColor));
                 _instancedGrowMaterial.SetFloat(_value, 0.5f);
                 break;
         }
 
         var targetAlpha = state != CardBidState.None ? 0.6f : 0f;
         _growAlphaHandle = _instancedGrowMaterial.MaterialFloatTo(_alpha, targetAlpha, fadeDuration, Ease.OutCubic, gameObject);
+    }
+
+    /// <summary>
+    /// 知覚的輝度に基づいてHDR色強度を計算する
+    /// 高輝度色（黄色など）は低い乗数、低輝度色（青など）は高い乗数を返す
+    /// </summary>
+    private static float CalculateHdrIntensity(Color color)
+    {
+        var luminance = 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
+        return Mathf.Lerp(4.0f, 1.5f, luminance);
     }
 
     protected override CardData GetCardData() => CardData;

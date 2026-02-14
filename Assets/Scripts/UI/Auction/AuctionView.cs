@@ -256,7 +256,10 @@ public class AuctionView : BasePhaseView
 
             if (!result.NoBids)
             {
-                bidInfoView.ShowResult(result.IsPlayerWon);
+                if (result.IsDraw)
+                    bidInfoView.ShowDraw();
+                else
+                    bidInfoView.ShowResult(result.IsPlayerWon);
             }
         }
     }
@@ -304,6 +307,13 @@ public class AuctionView : BasePhaseView
             {
                 // 入札なし → フェードアウト
                 await targetCardView.PlayFadeOutAsync();
+            }
+            else if (result.IsDraw)
+            {
+                // 引き分け → グローエフェクト表示、カードは移動させない
+                targetCardView.SetGrowEffect(CardView.CardBidState.DrawBid, enemyColor);
+                bidInfoView.ShowDraw();
+                await UniTask.Delay(300);
             }
             else
             {
