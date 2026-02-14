@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
-using LitMotion;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,17 +17,14 @@ public class CardAcquisitionView : MonoBehaviour
     [SerializeField] private CardView cardPrefab;
     [SerializeField] private Transform textContainer;
     [SerializeField] private AcquiredCardTextView cardTextPrefab;
+    [SerializeField] private StaggeredSlideInGroup cardStagger;
+    [SerializeField] private StaggeredSlideInGroup textStagger;
 
     [Header("アニメーション設定")]
     [SerializeField] private float initialDelay = 0.3f;
-    [SerializeField] private float staggerDelay = 0.05f;
-    [SerializeField] private float animDuration = 0.2f;
-    [SerializeField] private float cardSlideOffset = -50f;
-    [SerializeField] private float textSlideOffset = 50f;
 
     private readonly Subject<Unit> _onNextButtonClicked = new();
     private readonly List<GameObject> _instantiatedItems = new();
-    private readonly List<MotionHandle> _animHandles = new();
 
     /// <summary>
     /// 獲得カードを一括表示し、nextボタンで進行
@@ -63,7 +58,8 @@ public class CardAcquisitionView : MonoBehaviour
         }
 
         await UniTask.Delay(System.TimeSpan.FromSeconds(initialDelay));
-        PlayEnterAnimation();
+        cardStagger.Play();
+        textStagger.Play();
     }
 
     public async UniTask WaitForNextAndHideAsync()
@@ -74,7 +70,8 @@ public class CardAcquisitionView : MonoBehaviour
 
     public void Hide()
     {
-        _animHandles.CancelAll();
+        cardStagger.Cancel();
+        textStagger.Cancel();
         canvasGroup.Hide();
         ClearInstantiatedItems();
     }
@@ -82,29 +79,6 @@ public class CardAcquisitionView : MonoBehaviour
     private void Show()
     {
         canvasGroup.Show();
-    }
-
-    /// <summary>
-    /// カードとテキストの順次スライド+フェードインアニメーション
-    /// </summary>
-    private void PlayEnterAnimation()
-    {
-        _animHandles.CancelAll();
-        Canvas.ForceUpdateCanvases();
-
-        // カード列: 下からスライドイン
-        var cardTargets = Enumerable.Range(0, cardContainer.childCount)
-            .Select(i => cardContainer.GetChild(i))
-            .Select(c => ((RectTransform)c, c.gameObject.GetOrAddComponent<CanvasGroup>()))
-            .ToList();
-        cardTargets.StaggeredSlideIn(new Vector2(0, cardSlideOffset), animDuration, staggerDelay, _animHandles);
-
-        // テキスト列: 右からスライドイン
-        var textTargets = Enumerable.Range(0, textContainer.childCount)
-            .Select(i => textContainer.GetChild(i))
-            .Select(c => ((RectTransform)c, c.gameObject.GetOrAddComponent<CanvasGroup>()))
-            .ToList();
-        textTargets.StaggeredSlideIn(new Vector2(textSlideOffset, 0), animDuration, staggerDelay, _animHandles);
     }
 
     private void ClearInstantiatedItems()
@@ -125,7 +99,6 @@ public class CardAcquisitionView : MonoBehaviour
 
     private void OnDestroy()
     {
-        _animHandles.CancelAll();
         _onNextButtonClicked.Dispose();
     }
 }

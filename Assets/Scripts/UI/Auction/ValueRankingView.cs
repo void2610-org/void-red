@@ -2,11 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Auction;
 using Cysharp.Threading.Tasks;
-using LitMotion;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// 価値順位設定UI
@@ -32,19 +30,15 @@ public class ValueRankingView : BasePhaseView
     [Header("ドラッグ演出")]
     [SerializeField] private DragLineView dragLineView;
 
-    [Header("アニメーション設定")]
-    [SerializeField] private float slotStaggerDelay = 0.05f;
-    [SerializeField] private float cardStaggerDelay = 0.03f;
-    [SerializeField] private float animDuration = 0.2f;
-    [SerializeField] private float slotSlideOffset = 50f;
-    [SerializeField] private float cardSlideOffset = -100f;
+    [Header("アニメーション")]
+    [SerializeField] private StaggeredSlideInGroup slotStagger;
+    [SerializeField] private StaggeredSlideInGroup cardStagger;
 
     public Observable<Unit> OnRankingComplete => _onRankingComplete;
 
     private readonly List<DraggableCardView> _handCards = new();
     private readonly List<CardModel> _rankedCards = new();
     private readonly Subject<Unit> _onRankingComplete = new();
-    private readonly List<MotionHandle> _animHandles = new();
     private CompositeDisposable _disposables = new();
     private bool _wasDroppedToSlot;
     private RectTransform _handContainerRect;
@@ -52,12 +46,13 @@ public class ValueRankingView : BasePhaseView
     public override void Show()
     {
         base.Show();
-        PlaySlotEnterAnimation();
+        slotStagger.Play();
     }
 
     public override void Hide()
     {
-        _animHandles.CancelAll();
+        slotStagger.Cancel();
+        cardStagger.Cancel();
         base.Hide();
     }
 
@@ -83,7 +78,7 @@ public class ValueRankingView : BasePhaseView
         }
 
         // カードのスライドインアニメーション
-        PlayCardEnterAnimation();
+        cardStagger.Play();
 
         foreach (var slot in slots)
         {
@@ -233,27 +228,6 @@ public class ValueRankingView : BasePhaseView
         card.transform.localEulerAngles = new Vector3(0, 0, rotation);
     }
 
-    /// <summary>
-    /// スロットの順次スライド+フェードインアニメーション
-    /// </summary>
-    private void PlaySlotEnterAnimation()
-    {
-        _animHandles.CancelAll();
-        Canvas.ForceUpdateCanvases();
-        var targets = slots.Select(s => ((RectTransform)s.transform, s.CanvasGroup)).ToList();
-        targets.StaggeredSlideIn(new Vector2(0, slotSlideOffset), animDuration, slotStaggerDelay, _animHandles);
-    }
-
-    /// <summary>
-    /// カードの順次スライド+フェードインアニメーション
-    /// </summary>
-    private void PlayCardEnterAnimation()
-    {
-        Canvas.ForceUpdateCanvases();
-        var targets = _handCards.Select(c => ((RectTransform)c.transform, c.CanvasGroup)).ToList();
-        targets.StaggeredSlideIn(new Vector2(0, cardSlideOffset), animDuration, cardStaggerDelay, _animHandles);
-    }
-
     protected override void Awake()
     {
         base.Awake();
@@ -264,7 +238,6 @@ public class ValueRankingView : BasePhaseView
 
     private void OnDestroy()
     {
-        _animHandles.CancelAll();
         _disposables.Dispose();
         _onRankingComplete.Dispose();
     }

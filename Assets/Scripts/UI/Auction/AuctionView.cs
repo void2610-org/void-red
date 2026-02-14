@@ -28,13 +28,11 @@ public class AuctionView : BasePhaseView
     [SerializeField] private CardBidInfoView cardBidInfoPrefab;
 
     [Header("カード登場アニメーション")]
-    [SerializeField] private float staggerDelay = 0.15f;
-    [SerializeField] private float animDuration = 0.2f;
-    [SerializeField] private float cardSlideOffset = 75f;
+    [SerializeField] private StaggeredSlideInGroup playerCardStagger;
+    [SerializeField] private StaggeredSlideInGroup enemyCardStagger;
 
     public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
 
-    private readonly List<MotionHandle> _animHandles = new();
     private readonly List<CardView> _cardViews = new();
     private readonly Dictionary<CardView, CardModel> _cardViewToModel = new();
     private readonly Dictionary<CardView, CardBidInfoView> _cardBidInfoViews = new();
@@ -115,7 +113,8 @@ public class AuctionView : BasePhaseView
             _cardBidInfoViews[cardView] = bidInfoView;
         }
 
-        PlayCardEnterAnimation();
+        playerCardStagger.Play();
+        enemyCardStagger.Play();
     }
 
     // 入札フェーズ開始
@@ -334,7 +333,8 @@ public class AuctionView : BasePhaseView
 
     public void Clear()
     {
-        _animHandles.CancelAll();
+        playerCardStagger.Cancel();
+        enemyCardStagger.Cancel();
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
 
@@ -522,29 +522,8 @@ public class AuctionView : BasePhaseView
             .ToUniTask();
     }
 
-    private void PlayCardEnterAnimation()
-    {
-        _animHandles.CancelAll();
-        Canvas.ForceUpdateCanvases();
-
-        // プレイヤーカード: 上からスライドイン
-        var playerTargets = Enumerable.Range(0, playerCardContainer.childCount)
-            .Select(i => playerCardContainer.GetChild(i))
-            .Select(c => ((RectTransform)c, c.gameObject.GetOrAddComponent<CanvasGroup>()))
-            .ToList();
-        playerTargets.StaggeredSlideIn(new Vector2(0, -cardSlideOffset), animDuration, staggerDelay, _animHandles);
-
-        // 敵カード: 下からスライドイン
-        var enemyTargets = Enumerable.Range(0, enemyCardContainer.childCount)
-            .Select(i => enemyCardContainer.GetChild(i))
-            .Select(c => ((RectTransform)c, c.gameObject.GetOrAddComponent<CanvasGroup>()))
-            .ToList();
-        enemyTargets.StaggeredSlideIn(new Vector2(0, cardSlideOffset), animDuration, staggerDelay, _animHandles);
-    }
-
     private void OnDestroy()
     {
-        _animHandles.CancelAll();
         _disposables.Dispose();
     }
 }
