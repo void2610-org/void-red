@@ -12,7 +12,10 @@ using Void2610.UnityTemplate;
 [CreateAssetMenu(fileName = "AllTutorialData", menuName = "VoidRed/All Tutorial Data")]
 public class AllTutorialData : ScriptableObject
 {
+    [SerializeField] private bool enableTutorial = true;
     [SerializeField] private List<TutorialData> tutorialList = new();
+
+    public bool EnableTutorial => enableTutorial;
 
     /// <summary>
     /// チュートリアルIDでチュートリアルを取得
