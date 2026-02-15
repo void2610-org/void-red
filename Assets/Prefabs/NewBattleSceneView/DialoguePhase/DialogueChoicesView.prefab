@@ -57,8 +57,8 @@ MonoBehaviour:
   alignment: 4
   gridConstraintCount: 2
   slideOffset: {x: 50, y: 0}
-  duration: 0.2
-  staggerDelay: 0.05
+  duration: 0.5
+  staggerDelay: 0.15
   moveEase: 26
   enableFade: 1
   fadeEase: 8
