@@ -146,6 +146,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5301492600654782887}
   - component: {fileID: 8243325545328654129}
+  - component: {fileID: 2497461975041446832}
   m_Layer: 5
   m_Name: SlotContainer
   m_TagString: Untagged
@@ -202,6 +203,30 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
+--- !u!114 &2497461975041446832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4479017576366319394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e07333a62107943049d1f5d5a6038850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layoutMode: 0
+  spacing: 10
+  alignment: 4
+  gridConstraintCount: 2
+  slideOffset: {x: 0, y: 200}
+  duration: 0.5
+  staggerDelay: 0.2
+  moveEase: 8
+  enableFade: 1
+  fadeEase: 8
+  ignoreTimeScale: 0
+  activeOnly: 1
 --- !u!1 &6011470159155792265
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,6 +312,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3396604278848656548}
+  - component: {fileID: 8176199549145843010}
   m_Layer: 5
   m_Name: HandAnkers
   m_TagString: Untagged
@@ -313,6 +339,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 800, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8176199549145843010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6427104417176623359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e07333a62107943049d1f5d5a6038850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layoutMode: 0
+  spacing: 10
+  alignment: 4
+  gridConstraintCount: 2
+  slideOffset: {x: 0, y: -150}
+  duration: 0.5
+  staggerDelay: 0.15
+  moveEase: 8
+  enableFade: 1
+  fadeEase: 8
+  ignoreTimeScale: 0
+  activeOnly: 1
 --- !u!1 &6853857513757147591
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,11 +522,8 @@ MonoBehaviour:
   fanMaxAngle: 10
   confirmButton: {fileID: 7491099489286324350}
   dragLineView: {fileID: 7658362565713621403}
-  slotStaggerDelay: 0.2
-  cardStaggerDelay: 0.15
-  animDuration: 0.5
-  slotSlideOffset: 200
-  cardSlideOffset: -150
+  slotStagger: {fileID: 2497461975041446832}
+  cardStagger: {fileID: 8176199549145843010}
 --- !u!225 &2557049344710433139
 CanvasGroup:
   m_ObjectHideFlags: 0

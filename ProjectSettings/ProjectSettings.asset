@@ -593,8 +593,8 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Standalone: STEAMWORKS_NET;GOOGLE_ENABLE
-    WebGL: GOOGLE_ENABLE
+    Standalone: STEAMWORKS_NET;GOOGLE_ENABLE;ULOOPMCP_HAS_ROSLYN
+    WebGL: GOOGLE_ENABLE;ULOOPMCP_HAS_ROSLYN
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

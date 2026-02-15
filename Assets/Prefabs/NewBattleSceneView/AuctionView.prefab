@@ -72,9 +72,8 @@ MonoBehaviour:
   confirmBiddingButton: {fileID: 8462001119609464775}
   emotionResourceDisplayView: {fileID: 4318667104630866671}
   cardBidInfoPrefab: {fileID: 9134574364431770915, guid: e68a4e123d3de4df19bb1d9330ce530e, type: 3}
-  staggerDelay: 0.1
-  animDuration: 0.2
-  cardSlideOffset: 75
+  playerCardStagger: {fileID: 8892872961073848662}
+  enemyCardStagger: {fileID: 5145865381775669263}
 --- !u!225 &5837306852137217465
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -97,6 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8918312952511633238}
   - component: {fileID: 6805936607938116469}
+  - component: {fileID: 8892872961073848662}
   m_Layer: 5
   m_Name: PlayerCardContainer
   m_TagString: Untagged
@@ -149,6 +149,30 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &8892872961073848662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4219259713031664585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e07333a62107943049d1f5d5a6038850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layoutMode: 0
+  spacing: 10
+  alignment: 4
+  gridConstraintCount: 2
+  slideOffset: {x: 0, y: -75}
+  duration: 0.2
+  staggerDelay: 0.1
+  moveEase: 8
+  enableFade: 1
+  fadeEase: 8
+  ignoreTimeScale: 0
+  activeOnly: 1
 --- !u!1 &4886797364826216689
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,6 +183,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3690083444705993025}
   - component: {fileID: 6484018231310768228}
+  - component: {fileID: 5145865381775669263}
   m_Layer: 5
   m_Name: EnemyCardContainer
   m_TagString: Untagged
@@ -211,6 +236,30 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5145865381775669263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886797364826216689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e07333a62107943049d1f5d5a6038850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layoutMode: 0
+  spacing: 10
+  alignment: 4
+  gridConstraintCount: 2
+  slideOffset: {x: 0, y: 75}
+  duration: 0.2
+  staggerDelay: 0.1
+  moveEase: 8
+  enableFade: 1
+  fadeEase: 8
+  ignoreTimeScale: 0
+  activeOnly: 1
 --- !u!1 &5502286139450834692
 GameObject:
   m_ObjectHideFlags: 0
