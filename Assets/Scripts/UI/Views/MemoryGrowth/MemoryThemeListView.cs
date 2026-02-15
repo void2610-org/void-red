@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using R3;
 using UnityEngine;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 記憶テーマリストビュー

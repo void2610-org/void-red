@@ -3,6 +3,7 @@ using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 対話フェーズの選択肢表示View
