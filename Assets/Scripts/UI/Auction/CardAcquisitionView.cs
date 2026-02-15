@@ -14,7 +14,7 @@ public class CardAcquisitionView : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button nextButton;
     [SerializeField] private Transform cardContainer;
-    [SerializeField] private CardView cardPrefab;
+    [SerializeField] private AcquiredCardView cardPrefab;
     [SerializeField] private Transform textContainer;
     [SerializeField] private AcquiredCardTextView cardTextPrefab;
     [SerializeField] private StaggeredSlideInGroup cardStagger;
@@ -43,12 +43,10 @@ public class CardAcquisitionView : MonoBehaviour
 
         foreach (var cardData in cards)
         {
-            // カードをcardContainerに生成（アニメーション前は非表示）
-            var cardView = Instantiate(cardPrefab, cardContainer);
-            cardView.Initialize(cardData);
-            cardView.SetInteractable(false);
-            cardView.gameObject.GetOrAddComponent<CanvasGroup>().alpha = 0f;
-            _instantiatedItems.Add(cardView.gameObject);
+            // カードをcardContainerに生成
+            var acquiredCard = Instantiate(cardPrefab, cardContainer);
+            acquiredCard.Initialize(cardData);
+            _instantiatedItems.Add(acquiredCard.gameObject);
 
             // テキストをtextContainerに生成（アニメーション前は非表示）
             var textItem = Instantiate(cardTextPrefab, textContainer);
