@@ -117,7 +117,7 @@ public class CardView : BaseCardView
     private static float CalculateHdrIntensity(Color color)
     {
         var luminance = 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
-        return Mathf.Lerp(4.0f, 1.5f, luminance);
+        return Mathf.Lerp(4.0f, 1.5f, Mathf.Clamp01(luminance));
     }
 
     protected override CardData GetCardData() => CardData;

@@ -2567,9 +2567,41 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 595253103}
     m_Modifications:
+    - target: {fileID: 1309118263615037433, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778054532818937040, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778054532818937040, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -195
+      objectReference: {fileID: 0}
+    - target: {fileID: 3743415833802897540, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 3949737925467561685, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
       propertyPath: m_Name
       value: BattlePauseView
+      objectReference: {fileID: 0}
+    - target: {fileID: 5138806491087074695, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 5138806491087074695, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -135
+      objectReference: {fileID: 0}
+    - target: {fileID: 6355167856173032207, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6355167856173032207, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -75
       objectReference: {fileID: 0}
     - target: {fileID: 6530168348075070601, guid: b85e939239e8449ceb1220e463b5f119, type: 3}
       propertyPath: m_Pivot.x
