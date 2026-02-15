@@ -460,6 +460,15 @@
       "dependencies": {},
       "hash": "4a8cec6d056e7673ce19d892d2bee1129ad33044"
     },
+    "io.github.hatayama.uloopmcp": {
+      "version": "https://github.com/hatayama/uLoopMCP.git?path=/Packages/src",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "ac5c3e34848ede292ff463ddf2dba0f795d779f5"
+    },
     "jp.hadashikick.vcontainer": {
       "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer",
       "depth": 0,
