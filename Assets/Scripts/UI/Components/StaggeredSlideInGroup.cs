@@ -308,9 +308,21 @@ public class StaggeredSlideInGroup : MonoBehaviour
 
     private static void ApplyPositions(List<RectTransform> children, List<Vector2> positions)
     {
+        if (children.Count == 0) return;
+
+        var parentRect = (RectTransform)children[0].parent;
+        var parentSize = parentRect.rect.size;
+
         for (var i = 0; i < children.Count && i < positions.Count; i++)
         {
-            children[i].anchoredPosition = positions[i];
+            var child = children[i];
+            // アンカーが(0.5, 0.5)でない場合の座標系差分を補正
+            var anchorCenter = (child.anchorMin + child.anchorMax) / 2f;
+            var anchorCorrection = new Vector2(
+                (0.5f - anchorCenter.x) * parentSize.x,
+                (0.5f - anchorCenter.y) * parentSize.y
+            );
+            child.anchoredPosition = positions[i] + anchorCorrection;
         }
     }
 
