@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6940639713402040647}
   - component: {fileID: 2610911944171587868}
+  - component: {fileID: 8370042297476627178}
   m_Layer: 5
   m_Name: AcquiredCardTextView
   m_TagString: Untagged
@@ -52,6 +53,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardNameText: {fileID: 5202430643872335637}
+--- !u!225 &8370042297476627178
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121110411281655967}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &925155273157771525
 GameObject:
   m_ObjectHideFlags: 0

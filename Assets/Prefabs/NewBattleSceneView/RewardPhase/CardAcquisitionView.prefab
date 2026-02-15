@@ -260,6 +260,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1780612484730660277}
   - component: {fileID: 8741282039197540289}
+  - component: {fileID: 6770771796377266344}
   m_Layer: 5
   m_Name: CardContainer
   m_TagString: Untagged
@@ -312,6 +313,30 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &6770771796377266344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3213290329211750396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e07333a62107943049d1f5d5a6038850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layoutMode: 0
+  spacing: 10
+  alignment: 4
+  gridConstraintCount: 2
+  slideOffset: {x: 0, y: 50}
+  duration: 0.3
+  staggerDelay: 0.15
+  moveEase: 8
+  enableFade: 1
+  fadeEase: 8
+  ignoreTimeScale: 0
+  activeOnly: 1
 --- !u!1 &3874693950682754291
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,14 +484,12 @@ MonoBehaviour:
   canvasGroup: {fileID: 2923211527616852343}
   nextButton: {fileID: 1913447475028633268}
   cardContainer: {fileID: 1780612484730660277}
-  cardPrefab: {fileID: 7383955479449652679, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  cardPrefab: {fileID: 3416793835326704891, guid: f7742a576cf8f4c799924bccd0728be4, type: 3}
   textContainer: {fileID: 4725685669159206177}
   cardTextPrefab: {fileID: 2610911944171587868, guid: d0e99a736fa754670b9f43d45ec6f8b2, type: 3}
+  cardStagger: {fileID: 6770771796377266344}
+  textStagger: {fileID: 3654354195754103988}
   initialDelay: 0.3
-  staggerDelay: 0.15
-  animDuration: 0.3
-  cardSlideOffset: -50
-  textSlideOffset: 50
 --- !u!1 &7772773081381135405
 GameObject:
   m_ObjectHideFlags: 0
@@ -549,6 +572,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4725685669159206177}
   - component: {fileID: 8964455073581261338}
+  - component: {fileID: 3654354195754103988}
   m_Layer: 5
   m_Name: TextContainer
   m_TagString: Untagged
@@ -599,6 +623,30 @@ MonoBehaviour:
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 1
   m_ConstraintCount: 2
+--- !u!114 &3654354195754103988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8234326788108221482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e07333a62107943049d1f5d5a6038850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layoutMode: 0
+  spacing: 10
+  alignment: 4
+  gridConstraintCount: 2
+  slideOffset: {x: -30, y: 0}
+  duration: 0.5
+  staggerDelay: 0.2
+  moveEase: 8
+  enableFade: 1
+  fadeEase: 8
+  ignoreTimeScale: 0
+  activeOnly: 1
 --- !u!1 &8598036859834358741
 GameObject:
   m_ObjectHideFlags: 0
