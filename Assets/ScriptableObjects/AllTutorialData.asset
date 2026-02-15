@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c24ea12b7e5a8412db0b200a7245e0df, type: 3}
   m_Name: AllTutorialData
   m_EditorClassIdentifier: 
+  enableTutorial: 0
   tutorialList:
   - {fileID: 11400000, guid: 42add784271004f01965057cf03e2a48, type: 2}
   - {fileID: 11400000, guid: 61b837fc30d7c4ca1b6f072ca62eeae7, type: 2}

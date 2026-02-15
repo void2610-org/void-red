@@ -24,6 +24,9 @@ public static class AuctionJudge
 
         /// <summary>どちらも入札していない場合true</summary>
         public bool NoBids;
+
+        /// <summary>引き分けの場合true</summary>
+        public bool IsDraw;
     }
 
     /// <summary>
@@ -53,20 +56,22 @@ public static class AuctionJudge
                 NoBids = playerBid == 0 && enemyBid == 0
             };
 
-            // 判定ルール: 入札合計が多い方が落札、同点時はプレイヤー優先
+            // 判定ルール: 入札合計が多い方が落札、同点は引き分け
             if (entry.NoBids)
             {
-                // どちらも入札していない場合は誰も落札しない
                 entry.IsPlayerWon = false;
             }
-            else if (playerBid >= enemyBid)
+            else if (playerBid == enemyBid)
             {
-                // プレイヤーの入札が同じか多い場合はプレイヤーが落札
+                entry.IsDraw = true;
+                entry.IsPlayerWon = false;
+            }
+            else if (playerBid > enemyBid)
+            {
                 entry.IsPlayerWon = true;
             }
             else
             {
-                // 敵の入札が多い場合は敵が落札
                 entry.IsPlayerWon = false;
             }
 
@@ -84,13 +89,17 @@ public static class AuctionJudge
         var playerBid = playerBids.GetTotalBid(card);
         var enemyBid = enemyBids.GetTotalBid(card);
 
+        var noBids = playerBid == 0 && enemyBid == 0;
+        var isDraw = !noBids && playerBid == enemyBid;
+
         return new AuctionResultEntry
         {
             Card = card,
             PlayerBid = playerBid,
             EnemyBid = enemyBid,
-            NoBids = playerBid == 0 && enemyBid == 0,
-            IsPlayerWon = playerBid > 0 && playerBid >= enemyBid
+            NoBids = noBids,
+            IsDraw = isDraw,
+            IsPlayerWon = !noBids && !isDraw && playerBid > enemyBid
         };
     }
 }

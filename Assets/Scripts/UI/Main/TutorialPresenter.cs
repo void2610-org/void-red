@@ -33,6 +33,8 @@ public class TutorialPresenter : IDisposable
     /// <param name="args">メッセージのフォーマット引数</param>
     public async UniTask StartTutorial(string tutorialId, params string[] args)
     {
+        if (!_allTutorialData.EnableTutorial) return;
+
         var tutorialData = _allTutorialData.GetTutorialById(tutorialId);
 
         // キーバインドを設定

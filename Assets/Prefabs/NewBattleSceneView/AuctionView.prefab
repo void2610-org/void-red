@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layoutMode: 1
-  spacing: 0
+  spacing: 25
   alignment: 4
   gridConstraintCount: 2
   slideOffset: {x: 0, y: -75}

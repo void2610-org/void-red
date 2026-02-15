@@ -345,6 +345,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 continue;
             }
 
+            if (result.IsDraw)
+            {
+                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 引き分け（{result.PlayerBid} vs {result.EnemyBid}）");
+                continue;
+            }
+
             if (result.IsPlayerWon)
             {
                 _player.AddWonCard(result.Card);
