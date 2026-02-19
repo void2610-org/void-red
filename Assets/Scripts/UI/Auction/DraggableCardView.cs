@@ -12,7 +12,7 @@ using Void2610.UnityTemplate;
 /// CardViewをラップしてドラッグ&ドロップ機能を追加
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
+public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler, IPointerEnterHandler
 {
     [SerializeField] private CardView cardView;
     [SerializeField] private float dragAlpha = 0.8f;
@@ -30,6 +30,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     private const float SNAP_DURATION = 0.2f;
     private const float RETURN_DURATION = 0.3f;
+    private const float HOVER_SE_COOLDOWN = 0.15f;
 
     private readonly Subject<DraggableCardView> _onDragStarted = new();
     private readonly Subject<DraggableCardView> _onDragEnded = new();
@@ -40,6 +41,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private Vector2 _originalPosition;
     private Canvas _rootCanvas;
     private bool _isDragging;
+    private float _lastHoverSeTime;
     private MotionHandle _moveTween;
     private MotionHandle _scaleTween;
     private MotionHandle _rotateTween;
@@ -100,6 +102,15 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
             .AddTo(gameObject);
 
         await _moveTween.ToUniTask();
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (CardModel == null) return;
+        if (Time.unscaledTime - _lastHoverSeTime < HOVER_SE_COOLDOWN) return;
+        _lastHoverSeTime = Time.unscaledTime;
+
+        SeManager.Instance.PlaySe(CardModel.Data.MemoryType.ToHoverSeName());
     }
 
     public void OnBeginDrag(PointerEventData eventData)

@@ -33,6 +33,18 @@ public static class MemoryTypeExtensions
     };
 
     /// <summary>
+    /// 記憶種類に対応するホバーSE名を取得
+    /// </summary>
+    public static string ToHoverSeName(this MemoryType memoryType) => memoryType switch
+    {
+        MemoryType.SelfMemory => "SE_CARD_HOVER_1",
+        MemoryType.OtherMemory => "SE_CARD_HOVER_2",
+        MemoryType.SpecificOtherMemory => "SE_CARD_HOVER_3",
+        MemoryType.AmbiguousMemory => "SE_CARD_HOVER_3",
+        _ => "SE_CARD_HOVER_1"
+    };
+
+    /// <summary>
     /// 記憶種類に対応するゲージ色を取得
     /// </summary>
     public static Color ToGaugeColor(this MemoryType memoryType) => memoryType switch

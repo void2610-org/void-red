@@ -1,6 +1,7 @@
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カード詳細情報を表示するモーダルViewクラス
@@ -23,5 +24,7 @@ public class CardDetailView : BaseWindowView
         cardView.Initialize(cardModel);
         playButton.gameObject.SetActive(isPlayable);
         Show();
+        // カード詳細表示SE
+        SeManager.Instance.PlaySe("SE_CARD_OPEN", pitch: 1f);
     }
 }

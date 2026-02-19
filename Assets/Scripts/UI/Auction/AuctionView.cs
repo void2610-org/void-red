@@ -155,6 +155,9 @@ public class AuctionView : BasePhaseView
         emotionResourceDisplayView.UpdateResources(emotionResources);
         emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
 
+        // 歯車UI展開SE（入札フェーズ開始時に1回だけ再生）
+        SeManager.Instance.PlaySe("SE_GEAR_OPEN", pitch: 1f);
+
         // 入札UIを初期化
         UpdateRemainingResourceDisplay();
 
@@ -438,6 +441,9 @@ public class AuctionView : BasePhaseView
         _playerBids.AddBid(_selectedCardModel, _currentEmotion, 1);
         _usedResources[_currentEmotion] = used + 1;
 
+        // 感情リソース配置SE
+        SeManager.Instance.PlaySe(GetResourceSeName(_currentEmotion), pitch: 1f);
+
         UpdateRemainingResourceDisplay();
         UpdateCardBidInfoDisplay(_selectedCard);
         UpdateBidWindowAmount();
@@ -511,6 +517,20 @@ public class AuctionView : BasePhaseView
         }
         emotionResourceDisplayView.UpdateResources(currentResources);
     }
+
+    // 感情タイプからリソースSE名を取得
+    private static string GetResourceSeName(EmotionType emotion) => emotion switch
+    {
+        EmotionType.Joy => "SE_RESOURCE_JOY",
+        EmotionType.Trust => "SE_RESOURCE_TRUST",
+        EmotionType.Fear => "SE_RESOURCE_FEAR",
+        EmotionType.Surprise => "SE_RESOURCE_WONDER",
+        EmotionType.Sadness => "SE_RESOURCE_GRIEF",
+        EmotionType.Disgust => "SE_RESOURCE_HATE",
+        EmotionType.Anger => "SE_RESOURCE_ANGER",
+        EmotionType.Anticipation => "SE_RESOURCE_EXPECT",
+        _ => "SE_RESOURCE_JOY"
+    };
 
     private static async UniTask MoveCardToPlayerSideAsync(RectTransform rt, float duration = 0.5f)
     {
