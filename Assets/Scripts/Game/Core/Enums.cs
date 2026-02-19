@@ -117,6 +117,34 @@ public static class EmotionTypeExtensions
         _ => UnityEngine.Color.white
     };
 
+    // 感情タイプからリアクションSE名を取得
+    public static string ToReactSeName(this EmotionType emotion) => emotion switch
+    {
+        EmotionType.Joy => "SE_REACT_JOY",
+        EmotionType.Trust => "SE_REACT_TRUST",
+        EmotionType.Fear => "SE_REACT_FEAR",
+        EmotionType.Surprise => "SE_REACT_WONDER",
+        EmotionType.Sadness => "SE_REACT_GRIEF",
+        EmotionType.Disgust => "SE_REACT_HATE",
+        EmotionType.Anger => "SE_REACT_ANGER",
+        EmotionType.Anticipation => "SE_REACT_EXPECT",
+        _ => "SE_REACT_JOY"
+    };
+
+    // 感情タイプから記憶育成フェーズのリアクションSE名を取得
+    public static string ToFaceReactSeName(this EmotionType emotion) => emotion switch
+    {
+        EmotionType.Joy => "SE_FACE_REACT_JOY",
+        EmotionType.Trust => "SE_FACE_REACT_TRUST",
+        EmotionType.Fear => "SE_FACE_REACT_FEAR",
+        EmotionType.Surprise => "SE_FACE_REACT_WONDER",
+        EmotionType.Sadness => "SE_FACE_REACT_GRIEF",
+        EmotionType.Disgust => "SE_FACE_REACT_HATE",
+        EmotionType.Anger => "SE_FACE_REACT_ANGER",
+        EmotionType.Anticipation => "SE_FACE_REACT_EXPECT",
+        _ => "SE_FACE_REACT_JOY"
+    };
+
     /// <summary>
     /// 隣接する感情タイプを取得（感情の輪で時計回りに次の感情）
     /// </summary>

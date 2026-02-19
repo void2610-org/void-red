@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using LitMotion;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// キャラクター記憶ビュー
@@ -51,6 +52,9 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
 
         ShowCardsInCircle(theme.AcquiredCards);
         base.Show();
+        SeManager.Instance.PlaySe("SE_MEMORY_CARD_OPEN", pitch: 1f);
+        var dominantEmotion = theme.DominantEmotionResult.PrimaryEmotion;
+        SeManager.Instance.PlaySe(dominantEmotion.ToFaceReactSeName(), pitch: 1f);
 
         await closeButton.OnClickAsync();
         base.Hide();

@@ -316,6 +316,7 @@ public class AuctionView : BasePhaseView
                 // 引き分け → グローエフェクト表示、カードは移動させない
                 targetCardView.SetGrowEffect(CardView.CardBidState.DrawBid, enemyColor);
                 bidInfoView.ShowDraw();
+                SeManager.Instance.PlaySe("SE_RESULT_CLASH", pitch: 1f);
                 await UniTask.Delay(300);
             }
             else
@@ -326,6 +327,7 @@ public class AuctionView : BasePhaseView
 
                 // 勝敗表示
                 bidInfoView.ShowResult(result.IsPlayerWon);
+                SeManager.Instance.PlaySe(result.IsPlayerWon ? "SE_RESULT_WIN" : "SE_RESULT_LOSE", pitch: 1f);
                 await UniTask.Delay(300);
 
                 // 落札者側へ移動

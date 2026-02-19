@@ -56,7 +56,9 @@ public class CardAcquisitionView : MonoBehaviour
         }
 
         await UniTask.Delay(System.TimeSpan.FromSeconds(initialDelay));
+        SeManager.Instance.PlaySe("SE_REWARD_CARD", pitch: 1f);
         cardStagger.Play();
+        SeManager.Instance.PlaySe("SE_RESOURCE_TEXT", pitch: 1f);
         textStagger.Play();
     }
 
