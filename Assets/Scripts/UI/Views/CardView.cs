@@ -4,7 +4,6 @@ using LitMotion;
 using R3;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
@@ -12,7 +11,7 @@ using Void2610.UnityTemplate;
 /// カードの表示と基本的なロジックを担当するViewクラス
 /// 元のCard.csをベースに選択機能とアニメーション機能を追加した簡略化されたMVPパターン
 /// </summary>
-public class CardView : BaseCardView, IPointerEnterHandler
+public class CardView : BaseCardView
 {
     public enum CardBidState
     {
@@ -43,8 +42,6 @@ public class CardView : BaseCardView, IPointerEnterHandler
     protected override Image CardFrame => cardFrame;
     protected override Image GaugeImage => gaugeImage;
 
-    private const float HOVER_SE_COOLDOWN = 0.15f;
-    private float _lastHoverSeTime;
     private RectTransform _rectTransform;
     private CardDisplayState _displayState = CardDisplayState.Normal;
     // Tween管理用
@@ -124,15 +121,6 @@ public class CardView : BaseCardView, IPointerEnterHandler
     }
 
     protected override CardData GetCardData() => CardData;
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (CardData == null) return;
-        if (Time.unscaledTime - _lastHoverSeTime < HOVER_SE_COOLDOWN) return;
-        _lastHoverSeTime = Time.unscaledTime;
-
-        SeManager.Instance.PlaySe(CardData.MemoryType.ToHoverSeName());
-    }
 
     private void Awake()
     {
