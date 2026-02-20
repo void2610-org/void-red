@@ -43,14 +43,13 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         _textSeCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
         SeManager.Instance.PlaySeLoop("SE_TEXT_NEXT", cancellationToken: _textSeCancellationTokenSource.Token).Forget();
 
-        themeText.TypewriterAnimation(themeData.Title).Forget();
-        await UniTask.Delay(4000, cancellationToken: destroyCancellationToken);
-
-        // テキストSEループ停止
+        await themeText.TypewriterAnimation(themeData.Title);
+        
         _textSeCancellationTokenSource?.Cancel();
         _textSeCancellationTokenSource?.Dispose();
         _textSeCancellationTokenSource = null;
-
+        
+        await UniTask.Delay(4000, cancellationToken: destroyCancellationToken);
         BgmManager.Instance.RestoreVolume().Forget();
     }
 
