@@ -44,11 +44,11 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         SeManager.Instance.PlaySeLoop("SE_TEXT_NEXT", cancellationToken: _textSeCancellationTokenSource.Token).Forget();
 
         await themeText.TypewriterAnimation(themeData.Title);
-        
+
         _textSeCancellationTokenSource?.Cancel();
         _textSeCancellationTokenSource?.Dispose();
         _textSeCancellationTokenSource = null;
-        
+
         await UniTask.Delay(4000, cancellationToken: destroyCancellationToken);
         BgmManager.Instance.RestoreVolume().Forget();
     }
