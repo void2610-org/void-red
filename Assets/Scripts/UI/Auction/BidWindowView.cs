@@ -2,6 +2,7 @@ using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 // 入札ウィンドウView
 // カードクリック時にモーダル表示される入札額調整UI
@@ -11,6 +12,7 @@ public class BidWindowView : BaseWindowView
     [SerializeField] private TMP_Text cardNameText;
     [SerializeField] private TMP_Text emotionNameText;
     [SerializeField] private Image emotionIndicator;
+    [SerializeField] private SerializableDictionary<EmotionType, Sprite> emotionSprites = new();
 
     [Header("炎演出")]
     [SerializeField] private Image flameImage;
@@ -43,7 +45,8 @@ public class BidWindowView : BaseWindowView
 
     public void SetEmotion(EmotionType emotion)
     {
-        emotionIndicator.color = emotion.GetColor();
+        if (emotionSprites.TryGetValue(emotion, out var sprite))
+            emotionIndicator.sprite = sprite;
         emotionNameText.text = emotion.ToJapaneseName();
     }
 
