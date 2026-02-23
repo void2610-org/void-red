@@ -76,3 +76,136 @@ MonoBehaviour:
   - name: ThemeAppearance
     audioClip: {fileID: 8300000, guid: 33de1d472fba848b880c6c42fdd1b300, type: 3}
     volume: 0.3
+  - name: SE_TEXT_NEXT
+    audioClip: {fileID: 8300000, guid: 72547479258c2447297409140b8191c0, type: 3}
+    volume: 0.2
+  - name: SE_CARD_HOVER_1
+    audioClip: {fileID: 8300000, guid: 914c8f41d266546e2aea8e046dcbbffa, type: 3}
+    volume: 1
+  - name: SE_CARD_HOVER_2
+    audioClip: {fileID: 8300000, guid: 5f7bb22cd443d48acb136030404a7239, type: 3}
+    volume: 1
+  - name: SE_CARD_HOVER_3
+    audioClip: {fileID: 8300000, guid: f850759fb4c0f458d8625b37f76e4916, type: 3}
+    volume: 1
+  - name: SE_CARD_OPEN
+    audioClip: {fileID: 8300000, guid: 991c8c361b37644128d6a4855cff9f34, type: 3}
+    volume: 1
+  - name: SE_FRAME_LIGHT
+    audioClip: {fileID: 8300000, guid: e1818555336df496a8fe0575eb1008b5, type: 3}
+    volume: 1
+  - name: SE_DECIDE
+    audioClip: {fileID: 8300000, guid: 3201935c4382f4b48b1361533e6f0015, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_JOY
+    audioClip: {fileID: 8300000, guid: 16661a9fe1991466aa91ae4232505ef9, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_TRUST
+    audioClip: {fileID: 8300000, guid: fa5f802eeaa424c91b9dcd3ac904569f, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_FEAR
+    audioClip: {fileID: 8300000, guid: 80a2efc39301f4cd2895320a890c3a40, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_WONDER
+    audioClip: {fileID: 8300000, guid: cb0825eaa6e2a4568b0059505be063d0, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_GRIEF
+    audioClip: {fileID: 8300000, guid: f963350ae36ed48a4a991fcef263c647, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_HATE
+    audioClip: {fileID: 8300000, guid: 127102627cb934fce8391e58abf5f1cf, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_ANGER
+    audioClip: {fileID: 8300000, guid: 79ca86291376444689a0b42bb01f93a8, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_EXPECT
+    audioClip: {fileID: 8300000, guid: f81a4fdd8040144f38725f9da087d2f3, type: 3}
+    volume: 1
+  - name: SE_GEAR_OPEN
+    audioClip: {fileID: 8300000, guid: a364758702fb148cea6d309a5f18378f, type: 3}
+    volume: 1
+  - name: SE_TALK_SELECT_1
+    audioClip: {fileID: 8300000, guid: 51e181431a2af47eb99c72a42e643dc3, type: 3}
+    volume: 1
+  - name: SE_TALK_SELECT_2
+    audioClip: {fileID: 8300000, guid: 49b4374eb94b94910adb7126f6af71ee, type: 3}
+    volume: 1
+  - name: SE_TALK_SELECT_3
+    audioClip: {fileID: 8300000, guid: ea5f523b827d5417ba1a14b59c457738, type: 3}
+    volume: 1
+  - name: SE_TALK_SELECT_4
+    audioClip: {fileID: 8300000, guid: f197d9e0ab1a943e8b61adde5c97297d, type: 3}
+    volume: 1
+  - name: SE_REACT_JOY
+    audioClip: {fileID: 8300000, guid: 16661a9fe1991466aa91ae4232505ef9, type: 3}
+    volume: 1
+  - name: SE_REACT_TRUST
+    audioClip: {fileID: 8300000, guid: fa5f802eeaa424c91b9dcd3ac904569f, type: 3}
+    volume: 1
+  - name: SE_REACT_FEAR
+    audioClip: {fileID: 8300000, guid: 80a2efc39301f4cd2895320a890c3a40, type: 3}
+    volume: 1
+  - name: SE_REACT_WONDER
+    audioClip: {fileID: 8300000, guid: cb0825eaa6e2a4568b0059505be063d0, type: 3}
+    volume: 1
+  - name: SE_REACT_GRIEF
+    audioClip: {fileID: 8300000, guid: f963350ae36ed48a4a991fcef263c647, type: 3}
+    volume: 1
+  - name: SE_REACT_HATE
+    audioClip: {fileID: 8300000, guid: 127102627cb934fce8391e58abf5f1cf, type: 3}
+    volume: 1
+  - name: SE_REACT_ANGER
+    audioClip: {fileID: 8300000, guid: 79ca86291376444689a0b42bb01f93a8, type: 3}
+    volume: 1
+  - name: SE_REACT_EXPECT
+    audioClip: {fileID: 8300000, guid: f81a4fdd8040144f38725f9da087d2f3, type: 3}
+    volume: 1
+  - name: SE_RESULT_WIN
+    audioClip: {fileID: 8300000, guid: 98f527fc82fad4958b6a75369f3446ab, type: 3}
+    volume: 1
+  - name: SE_RESULT_LOSE
+    audioClip: {fileID: 8300000, guid: 29eaab8bd854c4e098cb49874eb0ad8a, type: 3}
+    volume: 1
+  - name: SE_RESULT_CLASH
+    audioClip: {fileID: 8300000, guid: 11ed408025f2d43a2a97ff4866657ce4, type: 3}
+    volume: 1
+  - name: SE_REWARD_CARD
+    audioClip: {fileID: 8300000, guid: e99e940c75bc441ad9e865c216eae354, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_GAIN
+    audioClip: {fileID: 8300000, guid: 5b91e3a54c5d04724b53dfb0c3db4350, type: 3}
+    volume: 1
+  - name: SE_RESOURCE_TEXT
+    audioClip: {fileID: 8300000, guid: e641014b38e3048d1a0c421f119735b3, type: 3}
+    volume: 1
+  - name: SE_THEME_CHANGE
+    audioClip: {fileID: 8300000, guid: 33de1d472fba848b880c6c42fdd1b300, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_JOY
+    audioClip: {fileID: 8300000, guid: 16661a9fe1991466aa91ae4232505ef9, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_TRUST
+    audioClip: {fileID: 8300000, guid: fa5f802eeaa424c91b9dcd3ac904569f, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_FEAR
+    audioClip: {fileID: 8300000, guid: 80a2efc39301f4cd2895320a890c3a40, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_WONDER
+    audioClip: {fileID: 8300000, guid: cb0825eaa6e2a4568b0059505be063d0, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_GRIEF
+    audioClip: {fileID: 8300000, guid: f963350ae36ed48a4a991fcef263c647, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_HATE
+    audioClip: {fileID: 8300000, guid: 127102627cb934fce8391e58abf5f1cf, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_ANGER
+    audioClip: {fileID: 8300000, guid: 79ca86291376444689a0b42bb01f93a8, type: 3}
+    volume: 1
+  - name: SE_FACE_REACT_EXPECT
+    audioClip: {fileID: 8300000, guid: f81a4fdd8040144f38725f9da087d2f3, type: 3}
+    volume: 1
+  - name: SE_MEMORY_CARD_OPEN
+    audioClip: {fileID: 8300000, guid: 33f6e0e7b697e48918cfdac3f0b3d09b, type: 3}
+    volume: 1
+  maxChannels: 20

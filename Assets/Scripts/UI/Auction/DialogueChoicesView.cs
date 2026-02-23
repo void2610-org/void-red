@@ -33,7 +33,11 @@ public class DialogueChoicesView : MonoBehaviour
                 choiceLabels[i].text = labels[i];
                 choiceButtons[i].gameObject.SetActive(true);
                 choiceButtons[i].OnClickAsObservable()
-                    .Subscribe(_ => _onChoiceSelected.OnNext(index))
+                    .Subscribe(_ =>
+                    {
+                        SeManager.Instance.PlaySe($"SE_TALK_SELECT_{Mathf.Min(index + 1, 4)}", pitch: 1f);
+                        _onChoiceSelected.OnNext(index);
+                    })
                     .AddTo(_disposables);
             }
             else

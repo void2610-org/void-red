@@ -173,6 +173,9 @@ public class ValueRankingView : BasePhaseView
         slot.PlaceCard(droppedCard);
         droppedCard.PlaySnapToSlotAsync(slot.CardAnchor, Vector2.zero).Forget();
 
+        // カードを枠に配置した時のSE
+        SeManager.Instance.PlaySe("SE_FRAME_LIGHT", pitch: 1f);
+
         UpdateConfirmButtonState();
     }
 
@@ -192,6 +195,9 @@ public class ValueRankingView : BasePhaseView
     private void OnConfirmClicked()
     {
         if (!IsAllSlotsOccupied()) return;
+
+        // 決定SE
+        SeManager.Instance.PlaySe("SE_DECIDE", pitch: 1f);
 
         _onRankingComplete.OnNext(Unit.Default);
     }

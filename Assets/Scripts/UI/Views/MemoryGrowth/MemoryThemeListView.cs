@@ -47,6 +47,7 @@ public class MemoryThemeListView : MonoBehaviour
             }
         }
 
+        SeManager.Instance.PlaySe("SE_THEME_CHANGE", pitch: 1f);
         stagger.Play();
     }
 

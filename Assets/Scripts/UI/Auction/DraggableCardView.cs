@@ -108,6 +108,10 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _originalParent = transform.parent;
         _originalPosition = _rectTransform.anchoredPosition;
 
+        // ドラッグ開始SEを再生
+        if (CardModel != null)
+            SeManager.Instance.PlaySe(CardModel.Data.MemoryType.ToHoverSeName());
+
         transform.SetParent(_rootCanvas.transform);
         transform.SetAsLastSibling();
 

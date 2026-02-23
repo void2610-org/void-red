@@ -89,9 +89,9 @@ public class HelpPresenter : IStartable, IDisposable
             .AddTo(_disposables);
 
         // ヘルプボタンのイベント購読
-        _helpButtonView.OnButtonClicked
-            .Subscribe(_ => ShowHelp())
-            .AddTo(_disposables);
+        // _helpButtonView.OnButtonClicked
+        //     .Subscribe(_ => ShowHelp())
+        //     .AddTo(_disposables);
 
         // イベント購読
         _helpView.OnPreviousClicked

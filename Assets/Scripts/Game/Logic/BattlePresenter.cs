@@ -278,6 +278,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await _battleUIPresenter.ShowPlayerDialogueAsync(playerChoice.ToJapaneseName());
 
         var response = dialogueData.GetResponse(playerChoice);
+        // 敵のリアクションSEを再生
+        SeManager.Instance.PlaySe(playerChoice.ToReactEmotionType().ToReactSeName(), pitch: 1f);
         await _battleUIPresenter.ShowEnemyDialogueAsync(response.DialogueText);
 
         var resultMessage = DialogueEffectApplier.ApplyEffect(response.Effect, _enemy, _auctionCards);
@@ -306,6 +308,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // プレイヤーの選択をセリフとして表示
         await _battleUIPresenter.ShowPlayerDialogueAsync(selectedOption.OptionText);
 
+        // 敵の返答リアクションSEを再生
+        SeManager.Instance.PlaySe(playerFirstChoice.ToReactEmotionType().ToReactSeName(), pitch: 1f);
         // 敵の返答を表示
         await _battleUIPresenter.ShowEnemyDialogueAsync(selectedOption.ResultText);
 

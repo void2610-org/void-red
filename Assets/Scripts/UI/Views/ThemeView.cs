@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     private ThemeData _themeData;
     private bool _isKeywordsVisible;
+    private CancellationTokenSource _textSeCancellationTokenSource;
 
     /// <summary>
     /// テーマとキーワードを表示
@@ -34,7 +36,19 @@ public class ThemeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         await BgmManager.Instance.DuckVolume();
         SeManager.Instance.PlaySe("ThemeAppearance", pitch: 1f);
         _themeData = themeData;
-        themeText.TypewriterAnimation(themeData.Title).Forget();
+
+        // テキスト文字送りSEループ開始
+        _textSeCancellationTokenSource?.Cancel();
+        _textSeCancellationTokenSource?.Dispose();
+        _textSeCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+        SeManager.Instance.PlaySeLoop("SE_TEXT_NEXT", cancellationToken: _textSeCancellationTokenSource.Token).Forget();
+
+        await themeText.TypewriterAnimation(themeData.Title);
+
+        _textSeCancellationTokenSource?.Cancel();
+        _textSeCancellationTokenSource?.Dispose();
+        _textSeCancellationTokenSource = null;
+
         await UniTask.Delay(4000, cancellationToken: destroyCancellationToken);
         BgmManager.Instance.RestoreVolume().Forget();
     }

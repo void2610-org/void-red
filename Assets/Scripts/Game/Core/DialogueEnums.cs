@@ -32,4 +32,14 @@ public static class DialogueChoiceTypeExtensions
         DialogueChoiceType.Silence => "沈黙",
         _ => "不明"
     };
+
+    // 対話選択タイプから対応するリアクション感情タイプを取得
+    public static EmotionType ToReactEmotionType(this DialogueChoiceType choice) => choice switch
+    {
+        DialogueChoiceType.Provoke => EmotionType.Anger,
+        DialogueChoiceType.Empathize => EmotionType.Trust,
+        DialogueChoiceType.Persuade => EmotionType.Anticipation,
+        DialogueChoiceType.Silence => EmotionType.Fear,
+        _ => EmotionType.Joy
+    };
 }
