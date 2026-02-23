@@ -412,7 +412,8 @@ public class AuctionView : BasePhaseView
         _selectedCardModel = _cardViewToModel[cardView];
         _selectedCard.SetHighlight(true);
 
-        // ウィンドウに現在の感情の入札値をセット
+        // ウィンドウにカード名・感情・入札値をセット
+        bidWindowView.SetCardName(_selectedCardModel.Data.CardName);
         bidWindowView.SetEmotion(_currentEmotion);
         var emotionBids = _playerBids.GetBidsByEmotion(_selectedCardModel);
         var currentBid = emotionBids.GetValueOrDefault(_currentEmotion, 0);
