@@ -111,7 +111,8 @@ public class ResourceRewardView : MonoBehaviour
         _currentResourceValues[emotion] = newValue;
 
         _rewardedAmounts[emotion] += rewardAmount;
-        SeManager.Instance.PlaySe("SE_RESOURCE_GAIN", pitch: 1f);
+        var seName = rewardAmount >= 0 ? "SE_RESOURCE_GAIN" : "SE_RESOURCE_LOSE";
+        SeManager.Instance.PlaySe(seName, pitch: 1f);
         gauge.AnimateToValue(newValue, _maxResources[emotion]);
     }
 
