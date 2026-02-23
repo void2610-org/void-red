@@ -1,20 +1,21 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Claude Code (claude.ai/code) がこのリポジトリで作業する際のガイダンス。
 
-## Unity Project Overview
+## プロジェクト概要
 
-void-red is a Unity card game project using Unity 6000.0.50f1 with VContainer for dependency injection, R3 for reactive programming, LitMotion for animations, UniTask for async operations, and Unity-SerializeReferenceExtensions for simplified editor customization.
+void-red は Unity 6000.0.50f1 で開発されているカードゲームプロジェクト。VContainer（依存性注入）、R3（リアクティブプログラミング）、LitMotion（アニメーション）、UniTask（非同期処理）、Unity-SerializeReferenceExtensions（エディタカスタマイズ）を使用。
 
-## Development Workflow
+## 開発ワークフロー
 
-1. Make code changes
-2. Use unity-compile.sh to verify compilation
-3. Run format check with `dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn`
-4. Fix any format violations
-5. Run code quality check by `unity-code-quality-checker` subagent
-6. Fix issues reported by the code quality checker
-7. Report results to the user
+1. コードを変更する
+2. `mcp__uLoopMCP__compile` (ForceRecompile=true) でコンパイル
+3. `mcp__uLoopMCP__get-logs` (LogType=Error) でコンパイルエラーがないことを確認
+4. フォーマット自動修正を実行:
+   - `dotnet format whitespace FormatCheck.csproj`
+   - `dotnet format style FormatCheck.csproj --severity warn`
+   - `dotnet format analyzers FormatCheck.csproj --severity warn`
+5. 結果をユーザーに報告する
 
 **YAGNI (You Aren't Gonna Need It) 原則:**
 - 将来必要になるかもしれない機能を先回りして実装しない
@@ -28,45 +29,41 @@ void-red is a Unity card game project using Unity 6000.0.50f1 with VContainer fo
 - 1つのクラス・メソッドには1つの責任のみを持たせる
 - 誰でも理解できる明快な実装を優先する
 
-## Response Guidelines
+## レスポンスガイドライン
 
-- SerializeFieldで設定されるべきコンポーネントのnullチェックは不要。コンポーネントが正しく設定されていることを前提としたコードを記述する。
-- プログラム内の全てのコメントは日本語で記述してください (from user's CLAUDE.md)
-- Respond in Japanese and avoid excessive comments
-- When refactoring, implement clean replacements rather than maintaining backward compatibility
-- Always follow YAGNI and KISS principles - implement only what is needed now, keep it simple
+- SerializeFieldで設定されるべきコンポーネントのnullチェックは不要。コンポーネントが正しく設定されていることを前提としたコードを記述する
+- プログラム内の全てのコメントは日本語で記述する
+- 日本語で応答し、過剰なコメントは避ける
+- リファクタリング時は後方互換性を維持せず、クリーンな置き換えを実装する
+- YAGNI・KISS原則に従い、今必要なものだけを実装し、シンプルに保つ
 
-## Core Commands
+## 主要コマンド
 
 ```bash
-# Compile and check errors
-./unity-tools/unity-compile.sh trigger . && sleep 3 && ./unity-tools/unity-compile.sh check .
-
-# Check compilation errors only
-./unity-tools/unity-compile.sh check .
-
-# Format check (whitespace + code style + custom analyzers VUA0001-VUA0006)
+# フォーマット自動修正（whitespace + コードスタイル + カスタムアナライザー VUA0001-VUA0006）
 dotnet format whitespace FormatCheck.csproj
 dotnet format style FormatCheck.csproj --severity warn
-dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn
+dotnet format analyzers FormatCheck.csproj --severity warn
 ```
 
-## Key Design Principles
+コンパイルは `mcp__uLoopMCP__compile` (ForceRecompile=true) を使用し、その後 `mcp__uLoopMCP__get-logs` (LogType=Error) でエラーを確認する。
+
+## 設計原則
 - **明確なファイル構造**: 機能別ディレクトリで保守性向上
 - **責任の明確化**: Stats, Services, Logic, Coreの分離
 - **Unity-First**: MonoBehaviourパターンの自然な活用
 - **リアクティブ設計**: R3による状態変更の伝播
 
-## Critical Implementation Details
+## 実装詳細
 
-### VContainer Setup
+### VContainer設定
 ```csharp
-// RootLifetimeScope.cs - Cross-scene services
+// RootLifetimeScope.cs - シーン横断サービス
 builder.Register<SaveDataManager>(Lifetime.Singleton);
 builder.Register<SceneTransitionService>(Lifetime.Singleton);
 builder.Register<GameProgressService>(Lifetime.Singleton);
 
-// BattleLifetimeScope.cs - Battle-specific dependencies
+// BattleLifetimeScope.cs - バトル固有の依存関係
 builder.RegisterInstance(player);
 builder.RegisterInstance(enemy);
 builder.Register<CardPoolService>(Lifetime.Singleton);
@@ -74,59 +71,23 @@ builder.Register<ThemeService>(Lifetime.Singleton);
 builder.RegisterEntryPoint<GameManager>();
 builder.RegisterComponentInHierarchy<UIPresenter>();
 
-// HomeLifetimeScope.cs - Home scene dependencies  
+// HomeLifetimeScope.cs - ホームシーンの依存関係
 builder.RegisterComponentInHierarchy<HomeUIPresenter>();
 ```
 
-### Card Animation System
-CardView contains all animations using LitMotion:
-- PlayDrawAnimation: Deck to hand
-- PlayRemoveAnimation: Normal removal or collapse effect
-- PlayArrangeAnimation: Hand positioning
-- PlayReturnToDeckAnimation: Hand to deck
-- SetHighlight: Selection state
+### シーン構成
+- **TitleScene**: TitleUIPresenterによるエントリーポイント
+- **HomeScene**: HomeUIPresenterによるナビゲーションハブ
+- **BattleScene**: Player, Enemy, UIPresenterコンポーネントによるメインゲームシーン
+- **NovelScene**: NovelUIPresenterによるストーリーシーン
 
-### Scene Architecture
-- **TitleScene**: Entry point with TitleUIPresenter
-- **HomeScene**: Hub scene with HomeUIPresenter for navigation
-- **BattleScene**: Main game scene with Player, Enemy, UIPresenter components (renamed from MainScene)
-- **NovelScene**: Story scene with NovelUIPresenter for narrative content
+### シーン遷移フロー
+- Title → Home → Battle/Novel → Home（バトル/ストーリー後に戻る）
+- 全シーンでSceneTransitionServiceを使用してナビゲーション
+- シーン間のデータ永続化はトランジションデータオブジェクト経由
 
-### Scene Transition System
-The project uses a centralized SceneTransitionService for type-safe scene management and data passing:
+## 依存パッケージ
 
-```csharp
-// SceneType enum with extension methods for type safety
-public enum SceneType { Title, Home, Battle, Novel }
-
-// Base transition data class
-public abstract class SceneTransitionData
-{
-    public abstract SceneType TargetScene { get; }
-    public SceneType ReturnScene { get; set; } = SceneType.Home;
-    public virtual string GetDebugInfo() => $"Target: {TargetScene}, Return: {ReturnScene}";
-}
-
-// Specific transition data for battles
-public class BattleTransitionData : SceneTransitionData
-{
-    public override SceneType TargetScene => SceneType.Battle;
-    public EnemyData TargetEnemy { get; set; }  // Required for battle scenes
-}
-
-// Scene transition service usage
-await _sceneTransitionService.TransitionToScene(battleData);
-var receivedData = _sceneTransitionService.GetTransitionData<BattleTransitionData>();
-```
-
-### Scene Flow
-- Title → Home → Battle/Novel → Home (post-battle/story return)
-- All scenes use SceneTransitionService for navigation
-- Data persistence across scene changes via transition data objects
-
-## Dependencies
-
-Key packages from manifest.json:
 - VContainer (hadashiA/VContainer) - 依存性注入
 - R3 (Cysharp/R3) - リアクティブプログラミング
 - UniTask (Cysharp/UniTask) - 非同期処理
