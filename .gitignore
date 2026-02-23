@@ -109,3 +109,4 @@ tools/**/obj/
 # IDE
 .idea/
 .serena/
+/.uloop/outputs
