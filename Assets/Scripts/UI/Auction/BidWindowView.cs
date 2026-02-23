@@ -27,6 +27,14 @@ public class BidWindowView : BaseWindowView
 
     public void SetCardName(string name) => cardNameText.text = name;
 
+    // 入札値から炎レベル(0〜2)を判定
+    public static int GetFlameLevel(int bidAmount) => bidAmount switch
+    {
+        <= 4 => 0,
+        <= 9 => 1,
+        _ => 2,
+    };
+
     public void UpdateBidAmount(int amount)
     {
         bidAmountText.text = amount.ToString();
@@ -39,10 +47,9 @@ public class BidWindowView : BaseWindowView
         emotionNameText.text = emotion.ToJapaneseName();
     }
 
-    // 入札値に応じた炎スプライトに差し替え
     private void UpdateFlame(int amount)
     {
-        var index = Mathf.Clamp(amount, 0, flameSprites.Length - 1);
-        flameImage.sprite = flameSprites[index];
+        var level = GetFlameLevel(amount);
+        flameImage.sprite = flameSprites[level];
     }
 }
