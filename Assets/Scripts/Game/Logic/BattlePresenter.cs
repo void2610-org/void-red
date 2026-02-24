@@ -173,20 +173,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // トランジション：開く（黒フェードから復帰）
         await _battleUIPresenter.PlayPhaseTransitionOpenAsync();
-
-        await UniTask.Delay(1500);
     }
 
-    // === 3. 対話フェーズ（仮実装） ===
+    // === 3. 対話フェーズ（入札と同時進行） ===
 
     private async UniTask HandleDialoguePhase()
     {
-        Debug.Log("[BattlePresenter] 対話フェーズ開始（仮実装: 対話ボタン→ログ出力のみ）");
-
-        // TODO: AuctionCardViewの対話ボタンによる本実装に置き換え
-        await UniTask.Delay(500);
-
-        Debug.Log("[BattlePresenter] 対話フェーズ終了");
+        // 対話ボタンは入札フェーズ中にカード上で利用可能
+        // TODO: 対話ボタン押下時の本実装に置き換え
+        await UniTask.CompletedTask;
     }
 
     // === 4. 入札フェーズ ===
