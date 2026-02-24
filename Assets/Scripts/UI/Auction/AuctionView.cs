@@ -78,6 +78,9 @@ public class AuctionView : BasePhaseView
             auctionCard.OnCardClicked
                 .Subscribe(OnCardClicked)
                 .AddTo(_disposables);
+            auctionCard.OnDialogueClicked
+                .Subscribe(OnDialogueClicked)
+                .AddTo(_disposables);
         }
 
         _playerBids = playerBids;
@@ -242,6 +245,11 @@ public class AuctionView : BasePhaseView
         return null;
     }
 
+    private static void OnDialogueClicked(AuctionCardView auctionCard)
+    {
+        Debug.Log($"[対話] {auctionCard.CardModel.Data.CardName} の対話ボタンが押されました");
+    }
+
     private void OnCardClicked(AuctionCardView auctionCard)
     {
         if (_selectedAuctionCard == auctionCard)
@@ -268,10 +276,8 @@ public class AuctionView : BasePhaseView
         var cardModel = auctionCard.CardModel;
         bidWindowView.SetCardName(cardModel.Data.CardName);
 
-        // 1カード1感情制約: このカードにベット済みの感情があればそれを表示
-        var existingEmotion = _playerBids.GetBidEmotion(cardModel);
-        var emotionToShow = existingEmotion ?? _currentEmotion;
-        bidWindowView.SetEmotion(emotionToShow);
+        // 現在選択中の感情タイプを表示
+        bidWindowView.SetEmotion(_currentEmotion);
 
         var currentBid = _playerBids.GetTotalBid(cardModel);
         bidWindowView.UpdateBidAmount(currentBid);
