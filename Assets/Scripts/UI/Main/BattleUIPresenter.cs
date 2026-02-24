@@ -24,7 +24,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly CompositeDisposable _disposables = new();
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
-    private readonly ValueRankingView _valueRankingView;
     private readonly AuctionView _auctionView;
     private readonly DialoguePhaseView _dialoguePhaseView;
     private readonly RewardPhaseView _rewardPhaseView;
@@ -41,7 +40,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
-        _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
         _auctionView = Object.FindFirstObjectByType<AuctionView>();
         _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>();
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
@@ -72,7 +70,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask WaitForCardAcquisitionCompleteAsync() =>
         await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
     public void ShowAuctionView() => _auctionView.Show();
-    public async UniTask ShowAuctionResultsSequentialAsync(IReadOnlyList<AuctionJudge.AuctionResultEntry> results, ValueRankingModel playerRanking, ValueRankingModel enemyRanking, Color enemyColor) => await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking, enemyColor);
+    public async UniTask ShowAuctionResultsSequentialAsync(
+        IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) =>
+        await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
     public void HideRewardView() => _rewardPhaseView.Hide();
@@ -102,52 +102,26 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView.Initialize(enemyData);
     }
 
-    public void ShowValueRankingView(IReadOnlyList<CardModel> cards)
-    {
-        _valueRankingView.Show();
-        _valueRankingView.StartRanking(cards);
-    }
-
-    public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync()
-    {
-        await _valueRankingView.OnRankingComplete.FirstAsync();
-
-        var result = _valueRankingView.GetRankedCards();
-
-        // 少し待ってから次のフェーズへ
-        await UniTask.Delay(1000);
-
-        // トランジション：閉じる（黒フェードで画面を覆う）
-        await _eyeBlinkTransitionView.PlayCloseAsync();
-
-        _valueRankingView.Hide();
-
-        return result;
-    }
-
-    // カード公開（CardRevealフェーズ）
+    // カード提示（6枚共有表示）
     public void ShowAuctionCards(
-        IReadOnlyList<CardModel> playerCards,
-        IReadOnlyList<CardModel> enemyCards,
-        IReadOnlyDictionary<EmotionType, int> emotionResources,
-        ValueRankingModel playerRanking = null)
+        IReadOnlyList<CardModel> auctionCards,
+        IReadOnlyDictionary<EmotionType, int> emotionResources)
     {
         _auctionView.Show();
-        _auctionView.ShowCards(playerCards, enemyCards, playerRanking);
+        _auctionView.ShowCards(auctionCards);
         _auctionView.UpdateEmotionResources(emotionResources);
         _auctionView.SetSelectedEmotion(EmotionType.Joy);
     }
 
     // 入札待機（BiddingPhaseフェーズ）
     public async UniTask WaitForBiddingAsync(
-        IReadOnlyList<CardModel> playerCards,
-        IReadOnlyList<CardModel> enemyCards,
+        IReadOnlyList<CardModel> auctionCards,
         BidModel playerBids,
         EmotionType initialEmotion,
         IReadOnlyDictionary<EmotionType, int> emotionResources)
     {
         _auctionView.Show();
-        _auctionView.StartBidding(playerCards, enemyCards, playerBids, initialEmotion, emotionResources);
+        _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
 
         await _auctionView.OnBiddingComplete.FirstAsync();
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 獲得カードの詳細情報（シリアライズ用）
-/// オークションでの入札状況、価値順位、勝敗を保存
+/// オークションでの入札状況、勝敗を保存
 /// </summary>
 [Serializable]
 public class SavedCardAcquisitionInfo
@@ -28,16 +28,6 @@ public class SavedCardAcquisitionInfo
     [SerializeField] private List<int> enemyBidAmounts = new();
 
     /// <summary>
-    /// プレイヤーが設定した価値順位（1-4、未設定は0）
-    /// </summary>
-    [SerializeField] private int playerValueRank;
-
-    /// <summary>
-    /// 敵が設定した価値順位（1-4、未設定は0）
-    /// </summary>
-    [SerializeField] private int enemyValueRank;
-
-    /// <summary>
     /// オークションでの勝敗（true: プレイヤー勝利、false: 敵勝利）
     /// </summary>
     [SerializeField] private bool playerWon;
@@ -54,8 +44,6 @@ public class SavedCardAcquisitionInfo
 
     // プロパティ
     public string CardId => cardId;
-    public int PlayerValueRank => playerValueRank;
-    public int EnemyValueRank => enemyValueRank;
     public bool PlayerWon => playerWon;
     public int PlayerTotalBid => playerTotalBid;
     public int EnemyTotalBid => enemyTotalBid;
@@ -67,13 +55,9 @@ public class SavedCardAcquisitionInfo
         string cardId,
         Dictionary<EmotionType, int> playerBids,
         Dictionary<EmotionType, int> enemyBids,
-        int playerValueRank,
-        int enemyValueRank,
         bool playerWon)
     {
         this.cardId = cardId;
-        this.playerValueRank = playerValueRank;
-        this.enemyValueRank = enemyValueRank;
         this.playerWon = playerWon;
 
         // プレイヤー入札を保存
