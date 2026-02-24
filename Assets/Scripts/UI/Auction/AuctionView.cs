@@ -52,7 +52,6 @@ public class AuctionView : BasePhaseView
             var auctionCard = Instantiate(auctionCardPrefab, cardContainer);
             auctionCard.Initialize(card);
             auctionCard.SetInteractable(false);
-            auctionCard.SetDialogueButtonVisible(false);
             _auctionCardViews.Add(auctionCard);
         }
 
