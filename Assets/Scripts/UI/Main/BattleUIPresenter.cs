@@ -25,7 +25,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
     private readonly AuctionView _auctionView;
-    private readonly DialoguePhaseView _dialoguePhaseView;
     private readonly RewardPhaseView _rewardPhaseView;
     private readonly MemoryGrowthView _memoryGrowthView;
     private readonly PlayerFaceView _playerFaceView;
@@ -41,7 +40,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
         _auctionView = Object.FindFirstObjectByType<AuctionView>();
-        _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>();
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
@@ -56,15 +54,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
     public async UniTask PlayPhaseTransitionCloseAsync() => await _eyeBlinkTransitionView.PlayCloseAsync();
     public async UniTask StartTutorial(string tutorialId, params string[] args) => await _tutorialPresenter.StartTutorial(tutorialId, args);
-    public UniTask ShowPlayerDialogueAsync(string text) => _dialoguePhaseView.ShowPlayerDialogueAsync(text);
-    public UniTask HidePlayerDialogueAsync() => _dialoguePhaseView.HidePlayerDialogueAsync();
-    public UniTask ShowEnemyDialogueAsync(string text) => _dialoguePhaseView.ShowEnemyDialogueAsync(text);
-    public UniTask HideEnemyDialogueAsync() => _dialoguePhaseView.HideEnemyDialogueAsync();
-    public async UniTask ShowPlayerNarration(string message) => await _dialoguePhaseView.ShowPlayerNarrationAsync(message);
-    public async UniTask ShowEnemyNarration(string message) => await _dialoguePhaseView.ShowEnemyNarrationAsync(message);
-    public UniTask HideAllAsync() => _dialoguePhaseView.HideAllAsync();
-    public void ShowDialogueView() => _dialoguePhaseView.Show();
-    public void InitializeDialogueView(EnemyData enemyData) => _dialoguePhaseView.Initialize(enemyData);
     public async UniTask DisplayCardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) =>
         await _rewardPhaseView.DisplayCardsAsync(results);
     public async UniTask WaitForCardAcquisitionCompleteAsync() =>
@@ -131,43 +120,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _auctionView.Clear();
         _auctionView.Hide();
-    }
-
-    public async UniTask<DialogueChoiceType> WaitForFourChoiceAsync()
-    {
-        var labels = new List<string>
-        {
-            DialogueChoiceType.Provoke.ToJapaneseName() + "する",
-            DialogueChoiceType.Empathize.ToJapaneseName() + "する",
-            DialogueChoiceType.Persuade.ToJapaneseName() + "する",
-            DialogueChoiceType.Silence.ToJapaneseName() + "する"
-        };
-
-        _dialoguePhaseView.SetupChoices(labels);
-        _dialoguePhaseView.Show();
-
-        var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
-
-        _dialoguePhaseView.HideChoices();
-
-        return (DialogueChoiceType)selectedIndex;
-    }
-
-    public async UniTask<int> WaitForThreeResponseAsync(List<string> options)
-    {
-        _dialoguePhaseView.SetupChoices(options);
-
-        var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
-
-        _dialoguePhaseView.HideChoices();
-
-        return selectedIndex;
-    }
-
-    public async UniTask HideDialogueViewAsync()
-    {
-        await _dialoguePhaseView.HideAllAsync();
-        _dialoguePhaseView.Hide();
     }
 
     public async UniTask<IReadOnlyDictionary<EmotionType, int>> AnimateResourceRewardsAsync(
