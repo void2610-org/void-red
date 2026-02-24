@@ -234,6 +234,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _player.ClearWonCards();
         _enemy.ClearWonCards();
 
+        var drawResults = new List<AuctionJudge.AuctionResultEntry>();
+
         foreach (var result in results)
         {
             if (result.NoBids)
@@ -244,9 +246,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             if (result.IsDraw)
             {
-                // TODO: Phase 6で競合フェーズを実装
-                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 引き分け（{result.PlayerBid} vs {result.EnemyBid}）");
-                // 引き分け時は両者ともリソース返却（競合未実装時の暫定処理）
+                // 競合リストに追加（後で競合フェーズで処理）
+                drawResults.Add(result);
+                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 引き分け → 競合へ（{result.PlayerBid} vs {result.EnemyBid}）");
                 continue;
             }
 
@@ -255,7 +257,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 // 勝者: リソース消費
                 ConsumeBidForCard(_player, result.Card);
                 _player.AddWonCard(result.Card);
-                // 敗者: リソース返却（消費しない）
                 Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: プレイヤー落札（{result.PlayerBid} vs {result.EnemyBid}）");
             }
             else
@@ -263,19 +264,144 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 // 敵勝者: リソース消費
                 ConsumeBidForCard(_enemy, result.Card);
                 _enemy.AddWonCard(result.Card);
-                // プレイヤー: リソース返却（消費しない）
                 Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 敵落札（{result.PlayerBid} vs {result.EnemyBid}）");
             }
         }
 
-        Debug.Log($"[BattlePresenter] 落札結果: プレイヤー{_player.WonCards.Count}枚、敵{_enemy.WonCards.Count}枚");
+        Debug.Log($"[BattlePresenter] 落札結果: プレイヤー{_player.WonCards.Count}枚、敵{_enemy.WonCards.Count}枚、競合{drawResults.Count}枚");
 
         // 順次演出で結果を表示
         await _battleUIPresenter.ShowAuctionResultsSequentialAsync(results, _currentEnemyData.EnemyColor);
 
+        // 競合カードがある場合は競合フェーズへ
+        if (drawResults.Count > 0)
+        {
+            _currentGameState.Value = GameState.CompetitionPhase;
+            await HandleCompetitions(drawResults);
+        }
+
         await UniTask.Delay(1000);
         // オークション完全終了時にクリア
         _battleUIPresenter.ClearAuctionView();
+    }
+
+    // === 5.5 競合フェーズ ===
+
+    private async UniTask HandleCompetitions(List<AuctionJudge.AuctionResultEntry> drawResults)
+    {
+        _battleUIPresenter.HideAuctionView();
+
+        foreach (var drawResult in drawResults)
+        {
+            await HandleSingleCompetition(drawResult);
+        }
+    }
+
+    private async UniTask HandleSingleCompetition(AuctionJudge.AuctionResultEntry drawResult)
+    {
+        var handler = new CompetitionHandler();
+        handler.Start(drawResult.Card, drawResult.PlayerBid, drawResult.EnemyBid);
+
+        var selectedEmotion = EmotionType.Joy;
+        var disposables = new CompositeDisposable();
+
+        // 競合UI表示
+        _battleUIPresenter.ShowCompetition(
+            handler.PlayerTotal, handler.EnemyTotal, _player.EmotionResources);
+
+        // プレイヤー上乗せボタン
+        _battleUIPresenter.OnCompetitionRaise
+            .Subscribe(_ =>
+            {
+                if (handler.TryPlayerRaise(selectedEmotion, _player))
+                {
+                    _battleUIPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
+                    _battleUIPresenter.UpdateCompetitionResources(_player.EmotionResources);
+                }
+            })
+            .AddTo(disposables);
+
+        // 感情選択変更
+        _battleUIPresenter.OnCompetitionEmotionSelected
+            .Subscribe(emotion => selectedEmotion = emotion)
+            .AddTo(disposables);
+
+        // 敵AIの次回上乗せ時刻
+        var nextEnemyRaiseTime = Time.time + Random.Range(2f, 5f);
+
+        // 競合ループ（タイムアウトまで）
+        while (!handler.IsTimedOut)
+        {
+            // タイマー更新
+            _battleUIPresenter.UpdateCompetitionTimer(
+                handler.RemainingTime, GameConstants.COMPETITION_TIMEOUT_SECONDS);
+
+            // 敵AI上乗せ判定
+            if (Time.time >= nextEnemyRaiseTime)
+            {
+                TryEnemyCompetitionRaise(handler);
+                nextEnemyRaiseTime = Time.time + Random.Range(2f, 5f);
+
+                if (handler.EnemyTotal != drawResult.EnemyBid)
+                {
+                    _battleUIPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
+                }
+            }
+
+            await UniTask.Yield();
+        }
+
+        // 競合終了
+        handler.End();
+        disposables.Dispose();
+
+        var winner = handler.IsPlayerWon;
+        if (winner == true)
+        {
+            // プレイヤー勝利: 元の入札分を消費（上乗せ分はリアルタイムで消費済み）
+            ConsumeBidForCard(_player, drawResult.Card);
+            _player.AddWonCard(drawResult.Card);
+            Debug.Log($"[BattlePresenter] 競合勝利: {drawResult.Card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
+        }
+        else if (winner == false)
+        {
+            // 敵勝利: 敵の元の入札分を消費
+            ConsumeBidForCard(_enemy, drawResult.Card);
+            _enemy.AddWonCard(drawResult.Card);
+            Debug.Log($"[BattlePresenter] 競合敗北: {drawResult.Card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
+        }
+        else
+        {
+            // 完全引き分け: カード消失
+            Debug.Log($"[BattlePresenter] 競合引き分け: {drawResult.Card.Data.CardName} カード消失（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
+        }
+
+        handler.Dispose();
+        _battleUIPresenter.HideCompetition();
+        await UniTask.Delay(500);
+    }
+
+    /// <summary>
+    /// 敵AIの競合時上乗せ判定
+    /// </summary>
+    private void TryEnemyCompetitionRaise(CompetitionHandler handler)
+    {
+        // 50%の確率で上乗せしない
+        if (Random.value < 0.5f) return;
+
+        // リソースが残っている感情からランダムに選択
+        var emotions = (EmotionType[])System.Enum.GetValues(typeof(EmotionType));
+        var available = new List<EmotionType>();
+        foreach (var emotion in emotions)
+        {
+            if (_enemy.GetEmotionAmount(emotion) > 0)
+                available.Add(emotion);
+        }
+
+        if (available.Count == 0) return;
+
+        var chosen = available[Random.Range(0, available.Count)];
+        handler.EnemyRaise(chosen, _enemy);
     }
 
     /// <summary>

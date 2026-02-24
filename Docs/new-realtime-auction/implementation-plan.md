@@ -43,38 +43,38 @@
 
 ### 3.1 削除・大幅改修が必要なファイル
 
-| ファイル | 現在の役割 | 対応 |
-|--------|----------|------|
-| `Assets/Scripts/Game/Models/ValueRankingModel.cs` | 価値順位管理 | **削除** |
-| `Assets/Scripts/UI/Auction/ValueRankingView.cs` | 価値順位UI | **削除** |
-| `Assets/Scripts/UI/Auction/DraggableCardView.cs` | ドラッグ操作 | **削除** |
-| `Assets/Scripts/UI/Auction/RankingSlotView.cs` | 順位スロット | **削除** |
-| `Assets/Scripts/Game/Services/RewardCalculator.cs` | 報酬計算 | **大幅改修** |
+| ファイル | 現在の役割 | 対応 | 状況 |
+|--------|----------|------|------|
+| `Assets/Scripts/Game/Models/ValueRankingModel.cs` | 価値順位管理 | **削除** | ✅ |
+| `Assets/Scripts/UI/Auction/ValueRankingView.cs` | 価値順位UI | **削除** | ✅ |
+| `Assets/Scripts/UI/Auction/DraggableCardView.cs` | ドラッグ操作 | **削除** | ✅ |
+| `Assets/Scripts/UI/Auction/RankingSlotView.cs` | 順位スロット | **削除** | ✅ |
+| `Assets/Scripts/Game/Services/RewardCalculator.cs` | 報酬計算 | **大幅改修** | ✅ スタブ実装 |
+| `Assets/Scripts/UI/Auction/DialoguePhaseView.cs` 他6件 | 旧対話システム | **削除** | ✅ |
 
 ### 3.2 改修が必要なファイル
 
-| ファイル | 変更内容 |
-|--------|---------|
-| `Assets/Scripts/Game/Logic/BattlePresenter.cs` | フェーズ順序変更、競合処理追加、リソース返却ロジック |
-| `Assets/Scripts/Game/Models/BidModel.cs` | 1カード1感情制約の追加 |
-| `Assets/Scripts/Game/Services/AuctionJudge.cs` | 競合（Draw）時の新判定ロジック |
-| `Assets/Scripts/Game/Models/PlayerModel.cs` | 初期リソース値変更（10→3） |
-| `Assets/Scripts/Game/Core/GameConstants.cs` | 定数値変更 |
-| `Assets/Scripts/Game/Core/Enums.cs` (GameState) | ValueRanking削除、競合フェーズ追加 |
-| `Assets/Scripts/Game/Presenters/PlayerPresenter.cs` | ValueRanking参照削除 |
-| `Assets/Scripts/Game/Presenters/Enemy.cs` | 入札AI改修、競合AI追加 |
-| `Assets/Scripts/ScriptableObject/AuctionData.cs` | 6枚カード構成に変更 |
-| `Assets/Scripts/UI/Auction/AuctionView.cs` | 6枚表示、1感情制約UI、対話連携 |
-| `Assets/Scripts/UI/Auction/BidWindowView.cs` | 1感情制約対応 |
-| `Assets/Scripts/UI/Main/BattleUIPresenter.cs` | フェーズ順序・UIフロー変更 |
+| ファイル | 変更内容 | 状況 |
+|--------|---------|------|
+| `Assets/Scripts/Game/Logic/BattlePresenter.cs` | フェーズ順序変更、リソース返却ロジック | ✅ |
+| `Assets/Scripts/Game/Models/BidModel.cs` | 1カード1感情制約の追加 | ✅ |
+| `Assets/Scripts/Game/Services/AuctionJudge.cs` | 競合（Draw）時の新判定ロジック | ✅ 既存IsDraw判定で十分 |
+| `Assets/Scripts/Game/Core/GameConstants.cs` | 定数値変更 | ✅ |
+| `Assets/Scripts/Game/Core/Enums.cs` (GameState) | ValueRanking削除、競合フェーズ追加 | ✅ |
+| `Assets/Scripts/Game/Presenters/PlayerPresenter.cs` | ValueRanking参照削除 | ✅ |
+| `Assets/Scripts/Game/Presenters/Enemy.cs` | 入札AI改修、競合AI追加 | ✅ |
+| `Assets/Scripts/ScriptableObject/AuctionData.cs` | 6枚カード構成に変更、DialogueData削除 | ✅ |
+| `Assets/Scripts/UI/Auction/AuctionView.cs` | AuctionCardView統合、単一CardContainer | ✅ |
+| `Assets/Scripts/UI/Auction/BidWindowView.cs` | 1感情制約対応 | Phase 5.6（後回し可） |
+| `Assets/Scripts/UI/Main/BattleUIPresenter.cs` | フェーズ順序・UIフロー変更、対話関連削除 | ✅ |
 
 ### 3.3 新規作成ファイル
 
-| ファイル | 役割 |
-|--------|------|
-| `Assets/Scripts/UI/Auction/AuctionCardView.cs` | オークション用カードラッパー（CardView + BidInfo + 対話ボタン） |
-| `Assets/Scripts/UI/Auction/CompetitionView.cs` | リアルタイム競合UI（天秤＋タイマー） |
-| `Assets/Scripts/Game/Logic/CompetitionHandler.cs` | 競合ロジック（タイマー・上乗せ管理） |
+| ファイル | 役割 | 状況 |
+|--------|------|------|
+| `Assets/Scripts/UI/Auction/AuctionCardView.cs` | オークション用カードラッパー（CardView + BidInfo + 対話ボタン） | ✅ |
+| `Assets/Scripts/UI/Auction/CompetitionView.cs` | リアルタイム競合UI（天秤＋タイマー） | ✅ |
+| `Assets/Scripts/Game/Logic/CompetitionHandler.cs` | 競合ロジック（タイマー・上乗せ管理） | ✅ |
 
 ---
 
@@ -275,30 +275,31 @@ Canvas
 ### 3.5.6 Prefab・ヒエラルキー作業チェックリスト
 
 ```
-削除:
-  [ ] ヒエラルキーから Canvas/ValueRankingView を削除（execute-dynamic-code）
-  [ ] ValueRankingView.prefab 削除
-  [ ] ValueRanking/DraggableCardView.prefab 削除
-  [ ] ValueRanking/RankingSlotView.prefab 削除
-  [ ] RankTextPrefab.prefab 削除
-  [ ] ValueRanking/ フォルダ自体を削除
-  [ ] シーンを保存
+削除: ✅ 完了
+  [x] ヒエラルキーから Canvas/ValueRankingView を削除（execute-dynamic-code）
+  [x] ValueRankingView.prefab 削除
+  [x] ValueRanking/DraggableCardView.prefab 削除
+  [x] ValueRanking/RankingSlotView.prefab 削除
+  [x] RankTextPrefab.prefab 削除
+  [x] ValueRanking/ フォルダ自体を削除
+  [x] ヒエラルキーから Canvas/DialoguePhaseView を削除
+  [x] DialoguePhase/ フォルダ全体を削除
+  [x] シーンを保存
 
-改修:
-  [ ] AuctionView: PlayerCardContainer/EnemyCardContainer → 単一CardContainer に統合
-  [ ] AuctionView: SerializeField を auctionCardPrefab (AuctionCardView) に変更
-  [ ] BidWindowView: EmotionLockIndicator 追加
-  [ ] CardBidInfoView: Rank表示UIの削除/非表示化
-  [ ] AuctionView.prefab に Apply
-  [ ] BidWindowView.prefab に Apply
-  [ ] CardBidInfoView.prefab に Apply
+改修: ✅ 完了（BidWindowView EmotionLockIndicator は後回し）
+  [x] AuctionView: PlayerCardContainer/EnemyCardContainer → 単一CardContainer に統合
+  [x] AuctionView: SerializeField を auctionCardPrefab (AuctionCardView) に変更
+  [ ] BidWindowView: EmotionLockIndicator 追加（後回し可）
+  [x] CardBidInfoView: Rank表示UIの削除/非表示化
+  [x] AuctionView.prefab に Apply
+  [x] CardBidInfoView.prefab に Apply
 
-新規作成:
-  [ ] AuctionCardView.prefab 作成（CardView + CardBidInfoView + DialogueButton のラッパー）
-  [ ] CompetitionView.prefab 作成
-  [ ] ヒエラルキーに CompetitionView を追加（Canvas直下）
-  [ ] CompetitionView の SerializeField 設定
-  [ ] シーンを保存
+新規作成: ✅ 完了
+  [x] AuctionCardView.prefab 作成（CardView + CardBidInfoView + DialogueButton のラッパー）
+  [x] CompetitionView.prefab 作成
+  [x] ヒエラルキーに CompetitionView を追加（execute-dynamic-code）
+  [x] CompetitionView の SerializeField 設定
+  [x] シーンを保存
 ```
 
 ### 3.5.7 ScriptableObjectアセットの変更
@@ -1010,18 +1011,17 @@ Phase 5: Prefab統合 + AuctionCardView組み込み ✅ 完了
   [ ] 5.6 Prefab改修: BidWindowView（EmotionLockIndicator追加）※ 後回し可
   [x] コンパイル確認 + フォーマット修正
 
-Phase 6: 競合システム
-  [ ] 6.1 AuctionJudge 改修（ShouldRefundフィールドは不要、現在のIsDraw判定で十分）
-  [x] 6.2 BattlePresenter のリソース返却処理（勝者のみ消費、敗者は返却）※ 実装済み
-       引き分け時は暫定で両者リソース返却（競合未実装のため）
-  [ ] 6.3 CompetitionHandler.cs 新規作成
-  [ ] 6.4 CompetitionView.cs 新規作成
-  [ ] 6.5 Prefab新規: CompetitionView.prefab 作成
-  [ ] 6.6 ヒエラルキー: Canvas直下に CompetitionView 追加（execute-dynamic-code）
-  [ ] 6.7 CompetitionView の SerializeField 設定
-  [ ] 6.8 BattlePresenter に競合処理組み込み（HandleAuctionResult内のIsDraw分岐を競合フェーズへ）
-  [ ] 6.9 敵AI の競合時ロジック
-  [ ] コンパイル確認 + シーン保存
+Phase 6: 競合システム ✅ 完了
+  [x] 6.1 AuctionJudge 改修（ShouldRefundフィールドは不要、現在のIsDraw判定で十分）
+  [x] 6.2 BattlePresenter のリソース返却処理（勝者のみ消費、敗者は返却）
+  [x] 6.3 CompetitionHandler.cs 新規作成（R3 Subject通知、タイマー、上乗せ管理）
+  [x] 6.4 CompetitionView.cs 新規作成（BasePhaseView継承、天秤+タイマー+感情選択+上乗せボタン）
+  [x] 6.5 Prefab新規: CompetitionView.prefab 作成（ヒエラルキーから変換）
+  [x] 6.6 ヒエラルキー: Canvas直下に CompetitionView 追加（execute-dynamic-code）
+  [x] 6.7 CompetitionView の SerializeField 設定（EmotionResourceDisplayView含む）
+  [x] 6.8 BattlePresenter に競合処理組み込み（HandleCompetitions/HandleSingleCompetition）
+  [x] 6.9 敵AI の競合時ロジック（TryEnemyCompetitionRaise: 50%確率、ランダム感情選択）
+  [x] コンパイル確認 + フォーマット修正 + シーン保存
 
 Phase 7: ゲームオーバー
   [ ] 7.1 リソース枯渇チェック追加

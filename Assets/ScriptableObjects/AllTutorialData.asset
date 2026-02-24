@@ -16,11 +16,8 @@ MonoBehaviour:
   tutorialList:
   - {fileID: 11400000, guid: 42add784271004f01965057cf03e2a48, type: 2}
   - {fileID: 11400000, guid: 61b837fc30d7c4ca1b6f072ca62eeae7, type: 2}
-  - {fileID: 11400000, guid: 388972063e4ff4a8583b7793be5de6a3, type: 2}
-  - {fileID: 11400000, guid: 32c59c13b296242c0acb3c7ad3ae0cb4, type: 2}
   - {fileID: 11400000, guid: b855191f7f2e04c258ce13bd0efe5ce2, type: 2}
   - {fileID: 11400000, guid: c504f0f104a964d149d731dd3c747ba3, type: 2}
   - {fileID: 11400000, guid: 2064ab00b1f7849cc82a98ccaa9975cc, type: 2}
   - {fileID: 11400000, guid: 0d9e3a8adb11e48ddad50e0fe238aef6, type: 2}
   - {fileID: 11400000, guid: 654c046bbf5c8415fb25b5e21218bcf6, type: 2}
-  - {fileID: 11400000, guid: f1a6dc9106f7c4b2a85f44af0d3b14b1, type: 2}

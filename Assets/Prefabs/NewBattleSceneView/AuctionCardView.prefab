@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1346812101794561109}
   - component: {fileID: 3071216832625960435}
+  - component: {fileID: 4423743915511149918}
   m_Layer: 0
   m_Name: AuctionCardView
   m_TagString: Untagged
@@ -54,6 +55,18 @@ MonoBehaviour:
   cardView: {fileID: 2251256601627274402}
   cardBidInfoView: {fileID: 7785553790846976336}
   dialogueButton: {fileID: 7539634764765378284}
+--- !u!225 &4423743915511149918
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2177424670406202371}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &5721052960412192578
 GameObject:
   m_ObjectHideFlags: 0

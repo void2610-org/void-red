@@ -11,6 +11,9 @@ using VContainer.Unity;
 /// </summary>
 public class BattleUIPresenter : IStartable, System.IDisposable
 {
+    public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
+    public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
+
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
     [Inject] private readonly InputActionsProvider _inputActionsProvider;
@@ -25,6 +28,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
     private readonly AuctionView _auctionView;
+    private readonly CompetitionView _competitionView;
     private readonly RewardPhaseView _rewardPhaseView;
     private readonly MemoryGrowthView _memoryGrowthView;
     private readonly PlayerFaceView _playerFaceView;
@@ -40,6 +44,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
         _auctionView = Object.FindFirstObjectByType<AuctionView>();
+        _competitionView = Object.FindFirstObjectByType<CompetitionView>();
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
@@ -71,6 +76,15 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         IReadOnlyDictionary<EmotionType, int> currentResources,
         IReadOnlyDictionary<EmotionType, int> maxResources) =>
         _rewardPhaseView.DisplayResourceGauges(currentResources, maxResources);
+
+    // 競合フェーズ
+    public void ShowCompetition(int playerBid, int enemyBid, IReadOnlyDictionary<EmotionType, int> resources) =>
+        _competitionView.Initialize(playerBid, enemyBid, resources);
+    public void UpdateCompetitionBids(int playerBid, int enemyBid) => _competitionView.UpdateBids(playerBid, enemyBid);
+    public void UpdateCompetitionTimer(float remaining, float max) => _competitionView.UpdateTimer(remaining, max);
+    public void UpdateCompetitionResources(IReadOnlyDictionary<EmotionType, int> resources) =>
+        _competitionView.UpdateResources(resources);
+    public void HideCompetition() => _competitionView.Hide();
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {
