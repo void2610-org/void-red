@@ -544,20 +544,63 @@ private async UniTask HandleCardReveal()
 
 ---
 
-### Phase 4: 対話フェーズ改修
+### Phase 4: 旧対話システム削除 + 仮実装
 
-#### Step 4.1: AuctionCardView（ラッパー）新規作成
+対話フェーズは今後大きく変わるため、現行の対話システムを完全に削除し、
+カードの対話ボタンを押すとログが流れるだけの仮実装に置き換える。
+
+#### Step 4.1: 旧対話システムの削除
+
+**削除するスクリプト:**
+- `Assets/Scripts/UI/Auction/DialoguePhaseView.cs` — 旧対話フェーズView
+- `Assets/Scripts/UI/Auction/DialogueChoicesView.cs` — 選択肢UI
+- `Assets/Scripts/UI/Auction/DialoguePortraitView.cs` — 立ち絵View
+- `Assets/Scripts/UI/Auction/DialogueCutInView.cs` — カットインView
+- `Assets/Scripts/Game/Logic/DialogueEffectApplier.cs` — 対話効果適用ロジック
+- `Assets/Scripts/Game/Core/DialogueEnums.cs` — DialogueChoiceType等のenum
+- `Assets/Scripts/ScriptableObject/EnemyDialogueData.cs` — 敵対話データ定義
+
+**削除するPrefab:**
+- `Assets/Prefabs/NewBattleSceneView/DialoguePhase/` フォルダ全体
+  - DialoguePhaseView.prefab
+  - DialogueChoicesView.prefab
+  - DialogueCutInView.prefab
+  - DialoguePortraitView.prefab
+- `Assets/Prefabs/BattleSceneView/DialogueChoiceButton.prefab`
+
+**削除するScriptableObjectアセット:**
+- `Assets/ScriptableObjects/EnemyDialogueData/` フォルダ全体（Alv.asset, Cerica.asset）
+- `Assets/ScriptableObjects/TutorialData/FirstBattle/DialoguePhase.asset`
+- `Assets/ScriptableObjects/TutorialData/FirstBattle/DialoguePhase2.asset`
+
+**削除するスプライト:**
+- `Assets/Sprites/Auction/Dialogue/` フォルダ全体
+
+**削除するヒエラルキーGameObject:**
+- `Canvas/DialoguePhaseView`（子含む全体を削除）
+
+#### Step 4.2: 参照コードの修正
+
+**BattleUIPresenter.cs** — 対話関連メソッドを全て削除:
+- `_dialoguePhaseView` フィールド
+- `ShowPlayerDialogueAsync`, `HidePlayerDialogueAsync`
+- `ShowEnemyDialogueAsync`, `HideEnemyDialogueAsync`
+- `ShowPlayerNarration`, `ShowEnemyNarration`
+- `HideAllAsync`, `ShowDialogueView`, `InitializeDialogueView`
+- `WaitForFourChoiceAsync`, `WaitForThreeResponseAsync`
+- `HideDialogueViewAsync`
+
+**BattlePresenter.cs** — HandleDialoguePhaseを仮実装に置き換え:
+- `HandleDialoguePhase` — Debug.Logのみのスタブに変更
+- `HandlePlayerFirstTurn`, `HandleEnemyFirstTurn` — 削除
+
+**AuctionData.cs** — `DialogueData` フィールドを削除
+
+#### Step 4.3: AuctionCardView（ラッパー）新規作成
+
 **ファイル**: `Assets/Scripts/UI/Auction/AuctionCardView.cs`
 
-企画書の画像では各カードの右下に個別の対話ボタンが配置されている。
-現在は AuctionView が `CardView` と `CardBidInfoView` を別々にインスタンス化しているが、
-新仕様ではこれらと対話ボタンを **AuctionCardView** ラッパーPrefabにまとめる。
-
 ```csharp
-/// <summary>
-/// オークション用カードのラッパーView
-/// CardView + CardBidInfoView + 対話ボタンを1つのPrefabに統合
-/// </summary>
 public class AuctionCardView : MonoBehaviour
 {
     [SerializeField] private CardView cardView;
@@ -566,61 +609,29 @@ public class AuctionCardView : MonoBehaviour
 
     public CardView CardView => cardView;
     public CardBidInfoView BidInfoView => cardBidInfoView;
+    public CardModel CardModel { get; private set; }
 
-    // カード自体のクリック（入札ウィンドウ表示用）
     public Observable<AuctionCardView> OnCardClicked =>
         cardView.OnClicked.Select(_ => this);
 
-    // 対話ボタンのクリック（対話フェーズ用）
     public Observable<AuctionCardView> OnDialogueClicked =>
         dialogueButton.OnClickAsObservable().Select(_ => this);
 
-    public CardModel CardModel { get; private set; }
-
-    public void Initialize(CardModel cardModel)
-    {
-        CardModel = cardModel;
-        cardView.Initialize(cardModel.Data);
-    }
-
-    /// <summary>
-    /// 対話ボタンの表示/非表示（入札フェーズでは非表示にする）
-    /// </summary>
-    public void SetDialogueButtonVisible(bool visible) =>
-        dialogueButton.gameObject.SetActive(visible);
+    public void Initialize(CardModel cardModel) { ... }
+    public void SetDialogueButtonVisible(bool visible) => ...;
 }
 ```
 
-これにより AuctionView.cs の以下が変更:
-- `[SerializeField] private CardView cardPrefab` → `[SerializeField] private AuctionCardView auctionCardPrefab`
-- `[SerializeField] private CardBidInfoView cardBidInfoPrefab` → **削除**（AuctionCardView内に含まれる）
-- カード生成時に `Instantiate(auctionCardPrefab, cardContainer)` で一括生成
-- 対話ボタンのイベントは `auctionCardView.OnDialogueClicked` で購読
-
-#### Step 4.2: HandleDialoguePhase を入札前に移動 + カード選択対話
-
-企画書では「任意のカードを選択し、対話ボタンを押す」仕組み。
-各カードの対話ボタンを押すと、そのカードについて相手のブラフ/ヒントを聞ける。
-
-**BattlePresenter側の変更**:
-```csharp
-private async UniTask HandleDialoguePhase()
-{
-    // AuctionView上でカードの対話ボタンを有効化
-    // プレイヤーがカードの対話ボタンを押す → 対話ウィンドウ表示
-    // 「入札確定」ボタンで対話フェーズ終了
-    await _battleUIPresenter.WaitForCardDialogueAsync(
-        _auctionCards,
-        _currentAuctionData.DialogueData);
-}
-```
+#### Step 4.4: 対話ボタンの仮実装
 
 **UIフロー**:
 1. 6枚のカードそれぞれに対話ボタンが表示される
 2. プレイヤーが任意のカードの対話ボタンを押す
-3. そのカードに関する敵のブラフ/ヒントが対話ウィンドウに表示
-4. 選択肢次第で揺さぶりも可能
-5. 「入札確定」ボタンで対話フェーズ終了 → 入札フェーズへ
+3. Debug.Logでカード名が出力される（仮実装）
+4. 入札確定ボタンで対話フェーズ終了 → 入札フェーズへ
+
+対話ボタンを押すとDebug.Logでカード名が出力されるだけの仮実装。
+対話フェーズの詳細は後日設計する。
 
 ---
 
@@ -933,57 +944,82 @@ if (_player.IsAllResourcesDepleted())
 ### 5.2 作業順序チェックリスト
 
 ```
-Phase 1: 基盤変更
-  [ ] 1.1 GameConstants の定数変更
-  [ ] 1.2 GameState enum の変更
-  [ ] 1.3 BidModel に1カード1感情制約を追加
-  [ ] 1.4 AuctionData を6枚構成に変更
-  [ ] コンパイル確認
+Phase 1: 基盤変更 ✅ 完了
+  [x] 1.1 GameConstants の定数変更（DEFAULT_EMOTION_VALUE=3, AUCTION_CARD_COUNT=6, COMPETITION_TIMEOUT_SECONDS=10f）
+  [x] 1.2 GameState enum の変更（CardDistribution/ValueRanking削除、CompetitionPhase追加、DialoguePhase順序変更）
+  [x] 1.3 BidModel に1カード1感情制約を追加（SetBid/GetBidEmotion）
+  [x] 1.4 AuctionData を6枚構成に変更（playerCards+enemyCards → auctionCards）
+  [x] コンパイル確認
 
-Phase 2: 価値順位削除
-  [ ] 2.1 ValueRankingModel.cs 削除
-  [ ] 2.2 PlayerPresenter から参照削除
-  [ ] 2.3 Enemy から DecideValueRankings 削除
-  [ ] 2.4 スクリプト削除: ValueRankingView.cs, DraggableCardView.cs, RankingSlotView.cs, DragLineView.cs
-  [ ] 2.5 Prefab削除: ValueRankingView.prefab, ValueRanking/DraggableCardView.prefab, ValueRanking/RankingSlotView.prefab, RankTextPrefab.prefab
-  [ ] 2.6 ヒエラルキー: Canvas/ValueRankingView を削除（execute-dynamic-code）
-  [ ] 2.7 RewardCalculator 再設計
-  [ ] 2.8 BattlePresenter/BattleUIPresenter から ValueRanking 関連コード削除
-  [ ] 2.9 CardBidInfoView: Rank表示UIの削除/非表示化
-  [ ] コンパイル確認 + シーン保存
+Phase 2: 価値順位削除 ✅ 完了
+  [x] 2.1 ValueRankingModel.cs 削除
+  [x] 2.2 PlayerPresenter から参照削除
+  [x] 2.3 Enemy から DecideValueRankings 削除、DecideBids を1カード1感情制約対応に書き換え
+  [x] 2.4 スクリプト削除: ValueRankingView.cs, DraggableCardView.cs, RankingSlotView.cs
+       ※ DragLineView.cs は将来利用の可能性があるため残留
+  [x] 2.5 Prefab削除: ValueRankingView.prefab, ValueRanking/DraggableCardView.prefab, ValueRanking/RankingSlotView.prefab, RankTextPrefab.prefab
+  [x] 2.6 ヒエラルキー: Canvas/ValueRankingView を削除（execute-dynamic-code）
+  [x] 2.7 RewardCalculator をスタブ実装に書き換え（報酬計算は後で設計）
+  [x] 2.8 BattlePresenter/BattleUIPresenter から ValueRanking 関連コード削除
+  [x] 2.9 CardBidInfoView: ShowRank/HideRank/rankText を削除
+  [x] 2.10 CardAcquisitionInfo/SavedCardAcquisitionInfo から PlayerValueRank/EnemyValueRank を削除
+  [x] 2.11 GameStateRepository の ConvertSavedThemeToAcquiredTheme を更新
+  [x] 2.12 DialogueEffectApplier: AddBid → SetBid に修正（※ Phase 4 でファイル自体を削除済み）
+  [x] 2.13 スプライト削除: Sprites/Auction/ValueRanking/ フォルダ
+  [x] 2.14 チュートリアルアセット削除: ValueRanking.asset
+       ※ CardDragLine.shadergraph は将来利用の可能性があるため残留
+  [x] コンパイル確認 + シーン保存
 
-Phase 3: フェーズ順序変更
-  [ ] 3.1 BattlePresenter.StartGame() のフロー書き換え
-  [ ] 3.2 HandleCardReveal を6枚共有表示に変更
-  [ ] 3.3 HandleCardDistribution, HandleValueRanking 削除
-  [ ] コンパイル確認
+Phase 3: フェーズ順序変更 ✅ 完了
+  [x] 3.1 BattlePresenter.StartGame() のフロー書き換え（テーマ→カード提示→対話→入札→判定→報酬→記憶育成）
+  [x] 3.2 HandleCardReveal を6枚共有表示に変更（AuctionCards から CardModel 生成）
+  [x] 3.3 HandleCardDistribution, HandleValueRanking 削除
+  [x] 3.4 HandleAuctionResult: 勝者のみリソース消費、敗者はリソース返却（ConsumeBidForCard 新設）
+  [x] 3.5 HandleRewardPhase: 新 RewardCalculator シグネチャ対応
+  [x] 3.6 HandleBiddingPhase: 新 ShowAuctionCards/WaitForBiddingAsync シグネチャ対応
+  [x] 3.7 BuildCardAcquisitionInfoList: ValueRank 参照削除
+  [x] コンパイル確認
 
-Phase 4: 対話フェーズ改修
-  [ ] 4.1 対話フローの設計確認（ユーザー要確認）
-  [ ] 4.2 AuctionCardView.cs 新規作成（CardView + CardBidInfoView + DialogueButton ラッパー）
-  [ ] 4.3 Prefab新規: AuctionCardView.prefab 作成（CardView/CardBidInfoViewをネスト、DialogueButton追加）
-  [ ] 4.4 AuctionView.cs を AuctionCardView ベースに書き換え（cardPrefab → auctionCardPrefab）
-  [ ] 4.5 HandleDialoguePhase の書き換え
-  [ ] コンパイル確認
+Phase 4: 旧対話システム削除 + 仮実装 ✅ 完了
+  [x] 4.1 旧対話システム削除
+       - スクリプト: DialoguePhaseView, DialogueChoicesView, DialoguePortraitView, DialogueCutInView,
+         DialogueEffectApplier, DialogueEnums, EnemyDialogueData を削除
+       - Prefab: NewBattleSceneView/DialoguePhase/ フォルダ全体、DialogueChoiceButton.prefab を削除
+       - ScriptableObject: EnemyDialogueData/ フォルダ、DialoguePhase.asset, DialoguePhase2.asset を削除
+       - スプライト: Sprites/Auction/Dialogue/ フォルダを削除
+       - ヒエラルキー: Canvas/DialoguePhaseView を削除
+  [x] 4.2 参照コードの修正
+       - BattleUIPresenter: _dialoguePhaseView, 対話関連メソッド群を全て削除
+       - BattlePresenter: HandleDialoguePhase をスタブに置き換え、HandlePlayerFirstTurn/HandleEnemyFirstTurn を削除
+       - AuctionData: dialogueData フィールドを削除
+  [x] 4.3 AuctionCardView.cs 新規作成（CardView + CardBidInfoView + DialogueButton ラッパー）
+  [x] コンパイル確認 + フォーマット修正
 
-Phase 5: 入札フェーズ改修
-  [ ] 5.1 AuctionView の1カード1感情制約UI
-  [ ] 5.2 Enemy 入札AI改修
-  [ ] 5.3 Prefab改修: AuctionView（PlayerCardContainer+EnemyCardContainer → 単一CardContainer統合）
-  [ ] 5.4 Prefab改修: AuctionView の SerializeField を auctionCardPrefab (AuctionCardView) に変更
-  [ ] 5.5 Prefab改修: BidWindowView（EmotionLockIndicator追加）
-  [ ] 5.6 AuctionView.prefab / BidWindowView.prefab に Apply
-  [ ] コンパイル確認 + シーン保存
+Phase 5: Prefab統合 + AuctionCardView組み込み ✅ 完了
+  [x] 5.1 AuctionView の1カード1感情制約UI（OnIncreaseBid/OnDecreaseBidで制約チェック済み）
+  [x] 5.2 Enemy 入札AI改修（1カード1感情制約対応済み）
+  [x] 5.3 Prefab新規: AuctionCardView.prefab 作成（CardView + CardBidInfoView + DialogueButton をネスト）
+  [x] 5.4 AuctionView.cs を AuctionCardView ベースに書き換え
+       - cardPrefab (CardView) → auctionCardPrefab (AuctionCardView) に変更
+       - cardBidInfoPrefab を削除（AuctionCardView内に含まれるため）
+       - _cardViewToModel / _cardBidInfoViews の辞書を List<AuctionCardView> に統合
+  [x] 5.5 Prefab改修: AuctionView（PlayerCardContainer+EnemyCardContainer → 単一CardContainer統合）
+       - EnemyCardContainer 削除、PlayerCardContainer → CardContainer にリネーム
+       - enemyCardStagger 削除、playerCardStagger → cardStagger に統合
+       - AuctionView SerializeField を更新（cardContainer, auctionCardPrefab, cardStagger）
+  [ ] 5.6 Prefab改修: BidWindowView（EmotionLockIndicator追加）※ 後回し可
+  [x] コンパイル確認 + フォーマット修正
 
 Phase 6: 競合システム
-  [ ] 6.1 AuctionJudge 改修（返却ロジック）
-  [ ] 6.2 BattlePresenter のリソース返却処理
+  [ ] 6.1 AuctionJudge 改修（ShouldRefundフィールドは不要、現在のIsDraw判定で十分）
+  [x] 6.2 BattlePresenter のリソース返却処理（勝者のみ消費、敗者は返却）※ 実装済み
+       引き分け時は暫定で両者リソース返却（競合未実装のため）
   [ ] 6.3 CompetitionHandler.cs 新規作成
   [ ] 6.4 CompetitionView.cs 新規作成
   [ ] 6.5 Prefab新規: CompetitionView.prefab 作成
   [ ] 6.6 ヒエラルキー: Canvas直下に CompetitionView 追加（execute-dynamic-code）
   [ ] 6.7 CompetitionView の SerializeField 設定
-  [ ] 6.8 BattlePresenter に競合処理組み込み
+  [ ] 6.8 BattlePresenter に競合処理組み込み（HandleAuctionResult内のIsDraw分岐を競合フェーズへ）
   [ ] 6.9 敵AI の競合時ロジック
   [ ] コンパイル確認 + シーン保存
 
@@ -1006,16 +1042,17 @@ Phase 8: UI調整
 
 ### 確認済み
 1. **カードの出所**: **区別なし（共有6枚）** → プレイヤー/敵の所有概念を廃止。AuctionDataは `auctionCards` のみ
-2. **報酬計算**: **後で決める** → RewardCalculatorは一旦スタブ実装。報酬フェーズ自体は残すが計算ロジックは仮
-3. **リソース消費ルール**: **勝者は消費、敗者は返却** → 落札者のみベット分を消費、敗者はベット分が手元に戻る
+2. **報酬計算**: **後で決める** → RewardCalculatorは一旦スタブ実装（TotalReward=1固定）。報酬フェーズ自体は残すが計算ロジックは仮
+3. **リソース消費ルール**: **勝者は消費、敗者は返却** → 落札者のみベット分を消費、敗者はベット分が手元に戻る。実装済み（ConsumeBidForCard）
 4. **ゲームオーバー後**: **後で決める** → ゲームオーバー判定のみ実装、遷移先はTODOとする
+5. **DragLineView/CardDragLine.shadergraph**: 将来利用の可能性があるため残留
 
 ### 未確認（実装時に確認）
-5. **対話フェーズの詳細**: カード選択→対話の具体的なセリフデータ構造。現在のEnemyDialogueDataをカード別に拡張する必要があるか
-6. **特殊効果カード**: 「一部特殊効果を持つ記憶カード」の詳細仕様
-7. **敵AIの賢さ**: 競合時の敵AIはどの程度賢くすべきか
-8. **落札失敗時のリソース返却演出**: どの程度の演出が必要か
-9. **競合時に別感情使用可能**: 企画書に記載あり。最初のベットと異なる感情で上乗せ可能でよいか
+6. **対話フェーズの詳細**: カード選択→対話の具体的なセリフデータ構造。現在のEnemyDialogueDataをカード別に拡張する必要があるか
+7. **特殊効果カード**: 「一部特殊効果を持つ記憶カード」の詳細仕様
+8. **敵AIの賢さ**: 競合時の敵AIはどの程度賢くすべきか
+9. **落札失敗時のリソース返却演出**: どの程度の演出が必要か
+10. **競合時に別感情使用可能**: 企画書に記載あり。最初のベットと異なる感情で上乗せ可能でよいか
 
 ---
 

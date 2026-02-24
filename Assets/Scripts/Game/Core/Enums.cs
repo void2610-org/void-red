@@ -5,18 +5,16 @@ public enum GameState
 {
     /// <summary> 記憶テーマ公開 </summary>
     ThemeAnnouncement,
-    /// <summary> カード配布（主4枚 + 相4枚） </summary>
-    CardDistribution,
-    /// <summary> 価値順位設定 </summary>
-    ValueRanking,
-    /// <summary> カード公開 </summary>
+    /// <summary> カード提示（6枚を場に並べる） </summary>
     CardReveal,
+    /// <summary> 対話フェーズ（カード選択→ブラフ/ヒント） </summary>
+    DialoguePhase,
     /// <summary> 感情リソースで入札 </summary>
     BiddingPhase,
-    /// <summary> 揺さぶり・入札変動 </summary>
-    DialoguePhase,
     /// <summary> 入札結果の開示・落札者決定 </summary>
     AuctionResult,
+    /// <summary> 競合フェーズ（同数時のリアルタイム上乗せ） </summary>
+    CompetitionPhase,
     /// <summary> 報酬ポイント算出・感情リソース獲得 </summary>
     RewardPhase,
     /// <summary> 記憶テーマ構成・キャラクター表示 </summary>

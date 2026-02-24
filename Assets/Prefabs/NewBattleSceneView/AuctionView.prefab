@@ -34,7 +34,6 @@ RectTransform:
   - {fileID: 6937983825494322785}
   - {fileID: 3573503303398212736}
   - {fileID: 8918312952511633238}
-  - {fileID: 3690083444705993025}
   - {fileID: 6429865253687746241}
   - {fileID: 8147985141223621162}
   - {fileID: 5505111605585215236}
@@ -65,15 +64,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4385313dac7941a28dcebc7e01cf097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerCardContainer: {fileID: 8918312952511633238}
-  enemyCardContainer: {fileID: 3690083444705993025}
-  cardPrefab: {fileID: 7383955479449652679, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  cardContainer: {fileID: 8918312952511633238}
+  auctionCardPrefab: {fileID: 3071216832625960435, guid: 7cce861ff0ef44a39a9cfa30a09afd43, type: 3}
   bidWindowView: {fileID: 8402262033418295262}
   confirmBiddingButton: {fileID: 8162407218790797572}
   emotionResourceDisplayView: {fileID: 4318667104630866671}
-  cardBidInfoPrefab: {fileID: 9134574364431770915, guid: e68a4e123d3de4df19bb1d9330ce530e, type: 3}
-  playerCardStagger: {fileID: 8892872961073848662}
-  enemyCardStagger: {fileID: 5145865381775669263}
+  cardStagger: {fileID: 8892872961073848662}
 --- !u!225 &5837306852137217465
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -97,7 +93,7 @@ GameObject:
   - component: {fileID: 8918312952511633238}
   - component: {fileID: 8892872961073848662}
   m_Layer: 5
-  m_Name: PlayerCardContainer
+  m_Name: CardContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -139,66 +135,6 @@ MonoBehaviour:
   alignment: 4
   gridConstraintCount: 2
   slideOffset: {x: 0, y: -75}
-  duration: 0.2
-  staggerDelay: 0.1
-  moveEase: 8
-  enableFade: 1
-  fadeEase: 8
-  ignoreTimeScale: 0
-  activeOnly: 1
---- !u!1 &4886797364826216689
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3690083444705993025}
-  - component: {fileID: 5145865381775669263}
-  m_Layer: 5
-  m_Name: EnemyCardContainer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &3690083444705993025
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4886797364826216689}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 6846512103505280209}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 75}
-  m_SizeDelta: {x: 600, y: 200}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &5145865381775669263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4886797364826216689}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e07333a62107943049d1f5d5a6038850, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layoutMode: 1
-  spacing: 25
-  alignment: 4
-  gridConstraintCount: 2
-  slideOffset: {x: 0, y: 75}
   duration: 0.2
   staggerDelay: 0.1
   moveEase: 8
