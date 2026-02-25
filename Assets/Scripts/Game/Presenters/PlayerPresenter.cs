@@ -12,7 +12,6 @@ public abstract class PlayerPresenter : IDisposable
 
     public IReadOnlyDictionary<EmotionType, int> EmotionResources => _playerModel.EmotionResources;
     public IReadOnlyList<CardModel> Cards => _cards;
-    public ValueRankingModel ValueRanking => _valueRanking;
     public BidModel Bids => _bids;
     public IReadOnlyList<CardModel> WonCards => _wonCards;
     public ReadOnlyReactiveProperty<float> PainLevel => _painLevel;
@@ -24,7 +23,6 @@ public abstract class PlayerPresenter : IDisposable
     private readonly GameProgressService _gameProgressService;
 
     private readonly List<CardModel> _cards = new();
-    private readonly ValueRankingModel _valueRanking = new();
     private readonly BidModel _bids = new();
     private readonly List<CardModel> _wonCards = new();
     private readonly ReactiveProperty<float> _painLevel = new(0f);
@@ -71,7 +69,6 @@ public abstract class PlayerPresenter : IDisposable
     public virtual void InitializeAuctionData()
     {
         _cards.Clear();
-        _valueRanking.Clear();
         _bids.Clear();
         _wonCards.Clear();
     }

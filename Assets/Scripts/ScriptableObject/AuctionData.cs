@@ -9,15 +9,11 @@ public class AuctionData : ScriptableObject
 {
     [SerializeField] private string auctionId;
     [SerializeField] private EnemyData enemy;
-    [SerializeField] private EnemyDialogueData dialogueData;
     [SerializeField] private ThemeData theme;
-    [SerializeField] private List<CardData> playerCards = new();
-    [SerializeField] private List<CardData> enemyCards = new();
+    [SerializeField] private List<CardData> auctionCards = new();
 
     public string AuctionId => auctionId;
     public EnemyData Enemy => enemy;
     public ThemeData Theme => theme;
-    public IReadOnlyList<CardData> PlayerCards => playerCards;
-    public IReadOnlyList<CardData> EnemyCards => enemyCards;
-    public EnemyDialogueData DialogueData => dialogueData;
+    public IReadOnlyList<CardData> AuctionCards => auctionCards;
 }

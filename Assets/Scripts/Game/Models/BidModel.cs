@@ -3,7 +3,7 @@ using System.Linq;
 
 /// <summary>
 /// 入札情報を管理するモデル
-/// カードごとに感情タイプ別の入札量を保持
+/// 1カードにつき1種類の感情のみベット可能（1カード1感情制約）
 /// </summary>
 public class BidModel
 {
@@ -12,7 +12,6 @@ public class BidModel
     /// <summary>
     /// 入札対象カード一覧を取得
     /// </summary>
-    /// <returns>入札があるカードのリスト</returns>
     public IReadOnlyList<CardModel> GetBidTargets() => _bids.Keys.ToList();
 
     /// <summary>
@@ -31,53 +30,44 @@ public class BidModel
     public void Clear() => _bids.Clear();
 
     /// <summary>
-    /// 入札を追加
+    /// 入札を設定（1カード1感情制約）
+    /// 既に別の感情がセットされている場合はクリアしてから設定
     /// </summary>
-    /// <param name="card">対象カード</param>
-    /// <param name="emotion">感情タイプ</param>
-    /// <param name="amount">入札量</param>
-    public void AddBid(CardModel card, EmotionType emotion, int amount)
-    {
-        if (amount <= 0)
-            return;
-
-        if (!_bids.ContainsKey(card))
-            _bids[card] = new Dictionary<EmotionType, int>();
-
-        if (!_bids[card].ContainsKey(emotion))
-            _bids[card][emotion] = 0;
-
-        _bids[card][emotion] += amount;
-    }
-
-    /// <summary>
-    /// 入札を設定（上書き）
-    /// </summary>
-    /// <param name="card">対象カード</param>
-    /// <param name="emotion">感情タイプ</param>
-    /// <param name="amount">入札量</param>
     public void SetBid(CardModel card, EmotionType emotion, int amount)
     {
         if (!_bids.ContainsKey(card))
             _bids[card] = new Dictionary<EmotionType, int>();
 
-        if (amount <= 0)
-        {
-            _bids[card].Remove(emotion);
-            if (_bids[card].Count == 0)
-                _bids.Remove(card);
-        }
-        else
+        // 1カード1感情制約: 既存の他感情をクリア
+        _bids[card].Clear();
+
+        if (amount > 0)
         {
             _bids[card][emotion] = amount;
         }
+        else
+        {
+            _bids.Remove(card);
+        }
+    }
+
+    /// <summary>
+    /// カードに設定されている感情タイプを取得（1カード1感情制約）
+    /// </summary>
+    public EmotionType? GetBidEmotion(CardModel card)
+    {
+        if (!_bids.TryGetValue(card, out var emotions) || emotions.Count == 0)
+            return null;
+
+        foreach (var kvp in emotions)
+            return kvp.Key;
+
+        return null;
     }
 
     /// <summary>
     /// 特定カードの入札合計を取得
     /// </summary>
-    /// <param name="card">対象カード</param>
-    /// <returns>入札合計値</returns>
     public int GetTotalBid(CardModel card)
     {
         if (!_bids.TryGetValue(card, out var emotions))
@@ -89,8 +79,6 @@ public class BidModel
     /// <summary>
     /// 特定カードの感情別入札量を取得
     /// </summary>
-    /// <param name="card">対象カード</param>
-    /// <returns>感情タイプ別入札量（入札がない場合は空の辞書）</returns>
     public Dictionary<EmotionType, int> GetBidsByEmotion(CardModel card)
     {
         if (!_bids.TryGetValue(card, out var emotions))
@@ -102,7 +90,6 @@ public class BidModel
     /// <summary>
     /// 感情タイプ別の入札合計を取得（全カードの合計）
     /// </summary>
-    /// <returns>感情タイプごとの入札合計量</returns>
     public Dictionary<EmotionType, int> GetTotalBidsByEmotion()
     {
         var result = new Dictionary<EmotionType, int>();

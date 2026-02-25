@@ -3,7 +3,7 @@ using System.Linq;
 
 /// <summary>
 /// カード獲得情報（実行時データ）
-/// オークションでの各カードの入札・順位・勝敗情報を保持
+/// オークションでの各カードの入札・勝敗情報を保持
 /// </summary>
 public class CardAcquisitionInfo
 {
@@ -21,16 +21,6 @@ public class CardAcquisitionInfo
     /// 敵の感情別入札量
     /// </summary>
     public IReadOnlyDictionary<EmotionType, int> EnemyBids { get; }
-
-    /// <summary>
-    /// プレイヤーの価値順位（1-4、未設定は0）
-    /// </summary>
-    public int PlayerValueRank { get; }
-
-    /// <summary>
-    /// 敵の価値順位（1-4、未設定は0）
-    /// </summary>
-    public int EnemyValueRank { get; }
 
     /// <summary>
     /// プレイヤーが勝利したか
@@ -51,15 +41,11 @@ public class CardAcquisitionInfo
         CardModel card,
         Dictionary<EmotionType, int> playerBids,
         Dictionary<EmotionType, int> enemyBids,
-        int playerValueRank,
-        int enemyValueRank,
         bool playerWon)
     {
         Card = card;
         PlayerBids = new Dictionary<EmotionType, int>(playerBids);
         EnemyBids = new Dictionary<EmotionType, int>(enemyBids);
-        PlayerValueRank = playerValueRank;
-        EnemyValueRank = enemyValueRank;
         PlayerWon = playerWon;
     }
 
@@ -70,8 +56,6 @@ public class CardAcquisitionInfo
         Card.Data.CardId,
         new Dictionary<EmotionType, int>(PlayerBids),
         new Dictionary<EmotionType, int>(EnemyBids),
-        PlayerValueRank,
-        EnemyValueRank,
         PlayerWon
     );
 }

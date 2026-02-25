@@ -5,12 +5,9 @@ using UnityEngine;
 using Void2610.UnityTemplate;
 
 // カード上の入札情報表示View
-// 価値順位、入札額、WIN/LOSEを表示
+// 入札額、WIN/LOSEを表示
 public class CardBidInfoView : MonoBehaviour
 {
-    [Header("価値順位表示")]
-    [SerializeField] private TextMeshProUGUI rankText;
-
     [Header("入札額表示")]
     [SerializeField] private BidAmountIconView bidAmountIconPrefab;
     [SerializeField] private Transform playerBidContainer;
@@ -25,19 +22,8 @@ public class CardBidInfoView : MonoBehaviour
 
     private readonly List<BidAmountIconView> _spawnedIcons = new();
 
-    // 価値順位を非表示
-    public void HideRank() => rankText.text = "";
-
     // 結果を非表示
     public void HideResult() => resultText.gameObject.SetActive(false);
-
-    // 価値順位を表示（色でプレイヤー/敵を判別）
-    public void ShowRank(int rank, bool isPlayerCard)
-    {
-        // プレイヤーカードは順位を表示、敵カードは非公開（?）
-        rankText.text = isPlayerCard ? $"{rank}" : "?";
-        rankText.color = isPlayerCard ? _playerColor : _enemyColor;
-    }
 
     // 入札額を表示（両方公開）
     public void ShowBidAmounts(int playerBid, int enemyBid)

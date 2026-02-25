@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 using Void2610.SettingsSystem;
@@ -14,11 +15,14 @@ public class GameSettingsDefinition : ISettingsDefinition
         _gameProgressService = gameProgressService;
     }
 
+    public UniTask WaitForInitializationAsync() => UniTask.CompletedTask;
+
     public IEnumerable<SettingsCategory> CreateCategories()
     {
         yield return new SettingsCategory("オーディオ", new ISettingBase[]
         {
             new SliderSetting(
+                key: "bgm-volume",
                 name: "BGM音量",
                 desc: "BGMの音量を設定します",
                 defaultVal: BgmManager.Instance.BgmVolume,
@@ -26,6 +30,7 @@ public class GameSettingsDefinition : ISettingsDefinition
                 max: 1f
             ),
             new SliderSetting(
+                key: "se-volume",
                 name: "SE音量",
                 desc: "効果音の音量を設定します",
                 defaultVal: SeManager.Instance.SeVolume,
@@ -33,6 +38,7 @@ public class GameSettingsDefinition : ISettingsDefinition
                 max: 1f
             ),
             new ButtonSetting(
+                key: "se-test",
                 name: "SE音量テスト",
                 desc: "現在のSE音量で効果音を再生します",
                 btnText: "再生"
@@ -42,6 +48,7 @@ public class GameSettingsDefinition : ISettingsDefinition
         yield return new SettingsCategory("グラフィック", new ISettingBase[]
         {
             new EnumSetting(
+                key: "fullscreen",
                 name: "フルスクリーン",
                 desc: "フルスクリーン表示の切り替え",
                 opts: new[] { "false", "true" },
@@ -53,6 +60,7 @@ public class GameSettingsDefinition : ISettingsDefinition
         yield return new SettingsCategory("データ", new ISettingBase[]
         {
             new ButtonSetting(
+                key: "delete-save",
                 name: "セーブデータ削除",
                 desc: "セーブデータを削除して初期状態に戻します",
                 btnText: "削除",
@@ -68,27 +76,27 @@ public class GameSettingsDefinition : ISettingsDefinition
         {
             switch (setting)
             {
-                case SliderSetting { SettingName: "BGM音量" } sliderSetting:
+                case SliderSetting { SettingKey: "bgm-volume" } sliderSetting:
                     sliderSetting.OnSettingChanged
                         .Subscribe(_ => BgmManager.Instance.BgmVolume = sliderSetting.CurrentValue)
                         .AddTo(disposables);
                     break;
-                case SliderSetting { SettingName: "SE音量" } sliderSetting:
+                case SliderSetting { SettingKey: "se-volume" } sliderSetting:
                     sliderSetting.OnSettingChanged
                         .Subscribe(_ => SeManager.Instance.SeVolume = sliderSetting.CurrentValue)
                         .AddTo(disposables);
                     break;
-                case ButtonSetting { SettingName: "SE音量テスト" } buttonSetting:
+                case ButtonSetting { SettingKey: "se-test" } buttonSetting:
                     buttonSetting.OnButtonClicked
                         .Subscribe(_ => SeManager.Instance.PlaySe("CardSelect"))
                         .AddTo(disposables);
                     break;
-                case EnumSetting { SettingName: "フルスクリーン" } enumSetting:
+                case EnumSetting { SettingKey: "fullscreen" } enumSetting:
                     enumSetting.OnValueChanged
                         .Subscribe(v => Screen.fullScreen = v == "true")
                         .AddTo(disposables);
                     break;
-                case ButtonSetting { SettingName: "セーブデータ削除" } buttonSetting:
+                case ButtonSetting { SettingKey: "delete-save" } buttonSetting:
                     buttonSetting.OnButtonClicked
                         .Subscribe(_ => _gameProgressService.ResetToDefaultData())
                         .AddTo(disposables);

@@ -11,6 +11,9 @@ using VContainer.Unity;
 /// </summary>
 public class BattleUIPresenter : IStartable, System.IDisposable
 {
+    public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
+    public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
+
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
     [Inject] private readonly InputActionsProvider _inputActionsProvider;
@@ -24,9 +27,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly CompositeDisposable _disposables = new();
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
-    private readonly ValueRankingView _valueRankingView;
     private readonly AuctionView _auctionView;
-    private readonly DialoguePhaseView _dialoguePhaseView;
+    private readonly CompetitionView _competitionView;
     private readonly RewardPhaseView _rewardPhaseView;
     private readonly MemoryGrowthView _memoryGrowthView;
     private readonly PlayerFaceView _playerFaceView;
@@ -41,9 +43,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView = Object.FindFirstObjectByType<EnemyView>();
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
-        _valueRankingView = Object.FindFirstObjectByType<ValueRankingView>();
         _auctionView = Object.FindFirstObjectByType<AuctionView>();
-        _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>();
+        _competitionView = Object.FindFirstObjectByType<CompetitionView>();
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
@@ -58,21 +59,14 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
     public async UniTask PlayPhaseTransitionCloseAsync() => await _eyeBlinkTransitionView.PlayCloseAsync();
     public async UniTask StartTutorial(string tutorialId, params string[] args) => await _tutorialPresenter.StartTutorial(tutorialId, args);
-    public UniTask ShowPlayerDialogueAsync(string text) => _dialoguePhaseView.ShowPlayerDialogueAsync(text);
-    public UniTask HidePlayerDialogueAsync() => _dialoguePhaseView.HidePlayerDialogueAsync();
-    public UniTask ShowEnemyDialogueAsync(string text) => _dialoguePhaseView.ShowEnemyDialogueAsync(text);
-    public UniTask HideEnemyDialogueAsync() => _dialoguePhaseView.HideEnemyDialogueAsync();
-    public async UniTask ShowPlayerNarration(string message) => await _dialoguePhaseView.ShowPlayerNarrationAsync(message);
-    public async UniTask ShowEnemyNarration(string message) => await _dialoguePhaseView.ShowEnemyNarrationAsync(message);
-    public UniTask HideAllAsync() => _dialoguePhaseView.HideAllAsync();
-    public void ShowDialogueView() => _dialoguePhaseView.Show();
-    public void InitializeDialogueView(EnemyData enemyData) => _dialoguePhaseView.Initialize(enemyData);
     public async UniTask DisplayCardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) =>
         await _rewardPhaseView.DisplayCardsAsync(results);
     public async UniTask WaitForCardAcquisitionCompleteAsync() =>
         await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
     public void ShowAuctionView() => _auctionView.Show();
-    public async UniTask ShowAuctionResultsSequentialAsync(IReadOnlyList<AuctionJudge.AuctionResultEntry> results, ValueRankingModel playerRanking, ValueRankingModel enemyRanking, Color enemyColor) => await _auctionView.ShowResultsSequentialAsync(results, playerRanking, enemyRanking, enemyColor);
+    public async UniTask ShowAuctionResultsSequentialAsync(
+        IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) =>
+        await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
     public void HideRewardView() => _rewardPhaseView.Hide();
@@ -82,6 +76,15 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         IReadOnlyDictionary<EmotionType, int> currentResources,
         IReadOnlyDictionary<EmotionType, int> maxResources) =>
         _rewardPhaseView.DisplayResourceGauges(currentResources, maxResources);
+
+    // 競合フェーズ
+    public void ShowCompetition(int playerBid, int enemyBid, IReadOnlyDictionary<EmotionType, int> resources) =>
+        _competitionView.Initialize(playerBid, enemyBid, resources);
+    public void UpdateCompetitionBids(int playerBid, int enemyBid) => _competitionView.UpdateBids(playerBid, enemyBid);
+    public void UpdateCompetitionTimer(float remaining, float max) => _competitionView.UpdateTimer(remaining, max);
+    public void UpdateCompetitionResources(IReadOnlyDictionary<EmotionType, int> resources) =>
+        _competitionView.UpdateResources(resources);
+    public void HideCompetition() => _competitionView.Hide();
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {
@@ -102,52 +105,26 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _enemyView.Initialize(enemyData);
     }
 
-    public void ShowValueRankingView(IReadOnlyList<CardModel> cards)
-    {
-        _valueRankingView.Show();
-        _valueRankingView.StartRanking(cards);
-    }
-
-    public async UniTask<IReadOnlyList<CardModel>> WaitForValueRankingAsync()
-    {
-        await _valueRankingView.OnRankingComplete.FirstAsync();
-
-        var result = _valueRankingView.GetRankedCards();
-
-        // 少し待ってから次のフェーズへ
-        await UniTask.Delay(1000);
-
-        // トランジション：閉じる（黒フェードで画面を覆う）
-        await _eyeBlinkTransitionView.PlayCloseAsync();
-
-        _valueRankingView.Hide();
-
-        return result;
-    }
-
-    // カード公開（CardRevealフェーズ）
+    // カード提示（6枚共有表示）
     public void ShowAuctionCards(
-        IReadOnlyList<CardModel> playerCards,
-        IReadOnlyList<CardModel> enemyCards,
-        IReadOnlyDictionary<EmotionType, int> emotionResources,
-        ValueRankingModel playerRanking = null)
+        IReadOnlyList<CardModel> auctionCards,
+        IReadOnlyDictionary<EmotionType, int> emotionResources)
     {
         _auctionView.Show();
-        _auctionView.ShowCards(playerCards, enemyCards, playerRanking);
+        _auctionView.ShowCards(auctionCards);
         _auctionView.UpdateEmotionResources(emotionResources);
         _auctionView.SetSelectedEmotion(EmotionType.Joy);
     }
 
     // 入札待機（BiddingPhaseフェーズ）
     public async UniTask WaitForBiddingAsync(
-        IReadOnlyList<CardModel> playerCards,
-        IReadOnlyList<CardModel> enemyCards,
+        IReadOnlyList<CardModel> auctionCards,
         BidModel playerBids,
         EmotionType initialEmotion,
         IReadOnlyDictionary<EmotionType, int> emotionResources)
     {
         _auctionView.Show();
-        _auctionView.StartBidding(playerCards, enemyCards, playerBids, initialEmotion, emotionResources);
+        _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
 
         await _auctionView.OnBiddingComplete.FirstAsync();
     }
@@ -157,43 +134,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     {
         _auctionView.Clear();
         _auctionView.Hide();
-    }
-
-    public async UniTask<DialogueChoiceType> WaitForFourChoiceAsync()
-    {
-        var labels = new List<string>
-        {
-            DialogueChoiceType.Provoke.ToJapaneseName() + "する",
-            DialogueChoiceType.Empathize.ToJapaneseName() + "する",
-            DialogueChoiceType.Persuade.ToJapaneseName() + "する",
-            DialogueChoiceType.Silence.ToJapaneseName() + "する"
-        };
-
-        _dialoguePhaseView.SetupChoices(labels);
-        _dialoguePhaseView.Show();
-
-        var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
-
-        _dialoguePhaseView.HideChoices();
-
-        return (DialogueChoiceType)selectedIndex;
-    }
-
-    public async UniTask<int> WaitForThreeResponseAsync(List<string> options)
-    {
-        _dialoguePhaseView.SetupChoices(options);
-
-        var selectedIndex = await _dialoguePhaseView.OnChoiceSelected.FirstAsync();
-
-        _dialoguePhaseView.HideChoices();
-
-        return selectedIndex;
-    }
-
-    public async UniTask HideDialogueViewAsync()
-    {
-        await _dialoguePhaseView.HideAllAsync();
-        _dialoguePhaseView.Hide();
     }
 
     public async UniTask<IReadOnlyDictionary<EmotionType, int>> AnimateResourceRewardsAsync(

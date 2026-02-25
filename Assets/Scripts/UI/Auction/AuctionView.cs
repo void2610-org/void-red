@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using R3;
@@ -13,9 +12,8 @@ using Void2610.UnityTemplate;
 public class AuctionView : BasePhaseView
 {
     [Header("カード表示")]
-    [SerializeField] private Transform playerCardContainer;
-    [SerializeField] private Transform enemyCardContainer;
-    [SerializeField] private CardView cardPrefab;
+    [SerializeField] private Transform cardContainer;
+    [SerializeField] private AuctionCardView auctionCardPrefab;
 
     [Header("入札UI")]
     [SerializeField] private BidWindowView bidWindowView;
@@ -24,23 +22,15 @@ public class AuctionView : BasePhaseView
     [Header("感情リソース表示")]
     [SerializeField] private EmotionResourceDisplayView emotionResourceDisplayView;
 
-    [Header("結果表示")]
-    [SerializeField] private CardBidInfoView cardBidInfoPrefab;
-
     [Header("カード登場アニメーション")]
-    [SerializeField] private StaggeredSlideInGroup playerCardStagger;
-    [SerializeField] private StaggeredSlideInGroup enemyCardStagger;
+    [SerializeField] private StaggeredSlideInGroup cardStagger;
 
     public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
 
-    private readonly List<CardView> _cardViews = new();
-    private readonly Dictionary<CardView, CardModel> _cardViewToModel = new();
-    private readonly Dictionary<CardView, CardBidInfoView> _cardBidInfoViews = new();
-    private readonly HashSet<CardModel> _playerCardModels = new();
+    private readonly List<AuctionCardView> _auctionCardViews = new();
     private CompositeDisposable _disposables = new();
 
-    private CardView _selectedCard;
-    private CardModel _selectedCardModel;
+    private AuctionCardView _selectedAuctionCard;
     private BidModel _playerBids;
     private EmotionType _currentEmotion;
     private IReadOnlyDictionary<EmotionType, int> _emotionResources;
@@ -52,91 +42,44 @@ public class AuctionView : BasePhaseView
 
     public override void Show() => CanvasGroup.Show();
 
-    // カード表示のみ（CardReveal用）
-    public void ShowCards(
-        IReadOnlyList<CardModel> playerCards,
-        IReadOnlyList<CardModel> enemyCards,
-        ValueRankingModel playerRanking = null)
+    // カード表示（6枚共有表示）
+    public void ShowCards(IReadOnlyList<CardModel> auctionCards)
     {
         Clear();
 
-        // プレイヤーのカードを表示
-        foreach (var card in playerCards)
+        foreach (var card in auctionCards)
         {
-            var cardView = Instantiate(cardPrefab, playerCardContainer);
-            cardView.Initialize(card.Data);
-            cardView.SetInteractable(false);
-
-            _cardViewToModel[cardView] = card;
-            _cardViews.Add(cardView);
-            _playerCardModels.Add(card);
-
-            // 入札情報Viewを生成
-            var bidInfoView = Instantiate(cardBidInfoPrefab, cardView.transform);
-            if (playerRanking != null)
-            {
-                var rank = playerRanking.GetRanking(card);
-                bidInfoView.ShowRank(rank, true);
-            }
-            else
-            {
-                bidInfoView.HideRank();
-            }
-            bidInfoView.ShowPlayerBidOnly(0);
-            bidInfoView.HideResult();
-            _cardBidInfoViews[cardView] = bidInfoView;
+            var auctionCard = Instantiate(auctionCardPrefab, cardContainer);
+            auctionCard.Initialize(card);
+            auctionCard.SetInteractable(false);
+            _auctionCardViews.Add(auctionCard);
         }
 
-        // 敵のカードを表示
-        foreach (var card in enemyCards)
-        {
-            var cardView = Instantiate(cardPrefab, enemyCardContainer);
-            cardView.Initialize(card.Data);
-            cardView.SetInteractable(false);
-
-            _cardViewToModel[cardView] = card;
-            _cardViews.Add(cardView);
-
-            // 入札情報Viewを生成
-            var bidInfoView = Instantiate(cardBidInfoPrefab, cardView.transform);
-            if (playerRanking != null)
-            {
-                var rank = playerRanking.GetRanking(card);
-                bidInfoView.ShowRank(rank, false);
-            }
-            else
-            {
-                bidInfoView.HideRank();
-            }
-            bidInfoView.ShowPlayerBidOnly(0);
-            bidInfoView.HideResult();
-            _cardBidInfoViews[cardView] = bidInfoView;
-        }
-
-        playerCardStagger.Play();
-        enemyCardStagger.Play();
+        cardStagger.Play();
     }
 
     // 入札フェーズ開始
     public void StartBidding(
-        IReadOnlyList<CardModel> playerCards,
-        IReadOnlyList<CardModel> enemyCards,
+        IReadOnlyList<CardModel> auctionCards,
         BidModel playerBids,
         EmotionType initialEmotion,
         IReadOnlyDictionary<EmotionType, int> emotionResources)
     {
         // カードが未表示なら表示
-        if (_cardViews.Count == 0)
+        if (_auctionCardViews.Count == 0)
         {
-            ShowCards(playerCards, enemyCards);
+            ShowCards(auctionCards);
         }
 
         // カードをクリック可能に
-        foreach (var cardView in _cardViews)
+        foreach (var auctionCard in _auctionCardViews)
         {
-            cardView.SetInteractable(true);
-            cardView.OnClicked
+            auctionCard.SetInteractable(true);
+            auctionCard.OnCardClicked
                 .Subscribe(OnCardClicked)
+                .AddTo(_disposables);
+            auctionCard.OnDialogueClicked
+                .Subscribe(OnDialogueClicked)
                 .AddTo(_disposables);
         }
 
@@ -155,7 +98,7 @@ public class AuctionView : BasePhaseView
         emotionResourceDisplayView.UpdateResources(emotionResources);
         emotionResourceDisplayView.SetSelectedEmotion(_currentEmotion);
 
-        // 歯車UI展開SE（入札フェーズ開始時に1回だけ再生）
+        // 歯車UI展開SE
         SeManager.Instance.PlaySe("SE_GEAR_OPEN", pitch: 1f);
 
         // 入札UIを初期化
@@ -183,25 +126,18 @@ public class AuctionView : BasePhaseView
             .AddTo(_disposables);
     }
 
-    // 入札対象カード公開演出（入札されたカードのみ表示）
+    // 入札対象カード公開演出
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f)
     {
         DeselectCard();
 
-        // 各カードの入札状態を入札額表示で表現
-        foreach (var cardView in _cardViews)
+        foreach (var auctionCard in _auctionCardViews)
         {
-            var cardModel = _cardViewToModel[cardView];
-            var playerBid = playerBids.GetTotalBid(cardModel);
-            var enemyBid = enemyBids.GetTotalBid(cardModel);
+            var playerBid = playerBids.GetTotalBid(auctionCard.CardModel);
+            var enemyBid = enemyBids.GetTotalBid(auctionCard.CardModel);
 
-            cardView.SetInteractable(false);
-
-            if (_cardBidInfoViews.TryGetValue(cardView, out var bidInfoView))
-            {
-                // 入札対象公開: 自分の入札→数値、相手の入札→?、入札なし→非表示
-                bidInfoView.ShowBidTargetReveal(playerBid, enemyBid > 0);
-            }
+            auctionCard.SetInteractable(false);
+            auctionCard.BidInfoView.ShowBidTargetReveal(playerBid, enemyBid > 0);
         }
 
         await UniTask.Delay((int)(duration * 1000));
@@ -210,98 +146,34 @@ public class AuctionView : BasePhaseView
     // 全カードを再表示
     public void ShowAllCards()
     {
-        foreach (var cardView in _cardViews)
+        foreach (var auctionCard in _auctionCardViews)
         {
-            cardView.gameObject.SetActive(true);
-
-            if (_cardBidInfoViews.TryGetValue(cardView, out var bidInfoView))
-            {
-                bidInfoView.gameObject.SetActive(true);
-            }
+            auctionCard.gameObject.SetActive(true);
         }
     }
 
-    // 結果表示（AuctionResult用）
-    public void ShowResults(IReadOnlyList<AuctionJudge.AuctionResultEntry> results)
-    {
-        // カードをクリック不可に
-        foreach (var cardView in _cardViews)
-        {
-            cardView.SetInteractable(false);
-        }
-
-        DeselectCard();
-
-        // 結果を表示
-        foreach (var result in results)
-        {
-            // CardModelからCardViewを探す
-            CardView targetCardView = null;
-            foreach (var kvp in _cardViewToModel)
-            {
-                if (kvp.Value == result.Card)
-                {
-                    targetCardView = kvp.Key;
-                    break;
-                }
-            }
-            if (targetCardView == null) continue;
-
-            // 既存のCardBidInfoViewを取得、なければ生成
-            if (!_cardBidInfoViews.TryGetValue(targetCardView, out var bidInfoView))
-            {
-                bidInfoView = Instantiate(cardBidInfoPrefab, targetCardView.transform);
-                _cardBidInfoViews[targetCardView] = bidInfoView;
-            }
-
-            // 両者の入札額を公開
-            bidInfoView.ShowBidAmounts(result.PlayerBid, result.EnemyBid);
-
-            if (!result.NoBids)
-            {
-                if (result.IsDraw)
-                    bidInfoView.ShowDraw();
-                else
-                    bidInfoView.ShowResult(result.IsPlayerWon);
-            }
-        }
-    }
-
-    // 順次結果表示（各カードごとにアニメーション付き）
+    // 順次結果表示
     public async UniTask ShowResultsSequentialAsync(
         IReadOnlyList<AuctionJudge.AuctionResultEntry> results,
-        ValueRankingModel playerRanking,
-        ValueRankingModel enemyRanking,
         Color enemyColor,
         float delayBetweenCards = 0.8f)
     {
         // 全カードを表示状態に戻す
-        foreach (var cardView in _cardViews)
+        foreach (var auctionCard in _auctionCardViews)
         {
-            cardView.gameObject.SetActive(true);
-            cardView.SetInteractable(false);
-
-            if (_cardBidInfoViews.TryGetValue(cardView, out var infoView))
-            {
-                infoView.gameObject.SetActive(true);
-            }
+            auctionCard.gameObject.SetActive(true);
+            auctionCard.SetInteractable(false);
         }
 
         DeselectCard();
 
         foreach (var result in results)
         {
-            // CardModelからCardViewを探す
-            var targetCardView = FindCardView(result.Card);
-            if (targetCardView == null) continue;
+            var targetAuctionCard = FindAuctionCardView(result.Card);
+            if (targetAuctionCard == null) continue;
 
-            // 既存のCardBidInfoViewを取得
-            if (!_cardBidInfoViews.TryGetValue(targetCardView, out var bidInfoView)) continue;
-
-            // 価値順位を公開（プレイヤーカードか敵カードかで色を変える）
-            var isPlayerCard = _playerCardModels.Contains(result.Card);
-            var rank = isPlayerCard ? playerRanking.GetRanking(result.Card) : enemyRanking.GetRanking(result.Card);
-            bidInfoView.ShowRank(rank, isPlayerCard);
+            var bidInfoView = targetAuctionCard.BidInfoView;
+            var cardView = targetAuctionCard.CardView;
 
             // 入札額を公開
             bidInfoView.ShowBidAmounts(result.PlayerBid, result.EnemyBid);
@@ -309,12 +181,12 @@ public class AuctionView : BasePhaseView
             if (result.NoBids)
             {
                 // 入札なし → フェードアウト
-                await targetCardView.PlayFadeOutAsync();
+                await cardView.PlayFadeOutAsync();
             }
             else if (result.IsDraw)
             {
-                // 引き分け → グローエフェクト表示、カードは移動させない
-                targetCardView.SetGrowEffect(CardView.CardBidState.DrawBid, enemyColor);
+                // 引き分け → 競合発生の表示
+                cardView.SetGrowEffect(CardView.CardBidState.DrawBid, enemyColor);
                 bidInfoView.ShowDraw();
                 SeManager.Instance.PlaySe("SE_RESULT_CLASH", pitch: 1f);
                 await UniTask.Delay(300);
@@ -323,7 +195,7 @@ public class AuctionView : BasePhaseView
             {
                 // 落札状態をグローエフェクトで可視化
                 var bidState = result.IsPlayerWon ? CardView.CardBidState.PlayerBid : CardView.CardBidState.EnemyBid;
-                targetCardView.SetGrowEffect(bidState, enemyColor);
+                cardView.SetGrowEffect(bidState, enemyColor);
 
                 // 勝敗表示
                 bidInfoView.ShowResult(result.IsPlayerWon);
@@ -331,7 +203,7 @@ public class AuctionView : BasePhaseView
                 await UniTask.Delay(300);
 
                 // 落札者側へ移動
-                var rt = (RectTransform)targetCardView.transform;
+                var rt = (RectTransform)targetAuctionCard.transform;
                 if (result.IsPlayerWon)
                 {
                     await MoveCardToPlayerSideAsync(rt);
@@ -348,48 +220,39 @@ public class AuctionView : BasePhaseView
 
     public void Clear()
     {
-        playerCardStagger.Cancel();
-        enemyCardStagger.Cancel();
+        cardStagger.Cancel();
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
 
         DeselectCard();
 
-        // 入札情報Viewを削除
-        foreach (var bidInfoView in _cardBidInfoViews.Values)
+        foreach (var auctionCard in _auctionCardViews)
         {
-            Destroy(bidInfoView.gameObject);
+            Destroy(auctionCard.gameObject);
         }
-        _cardBidInfoViews.Clear();
-
-        // カードViewを削除
-        foreach (var cardView in _cardViews)
-        {
-            Destroy(cardView.gameObject);
-        }
-        _cardViews.Clear();
-        _cardViewToModel.Clear();
-        _playerCardModels.Clear();
+        _auctionCardViews.Clear();
 
         _playerBids = null;
     }
 
-    // CardModelからCardViewを探すヘルパー
-    private CardView FindCardView(CardModel cardModel)
+    private AuctionCardView FindAuctionCardView(CardModel cardModel)
     {
-        foreach (var kvp in _cardViewToModel)
+        foreach (var auctionCard in _auctionCardViews)
         {
-            if (kvp.Value == cardModel)
-            {
-                return kvp.Key;
-            }
+            if (auctionCard.CardModel == cardModel)
+                return auctionCard;
         }
         return null;
     }
 
-    private void OnCardClicked(CardView cardView)
+    private static void OnDialogueClicked(AuctionCardView auctionCard)
     {
-        if (_selectedCard == cardView)
+        Debug.Log($"[対話] {auctionCard.CardModel.Data.CardName} の対話ボタンが押されました");
+    }
+
+    private void OnCardClicked(AuctionCardView auctionCard)
+    {
+        if (_selectedAuctionCard == auctionCard)
         {
             DeselectCard();
             if (bidWindowView.IsShowing)
@@ -397,87 +260,93 @@ public class AuctionView : BasePhaseView
             return;
         }
 
-        SelectCard(cardView);
+        SelectCard(auctionCard);
     }
 
-    private void SelectCard(CardView cardView)
+    private void SelectCard(AuctionCardView auctionCard)
     {
-        // ウィンドウが既に表示中なら閉じる
         if (bidWindowView.IsShowing)
             bidWindowView.Hide();
 
         DeselectCard();
 
-        _selectedCard = cardView;
-        _selectedCardModel = _cardViewToModel[cardView];
-        _selectedCard.SetHighlight(true);
+        _selectedAuctionCard = auctionCard;
+        _selectedAuctionCard.CardView.SetHighlight(true);
 
-        // ウィンドウにカード名・感情・入札値をセット
-        bidWindowView.SetCardName(_selectedCardModel.Data.CardName);
+        var cardModel = auctionCard.CardModel;
+        bidWindowView.SetCardName(cardModel.Data.CardName);
+
+        // 現在選択中の感情タイプを表示
         bidWindowView.SetEmotion(_currentEmotion);
-        var emotionBids = _playerBids.GetBidsByEmotion(_selectedCardModel);
-        var currentBid = emotionBids.GetValueOrDefault(_currentEmotion, 0);
+
+        var currentBid = _playerBids.GetTotalBid(cardModel);
         bidWindowView.UpdateBidAmount(currentBid);
         bidWindowView.Show();
     }
 
     private void DeselectCard()
     {
-        if (_selectedCard)
+        if (_selectedAuctionCard)
         {
-            _selectedCard.SetHighlight(false);
+            _selectedAuctionCard.CardView.SetHighlight(false);
         }
-        _selectedCard = null;
-        _selectedCardModel = null;
+        _selectedAuctionCard = null;
     }
 
     private void OnIncreaseBid()
     {
-        if (_selectedCardModel == null) return;
+        if (_selectedAuctionCard == null) return;
+        var cardModel = _selectedAuctionCard.CardModel;
+
+        // 1カード1感情制約: 既にこのカードに別の感情がベットされている場合は拒否
+        var existingEmotion = _playerBids.GetBidEmotion(cardModel);
+        if (existingEmotion.HasValue && existingEmotion.Value != _currentEmotion)
+            return;
 
         // 現在の感情のリソース残量をチェック
         var available = _emotionResources.TryGetValue(_currentEmotion, out var total) ? total : 0;
         var used = _usedResources.TryGetValue(_currentEmotion, out var u) ? u : 0;
         if (used >= available) return;
 
-        // 現在の感情での入札を増加（複数感情対応のためAddBidを使用）
-        _playerBids.AddBid(_selectedCardModel, _currentEmotion, 1);
+        // 入札を増加
+        var currentBid = _playerBids.GetTotalBid(cardModel);
+        _playerBids.SetBid(cardModel, _currentEmotion, currentBid + 1);
         _usedResources[_currentEmotion] = used + 1;
 
         // 感情リソース配置SE
         SeManager.Instance.PlaySe(GetResourceSeName(_currentEmotion), pitch: 1f);
 
         UpdateRemainingResourceDisplay();
-        UpdateCardBidInfoDisplay(_selectedCard);
+        UpdateCardBidInfoDisplay(_selectedAuctionCard);
         UpdateBidWindowAmount();
     }
 
     private void OnDecreaseBid()
     {
-        if (_selectedCardModel == null) return;
+        if (_selectedAuctionCard == null) return;
+        var cardModel = _selectedAuctionCard.CardModel;
 
-        // 現在の感情での入札量を取得
-        var emotionBids = _playerBids.GetBidsByEmotion(_selectedCardModel);
-        var currentEmotionBid = emotionBids.TryGetValue(_currentEmotion, out var bid) ? bid : 0;
-        if (currentEmotionBid <= 0) return;
+        var currentBid = _playerBids.GetTotalBid(cardModel);
+        if (currentBid <= 0) return;
 
-        // 現在の感情での入札を減少（SetBidで新しい値を設定）
-        _playerBids.SetBid(_selectedCardModel, _currentEmotion, currentEmotionBid - 1);
-        var used = _usedResources.TryGetValue(_currentEmotion, out var u) ? u : 0;
-        _usedResources[_currentEmotion] = Math.Max(0, used - 1);
+        // 1カード1感情制約: ベット中の感情を取得
+        var bidEmotion = _playerBids.GetBidEmotion(cardModel);
+        if (!bidEmotion.HasValue) return;
+
+        var emotion = bidEmotion.Value;
+        _playerBids.SetBid(cardModel, emotion, currentBid - 1);
+        var used = _usedResources.TryGetValue(emotion, out var u) ? u : 0;
+        _usedResources[emotion] = Math.Max(0, used - 1);
 
         UpdateRemainingResourceDisplay();
-        UpdateCardBidInfoDisplay(_selectedCard);
+        UpdateCardBidInfoDisplay(_selectedAuctionCard);
         UpdateBidWindowAmount();
     }
 
-    private void UpdateCardBidInfoDisplay(CardView cardView)
+    private void UpdateCardBidInfoDisplay(AuctionCardView auctionCard)
     {
-        if (_cardBidInfoViews.TryGetValue(cardView, out var bidInfoView))
-        {
-            var emotionBids = _playerBids.GetBidsByEmotion(_cardViewToModel[cardView]);
-            bidInfoView.ShowPlayerBidsWithEmotion(emotionBids);
-        }
+        var emotionBids = _playerBids.GetBidsByEmotion(auctionCard.CardModel);
+        auctionCard.BidInfoView.ShowPlayerBidsWithEmotion(emotionBids);
     }
 
     private void OnConfirmBidding()
@@ -487,12 +356,10 @@ public class AuctionView : BasePhaseView
         DeselectCard();
     }
 
-    // ウィンドウ内の入札値表示を更新
     private void UpdateBidWindowAmount()
     {
-        if (_selectedCardModel == null) return;
-        var emotionBids = _playerBids.GetBidsByEmotion(_selectedCardModel);
-        var currentBid = emotionBids.GetValueOrDefault(_currentEmotion, 0);
+        if (_selectedAuctionCard == null) return;
+        var currentBid = _playerBids.GetTotalBid(_selectedAuctionCard.CardModel);
         bidWindowView.UpdateBidAmount(currentBid);
     }
 
@@ -501,8 +368,7 @@ public class AuctionView : BasePhaseView
         _currentEmotion = emotion;
         UpdateRemainingResourceDisplay();
 
-        // ウィンドウが表示中なら感情色と入札値を更新
-        if (bidWindowView.IsShowing && _selectedCardModel != null)
+        if (bidWindowView.IsShowing && _selectedAuctionCard != null)
         {
             bidWindowView.SetEmotion(_currentEmotion);
             UpdateBidWindowAmount();
@@ -511,7 +377,6 @@ public class AuctionView : BasePhaseView
 
     private void UpdateRemainingResourceDisplay()
     {
-        // 全感情のリソース残量を更新
         var currentResources = new Dictionary<EmotionType, int>();
         foreach (var (emotion, originalAmount) in _emotionResources)
         {
@@ -521,7 +386,6 @@ public class AuctionView : BasePhaseView
         emotionResourceDisplayView.UpdateResources(currentResources);
     }
 
-    // 感情タイプからリソースSE名を取得
     private static string GetResourceSeName(EmotionType emotion) => emotion switch
     {
         EmotionType.Joy => "SE_RESOURCE_JOY",

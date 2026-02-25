@@ -170,8 +170,6 @@ public class GameStateRepository
                     cardModel,
                     savedCardInfo.GetPlayerBidsByEmotion(),
                     savedCardInfo.GetEnemyBidsByEmotion(),
-                    savedCardInfo.PlayerValueRank,
-                    savedCardInfo.EnemyValueRank,
                     savedCardInfo.PlayerWon
                 );
                 allCardInfoList.Add(cardInfo);
