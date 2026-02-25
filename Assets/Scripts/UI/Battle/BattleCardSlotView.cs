@@ -20,23 +20,23 @@ public class BattleCardSlotView : MonoBehaviour
     /// <summary>クリックイベント</summary>
     public Observable<Unit> OnClicked => button.OnClickAsObservable();
 
-    private BattleCardModel _card;
+    private CardModel _card;
 
     /// <summary>
     /// カード情報で初期化（表面表示）
     /// </summary>
-    public void Initialize(BattleCardModel card, bool showNumber = true)
+    public void Initialize(CardModel card, bool showNumber = true)
     {
         _card = card;
 
-        if (cardImage && card.Card.Data.CardImage)
-            cardImage.sprite = card.Card.Data.CardImage;
+        if (cardImage && card.Data.CardImage)
+            cardImage.sprite = card.Data.CardImage;
 
         if (numberText)
-            numberText.text = showNumber ? card.Number.ToString() : "";
+            numberText.text = showNumber ? card.BattleNumber.ToString() : "";
 
         if (emotionIcon)
-            emotionIcon.color = card.Emotion.GetColor();
+            emotionIcon.color = card.Data.CardEmotion.GetColor();
 
         ShowFront();
         SetSelected(false);

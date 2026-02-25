@@ -493,18 +493,16 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] デッキ選択フェーズ開始");
 
-        // BattleCardModel を生成
-        var allBattleCards = new Dictionary<CardModel, BattleCardModel>();
+        // カードにバトルデータを初期化
         foreach (var card in _auctionCards)
         {
             var info = _cardNumbers[card];
-            allBattleCards[card] = new BattleCardModel(card, info.Number, info.TotalBid);
+            card.InitializeBattleData(info.Number, info.TotalBid);
         }
 
-        // プレイヤーの獲得カード → BattleCardModel
+        // プレイヤーの獲得カード
         var playerWonBattleCards = _player.WonCards
-            .Where(c => allBattleCards.ContainsKey(c))
-            .Select(c => allBattleCards[c])
+            .Where(c => _auctionCards.Contains(c))
             .ToList();
 
         // 不足分を補完（数字3のダミーカード）
@@ -522,8 +520,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 敵AIのデッキ選択
         var enemyWonBattleCards = _enemy.WonCards
-            .Where(c => allBattleCards.ContainsKey(c))
-            .Select(c => allBattleCards[c])
+            .Where(c => _auctionCards.Contains(c))
             .ToList();
         FillDeckWithDefaults(enemyWonBattleCards);
 
@@ -539,19 +536,19 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <summary>
     /// 不足分をデフォルトカード（数字3）で補完する
     /// </summary>
-    private static void FillDeckWithDefaults(List<BattleCardModel> cards)
+    private static void FillDeckWithDefaults(List<CardModel> cards)
     {
         while (cards.Count < GameConstants.DECK_SIZE)
         {
-            // ダミーカード（数字3、入札0）
-            cards.Add(new BattleCardModel(null, GameConstants.DEFAULT_CARD_NUMBER, 0));
+            // ダミーカード（数字3）
+            cards.Add(new CardModel(GameConstants.DEFAULT_CARD_NUMBER));
         }
     }
 
     /// <summary>
     /// 敵AIのデッキ選択（ランダムで3枚選択）
     /// </summary>
-    private static List<BattleCardModel> SelectEnemyDeck(List<BattleCardModel> availableCards)
+    private static List<CardModel> SelectEnemyDeck(List<CardModel> availableCards)
     {
         return availableCards
             .OrderBy(_ => Random.value)

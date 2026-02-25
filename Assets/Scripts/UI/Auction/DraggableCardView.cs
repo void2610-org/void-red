@@ -20,7 +20,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     [SerializeField] private float dragAlpha = 0.8f;
     [SerializeField] private float dragScale = 1.05f;
 
-    public BattleCardModel BattleCard { get; private set; }
+    public CardModel CardModel { get; private set; }
     public DeckSlotView CurrentSlot { get; private set; }
     public bool IsPlaced => CurrentSlot;
     public int HandIndex { get; private set; }
@@ -59,18 +59,18 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
             numberText.text = number.ToString();
     }
 
-    public void Initialize(BattleCardModel battleCard, int handIndex)
+    public void Initialize(CardModel cardModel, int handIndex)
     {
-        BattleCard = battleCard;
+        CardModel = cardModel;
         HandIndex = handIndex;
 
         // カードデータを表示
-        if (battleCard.Card != null)
-            cardView.Initialize(battleCard.Card.Data);
+        if (cardModel.Data != null)
+            cardView.Initialize(cardModel.Data);
 
         // 数字表示
         if (numberText)
-            numberText.text = battleCard.Number.ToString();
+            numberText.text = cardModel.BattleNumber.ToString();
     }
 
     public async UniTask PlaySnapToSlotAsync(Transform targetParent, Vector2 targetPosition)
@@ -129,8 +129,8 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _originalScale = transform.localScale;
 
         // ドラッグ開始SEを再生
-        if (BattleCard?.Card != null)
-            SeManager.Instance.PlaySe(BattleCard.Card.Data.MemoryType.ToHoverSeName());
+        if (CardModel?.Data != null)
+            SeManager.Instance.PlaySe(CardModel.Data.MemoryType.ToHoverSeName());
 
         transform.SetParent(_rootCanvas.transform);
         transform.SetAsLastSibling();

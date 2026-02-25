@@ -13,7 +13,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 {
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
-    public Observable<BattleCardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
+    public Observable<CardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
     public Observable<Unit> OnSkillActivated => _skillButtonView.OnActivated;
     public Observable<Unit> OnBattleNextClicked => _cardBattleView.OnNextClicked;
 
@@ -96,10 +96,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void HideCompetition() => _competitionView.Hide();
 
     // デッキ選択フェーズ
-    public void InitializeDeckSelection(IReadOnlyList<BattleCardModel> wonCards) =>
+    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards) =>
         _deckSelectionView.Initialize(wonCards);
     public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
-    public IReadOnlyList<BattleCardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
+    public IReadOnlyList<CardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
     public void HideDeckSelection() => _deckSelectionView.Hide();
 
     // スキルボタン
@@ -109,11 +109,11 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // カードバトルフェーズ
     public void InitializeBattle(VictoryCondition condition) =>
         _cardBattleView.Initialize(condition);
-    public void ShowPlayerHand(IReadOnlyList<BattleCardModel> availableCards) =>
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) =>
         _cardBattleView.ShowPlayerHand(availableCards);
-    public void PlacePlayerCard(BattleCardModel card) => _cardBattleView.PlacePlayerCard(card);
+    public void PlacePlayerCard(CardModel card) => _cardBattleView.PlacePlayerCard(card);
     public void PlaceEnemyCard() => _cardBattleView.PlaceEnemyCard();
-    public void RevealCards(BattleCardModel playerCard, BattleCardModel enemyCard) =>
+    public void RevealCards(CardModel playerCard, CardModel enemyCard) =>
         _cardBattleView.RevealCards(playerCard, enemyCard);
     public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);
     public async UniTask WaitForBattleNextAsync() => await _cardBattleView.WaitForNextAsync();

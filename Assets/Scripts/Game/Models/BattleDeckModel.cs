@@ -7,24 +7,24 @@ using System.Linq;
 public class BattleDeckModel
 {
     /// <summary>デッキ内の全カード</summary>
-    public IReadOnlyList<BattleCardModel> Cards => _cards;
+    public IReadOnlyList<CardModel> Cards => _cards;
 
-    private readonly List<BattleCardModel> _cards = new();
-    private readonly Stack<BattleCardModel> _usedHistory = new();
+    private readonly List<CardModel> _cards = new();
+    private readonly Stack<CardModel> _usedHistory = new();
 
     /// <summary>使用可能なカードを取得</summary>
-    public IReadOnlyList<BattleCardModel> GetAvailableCards()
+    public IReadOnlyList<CardModel> GetAvailableCards()
         => _cards.Where(c => !c.IsUsed).ToList();
 
     /// <summary>直前に使用したカードを取得（信頼スキル用）</summary>
-    public BattleCardModel GetLastUsedCard()
+    public CardModel GetLastUsedCard()
         => _usedHistory.Count > 0 ? _usedHistory.Peek() : null;
 
     /// <summary>使用済みカードを未使用に戻す（信頼スキル用）</summary>
-    public void RestoreUsedCard(BattleCardModel card) => card.IsUsed = false;
+    public void RestoreUsedCard(CardModel card) => card.IsUsed = false;
 
     /// <summary>デッキにカードをセットする</summary>
-    public void SetDeck(List<BattleCardModel> cards)
+    public void SetDeck(List<CardModel> cards)
     {
         _cards.Clear();
         _cards.AddRange(cards);
@@ -32,7 +32,7 @@ public class BattleDeckModel
     }
 
     /// <summary>カードを使用済みにする</summary>
-    public void MarkAsUsed(BattleCardModel card)
+    public void MarkAsUsed(CardModel card)
     {
         card.IsUsed = true;
         _usedHistory.Push(card);

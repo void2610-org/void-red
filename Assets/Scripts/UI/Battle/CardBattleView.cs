@@ -36,13 +36,13 @@ public class CardBattleView : BasePhaseView
     [SerializeField] private StaggeredSlideInGroup cardStagger;
 
     /// <summary>プレイヤーがカードを場に出した</summary>
-    public Observable<BattleCardModel> OnCardSelected => _onCardSelected;
+    public Observable<CardModel> OnCardSelected => _onCardSelected;
 
     /// <summary>次へボタンが押された</summary>
     public Observable<Unit> OnNextClicked => _onNextClicked;
 
     private readonly List<DraggableCardView> _handCards = new();
-    private readonly Subject<BattleCardModel> _onCardSelected = new();
+    private readonly Subject<CardModel> _onCardSelected = new();
     private readonly Subject<Unit> _onNextClicked = new();
     private CompositeDisposable _disposables = new();
     private RectTransform _handContainerRect;
@@ -65,7 +65,7 @@ public class CardBattleView : BasePhaseView
     }
 
     /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
-    public void ShowPlayerHand(IReadOnlyList<BattleCardModel> availableCards)
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards)
     {
         ClearPlayerHand();
         handContainer.gameObject.SetActive(true);
@@ -98,7 +98,7 @@ public class CardBattleView : BasePhaseView
     }
 
     /// <summary>プレイヤーのカードを場に配置（確定後に手札をクリア）</summary>
-    public void PlacePlayerCard(BattleCardModel card)
+    public void PlacePlayerCard(CardModel card)
     {
         handContainer.gameObject.SetActive(false);
         ClearPlayerHand();
@@ -116,12 +116,12 @@ public class CardBattleView : BasePhaseView
     }
 
     /// <summary>両者のカードをオープンする（横並びで比較表示）</summary>
-    public void RevealCards(BattleCardModel playerCard, BattleCardModel enemyCard)
+    public void RevealCards(CardModel playerCard, CardModel enemyCard)
     {
         // プレイヤーカードの数字を更新（スキル効果による変更を反映）
         var placedCard = playerFieldSlot.PlacedCard;
         if (placedCard)
-            placedCard.UpdateNumber(playerCard.Number);
+            placedCard.UpdateNumber(playerCard.BattleNumber);
 
         // 敵カードを開示: BattleCardSlotViewを破棄してDraggableCardViewに置き換え
         if (_enemyFieldCardSlot)
@@ -215,7 +215,7 @@ public class CardBattleView : BasePhaseView
         if (!playerFieldSlot.IsOccupied) return;
 
         nextButton.gameObject.SetActive(false);
-        _onCardSelected.OnNext(playerFieldSlot.PlacedCard.BattleCard);
+        _onCardSelected.OnNext(playerFieldSlot.PlacedCard.CardModel);
     }
 
     /// <summary>カードを手札コンテナに戻してレイアウトを再計算する</summary>
