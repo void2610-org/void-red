@@ -400,6 +400,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// </summary>
     private void TryEnemyCompetitionRaise(CompetitionHandler handler)
     {
+        // 既にプレイヤーより多い場合は無駄に消費しない
+        if (handler.EnemyTotal > handler.PlayerTotal) return;
+
         // 50%の確率で上乗せしない
         if (Random.value < 0.5f) return;
 

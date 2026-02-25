@@ -21,7 +21,7 @@ public static class GameConstants
     /// <summary>
     /// 競合フェーズのタイムアウト時間（秒）
     /// </summary>
-    public const float COMPETITION_TIMEOUT_SECONDS = 10f;
+    public const float COMPETITION_TIMEOUT_SECONDS = 5f;
 
     /// <summary>
     /// バトルのラウンド数（3本勝負）
