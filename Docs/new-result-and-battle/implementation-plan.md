@@ -200,6 +200,8 @@ public enum GameState
 /// <summary>
 /// オークション入札量に基づいてカードに1〜6の数字を割り当てる
 /// 両者の入札合計が多い順に1から割り当て
+/// 同じ入札量のカードは同じ数字になる（ランク方式）
+/// 例: [5, 3, 3, 2, 0, 0] → [1, 2, 2, 4, 5, 5]
 /// </summary>
 public static class CardNumberAssigner
 {
@@ -208,15 +210,21 @@ public static class CardNumberAssigner
         BidModel playerBids,
         BidModel enemyBids)
     {
-        // 各カードの合計入札量（プレイヤー＋敵）を計算
+        // 各カードの合計入札量（プレイヤー＋敵）を計算し、降順ソート
         var cardTotals = auctionCards
             .Select(card => (card, total: playerBids.GetTotalBid(card) + enemyBids.GetTotalBid(card)))
             .OrderByDescending(x => x.total)
             .ToList();
 
+        // ランク方式: 同じ入札量は同じ数字
         var result = new Dictionary<CardModel, int>();
+        var rank = 1;
         for (var i = 0; i < cardTotals.Count; i++)
-            result[cardTotals[i].card] = i + 1; // 1〜6
+        {
+            if (i > 0 && cardTotals[i].total < cardTotals[i - 1].total)
+                rank = i + 1;
+            result[cardTotals[i].card] = rank;
+        }
         return result;
     }
 }
@@ -257,6 +265,7 @@ public class BattleDeckModel
 {
     public IReadOnlyList<BattleCardModel> Cards => _cards;
     private readonly List<BattleCardModel> _cards = new();
+    private readonly Stack<BattleCardModel> _usedHistory = new();
 
     public void SetDeck(List<BattleCardModel> cards) => ...;
 
@@ -265,9 +274,17 @@ public class BattleDeckModel
         => _cards.Where(c => !c.IsUsed).ToList();
 
     /// <summary>カードを使用済みにする</summary>
-    public void MarkAsUsed(BattleCardModel card) => card.IsUsed = true;
+    public void MarkAsUsed(BattleCardModel card)
+    {
+        card.IsUsed = true;
+        _usedHistory.Push(card);
+    }
 
-    /// <summary>信頼スキル: 使用済みカードを未使用に戻す</summary>
+    /// <summary>直前に使用したカードを取得（信頼スキル用）</summary>
+    public BattleCardModel GetLastUsedCard()
+        => _usedHistory.Count > 0 ? _usedHistory.Peek() : null;
+
+    /// <summary>使用済みカードを未使用に戻す（信頼スキル用）</summary>
     public void RestoreUsedCard(BattleCardModel card) => card.IsUsed = false;
 }
 ```
@@ -292,8 +309,6 @@ public class CardBattleHandler
     // 現ラウンドの状態
     public BattleCardModel PlayerCard { get; private set; }
     public BattleCardModel EnemyCard { get; private set; }
-    public bool PlayerUsedSkill { get; private set; }
-    public bool EnemyUsedSkill { get; private set; }
 
     // スキル使用権（バトル全体で1回のみ）
     private bool _playerSkillAvailable = true;
@@ -301,6 +316,9 @@ public class CardBattleHandler
 
     // 勝利条件の一時反転（怒りスキル用）
     private bool _conditionReversedNextTurn;
+
+    // カード数字割り当てマップ（タイブレーク用にオークション入札総量を保持）
+    private Dictionary<CardModel, int> _auctionBidTotals;
 
     /// <summary>コイントスで先攻後攻を決定</summary>
     public void DecideFirstPlayer() => IsPlayerFirst = Random.value > 0.5f;
@@ -315,8 +333,33 @@ public class CardBattleHandler
     public bool TryActivateEnemySkill(EmotionType skill,
         BattleDeckModel playerDeck, BattleDeckModel enemyDeck) { ... }
 
-    /// <summary>カードオープンして勝敗判定</summary>
-    public RoundResult ResolveRound() { ... }
+    /// <summary>
+    /// カードオープンして勝敗判定
+    /// 同数の場合はオークション入札リソース総量で比較（引き分けなし）
+    /// </summary>
+    public RoundResult ResolveRound()
+    {
+        var condition = _conditionReversedNextTurn
+            ? ReverseCondition(BaseCondition)
+            : BaseCondition;
+        _conditionReversedNextTurn = false;
+
+        // 数字が異なる場合
+        if (PlayerCard.Number != EnemyCard.Number)
+        {
+            return condition == VictoryCondition.LowerWins
+                ? (PlayerCard.Number < EnemyCard.Number ? RoundResult.PlayerWin : RoundResult.EnemyWin)
+                : (PlayerCard.Number > EnemyCard.Number ? RoundResult.PlayerWin : RoundResult.EnemyWin);
+        }
+
+        // 同数の場合: オークション入札リソース総量で比較
+        var playerBidTotal = _auctionBidTotals[PlayerCard.Card];
+        var enemyBidTotal = _auctionBidTotals[EnemyCard.Card];
+        // 入札量も同じ場合はランダム
+        if (playerBidTotal == enemyBidTotal)
+            return Random.value > 0.5f ? RoundResult.PlayerWin : RoundResult.EnemyWin;
+        return playerBidTotal > enemyBidTotal ? RoundResult.PlayerWin : RoundResult.EnemyWin;
+    }
 
     /// <summary>次ラウンドへ進む</summary>
     public void NextRound() { ... }
@@ -338,10 +381,15 @@ public enum RoundResult
 /// </summary>
 public static class SkillEffectApplier
 {
+    /// <summary>
+    /// スキル効果を適用する
+    /// 悲しみスキルの場合、targetCardForSadness に対象カードを指定する
+    /// </summary>
     public static void Apply(EmotionType emotion,
         BattleCardModel playerCard, BattleCardModel enemyCard,
         BattleDeckModel playerDeck, BattleDeckModel enemyDeck,
-        CardBattleHandler handler)
+        CardBattleHandler handler,
+        BattleCardModel targetCardForSadness = null)
     {
         switch (emotion)
         {
@@ -359,10 +407,10 @@ public static class SkillEffectApplier
                 playerCard.SetNumber(playerCard.Number * 2);
                 break;
             case EmotionType.Trust:
-                // 一度使ったカードがもう一度使える
-                var usedCards = playerDeck.Cards.Where(c => c.IsUsed).ToList();
-                if (usedCards.Count > 0)
-                    playerDeck.RestoreUsedCard(usedCards[^1]);
+                // 直前に使ったカードが自動的に手札に戻る
+                var lastUsed = playerDeck.GetLastUsedCard();
+                if (lastUsed != null)
+                    playerDeck.RestoreUsedCard(lastUsed);
                 break;
             case EmotionType.Fear:
                 // 相手と自分のカードの数字を入れ替える
@@ -378,8 +426,10 @@ public static class SkillEffectApplier
                 playerCard.SetNumber(Mathf.Max(1, playerCard.Number / 2));
                 break;
             case EmotionType.Sadness:
-                // デッキ内の任意のカードの数字を3に変える
-                // → UI側で選択させ、選択されたカードに適用
+                // 未使用カードから1枚を選んで数字を3に変える
+                // targetCardForSadness はUI側で選択されたカード
+                if (targetCardForSadness != null)
+                    targetCardForSadness.SetNumber(GameConstants.DEFAULT_CARD_NUMBER);
                 break;
         }
     }
@@ -388,17 +438,19 @@ public static class SkillEffectApplier
 
 ### 4.11 RewardCalculator 本実装
 
+基本報酬は **固定値1**。倍率のみ変動する設計。
+
 ```csharp
 // Assets/Scripts/Game/Services/RewardCalculator.cs
 public static class RewardCalculator
 {
     public struct RewardResult
     {
-        /// <summary>基本報酬</summary>
+        /// <summary>基本報酬（固定値1）</summary>
         public int BaseReward;
         /// <summary>倍率（感情マッチ or 記憶タイプ）</summary>
         public float Multiplier;
-        /// <summary>最終報酬（BaseReward * Multiplier）</summary>
+        /// <summary>最終報酬（切り上げ: 1→1, 1.5→2, 2→2）</summary>
         public int TotalReward;
         /// <summary>投入リソース</summary>
         public int BidAmount;
@@ -420,19 +472,18 @@ public static class RewardCalculator
         var isSelfMemory = card.Data.MemoryType == MemoryType.SelfMemory;
         var isEmotionMatched = bidEmotion.HasValue && bidEmotion.Value == cardEmotion;
 
-        // 基本報酬 = 入札量
-        var baseReward = bidAmount;
+        // 基本報酬 = 固定値1
+        const int baseReward = 1;
 
-        // 倍率決定
+        // 倍率決定（自己記憶 > 感情マッチ > 通常）
         float multiplier;
         if (isSelfMemory)
-            multiplier = GameConstants.SELF_MEMORY_MULTIPLIER;  // 2.0x
+            multiplier = GameConstants.SELF_MEMORY_MULTIPLIER;  // 2.0x → 報酬2
         else if (isEmotionMatched)
-            multiplier = GameConstants.EMOTION_MATCH_MULTIPLIER; // 1.5x
+            multiplier = GameConstants.EMOTION_MATCH_MULTIPLIER; // 1.5x → 報酬2（切り上げ）
         else
-            multiplier = 1.0f;
+            multiplier = 1.0f;                                   // 1.0x → 報酬1
 
-        // 最終報酬（小数点切り上げ）
         var totalReward = Mathf.CeilToInt(baseReward * multiplier);
 
         return new RewardResult
@@ -509,7 +560,7 @@ BattleResultView (CanvasGroup, BattleResultView.cs)
  ├─ ResultDescription ("記憶に入れるカードを選んでください" / "望まぬ記憶が...")
  ├─ CardSelectionContainer (勝利時: 所持カードから1枚選択)
  │   └─ (カード × N を動的生成)
- ├─ PlantedMemoryDisplay (敗北時: 植えつけられた記憶表示)
+ ├─ PlantedMemoryDisplay (敗北時: テキスト演出のみ。ゲームメカニクスへの影響は後で設計)
  └─ ConfirmButton (Button, "次へ")
 ```
 
@@ -729,13 +780,13 @@ Canvas
 
 #### Step 7.1: BattleResultView 新規作成
 - 勝利時: 所持カードから1枚を記憶に入れる選択UI
-- 敗北時: 相手に望まぬ記憶を植えつけられる演出
+- 敗北時: テキスト演出のみ（ゲームメカニクスへの影響は後で設計）
 
 #### Step 7.2: BattleResultView.prefab 作成 (uLoop)
 
 #### Step 7.3: BattlePresenter に HandleBattleResult を追加
-- 勝利/敗北判定
-- 記憶カード選択/植えつけ処理
+- 勝利: カード選択 → 記憶に入れる処理
+- 敗北: 演出テキスト表示のみ（メカニクス影響は未実装）
 - セーブデータへの反映
 
 #### Step 7.4: BattleUIPresenter にバトル結果メソッドを追加
@@ -831,24 +882,21 @@ private async UniTask StartGame()
 
 ---
 
-## 8. 確認事項・未確定事項
+## 8. 確認事項（全て確認済み）
 
-### 確認済み
-1. **カード数字の割り当て**: 両者の入札合計が多い順に1〜6
+1. **カード数字の割り当て**: 両者の入札合計が多い順に1〜6。**同じ入札量のカードは同じ数字**になる（ランク方式）
+   - 例: 入札合計 [5, 3, 3, 2, 0, 0] → 数字 [1, 2, 2, 4, 5, 5]
 2. **勝利条件**: AuctionData にフィールドとして持たせる
 3. **スキル効果**: 企画書の8種類をそのまま実装
 4. **バトル結果**: 勝利→記憶に入れる、敗北→望まぬ記憶を植えつけられる
-
-### 未確認（実装時に確認）
-1. **感情マッチの「基本報酬」**: 入札量をそのまま基本報酬にするか、固定値にするか（仮: 入札量ベース）
-2. **敗北時の「望まぬ記憶」の具体的な効果**: ゲーム的にどのような影響を与えるか
-3. **「一度デッキで使用したカード」の永続性**: 同じバトルシーン内（複数オークション間）で管理するか
-4. **感情の強さ順**: 同数の場合の感情強さ順とは何か（enum の順序? 別途定義?）
-5. **信頼スキルの詳細**: 「一度使ったカード」はどのカードを復活させるか（直前のもの? 選択可能?）
-6. **悲しみスキルの「任意のカード」**: 自分のデッキ内の使用済み含む全カードから選択か
-7. **敵AIのスキル使用**: どのような条件でスキルを使うか
-8. **カード数字が同値時の入札量ソート**: 入札量が同じカードの順位はどうするか
-9. **RewardPhaseView → ResultPhaseView のリネーム**: Prefabアセットの参照切れに注意
+5. **感情マッチの基本報酬**: **固定値（1リソース）**。倍率で1.5または2になるのみ
+6. **敗北時の「望まぬ記憶」**: **演出のみ（ゲームメカニクスへの影響は後で設計）**
+7. **バトル回数**: 1回のBattleScene内にオークション→バトルは **1回のみ**。デッキ使用制限は将来対応
+8. **感情の強さ順（同数字時のタイブレーク）**: **そのカードのオークション入札リソース総量**で比較
+9. **信頼スキル**: **直前に使ったカード**が自動的に手札に戻る（選択不要）
+10. **悲しみスキル**: **未使用カード（手札にあるカード）のみ**から1枚選択して数字を3に変更
+11. **敵AIのスキル使用**: **後で決める**（まずはランダム確率で仮実装）
+12. **RewardPhaseView → ResultPhaseView のリネーム**: Prefabアセットの参照切れに注意
 
 ---
 
