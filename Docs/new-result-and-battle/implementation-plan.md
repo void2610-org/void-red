@@ -946,8 +946,7 @@ Phase 3: カード数字割り当て ✅ 完了
 
 Phase 4: デッキ選択フェーズ ✅ 完了（D&D UI統合済み）
   [x] 4.1 DeckSelectionView 新規作成（D&D方式に改修済み）
-  [ ] 4.2 DeckSelectionView Prefab 再構築 ← 未着手
-        → DraggableCardView + RankingSlotView×3 + DragLineView + StaggeredSlideInGroup
+  [x] 4.2 DeckSelectionView Prefab 再構築（DraggableCardView + RankingSlotView×3 + DragLineView + StaggeredSlideInGroup）
   [x] 4.3 敵AIデッキ選択ロジック（BattlePresenter.SelectEnemyDeck）
   [x] 4.4 BattlePresenter HandleDeckSelection 実装
   [x] 4.5 BattleUIPresenter にメソッド追加
@@ -959,38 +958,30 @@ Phase 5: カードバトルロジック ✅ 完了
   [x] 5.3 敵AIバトルロジック（BattlePresenter内に仮実装: ランダム選択・50%スキル使用）
   [x] 5.4 コンパイル確認
 
-Phase 6: カードバトルUI ⚠️ スクリプト完了、Prefab未着手
+Phase 6: カードバトルUI ✅ 完了
   [x] 6.1 BattleCardSlotView 新規作成
   [-] 6.2 CoinFlipView → 未作成（BattlePresenter内でログ出力のみ）
   [x] 6.3 CardBattleView 新規作成
   [-] 6.4 SkillButtonView → CardBattleView内に統合済み（独立Viewなし）
   [-] 6.5 RoundIndicatorView → CardBattleView内に統合済み（独立Viewなし）
-  [ ] 6.6 Prefab群の作成 ← 未着手
-        → CardBattleView.prefab, BattleCardSlotView.prefab
+  [x] 6.6 Prefab群の作成（CardBattleView.prefab, BattleCardSlotView.prefab）
   [x] 6.7 BattlePresenter HandleCardBattle 実装
   [x] 6.8 BattleUIPresenter にメソッド追加
   [x] 6.9 コンパイル確認 + フォーマット修正
 
-Phase 7: バトル結果フェーズ ⚠️ スクリプト完了、Prefab未着手
+Phase 7: バトル結果フェーズ ✅ 完了
   [x] 7.1 BattleResultView 新規作成
-  [ ] 7.2 BattleResultView.prefab 作成 ← 未着手
+  [x] 7.2 BattleResultView.prefab 作成
   [x] 7.3 BattlePresenter HandleBattleResult 実装
   [x] 7.4 BattleUIPresenter にメソッド追加
   [x] 7.5 コンパイル確認 + フォーマット修正
 
-Phase 8: 統合・テスト ⚠️ スクリプト統合完了、Prefab・アセット未着手
+Phase 8: 統合・テスト ⚠️ 全フロー通しテスト未実施
   [x] 8.1 BattlePresenter 全フロー統合（StartGame に全フェーズ組み込み済み）
   [-] 8.2 VContainer 登録更新 → 不要（新サービスは全てPresenter内で生成）
-  [ ] 8.3 ScriptableObject アセット更新 ← 未着手
-        → CardData の EmotionType を各アセットで設定
-        → AuctionData の VictoryCondition を各アセットで設定
-  [ ] 8.4 Prefab 作成 & ヒエラルキー配置 ← 未着手
-        → DeckSelectionView（D&D: DraggableCardView×N, RankingSlotView×3, DragLineView）
-        → CardBattleView（BattleCardSlotView×N, SkillButton, RoundIndicator）
-        → BattleResultView（カード選択コンテナ, 確定ボタン）
-        → BattleCardSlotView（表裏切替, 数字テキスト, 感情アイコン）
-        → DraggableCardView.prefab に numberText を追加
-  [ ] 8.5 全フロー通しテスト ← 未着手
+  [x] 8.3 ScriptableObject アセット更新（CardData EmotionType, AuctionData VictoryCondition 設定済み）
+  [x] 8.4 Prefab 作成 & ヒエラルキー配置（全View Prefab化 + BattleScene配置完了）
+  [ ] 8.5 全フロー通しテスト ← 未実施
 ```
 
 ## 11. 残作業サマリー
@@ -998,24 +989,20 @@ Phase 8: 統合・テスト ⚠️ スクリプト統合完了、Prefab・アセ
 ### スクリプト: 全て完了 ✅
 全スクリプト（ロジック・UI View・Presenter）は実装済み。コンパイルエラー0件、VUA警告0件。
 
-### 未着手作業（Unity Editor での手動作業が中心）
+### Prefab・アセット・ヒエラルキー: 全て完了 ✅
+- DeckSelectionView.prefab（D&D方式: DraggableCardView + RankingSlotView×3 + DragLineView + StaggeredSlideInGroup）
+- CardBattleView.prefab（BattleCardSlotView, SkillButton, RoundIndicator, FieldSlot 等）
+- BattleResultView.prefab（ResultText, CardSelectionContainer, ConfirmButton）
+- BattleCardSlotView.prefab（表裏切替, 数字テキスト, 感情アイコン, ハイライト）
+- DraggableCardView.prefab に numberText 追加
+- ScriptableObject: CardData EmotionType, AuctionData VictoryCondition 設定済み
+- BattleScene Canvas に全View配置済み（Prefabインスタンス）
+
+### 未実施
 
 | # | 作業 | 種別 | 優先度 |
 |---|------|------|--------|
-| 1 | **DeckSelectionView Prefab 再構築** | Prefab | 高 |
-|   | DraggableCardView.prefab に numberText (TMP) を追加 | | |
-|   | DeckSelectionView に RankingSlotView×3, DragLineView, StaggeredSlideInGroup を配置 | | |
-| 2 | **CardBattleView Prefab 作成** | Prefab | 高 |
-|   | BattleCardSlotView.prefab 作成（表裏, 数字, 感情アイコン, ハイライト） | | |
-|   | CardBattleView に PlayerDeckContainer, FieldSlot×2, SkillButton, RoundIndicator 等を配置 | | |
-| 3 | **BattleResultView Prefab 作成** | Prefab | 高 |
-|   | 勝利時カード選択コンテナ, 敗北時テキスト, 確定ボタン | | |
-| 4 | **ScriptableObject アセット設定** | アセット | 高 |
-|   | 各 CardData に EmotionType を設定 | | |
-|   | 各 AuctionData に VictoryCondition を設定 | | |
-| 5 | **ヒエラルキー配置** | シーン | 高 |
-|   | BattleScene Canvas に DeckSelectionView, CardBattleView, BattleResultView を配置 | | |
-| 6 | **全フロー通しテスト** | テスト | 高 |
+| 1 | **全フロー通しテスト** | テスト | 高 |
 |   | オークション → リザルト → デッキ選択(D&D) → カードバトル → バトル結果 | | |
 
 ### 設計で省略したもの（後回し可）

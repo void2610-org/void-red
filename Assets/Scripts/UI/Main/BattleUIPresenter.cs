@@ -96,8 +96,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void HideCompetition() => _competitionView.Hide();
 
     // デッキ選択フェーズ
-    public void InitializeDeckSelection(IReadOnlyList<BattleCardModel> wonCards, VictoryCondition condition) =>
-        _deckSelectionView.Initialize(wonCards, condition);
+    public void InitializeDeckSelection(IReadOnlyList<BattleCardModel> wonCards) =>
+        _deckSelectionView.Initialize(wonCards);
     public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
     public IReadOnlyList<BattleCardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
     public void HideDeckSelection() => _deckSelectionView.Hide();
@@ -111,9 +111,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void PlaceEnemyCard() => _cardBattleView.PlaceEnemyCard();
     public void RevealCards(BattleCardModel playerCard, BattleCardModel enemyCard) =>
         _cardBattleView.RevealCards(playerCard, enemyCard);
-    public void SetBattleRoundResult(int round, RoundResult result) =>
-        _cardBattleView.SetRoundResult(round, result);
-    public void ShowTurnIndicator(bool isPlayerFirst) => _cardBattleView.ShowTurnIndicator(isPlayerFirst);
     public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);
     public void SetSkillButtonVisible(bool visible) => _cardBattleView.SetSkillButtonVisible(visible);
     public async UniTask WaitForBattleNextAsync() => await _cardBattleView.WaitForNextAsync();

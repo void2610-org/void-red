@@ -3484,6 +3484,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CompetitionView
       objectReference: {fileID: 0}
+    - target: {fileID: 2259175865427519691, guid: 5748cd6f7e9624809b944ddd0b1b55ae, type: 3}
+      propertyPath: m_Name
+      value: CharacterPortrait
+      objectReference: {fileID: 0}
     - target: {fileID: 6526016889428208146, guid: 5748cd6f7e9624809b944ddd0b1b55ae, type: 3}
       propertyPath: m_Alpha
       value: 0

@@ -3,7 +3,6 @@ using System.Linq;
 using Auction;
 using Cysharp.Threading.Tasks;
 using R3;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Void2610.UnityTemplate;
@@ -14,21 +13,12 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class DeckSelectionView : BasePhaseView
 {
-    [Header("テキスト")]
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI victoryConditionText;
-
     [Header("手札エリア")]
     [SerializeField] private Transform handContainer;
     [SerializeField] private DraggableCardView draggableCardPrefab;
 
     [Header("デッキスロット")]
-    [SerializeField] private List<RankingSlotView> deckSlots;
-
-    [Header("扇形配置")]
-    [SerializeField] private float fanSpreadWidth = 400f;
-    [SerializeField] private float fanHeightCurve = 30f;
-    [SerializeField] private float fanMaxAngle = 10f;
+    [SerializeField] private List<DeckSlotView> deckSlots;
 
     [Header("UI")]
     [SerializeField] private Button confirmButton;
@@ -69,17 +59,10 @@ public class DeckSelectionView : BasePhaseView
     /// <summary>
     /// デッキ選択を開始する
     /// </summary>
-    public void Initialize(
-        IReadOnlyList<BattleCardModel> wonCards,
-        VictoryCondition condition)
+    public void Initialize(IReadOnlyList<BattleCardModel> wonCards)
     {
         Show();
         Clear();
-
-        // 勝利条件テキスト
-        victoryConditionText.text = condition == VictoryCondition.LowerWins
-            ? "勝利条件: 数字が小さい方が勝利"
-            : "勝利条件: 数字が大きい方が勝利";
 
         // 獲得カードをドラッグ可能カードとして生成
         for (var i = 0; i < wonCards.Count; i++)
@@ -87,9 +70,6 @@ public class DeckSelectionView : BasePhaseView
             var card = wonCards[i];
             var draggableCard = Instantiate(draggableCardPrefab, handContainer);
             draggableCard.Initialize(card, i);
-
-            // 初期位置・回転を設定
-            SetCardToFanPosition(draggableCard, i, wonCards.Count);
 
             draggableCard.OnDragStarted.Subscribe(OnCardDragStarted).AddTo(_disposables);
             draggableCard.OnDragEnded.Subscribe(OnCardDragEnded).AddTo(_disposables);
@@ -99,7 +79,7 @@ public class DeckSelectionView : BasePhaseView
             _handCards.Add(draggableCard);
         }
 
-        // カードのスライドインアニメーション
+        // レイアウト計算＋スライドインアニメーション
         cardStagger.Play();
 
         // スロットのドロップイベントを購読
@@ -138,6 +118,7 @@ public class DeckSelectionView : BasePhaseView
     private void OnCardDragEnded(DraggableCardView card)
     {
         dragLineView.Hide();
+        Debug.Log($"[DeckSelectionView] OnCardDragEnded: wasDroppedToSlot={_wasDroppedToSlot}, isPlaced={card.IsPlaced}");
 
         // スロットにドロップされた場合はOnCardDroppedToSlotで処理済み
         if (_wasDroppedToSlot) return;
@@ -149,17 +130,14 @@ public class DeckSelectionView : BasePhaseView
             UpdateConfirmButton();
         }
 
-        var (position, rotation) = CalculateFanPosition(card.HandIndex, _handCards.Count);
-        card.PlayReturnToHandAsync(handContainer, position, rotation).Forget();
+        ReturnCardToHand(card);
     }
 
-    private void OnCardDragging(Vector3 cardWorldPos)
-    {
-        dragLineView.UpdateEndPosition(cardWorldPos);
-    }
+    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
-    private void OnCardDroppedToSlot(RankingSlotView slot, DraggableCardView droppedCard)
+    private void OnCardDroppedToSlot(DeckSlotView slot, DraggableCardView droppedCard)
     {
+        Debug.Log($"[DeckSelectionView] OnCardDroppedToSlot: slot={slot.name}, card={droppedCard.name}");
         _wasDroppedToSlot = true;
 
         var previousSlot = droppedCard.CurrentSlot;
@@ -176,8 +154,7 @@ public class DeckSelectionView : BasePhaseView
             }
             else
             {
-                var (pos, rot) = CalculateFanPosition(existingCard.HandIndex, _handCards.Count);
-                existingCard.PlayReturnToHandAsync(handContainer, pos, rot).Forget();
+                ReturnCardToHand(existingCard);
             }
         }
 
@@ -197,10 +174,37 @@ public class DeckSelectionView : BasePhaseView
         var slot = card.CurrentSlot;
         slot.RemoveCard();
 
-        var (position, rotation) = CalculateFanPosition(card.HandIndex, _handCards.Count);
-        card.PlayReturnToHandAsync(handContainer, position, rotation).Forget();
+        ReturnCardToHand(card);
 
         UpdateConfirmButton();
+    }
+
+    /// <summary>カードを手札コンテナに戻してレイアウトを再計算する</summary>
+    private void ReturnCardToHand(DraggableCardView card)
+    {
+        // 手札コンテナに戻す
+        card.transform.SetParent(handContainer);
+        card.transform.localScale = Vector3.one;
+        card.transform.localEulerAngles = Vector3.zero;
+
+        // HandIndexの順番に並べ直す
+        card.transform.SetSiblingIndex(GetSiblingIndexForHandIndex(card.HandIndex));
+
+        // StaggeredSlideInGroupでレイアウト再計算
+        cardStagger.ApplyLayout();
+    }
+
+    /// <summary>HandIndexに基づいて正しいSiblingIndexを計算する</summary>
+    private int GetSiblingIndexForHandIndex(int handIndex)
+    {
+        for (var i = 0; i < handContainer.childCount; i++)
+        {
+            var child = handContainer.GetChild(i).GetComponent<DraggableCardView>();
+            if (child && child.HandIndex > handIndex)
+                return i;
+        }
+
+        return handContainer.childCount;
     }
 
     private void OnConfirmClicked()
@@ -213,35 +217,9 @@ public class DeckSelectionView : BasePhaseView
         _onConfirm.OnNext(Unit.Default);
     }
 
-    private void UpdateConfirmButton()
-    {
-        confirmButton.interactable = IsAllSlotsFilled();
-    }
+    private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled();
 
     private bool IsAllSlotsFilled() => deckSlots.All(s => s.IsOccupied);
-
-    private (Vector2 position, float rotation) CalculateFanPosition(int index, int totalCount)
-    {
-        // -1 〜 1 の範囲に正規化（中央が0）
-        var t = totalCount > 1
-            ? (index - (totalCount - 1) / 2f) / ((totalCount - 1) / 2f)
-            : 0f;
-
-        var x = t * fanSpreadWidth / 2f;
-        // 放物線で中央が高い
-        var y = (1 - t * t) * fanHeightCurve;
-        var rotation = -t * fanMaxAngle;
-
-        return (new Vector2(x, y), rotation);
-    }
-
-    private void SetCardToFanPosition(DraggableCardView card, int index, int totalCount)
-    {
-        var (position, rotation) = CalculateFanPosition(index, totalCount);
-        var cardRect = card.transform as RectTransform;
-        cardRect.anchoredPosition = position;
-        card.transform.localEulerAngles = new Vector3(0, 0, rotation);
-    }
 
     protected override void Awake()
     {

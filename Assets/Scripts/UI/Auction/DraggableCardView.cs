@@ -21,7 +21,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     [SerializeField] private float dragScale = 1.05f;
 
     public BattleCardModel BattleCard { get; private set; }
-    public RankingSlotView CurrentSlot { get; private set; }
+    public DeckSlotView CurrentSlot { get; private set; }
     public bool IsPlaced => CurrentSlot;
     public int HandIndex { get; private set; }
     public CanvasGroup CanvasGroup { get; private set; }
@@ -46,25 +46,23 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private MotionHandle _scaleTween;
     private MotionHandle _rotateTween;
 
-    public void SetSlot(RankingSlotView slot) => CurrentSlot = slot;
+    public void SetSlot(DeckSlotView slot) => CurrentSlot = slot;
+
+    /// <summary>スキル効果等で変更された数字を反映する</summary>
+    public void UpdateNumber(int number)
+    {
+        if (numberText)
+            numberText.text = number.ToString();
+    }
 
     public void Initialize(BattleCardModel battleCard, int handIndex)
     {
         BattleCard = battleCard;
         HandIndex = handIndex;
 
-        // カードデータがある場合はCardViewで表示
+        // カードデータを表示
         if (battleCard.Card != null)
-        {
-            cardView.gameObject.SetActive(true);
             cardView.Initialize(battleCard.Card.Data);
-            cardView.SetInteractable(false);
-        }
-        else
-        {
-            // ダミーカードの場合はCardViewを非表示
-            cardView.gameObject.SetActive(false);
-        }
 
         // 数字表示
         if (numberText)
@@ -121,6 +119,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        Debug.Log($"[DraggableCardView] OnBeginDrag: {gameObject.name}, blocksRaycasts={CanvasGroup.blocksRaycasts}");
         _isDragging = true;
         _originalParent = transform.parent;
         _originalPosition = _rectTransform.anchoredPosition;
@@ -162,6 +161,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        Debug.Log($"[DraggableCardView] OnEndDrag: {gameObject.name}, pointerCurrentRaycast={eventData.pointerCurrentRaycast.gameObject?.name}");
         _isDragging = false;
 
         CanvasGroup.alpha = 1f;

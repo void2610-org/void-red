@@ -1,41 +1,43 @@
 using System.Collections.Generic;
+using Auction;
 using Cysharp.Threading.Tasks;
 using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カードバトル画面のView
-/// 3本勝負のカードバトルUIを管理する
+/// プレイヤーはD&Dでカードを場に出し、敵カードが開示されて横並びに表示される
 /// </summary>
 public class CardBattleView : BasePhaseView
 {
-    [Header("ラウンド情報")]
+    [Header("勝利条件")]
     [SerializeField] private TextMeshProUGUI victoryConditionText;
-    [SerializeField] private Image[] roundMarkers;
 
-    [Header("プレイヤー側")]
-    [SerializeField] private Transform playerDeckContainer;
-    [SerializeField] private Transform playerFieldSlot;
+    [Header("プレイヤー手札")]
+    [SerializeField] private Transform handContainer;
+    [SerializeField] private DraggableCardView draggableCardPrefab;
 
-    [Header("敵側")]
-    [SerializeField] private Transform enemyFieldSlot;
+    [Header("フィールド")]
+    [SerializeField] private DeckSlotView playerFieldSlot;
+    [SerializeField] private Transform enemyCardContainer;
+    [SerializeField] private BattleCardSlotView cardSlotPrefab;
+
+    [Header("ドラッグ演出")]
+    [SerializeField] private DragLineView dragLineView;
 
     [Header("UI要素")]
     [SerializeField] private TextMeshProUGUI instructionText;
-    [SerializeField] private TextMeshProUGUI turnIndicatorText;
     [SerializeField] private Button skillButton;
     [SerializeField] private TextMeshProUGUI skillNameText;
     [SerializeField] private Button nextButton;
-    [SerializeField] private BattleCardSlotView cardSlotPrefab;
 
-    [Header("色設定")]
-    [SerializeField] private Color winColor = Color.yellow;
-    [SerializeField] private Color loseColor = Color.gray;
-    [SerializeField] private Color pendingColor = Color.white;
+    [Header("アニメーション")]
+    [SerializeField] private StaggeredSlideInGroup cardStagger;
 
-    /// <summary>プレイヤーがカードを選択した</summary>
+    /// <summary>プレイヤーがカードを場に出した</summary>
     public Observable<BattleCardModel> OnCardSelected => _onCardSelected;
 
     /// <summary>スキルボタンが押された</summary>
@@ -44,17 +46,13 @@ public class CardBattleView : BasePhaseView
     /// <summary>次へボタンが押された</summary>
     public Observable<Unit> OnNextClicked => _onNextClicked;
 
-    private readonly List<BattleCardSlotView> _playerHandSlots = new();
+    private readonly List<DraggableCardView> _handCards = new();
     private readonly Subject<BattleCardModel> _onCardSelected = new();
     private readonly Subject<Unit> _onSkillActivated = new();
     private readonly Subject<Unit> _onNextClicked = new();
-
-    private BattleCardSlotView _playerFieldCardSlot;
+    private CompositeDisposable _disposables = new();
+    private RectTransform _handContainerRect;
     private BattleCardSlotView _enemyFieldCardSlot;
-
-    /// <summary>先攻/後攻を表示</summary>
-    public void ShowTurnIndicator(bool isPlayerFirst) =>
-        turnIndicatorText.text = isPlayerFirst ? "先攻" : "後攻";
 
     /// <summary>指示テキストを設定</summary>
     public void SetInstruction(string text) => instructionText.text = text;
@@ -62,9 +60,7 @@ public class CardBattleView : BasePhaseView
     /// <summary>スキルボタンの表示状態を設定</summary>
     public void SetSkillButtonVisible(bool visible) => skillButton.gameObject.SetActive(visible);
 
-    /// <summary>
-    /// バトルを初期化する
-    /// </summary>
+    /// <summary>バトルを初期化する</summary>
     public void Initialize(VictoryCondition condition, EmotionType playerSkill)
     {
         Show();
@@ -75,36 +71,38 @@ public class CardBattleView : BasePhaseView
 
         skillNameText.text = $"{playerSkill.ToJapaneseName()}\n{SkillEffectApplier.GetDescription(playerSkill)}";
 
-        // ラウンドマーカー初期化
-        foreach (var marker in roundMarkers)
-            marker.color = pendingColor;
-
         nextButton.gameObject.SetActive(false);
     }
 
-    /// <summary>プレイヤーの手札を表示する</summary>
+    /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
     public void ShowPlayerHand(IReadOnlyList<BattleCardModel> availableCards)
     {
         ClearPlayerHand();
 
-        foreach (var card in availableCards)
+        for (var i = 0; i < availableCards.Count; i++)
         {
-            var slot = Instantiate(cardSlotPrefab, playerDeckContainer);
-            slot.Initialize(card, showNumber: true);
-            var capturedCard = card;
-            slot.OnClicked.Subscribe(_ => _onCardSelected.OnNext(capturedCard)).AddTo(this);
-            _playerHandSlots.Add(slot);
+            var card = availableCards[i];
+            var draggableCard = Instantiate(draggableCardPrefab, handContainer);
+            draggableCard.Initialize(card, i);
+
+            draggableCard.OnDragStarted.Subscribe(OnCardDragStarted).AddTo(_disposables);
+            draggableCard.OnDragEnded.Subscribe(OnCardDragEnded).AddTo(_disposables);
+            draggableCard.OnDragging.Subscribe(OnCardDragging).AddTo(_disposables);
+
+            _handCards.Add(draggableCard);
         }
+
+        // レイアウト計算＋スライドインアニメーション
+        cardStagger.Play();
+
+        // フィールドスロットのドロップイベントを購読
+        playerFieldSlot.OnCardDropped
+            .Subscribe(tuple => OnCardDroppedToField(tuple.card))
+            .AddTo(_disposables);
     }
 
-    /// <summary>プレイヤーのカードを場に伏せる</summary>
-    public void PlacePlayerCard(BattleCardModel card)
-    {
-        ClearPlayerHand();
-        _playerFieldCardSlot = Instantiate(cardSlotPrefab, playerFieldSlot);
-        _playerFieldCardSlot.Initialize(card, showNumber: false);
-        _playerFieldCardSlot.ShowBack();
-    }
+    /// <summary>プレイヤーのカードを場に配置（D&Dで既に配置済みなので手札クリアのみ）</summary>
+    public void PlacePlayerCard(BattleCardModel card) => ClearPlayerHand();
 
     /// <summary>敵のカードを場に伏せる</summary>
     public void PlaceEnemyCard()
@@ -112,33 +110,24 @@ public class CardBattleView : BasePhaseView
         if (_enemyFieldCardSlot)
             Destroy(_enemyFieldCardSlot.gameObject);
 
-        _enemyFieldCardSlot = Instantiate(cardSlotPrefab, enemyFieldSlot);
+        _enemyFieldCardSlot = Instantiate(cardSlotPrefab, enemyCardContainer);
         _enemyFieldCardSlot.ShowBack();
         _enemyFieldCardSlot.SetInteractable(false);
     }
 
-    /// <summary>両者のカードをオープンする</summary>
+    /// <summary>両者のカードをオープンする（横並びで比較表示）</summary>
     public void RevealCards(BattleCardModel playerCard, BattleCardModel enemyCard)
     {
-        if (_playerFieldCardSlot)
-        {
-            _playerFieldCardSlot.Initialize(playerCard, showNumber: true);
-            _playerFieldCardSlot.ShowFront();
-        }
+        // プレイヤーカードの数字を更新（スキル効果による変更を反映）
+        var placedCard = playerFieldSlot.PlacedCard;
+        if (placedCard)
+            placedCard.UpdateNumber(playerCard.Number);
 
+        // 敵カードを開示
         if (_enemyFieldCardSlot)
         {
             _enemyFieldCardSlot.Initialize(enemyCard, showNumber: true);
             _enemyFieldCardSlot.ShowFront();
-        }
-    }
-
-    /// <summary>ラウンド結果を反映する</summary>
-    public void SetRoundResult(int round, RoundResult result)
-    {
-        if (round < roundMarkers.Length)
-        {
-            roundMarkers[round].color = result == RoundResult.PlayerWin ? winColor : loseColor;
         }
     }
 
@@ -153,12 +142,12 @@ public class CardBattleView : BasePhaseView
     /// <summary>場のカードをクリアする</summary>
     public void ClearField()
     {
-        if (_playerFieldCardSlot)
-        {
-            Destroy(_playerFieldCardSlot.gameObject);
-            _playerFieldCardSlot = null;
-        }
+        // プレイヤーのスロットをクリア
+        var placedCard = playerFieldSlot.RemoveCard();
+        if (placedCard)
+            Destroy(placedCard.gameObject);
 
+        // 敵カードをクリア
         if (_enemyFieldCardSlot)
         {
             Destroy(_enemyFieldCardSlot.gameObject);
@@ -166,16 +155,95 @@ public class CardBattleView : BasePhaseView
         }
     }
 
+    // === D&D関連 ===
+
+    private void OnCardDragStarted(DraggableCardView card)
+    {
+        var handCenterWorld = _handContainerRect.position;
+        dragLineView.Show(handCenterWorld);
+    }
+
+    private void OnCardDragEnded(DraggableCardView card)
+    {
+        dragLineView.Hide();
+        Debug.Log($"[CardBattleView] OnCardDragEnded: isPlaced={card.IsPlaced}");
+
+        // スロットにドロップされた場合はIsPlacedがtrueになっている
+        if (card.IsPlaced) return;
+
+        // スロット外にドロップされた場合、手札に戻す
+        ReturnCardToHand(card);
+    }
+
+    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
+
+    private void OnCardDroppedToField(DraggableCardView droppedCard)
+    {
+        Debug.Log($"[CardBattleView] OnCardDroppedToField: card={droppedCard.name}");
+        // 既にカードがある場合は入れ替え
+        if (playerFieldSlot.IsOccupied)
+        {
+            var existingCard = playerFieldSlot.RemoveCard();
+            ReturnCardToHand(existingCard);
+        }
+
+        playerFieldSlot.PlaceCard(droppedCard);
+        droppedCard.PlaySnapToSlotAsync(playerFieldSlot.CardAnchor, Vector2.zero).Forget();
+
+        // カードを枠に配置した時のSE
+        SeManager.Instance.PlaySe("SE_FRAME_LIGHT", pitch: 1f);
+
+        // カード選択イベントを発火
+        _onCardSelected.OnNext(droppedCard.BattleCard);
+    }
+
+    /// <summary>カードを手札コンテナに戻してレイアウトを再計算する</summary>
+    private void ReturnCardToHand(DraggableCardView card)
+    {
+        card.transform.SetParent(handContainer);
+        card.transform.localScale = Vector3.one;
+        card.transform.localEulerAngles = Vector3.zero;
+
+        // HandIndexの順番に並べ直す
+        card.transform.SetSiblingIndex(GetSiblingIndexForHandIndex(card.HandIndex));
+
+        // StaggeredSlideInGroupでレイアウト再計算
+        cardStagger.ApplyLayout();
+    }
+
+    /// <summary>HandIndexに基づいて正しいSiblingIndexを計算する</summary>
+    private int GetSiblingIndexForHandIndex(int handIndex)
+    {
+        for (var i = 0; i < handContainer.childCount; i++)
+        {
+            var child = handContainer.GetChild(i).GetComponent<DraggableCardView>();
+            if (child && child.HandIndex > handIndex)
+                return i;
+        }
+
+        return handContainer.childCount;
+    }
+
+    // === Lifecycle ===
+
     private void ClearPlayerHand()
     {
-        foreach (var slot in _playerHandSlots)
-            Destroy(slot.gameObject);
-        _playerHandSlots.Clear();
+        _disposables.Dispose();
+        _disposables = new CompositeDisposable();
+
+        foreach (var card in _handCards)
+            if (card && !card.IsPlaced)
+                Destroy(card.gameObject);
+
+        _handCards.Clear();
     }
 
     protected override void Awake()
     {
         base.Awake();
+        _handContainerRect = handContainer as RectTransform;
+        var canvas = GetComponentInParent<Canvas>().rootCanvas;
+        dragLineView.Initialize(canvas);
 
         skillButton.OnClickAsObservable()
             .Subscribe(_ => _onSkillActivated.OnNext(Unit.Default))
@@ -188,6 +256,7 @@ public class CardBattleView : BasePhaseView
 
     private void OnDestroy()
     {
+        _disposables.Dispose();
         _onCardSelected.Dispose();
         _onSkillActivated.Dispose();
         _onNextClicked.Dispose();

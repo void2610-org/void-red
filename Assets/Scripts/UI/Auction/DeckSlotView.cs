@@ -6,27 +6,27 @@ using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
-/// 順位スロットView
+/// デッキスロットView
 /// ドラッグされたカードを受け入れるドロップ先
 /// </summary>
 [RequireComponent(typeof(RectTransform))]
 [RequireComponent(typeof(CanvasGroup))]
-public class RankingSlotView : MonoBehaviour, IDropHandler
+public class DeckSlotView : MonoBehaviour, IDropHandler
 {
-    [SerializeField] private int rank;
+    [SerializeField] private int slotIndex;
     [SerializeField] private Image highlightImage;
 
-    public int Rank => rank;
+    public int SlotIndex => slotIndex;
     public bool IsOccupied => PlacedCard;
     public Transform CardAnchor => this.transform;
     public DraggableCardView PlacedCard { get; private set; }
     public CanvasGroup CanvasGroup { get; private set; }
 
-    public Observable<(RankingSlotView slot, DraggableCardView card)> OnCardDropped => _onCardDropped;
+    public Observable<(DeckSlotView slot, DraggableCardView card)> OnCardDropped => _onCardDropped;
 
     private const float FADE_DURATION = 0.15f;
 
-    private readonly Subject<(RankingSlotView slot, DraggableCardView card)> _onCardDropped = new();
+    private readonly Subject<(DeckSlotView slot, DraggableCardView card)> _onCardDropped = new();
     private MotionHandle _fadeTween;
 
     /// <summary>
@@ -67,6 +67,7 @@ public class RankingSlotView : MonoBehaviour, IDropHandler
     /// </summary>
     public void OnDrop(PointerEventData eventData)
     {
+        Debug.Log($"[DeckSlotView] OnDrop: pointerDrag={eventData.pointerDrag?.name}, has DraggableCardView={eventData.pointerDrag?.GetComponent<DraggableCardView>() != null}");
         var draggableCard = eventData.pointerDrag?.GetComponent<DraggableCardView>();
         if (!draggableCard) return;
 

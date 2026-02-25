@@ -514,9 +514,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         FillDeckWithDefaults(playerWonBattleCards);
 
         // デッキ選択UIを表示
-        _battleUIPresenter.InitializeDeckSelection(
-            playerWonBattleCards,
-            _currentAuctionData.VictoryCondition);
+        _battleUIPresenter.InitializeDeckSelection(playerWonBattleCards);
 
         await _battleUIPresenter.WaitForDeckSelectionAsync();
 
@@ -590,7 +588,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             // コイントス
             handler.DecideFirstPlayer();
-            _battleUIPresenter.ShowTurnIndicator(handler.IsPlayerFirst);
             await UniTask.Delay(1000);
 
             // カード伏せフェーズ
@@ -618,7 +615,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             // 勝敗判定
             var result = handler.ResolveRound();
-            _battleUIPresenter.SetBattleRoundResult(handler.CurrentRound, result);
 
             var resultText = result == RoundResult.PlayerWin ? "プレイヤー勝利！" : "敵の勝利...";
             _battleUIPresenter.SetBattleInstruction(resultText);
