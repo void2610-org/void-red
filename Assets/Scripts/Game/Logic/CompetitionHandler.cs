@@ -52,9 +52,8 @@ public class CompetitionHandler
     public bool TryPlayerRaise(EmotionType emotion, PlayerPresenter player)
     {
         if (!IsActive) return false;
-        if (player.GetEmotionAmount(emotion) <= 0) return false;
+        if (!player.TryConsumeEmotion(emotion, 1)) return false;
 
-        player.TryConsumeEmotion(emotion, 1);
         PlayerTotal++;
         _lastActionTime = Time.time;
         _onBidChanged.OnNext((PlayerTotal, EnemyTotal));
@@ -68,8 +67,8 @@ public class CompetitionHandler
     public void EnemyRaise(EmotionType emotion, PlayerPresenter enemy)
     {
         if (!IsActive) return;
+        if (!enemy.TryConsumeEmotion(emotion, 1)) return;
 
-        enemy.TryConsumeEmotion(emotion, 1);
         EnemyTotal++;
         _lastActionTime = Time.time;
         _onBidChanged.OnNext((PlayerTotal, EnemyTotal));
