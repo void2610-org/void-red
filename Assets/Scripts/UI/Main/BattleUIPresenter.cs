@@ -14,7 +14,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
     public Observable<BattleCardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
-    public Observable<Unit> OnSkillActivated => _cardBattleView.OnSkillActivated;
+    public Observable<Unit> OnSkillActivated => _skillButtonView.OnActivated;
     public Observable<Unit> OnBattleNextClicked => _cardBattleView.OnNextClicked;
 
     [Inject] private readonly CardPoolService _cardPoolService;
@@ -36,9 +36,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly MemoryGrowthView _memoryGrowthView;
     private readonly PlayerFaceView _playerFaceView;
     private readonly EnemyFaceView _enemyFaceView;
+    private readonly SkillButtonView _skillButtonView;
     private readonly DeckSelectionView _deckSelectionView;
     private readonly CardBattleView _cardBattleView;
-    private readonly BattleResultView _battleResultView;
     private BattlePresenter _battlePresenter;
 
     public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
@@ -55,9 +55,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
         _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
+        _skillButtonView = Object.FindFirstObjectByType<SkillButtonView>(FindObjectsInactive.Include);
         _deckSelectionView = Object.FindFirstObjectByType<DeckSelectionView>();
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
-        _battleResultView = Object.FindFirstObjectByType<BattleResultView>();
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
     }
@@ -102,9 +102,13 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public IReadOnlyList<BattleCardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
     public void HideDeckSelection() => _deckSelectionView.Hide();
 
+    // スキルボタン
+    public void InitializeSkillButton(EmotionType emotion) => _skillButtonView.Initialize(emotion);
+    public void SetSkillButtonVisible(bool visible) => _skillButtonView.SetVisible(visible);
+
     // カードバトルフェーズ
-    public void InitializeBattle(VictoryCondition condition, EmotionType playerSkill) =>
-        _cardBattleView.Initialize(condition, playerSkill);
+    public void InitializeBattle(VictoryCondition condition) =>
+        _cardBattleView.Initialize(condition);
     public void ShowPlayerHand(IReadOnlyList<BattleCardModel> availableCards) =>
         _cardBattleView.ShowPlayerHand(availableCards);
     public void PlacePlayerCard(BattleCardModel card) => _cardBattleView.PlacePlayerCard(card);
@@ -112,18 +116,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void RevealCards(BattleCardModel playerCard, BattleCardModel enemyCard) =>
         _cardBattleView.RevealCards(playerCard, enemyCard);
     public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);
-    public void SetSkillButtonVisible(bool visible) => _cardBattleView.SetSkillButtonVisible(visible);
     public async UniTask WaitForBattleNextAsync() => await _cardBattleView.WaitForNextAsync();
     public void ClearBattleField() => _cardBattleView.ClearField();
     public void HideBattle() => _cardBattleView.Hide();
-
-    // バトル結果フェーズ
-    public void ShowBattleWin(IReadOnlyList<BattleCardModel> playerCards) =>
-        _battleResultView.ShowWin(playerCards);
-    public void ShowBattleLose() => _battleResultView.ShowLose();
-    public async UniTask WaitForBattleResultConfirmAsync() => await _battleResultView.WaitForConfirmAsync();
-    public BattleCardModel GetSelectedMemoryCard() => _battleResultView.SelectedCard;
-    public void HideBattleResult() => _battleResultView.Hide();
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {

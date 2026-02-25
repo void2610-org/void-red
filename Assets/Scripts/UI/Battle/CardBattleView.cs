@@ -30,8 +30,6 @@ public class CardBattleView : BasePhaseView
 
     [Header("UI要素")]
     [SerializeField] private TextMeshProUGUI instructionText;
-    [SerializeField] private Button skillButton;
-    [SerializeField] private TextMeshProUGUI skillNameText;
     [SerializeField] private Button nextButton;
 
     [Header("アニメーション")]
@@ -40,36 +38,28 @@ public class CardBattleView : BasePhaseView
     /// <summary>プレイヤーがカードを場に出した</summary>
     public Observable<BattleCardModel> OnCardSelected => _onCardSelected;
 
-    /// <summary>スキルボタンが押された</summary>
-    public Observable<Unit> OnSkillActivated => _onSkillActivated;
-
     /// <summary>次へボタンが押された</summary>
     public Observable<Unit> OnNextClicked => _onNextClicked;
 
     private readonly List<DraggableCardView> _handCards = new();
     private readonly Subject<BattleCardModel> _onCardSelected = new();
-    private readonly Subject<Unit> _onSkillActivated = new();
     private readonly Subject<Unit> _onNextClicked = new();
     private CompositeDisposable _disposables = new();
     private RectTransform _handContainerRect;
     private BattleCardSlotView _enemyFieldCardSlot;
+    private DraggableCardView _enemyFieldCard;
 
     /// <summary>指示テキストを設定</summary>
     public void SetInstruction(string text) => instructionText.text = text;
 
-    /// <summary>スキルボタンの表示状態を設定</summary>
-    public void SetSkillButtonVisible(bool visible) => skillButton.gameObject.SetActive(visible);
-
     /// <summary>バトルを初期化する</summary>
-    public void Initialize(VictoryCondition condition, EmotionType playerSkill)
+    public void Initialize(VictoryCondition condition)
     {
         Show();
 
         victoryConditionText.text = condition == VictoryCondition.LowerWins
             ? "勝利条件: 数字が小さい方が勝利"
             : "勝利条件: 数字が大きい方が勝利";
-
-        skillNameText.text = $"{playerSkill.ToJapaneseName()}\n{SkillEffectApplier.GetDescription(playerSkill)}";
 
         nextButton.gameObject.SetActive(false);
     }
@@ -133,12 +123,16 @@ public class CardBattleView : BasePhaseView
         if (placedCard)
             placedCard.UpdateNumber(playerCard.Number);
 
-        // 敵カードを開示
+        // 敵カードを開示: BattleCardSlotViewを破棄してDraggableCardViewに置き換え
         if (_enemyFieldCardSlot)
         {
-            _enemyFieldCardSlot.Initialize(enemyCard, showNumber: true);
-            _enemyFieldCardSlot.ShowFront();
+            Destroy(_enemyFieldCardSlot.gameObject);
+            _enemyFieldCardSlot = null;
         }
+
+        _enemyFieldCard = Instantiate(draggableCardPrefab, enemyCardContainer);
+        _enemyFieldCard.Initialize(enemyCard, 0);
+        _enemyFieldCard.CanvasGroup.blocksRaycasts = false;
     }
 
     /// <summary>次へボタンを表示して待機</summary>
@@ -162,6 +156,12 @@ public class CardBattleView : BasePhaseView
         {
             Destroy(_enemyFieldCardSlot.gameObject);
             _enemyFieldCardSlot = null;
+        }
+
+        if (_enemyFieldCard)
+        {
+            Destroy(_enemyFieldCard.gameObject);
+            _enemyFieldCard = null;
         }
     }
 
@@ -273,10 +273,6 @@ public class CardBattleView : BasePhaseView
         var canvas = GetComponentInParent<Canvas>().rootCanvas;
         dragLineView.Initialize(canvas);
 
-        skillButton.OnClickAsObservable()
-            .Subscribe(_ => _onSkillActivated.OnNext(Unit.Default))
-            .AddTo(this);
-
         nextButton.OnClickAsObservable()
             .Subscribe(_ => _onNextClicked.OnNext(Unit.Default))
             .AddTo(this);
@@ -286,7 +282,6 @@ public class CardBattleView : BasePhaseView
     {
         _disposables.Dispose();
         _onCardSelected.Dispose();
-        _onSkillActivated.Dispose();
         _onNextClicked.Dispose();
     }
 }

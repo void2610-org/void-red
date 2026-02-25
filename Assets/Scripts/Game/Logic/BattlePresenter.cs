@@ -146,17 +146,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _currentGameState.Value = GameState.DeckSelection;
         var (playerDeck, enemyDeck) = await HandleDeckSelection();
 
-        // 9. カードバトル（3本勝負）
+        // 9. スキルボタン初期化 → カードバトル（3本勝負）
+        _battleUIPresenter.InitializeSkillButton(playerEmotionState);
         _currentGameState.Value = GameState.CardBattle;
-        var isPlayerWon = await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState);
-
-        // 10. バトル結果
-        _currentGameState.Value = GameState.BattleResult;
-        await HandleBattleResult(isPlayerWon, playerDeck);
+        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState);
 
         // ===== 終了処理 =====
 
-        // 11. 記憶育成フェーズ
+        // 10. 記憶育成フェーズ
         _currentGameState.Value = GameState.MemoryGrowth;
         await HandleMemoryGrowth();
 
@@ -579,7 +576,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var enemyEmotionState = emotions[Random.Range(0, emotions.Length)];
 
         // バトルUI初期化
-        _battleUIPresenter.InitializeBattle(_currentAuctionData.VictoryCondition, playerEmotionState);
+        _battleUIPresenter.InitializeBattle(_currentAuctionData.VictoryCondition);
 
         // ラウンドループ
         while (!handler.IsFinished)
@@ -713,36 +710,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _battleUIPresenter.SetSkillButtonVisible(false);
     }
 
-    // === 10. バトル結果フェーズ ===
-
-    private async UniTask HandleBattleResult(bool isPlayerWon, BattleDeckModel playerDeck)
-    {
-        Debug.Log($"[BattlePresenter] バトル結果フェーズ開始: {(isPlayerWon ? "勝利" : "敗北")}");
-
-        if (isPlayerWon)
-        {
-            // 勝利: プレイヤーのデッキカードから1枚選択して記憶に入れる
-            _battleUIPresenter.ShowBattleWin(playerDeck.Cards);
-            await _battleUIPresenter.WaitForBattleResultConfirmAsync();
-
-            var selectedCard = _battleUIPresenter.GetSelectedMemoryCard();
-            if (selectedCard != null)
-            {
-                Debug.Log($"[BattlePresenter] 記憶に入れるカード: {selectedCard.Card?.Data.CardName ?? "ダミー"}");
-            }
-        }
-        else
-        {
-            // 敗北: 演出テキスト表示のみ
-            _battleUIPresenter.ShowBattleLose();
-            await _battleUIPresenter.WaitForBattleResultConfirmAsync();
-        }
-
-        _battleUIPresenter.HideBattleResult();
-        await UniTask.Delay(500);
-    }
-
-    // === 11. 記憶育成フェーズ ===
+    // === 10. 記憶育成フェーズ ===
 
     private async UniTask HandleMemoryGrowth()
     {
