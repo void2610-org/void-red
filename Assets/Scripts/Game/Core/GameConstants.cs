@@ -22,4 +22,34 @@ public static class GameConstants
     /// 競合フェーズのタイムアウト時間（秒）
     /// </summary>
     public const float COMPETITION_TIMEOUT_SECONDS = 10f;
+
+    /// <summary>
+    /// バトルのラウンド数（3本勝負）
+    /// </summary>
+    public const int BATTLE_ROUND_COUNT = 3;
+
+    /// <summary>
+    /// バトルの勝利に必要な本数
+    /// </summary>
+    public const int BATTLE_WINS_REQUIRED = 2;
+
+    /// <summary>
+    /// デッキの枚数
+    /// </summary>
+    public const int DECK_SIZE = 3;
+
+    /// <summary>
+    /// 不足カードのデフォルト数字
+    /// </summary>
+    public const int DEFAULT_CARD_NUMBER = 3;
+
+    /// <summary>
+    /// 感情マッチ倍率
+    /// </summary>
+    public const float EMOTION_MATCH_MULTIPLIER = 1.5f;
+
+    /// <summary>
+    /// 自己記憶倍率
+    /// </summary>
+    public const float SELF_MEMORY_MULTIPLIER = 2.0f;
 }

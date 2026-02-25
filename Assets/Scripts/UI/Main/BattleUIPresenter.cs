@@ -13,6 +13,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 {
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
+    public Observable<BattleCardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
+    public Observable<Unit> OnSkillActivated => _skillButtonView.OnActivated;
+    public Observable<Unit> OnBattleNextClicked => _cardBattleView.OnNextClicked;
 
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
@@ -33,6 +36,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly MemoryGrowthView _memoryGrowthView;
     private readonly PlayerFaceView _playerFaceView;
     private readonly EnemyFaceView _enemyFaceView;
+    private readonly SkillButtonView _skillButtonView;
+    private readonly DeckSelectionView _deckSelectionView;
+    private readonly CardBattleView _cardBattleView;
     private BattlePresenter _battlePresenter;
 
     public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
@@ -49,6 +55,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
         _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
         _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
+        _skillButtonView = Object.FindFirstObjectByType<SkillButtonView>(FindObjectsInactive.Include);
+        _deckSelectionView = Object.FindFirstObjectByType<DeckSelectionView>();
+        _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
     }
@@ -85,6 +94,31 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void UpdateCompetitionResources(IReadOnlyDictionary<EmotionType, int> resources) =>
         _competitionView.UpdateResources(resources);
     public void HideCompetition() => _competitionView.Hide();
+
+    // デッキ選択フェーズ
+    public void InitializeDeckSelection(IReadOnlyList<BattleCardModel> wonCards) =>
+        _deckSelectionView.Initialize(wonCards);
+    public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
+    public IReadOnlyList<BattleCardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
+    public void HideDeckSelection() => _deckSelectionView.Hide();
+
+    // スキルボタン
+    public void InitializeSkillButton(EmotionType emotion) => _skillButtonView.Initialize(emotion);
+    public void SetSkillButtonVisible(bool visible) => _skillButtonView.SetVisible(visible);
+
+    // カードバトルフェーズ
+    public void InitializeBattle(VictoryCondition condition) =>
+        _cardBattleView.Initialize(condition);
+    public void ShowPlayerHand(IReadOnlyList<BattleCardModel> availableCards) =>
+        _cardBattleView.ShowPlayerHand(availableCards);
+    public void PlacePlayerCard(BattleCardModel card) => _cardBattleView.PlacePlayerCard(card);
+    public void PlaceEnemyCard() => _cardBattleView.PlaceEnemyCard();
+    public void RevealCards(BattleCardModel playerCard, BattleCardModel enemyCard) =>
+        _cardBattleView.RevealCards(playerCard, enemyCard);
+    public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);
+    public async UniTask WaitForBattleNextAsync() => await _cardBattleView.WaitForNextAsync();
+    public void ClearBattleField() => _cardBattleView.ClearField();
+    public void HideBattle() => _cardBattleView.Hide();
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
     {

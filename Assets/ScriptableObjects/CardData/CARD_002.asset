@@ -16,4 +16,5 @@ MonoBehaviour:
   description: "\u30EC\u30FC\u30EB\u3092\u6B69\u3044\u3066\u3044\u305F\u79C1\u306B\u306F\u81EA\u7531\u306F\u3042\u308A\u3042\u307E\u3063\u305F\u3093\u3060\u3002"
   image: {fileID: 21300000, guid: 9fff20710f47d457db24bda8ffee17af, type: 3}
   memoryType: 0
+  cardEmotion: 1
   effectAmount: 5

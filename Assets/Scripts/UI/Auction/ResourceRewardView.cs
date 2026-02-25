@@ -60,9 +60,8 @@ public class ResourceRewardView : MonoBehaviour
             // 次へボタンを待つ
             await _onNextButtonClicked.FirstAsync();
 
-            // ランダムな感情タイプに報酬を加算してバーをアニメーション
-            var randomEmotion = GetRandomEmotion();
-            AnimateRewardToEmotion(randomEmotion, result.TotalReward);
+            // カードの司る感情に報酬を加算してバーをアニメーション
+            AnimateRewardToEmotion(result.CardEmotion, result.TotalReward);
         }
 
         await _onNextButtonClicked.FirstAsync();
@@ -71,12 +70,6 @@ public class ResourceRewardView : MonoBehaviour
     private void Show()
     {
         _canvasGroup.Show();
-    }
-
-    private EmotionType GetRandomEmotion()
-    {
-        var index = Random.Range(0, _emotionTypes.Length);
-        return _emotionTypes[index];
     }
 
     private void InitializeEmotionGauges(
