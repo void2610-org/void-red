@@ -221,11 +221,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
 
         // プレイヤーの入札UI表示・待機
-        await _battleUIPresenter.WaitForBiddingAsync(
-            _auctionCards,
-            _player.Bids,
-            EmotionType.Joy,
-            _player.EmotionResources);
+        await _battleUIPresenter.WaitForBiddingAsync(_auctionCards, _player.Bids, EmotionType.Joy, _player.EmotionResources);
 
         Debug.Log($"[BattlePresenter] プレイヤーの入札完了: 合計{_player.Bids.GetTotalBidAmount()}リソース");
 
@@ -444,9 +440,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var isTutorial = _currentEnemyData.EnemyId == "alv";
 
         // プレイヤーの報酬を計算
-        var rewardResults = RewardCalculator.CalculateAll(
-            _player.WonCards,
-            _player.Bids);
+        var rewardResults = RewardCalculator.CalculateAll(_player.WonCards, _player.Bids);
 
         // 最大リソース値を設定（デフォルト値の3倍を仮の上限とする）
         var maxResources = new Dictionary<EmotionType, int>();
@@ -728,10 +722,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var usedEmotions = CalculateUsedEmotions();
 
         // 獲得テーマを作成
-        var acquiredTheme = new AcquiredTheme(
-            _currentTheme,
-            allCardInfoList,
-            usedEmotions);
+        var acquiredTheme = new AcquiredTheme(_currentTheme, allCardInfoList, usedEmotions);
 
         Debug.Log($"[BattlePresenter] 支配的感情: {acquiredTheme.DominantEmotionResult}");
         Debug.Log($"[BattlePresenter] 獲得テーマ作成: {acquiredTheme.ThemeName}");
@@ -770,13 +761,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 continue;
 
             var playerWon = _player.WonCards.Contains(card);
-
-            var cardInfo = new CardAcquisitionInfo(
-                card,
-                playerBids,
-                enemyBids,
-                playerWon
-            );
+            var cardInfo = new CardAcquisitionInfo(card, playerBids, enemyBids, playerWon);
             result.Add(cardInfo);
         }
 
@@ -795,8 +780,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             var bidsByEmotion = _player.Bids.GetBidsByEmotion(card);
             foreach (var kvp in bidsByEmotion)
             {
-                if (!result.ContainsKey(kvp.Key))
-                    result[kvp.Key] = 0;
+                result.TryAdd(kvp.Key, 0);
                 result[kvp.Key] += kvp.Value;
             }
         }
