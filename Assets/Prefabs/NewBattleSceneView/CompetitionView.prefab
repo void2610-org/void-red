@@ -81,7 +81,7 @@ MonoBehaviour:
   instructionText: {fileID: 8746997797232079930}
   timerImage: {fileID: 6624352239026892797}
   timerText: {fileID: 4949922573632544164}
-  balanceAnimator: {fileID: 2104943711283094855}
+  balanceTilt: {fileID: 4853249132638801497}
   playerBidText: {fileID: 9074043161712557915}
   enemyBidText: {fileID: 2207170374522837203}
   emotionResourceDisplayView: {fileID: 4000288856639253165}
@@ -1268,11 +1268,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3036533703911857125, guid: 63128d2577019407e89ab01b1d097d66, type: 3}
   m_PrefabInstance: {fileID: 2779894310618341642}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &2104943711283094855 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4297111354523878477, guid: 63128d2577019407e89ab01b1d097d66, type: 3}
+--- !u!114 &4853249132638801497 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7335835456122236755, guid: 63128d2577019407e89ab01b1d097d66, type: 3}
   m_PrefabInstance: {fileID: 2779894310618341642}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f8ccbf2ac1c349be8c7c419b466d34d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8234312904672561517 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6111961731886835815, guid: 63128d2577019407e89ab01b1d097d66, type: 3}
