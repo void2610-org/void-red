@@ -14,15 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   auctionId: cerica
   enemy: {fileID: 11400000, guid: 56d622f5c9c8147aba7c7a73258ce6b8, type: 2}
-  dialogueData: {fileID: 11400000, guid: 7c6361ee46f4844b89f065845931d77d, type: 2}
   theme: {fileID: 11400000, guid: 01136d71471194f54b19c069b86688f3, type: 2}
-  playerCards:
-  - {fileID: 11400000, guid: 3002b2ee333b642a9891d72701ba3081, type: 2}
-  - {fileID: 11400000, guid: 16f56a4b6822e49e4917ff50562bcb0c, type: 2}
-  - {fileID: 11400000, guid: 96418a77f5ef94e20bf72ebde966a197, type: 2}
-  - {fileID: 11400000, guid: 5ecb5aa2c56fa41448a2e55ccf2af044, type: 2}
-  enemyCards:
-  - {fileID: 11400000, guid: 340062878b38c4d26abf33d3bf2cc4d3, type: 2}
-  - {fileID: 11400000, guid: 73cde9b6853394361a93499ee00e9474, type: 2}
-  - {fileID: 11400000, guid: eee7d85232db54b5d9d38d1094a65137, type: 2}
-  - {fileID: 11400000, guid: 641f6d282ae7d4396ae3360b1d8eeaf1, type: 2}
+  auctionCards: []
+  victoryCondition: 1
