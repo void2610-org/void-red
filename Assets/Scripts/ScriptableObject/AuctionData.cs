@@ -11,9 +11,12 @@ public class AuctionData : ScriptableObject
     [SerializeField] private EnemyData enemy;
     [SerializeField] private ThemeData theme;
     [SerializeField] private List<CardData> auctionCards = new();
+    [SerializeField] private VictoryCondition victoryCondition;
 
     public string AuctionId => auctionId;
     public EnemyData Enemy => enemy;
     public ThemeData Theme => theme;
     public IReadOnlyList<CardData> AuctionCards => auctionCards;
+    /// <summary>カードバトルの勝利条件</summary>
+    public VictoryCondition VictoryCondition => victoryCondition;
 }

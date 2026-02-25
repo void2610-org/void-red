@@ -13,6 +13,7 @@ public class CardData : ScriptableObject
 
     [Header("記憶情報")]
     [SerializeField] private MemoryType memoryType;
+    [SerializeField] private EmotionType cardEmotion;
     [SerializeField, Range(0, GameConstants.MAX_GAUGE_VALUE)] private int effectAmount;
 
     public string CardId => name;
@@ -20,5 +21,7 @@ public class CardData : ScriptableObject
     public string Description => description;
     public Sprite CardImage => image;
     public MemoryType MemoryType => memoryType;
+    /// <summary>このカードが司る感情</summary>
+    public EmotionType CardEmotion => cardEmotion;
     public int EffectAmount => effectAmount;
 }

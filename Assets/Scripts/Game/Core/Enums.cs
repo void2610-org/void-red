@@ -15,8 +15,14 @@ public enum GameState
     AuctionResult,
     /// <summary> 競合フェーズ（同数時のリアルタイム上乗せ） </summary>
     CompetitionPhase,
-    /// <summary> 報酬ポイント算出・感情リソース獲得 </summary>
-    RewardPhase,
+    /// <summary> リザルト（獲得カード表示・感情リソース報酬・感情状態判定） </summary>
+    ResultPhase,
+    /// <summary> デッキ選択（バトル用の3枚を選択） </summary>
+    DeckSelection,
+    /// <summary> カードバトル（3本勝負） </summary>
+    CardBattle,
+    /// <summary> バトル結果（勝利→記憶選択、敗北→演出） </summary>
+    BattleResult,
     /// <summary> 記憶テーマ構成・キャラクター表示 </summary>
     MemoryGrowth,
     /// <summary> バトル終了 </summary>
