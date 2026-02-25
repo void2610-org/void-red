@@ -201,7 +201,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3910613775861725693, guid: 306fcd6780fe34b59afe07229688ab7d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -270
+      value: -260
       objectReference: {fileID: 0}
     - target: {fileID: 3910613775861725693, guid: 306fcd6780fe34b59afe07229688ab7d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3582,14 +3582,6 @@ PrefabInstance:
     - target: {fileID: 300435672328042387, guid: 5748cd6f7e9624809b944ddd0b1b55ae, type: 3}
       propertyPath: m_Name
       value: CompetitionView
-      objectReference: {fileID: 0}
-    - target: {fileID: 2259175865427519691, guid: 5748cd6f7e9624809b944ddd0b1b55ae, type: 3}
-      propertyPath: m_Name
-      value: CharacterPortrait
-      objectReference: {fileID: 0}
-    - target: {fileID: 6526016889428208146, guid: 5748cd6f7e9624809b944ddd0b1b55ae, type: 3}
-      propertyPath: m_Alpha
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7725107736382346990, guid: 5748cd6f7e9624809b944ddd0b1b55ae, type: 3}
       propertyPath: m_Pivot.x
