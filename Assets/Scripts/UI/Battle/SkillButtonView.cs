@@ -31,4 +31,6 @@ public class SkillButtonView : MonoBehaviour
         emotionNameText.text = emotion.ToJapaneseName();
         skillDescText.text = SkillEffectApplier.GetDescription(emotion);
     }
+
+    private void Awake() => gameObject.SetActive(false);
 }

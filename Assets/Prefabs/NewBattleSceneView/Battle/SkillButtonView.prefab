@@ -145,6 +145,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3910613775861725693}
+  - component: {fileID: 6724160634091574828}
   m_Layer: 0
   m_Name: SkillButtonView
   m_TagString: Untagged
@@ -173,6 +174,40 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 363}
   m_SizeDelta: {x: 180, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6724160634091574828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2188792519951088238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fa7ed1816a374ebca3fd51ef1e50666, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillButton: {fileID: 3545662954429332165}
+  emotionIcon: {fileID: 3749958729689085709}
+  emotionNameText: {fileID: 2012214388509712087}
+  skillDescText: {fileID: 5340224090223113170}
+  emotionSprites:
+    _serializedList:
+    - key: 0
+      value: {fileID: 21300000, guid: e0c8837dfc1da484b8d5f2c399eb204c, type: 3}
+    - key: 1
+      value: {fileID: 21300000, guid: 4fd3e491a823e4dcea24472b0ab9b9be, type: 3}
+    - key: 2
+      value: {fileID: 21300000, guid: 5a4e7fa78eca5417c91856b4d03a3f29, type: 3}
+    - key: 3
+      value: {fileID: 21300000, guid: c011f9c2d861c4ac1ad8bb6c907bd7a2, type: 3}
+    - key: 4
+      value: {fileID: 21300000, guid: 30d87465cf128410bbd012add98069d2, type: 3}
+    - key: 5
+      value: {fileID: 21300000, guid: 11275248916af40a78613d72cbac74f0, type: 3}
+    - key: 6
+      value: {fileID: 21300000, guid: a26d6d54fe1b64a0c9948ba7cddddab9, type: 3}
+    - key: 7
+      value: {fileID: 21300000, guid: 1c84865d087a04b90860f6ad311e42de, type: 3}
 --- !u!1 &2915783574094520067
 GameObject:
   m_ObjectHideFlags: 0
@@ -184,6 +219,7 @@ GameObject:
   - component: {fileID: 8320753699056541636}
   - component: {fileID: 6890810598962635657}
   - component: {fileID: 2012214388509712087}
+  - component: {fileID: 5064558801873582749}
   m_Layer: 0
   m_Name: EmotionName
   m_TagString: Untagged
@@ -281,7 +317,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -309,6 +345,23 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5064558801873582749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2915783574094520067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa6bf560f800412eb2d5c27423a00bdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shadowColor: {r: 0, g: 0, b: 0, a: 1}
+  shadowDistance: {x: 1, y: -1}
+  useGraphicAlpha: 1
+  iterations: 10
+  shadowSpread: {x: 2, y: 2}
 --- !u!1 &6385621000243578816
 GameObject:
   m_ObjectHideFlags: 0
@@ -423,7 +476,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -325, y: 30.000008}
-  m_SizeDelta: {x: 75, y: 75}
+  m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3626303661925899430
 CanvasRenderer:
@@ -453,7 +506,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e0c8837dfc1da484b8d5f2c399eb204c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5a4e7fa78eca5417c91856b4d03a3f29, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

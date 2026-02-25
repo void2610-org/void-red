@@ -142,12 +142,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 7. カード数字割り当て
         _cardNumbers = CardNumberAssigner.AssignNumbers(_auctionCards, _player.Bids, _enemy.Bids);
 
-        // 8. デッキ選択
+        // 8. スキルボタン初期化 → デッキ選択
+        _battleUIPresenter.InitializeSkillButton(playerEmotionState);
         _currentGameState.Value = GameState.DeckSelection;
         var (playerDeck, enemyDeck) = await HandleDeckSelection();
 
-        // 9. スキルボタン初期化 → カードバトル（3本勝負）
-        _battleUIPresenter.InitializeSkillButton(playerEmotionState);
+        // 9. カードバトル（3本勝負）
         _currentGameState.Value = GameState.CardBattle;
         await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState);
 
@@ -506,10 +506,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 不足分を補完（数字3のダミーカード）
         FillDeckWithDefaults(playerWonBattleCards);
 
-        // デッキ選択UIを表示
+        // デッキ選択UIとスキルボタンを表示
         _battleUIPresenter.InitializeDeckSelection(playerWonBattleCards);
+        _battleUIPresenter.SetSkillButtonVisible(true);
 
         await _battleUIPresenter.WaitForDeckSelectionAsync();
+
+        _battleUIPresenter.SetSkillButtonVisible(false);
 
         // プレイヤーのデッキ構築
         var playerDeck = new BattleDeckModel();
@@ -581,10 +584,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
             handler.DecideFirstPlayer();
             await UniTask.Delay(1000);
 
+            // スキルボタン表示（カード選択中に使用可能）
+            _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
+
             // カード伏せフェーズ
             if (handler.IsPlayerFirst)
             {
-                await PlayerPlaceCard(handler, playerDeck);
+                await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
                 EnemyPlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard();
             }
@@ -592,12 +598,19 @@ public class BattlePresenter : IStartable, ISceneInitializable
             {
                 EnemyPlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard();
-                await PlayerPlaceCard(handler, playerDeck);
+                await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
             }
 
-            // スキル発動フェーズ
-            await HandleSkillPhase(handler, playerDeck, enemyDeck,
-                playerEmotionState, enemyEmotionState);
+            _battleUIPresenter.SetSkillButtonVisible(false);
+
+            // 敵AIのスキル発動判定（ランダム50%）
+            if (handler.EnemySkillAvailable && Random.value > 0.5f)
+            {
+                handler.TryActivateEnemySkill(enemyEmotionState, enemyDeck);
+                _battleUIPresenter.SetBattleInstruction($"敵が{enemyEmotionState.ToJapaneseName()}スキルを発動！");
+                Debug.Log($"[BattlePresenter] 敵がスキル発動: {enemyEmotionState}");
+                await UniTask.Delay(1500);
+            }
 
             // カードオープン
             _battleUIPresenter.SetBattleInstruction("カードオープン！");
@@ -631,12 +644,30 @@ public class BattlePresenter : IStartable, ISceneInitializable
     }
 
     /// <summary>
-    /// プレイヤーがカードを選んで伏せる
+    /// プレイヤーがカードを選んで伏せる（スキルボタンも同時に操作可能）
     /// </summary>
-    private async UniTask PlayerPlaceCard(CardBattleHandler handler, BattleDeckModel playerDeck)
+    private async UniTask PlayerPlaceCard(
+        CardBattleHandler handler,
+        BattleDeckModel playerDeck,
+        EmotionType playerSkill)
     {
+        using var disposables = new CompositeDisposable();
+
         _battleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
         _battleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
+
+        // スキル発動の購読（カード選択と同時に使用可能）
+        _battleUIPresenter.OnSkillActivated
+            .Subscribe(_ =>
+            {
+                if (handler.TryActivatePlayerSkill(playerSkill, playerDeck))
+                {
+                    _battleUIPresenter.SetSkillButtonVisible(false);
+                    _battleUIPresenter.SetBattleInstruction($"{playerSkill.ToJapaneseName()}スキル発動！");
+                    Debug.Log($"[BattlePresenter] プレイヤーがスキル発動: {playerSkill}");
+                }
+            })
+            .AddTo(disposables);
 
         var selectedCard = await _battleUIPresenter.OnBattleCardSelected.FirstAsync();
         handler.PlacePlayerCard(selectedCard);
@@ -655,52 +686,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var card = availableCards[Random.Range(0, availableCards.Count)];
         handler.PlaceEnemyCard(card);
         enemyDeck.MarkAsUsed(card);
-    }
-
-    /// <summary>
-    /// スキル発動フェーズの処理
-    /// </summary>
-    private async UniTask HandleSkillPhase(
-        CardBattleHandler handler,
-        BattleDeckModel playerDeck,
-        BattleDeckModel enemyDeck,
-        EmotionType playerSkill,
-        EmotionType enemySkill)
-    {
-        using var disposables = new CompositeDisposable();
-
-        // プレイヤーのスキルボタン表示
-        _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
-        _battleUIPresenter.SetBattleInstruction("スキルを使用するか、次へ進んでください");
-
-        // スキル発動の一時購読
-        var skillUsed = false;
-        _battleUIPresenter.OnSkillActivated
-            .Subscribe(_ =>
-            {
-                if (!skillUsed && handler.TryActivatePlayerSkill(playerSkill, playerDeck))
-                {
-                    skillUsed = true;
-                    _battleUIPresenter.SetSkillButtonVisible(false);
-                    _battleUIPresenter.SetBattleInstruction($"{playerSkill.ToJapaneseName()}スキル発動！");
-                    Debug.Log($"[BattlePresenter] プレイヤーがスキル発動: {playerSkill}");
-                }
-            })
-            .AddTo(disposables);
-
-        // 次へボタンで進行
-        await _battleUIPresenter.WaitForBattleNextAsync();
-
-        // 敵AIのスキル発動判定（ランダム50%）
-        if (handler.EnemySkillAvailable && Random.value > 0.5f)
-        {
-            handler.TryActivateEnemySkill(enemySkill, enemyDeck);
-            _battleUIPresenter.SetBattleInstruction($"敵が{enemySkill.ToJapaneseName()}スキルを発動！");
-            Debug.Log($"[BattlePresenter] 敵がスキル発動: {enemySkill}");
-            await UniTask.Delay(1500);
-        }
-
-        _battleUIPresenter.SetSkillButtonVisible(false);
     }
 
     // === 10. 記憶育成フェーズ ===

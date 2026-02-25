@@ -59,6 +59,12 @@ public class CardModel
         BattleNumber = battleNumber;
     }
 
+    /// <summary>数字を変更する（スキル効果用）</summary>
+    public void SetBattleNumber(int number) => BattleNumber = number;
+
+    /// <summary>デバッグ用文字列</summary>
+    public override string ToString() => $"{Data?.CardName ?? "Unknown"} [{InstanceId.Substring(0, 8)}]";
+
     /// <summary>バトルデータを初期化する</summary>
     public void InitializeBattleData(int number, int auctionBidTotal)
     {
@@ -66,12 +72,4 @@ public class CardModel
         AuctionBidTotal = auctionBidTotal;
         IsUsed = false;
     }
-
-    /// <summary>数字を変更する（スキル効果用）</summary>
-    public void SetBattleNumber(int number) => BattleNumber = number;
-
-    /// <summary>
-    /// デバッグ用文字列
-    /// </summary>
-    public override string ToString() => $"{Data?.CardName ?? "Unknown"} [{InstanceId.Substring(0, 8)}]";
 }
