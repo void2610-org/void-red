@@ -356,10 +356,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 TryEnemyCompetitionRaise(handler);
                 nextEnemyRaiseTime = Time.time + Random.Range(2f, 5f);
 
-                if (handler.EnemyTotal != drawResult.EnemyBid)
-                {
-                    _battleUIPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
-                }
+                _battleUIPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
             }
 
             await UniTask.Yield();
@@ -369,30 +366,34 @@ public class BattlePresenter : IStartable, ISceneInitializable
         handler.End();
         disposables.Dispose();
 
+        ProcessCompetitionResult(handler, drawResult.Card);
+
+        _battleUIPresenter.HideCompetition();
+        await UniTask.Delay(500);
+    }
+
+    /// <summary>
+    /// 競合結果を処理（勝者判定・カード付与・ログ出力）
+    /// </summary>
+    private void ProcessCompetitionResult(CompetitionHandler handler, CardModel card)
+    {
         var winner = handler.IsPlayerWon;
         if (winner == true)
         {
-            // プレイヤー勝利: 元の入札分を消費（上乗せ分はリアルタイムで消費済み）
-            ConsumeBidForCard(_player, drawResult.Card);
-            _player.AddWonCard(drawResult.Card);
-            Debug.Log($"[BattlePresenter] 競合勝利: {drawResult.Card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
+            ConsumeBidForCard(_player, card);
+            _player.AddWonCard(card);
+            Debug.Log($"[BattlePresenter] 競合勝利: {card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
         }
         else if (winner == false)
         {
-            // 敵勝利: 敵の元の入札分を消費
-            ConsumeBidForCard(_enemy, drawResult.Card);
-            _enemy.AddWonCard(drawResult.Card);
-            Debug.Log($"[BattlePresenter] 競合敗北: {drawResult.Card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
+            ConsumeBidForCard(_enemy, card);
+            _enemy.AddWonCard(card);
+            Debug.Log($"[BattlePresenter] 競合敗北: {card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
         }
         else
         {
-            // 完全引き分け: カード消失
-            Debug.Log($"[BattlePresenter] 競合引き分け: {drawResult.Card.Data.CardName} カード消失（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
+            Debug.Log($"[BattlePresenter] 競合引き分け: {card.Data.CardName} カード消失（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
         }
-
-        handler.Dispose();
-        _battleUIPresenter.HideCompetition();
-        await UniTask.Delay(500);
     }
 
     /// <summary>
@@ -563,7 +564,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log("[BattlePresenter] カードバトルフェーズ開始");
 
         var handler = new CardBattleHandler(_currentAuctionData.VictoryCondition);
-        var disposables = new CompositeDisposable();
 
         // 敵の感情状態（ランダム）
         var emotions = (EmotionType[])System.Enum.GetValues(typeof(EmotionType));
@@ -597,7 +597,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             // スキル発動フェーズ
             await HandleSkillPhase(handler, playerDeck, enemyDeck,
-                playerEmotionState, enemyEmotionState, disposables);
+                playerEmotionState, enemyEmotionState);
 
             // カードオープン
             _battleUIPresenter.SetBattleInstruction("カードオープン！");
@@ -621,8 +621,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 _battleUIPresenter.ClearBattleField();
             }
         }
-
-        disposables.Dispose();
 
         // バトル結果
         var isPlayerWon = handler.IsPlayerWon;
@@ -667,9 +665,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
         BattleDeckModel playerDeck,
         BattleDeckModel enemyDeck,
         EmotionType playerSkill,
-        EmotionType enemySkill,
-        CompositeDisposable disposables)
+        EmotionType enemySkill)
     {
+        using var disposables = new CompositeDisposable();
+
         // プレイヤーのスキルボタン表示
         _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
         _battleUIPresenter.SetBattleInstruction("スキルを使用するか、次へ進んでください");
