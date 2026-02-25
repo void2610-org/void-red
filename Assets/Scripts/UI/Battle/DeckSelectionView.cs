@@ -118,7 +118,6 @@ public class DeckSelectionView : BasePhaseView
     private void OnCardDragEnded(DraggableCardView card)
     {
         dragLineView.Hide();
-        Debug.Log($"[DeckSelectionView] OnCardDragEnded: wasDroppedToSlot={_wasDroppedToSlot}, isPlaced={card.IsPlaced}");
 
         // スロットにドロップされた場合はOnCardDroppedToSlotで処理済み
         if (_wasDroppedToSlot) return;
@@ -137,7 +136,6 @@ public class DeckSelectionView : BasePhaseView
 
     private void OnCardDroppedToSlot(DeckSlotView slot, DraggableCardView droppedCard)
     {
-        Debug.Log($"[DeckSelectionView] OnCardDroppedToSlot: slot={slot.name}, card={droppedCard.name}");
         _wasDroppedToSlot = true;
 
         var previousSlot = droppedCard.CurrentSlot;
@@ -182,10 +180,16 @@ public class DeckSelectionView : BasePhaseView
     /// <summary>カードを手札コンテナに戻してレイアウトを再計算する</summary>
     private void ReturnCardToHand(DraggableCardView card)
     {
-        // 手札コンテナに戻す
+        var rt = card.transform as RectTransform;
         card.transform.SetParent(handContainer);
-        card.transform.localScale = Vector3.one;
+        card.transform.localScale = card.OriginalScale;
         card.transform.localEulerAngles = Vector3.zero;
+
+        // アンカーをリセット（ドラッグ中にrootCanvasに移動しているため）
+        rt.anchorMin = new Vector2(0.5f, 0.5f);
+        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = card.OriginalSizeDelta;
 
         // HandIndexの順番に並べ直す
         card.transform.SetSiblingIndex(GetSiblingIndexForHandIndex(card.HandIndex));

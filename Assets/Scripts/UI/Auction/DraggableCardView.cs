@@ -29,6 +29,8 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     public Observable<DraggableCardView> OnDragEnded => _onDragEnded;
     public Observable<DraggableCardView> OnClicked => _onClicked;
     public Observable<Vector3> OnDragging => _onDragging;
+    public Vector2 OriginalSizeDelta => _originalSizeDelta;
+    public Vector3 OriginalScale => _originalScale;
 
     private const float SNAP_DURATION = 0.2f;
     private const float RETURN_DURATION = 0.3f;
@@ -40,8 +42,10 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private RectTransform _rectTransform;
     private Transform _originalParent;
     private Vector2 _originalPosition;
+    private Vector3 _originalScale;
     private Canvas _rootCanvas;
     private bool _isDragging;
+    private Vector2 _originalSizeDelta;
     private MotionHandle _moveTween;
     private MotionHandle _scaleTween;
     private MotionHandle _rotateTween;
@@ -75,7 +79,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         var startWorldPos = _rectTransform.position;
 
         transform.SetParent(targetParent);
-        transform.localScale = Vector3.one;
+        transform.localScale = _originalScale;
 
         _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
@@ -96,7 +100,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         var startRotation = transform.localEulerAngles.z;
 
         transform.SetParent(handParent);
-        transform.localScale = Vector3.one;
+        transform.localScale = _originalScale;
 
         _rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         _rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
@@ -119,10 +123,10 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log($"[DraggableCardView] OnBeginDrag: {gameObject.name}, blocksRaycasts={CanvasGroup.blocksRaycasts}");
         _isDragging = true;
         _originalParent = transform.parent;
         _originalPosition = _rectTransform.anchoredPosition;
+        _originalScale = transform.localScale;
 
         // ドラッグ開始SEを再生
         if (BattleCard?.Card != null)
@@ -161,14 +165,13 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log($"[DraggableCardView] OnEndDrag: {gameObject.name}, pointerCurrentRaycast={eventData.pointerCurrentRaycast.gameObject?.name}");
         _isDragging = false;
 
         CanvasGroup.alpha = 1f;
         CanvasGroup.blocksRaycasts = true;
 
         _scaleTween.TryCancel();
-        _scaleTween = transform.ScaleTo(Vector3.one, 0.1f, Ease.OutQuad);
+        transform.localScale = _originalScale;
 
         _onDragEnded.OnNext(this);
     }
@@ -188,6 +191,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         _rectTransform = GetComponent<RectTransform>();
         CanvasGroup = GetComponent<CanvasGroup>();
         _rootCanvas = GetComponentInParent<Canvas>().rootCanvas;
+        _originalSizeDelta = _rectTransform.sizeDelta;
     }
 
     private void OnDestroy()

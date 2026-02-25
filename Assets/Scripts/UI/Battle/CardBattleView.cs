@@ -78,6 +78,7 @@ public class CardBattleView : BasePhaseView
     public void ShowPlayerHand(IReadOnlyList<BattleCardModel> availableCards)
     {
         ClearPlayerHand();
+        handContainer.gameObject.SetActive(true);
 
         for (var i = 0; i < availableCards.Count; i++)
         {
@@ -99,10 +100,19 @@ public class CardBattleView : BasePhaseView
         playerFieldSlot.OnCardDropped
             .Subscribe(tuple => OnCardDroppedToField(tuple.card))
             .AddTo(_disposables);
+
+        // 確定ボタンでカード選択を確定
+        nextButton.OnClickAsObservable()
+            .Subscribe(_ => OnConfirmCardSelection())
+            .AddTo(_disposables);
     }
 
-    /// <summary>プレイヤーのカードを場に配置（D&Dで既に配置済みなので手札クリアのみ）</summary>
-    public void PlacePlayerCard(BattleCardModel card) => ClearPlayerHand();
+    /// <summary>プレイヤーのカードを場に配置（確定後に手札をクリア）</summary>
+    public void PlacePlayerCard(BattleCardModel card)
+    {
+        handContainer.gameObject.SetActive(false);
+        ClearPlayerHand();
+    }
 
     /// <summary>敵のカードを場に伏せる</summary>
     public void PlaceEnemyCard()
@@ -166,10 +176,13 @@ public class CardBattleView : BasePhaseView
     private void OnCardDragEnded(DraggableCardView card)
     {
         dragLineView.Hide();
-        Debug.Log($"[CardBattleView] OnCardDragEnded: isPlaced={card.IsPlaced}");
 
-        // スロットにドロップされた場合はIsPlacedがtrueになっている
-        if (card.IsPlaced) return;
+        if (card.IsPlaced)
+        {
+            // 配置済みカードはスロットに戻す
+            card.PlaySnapToSlotAsync(card.CurrentSlot.CardAnchor, Vector2.zero).Forget();
+            return;
+        }
 
         // スロット外にドロップされた場合、手札に戻す
         ReturnCardToHand(card);
@@ -179,7 +192,6 @@ public class CardBattleView : BasePhaseView
 
     private void OnCardDroppedToField(DraggableCardView droppedCard)
     {
-        Debug.Log($"[CardBattleView] OnCardDroppedToField: card={droppedCard.name}");
         // 既にカードがある場合は入れ替え
         if (playerFieldSlot.IsOccupied)
         {
@@ -193,16 +205,32 @@ public class CardBattleView : BasePhaseView
         // カードを枠に配置した時のSE
         SeManager.Instance.PlaySe("SE_FRAME_LIGHT", pitch: 1f);
 
-        // カード選択イベントを発火
-        _onCardSelected.OnNext(droppedCard.BattleCard);
+        // 確定ボタンを表示
+        nextButton.gameObject.SetActive(true);
+    }
+
+    /// <summary>カード選択を確定する</summary>
+    private void OnConfirmCardSelection()
+    {
+        if (!playerFieldSlot.IsOccupied) return;
+
+        nextButton.gameObject.SetActive(false);
+        _onCardSelected.OnNext(playerFieldSlot.PlacedCard.BattleCard);
     }
 
     /// <summary>カードを手札コンテナに戻してレイアウトを再計算する</summary>
     private void ReturnCardToHand(DraggableCardView card)
     {
+        var rt = card.transform as RectTransform;
         card.transform.SetParent(handContainer);
-        card.transform.localScale = Vector3.one;
+        card.transform.localScale = card.OriginalScale;
         card.transform.localEulerAngles = Vector3.zero;
+
+        // アンカーをリセット（ドラッグ中にrootCanvasに移動しているため）
+        rt.anchorMin = new Vector2(0.5f, 0.5f);
+        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = card.OriginalSizeDelta;
 
         // HandIndexの順番に並べ直す
         card.transform.SetSiblingIndex(GetSiblingIndexForHandIndex(card.HandIndex));

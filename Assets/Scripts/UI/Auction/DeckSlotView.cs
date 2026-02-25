@@ -67,7 +67,6 @@ public class DeckSlotView : MonoBehaviour, IDropHandler
     /// </summary>
     public void OnDrop(PointerEventData eventData)
     {
-        Debug.Log($"[DeckSlotView] OnDrop: pointerDrag={eventData.pointerDrag?.name}, has DraggableCardView={eventData.pointerDrag?.GetComponent<DraggableCardView>() != null}");
         var draggableCard = eventData.pointerDrag?.GetComponent<DraggableCardView>();
         if (!draggableCard) return;
 
