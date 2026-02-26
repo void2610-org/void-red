@@ -43,9 +43,10 @@ public class CardAcquisitionView : MonoBehaviour
 
         foreach (var cardData in cards)
         {
-            // カードをcardContainerに生成
+            // カードをcardContainerに生成（アニメーション前は非表示）
             var acquiredCard = Instantiate(cardPrefab, cardContainer);
             acquiredCard.Initialize(cardData);
+            acquiredCard.gameObject.GetOrAddComponent<CanvasGroup>().alpha = 0f;
             _instantiatedItems.Add(acquiredCard.gameObject);
 
             // テキストをtextContainerに生成（アニメーション前は非表示）
