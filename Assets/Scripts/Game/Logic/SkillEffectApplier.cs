@@ -33,11 +33,11 @@ public static class SkillEffectApplier
     /// <param name="targetCardForSadness">悲しみスキル: 数字を3に変える対象カード</param>
     public static void Apply(
         EmotionType emotion,
-        BattleCardModel myCard,
-        BattleCardModel opponentCard,
+        CardModel myCard,
+        CardModel opponentCard,
         BattleDeckModel myDeck,
         CardBattleHandler handler,
-        BattleCardModel targetCardForSadness = null)
+        CardModel targetCardForSadness = null)
     {
         switch (emotion)
         {
@@ -49,13 +49,13 @@ public static class SkillEffectApplier
             case EmotionType.Anticipation:
                 // 自分の残りカードの数字を全てランダムに変える（被りあり）
                 foreach (var card in myDeck.GetAvailableCards())
-                    card.SetNumber(Random.Range(1, 7));
+                    card.SetBattleNumber(Random.Range(1, 7));
                 break;
 
             case EmotionType.Joy:
                 // 自分の出したカードの数字を2倍にする
                 if (myCard != null)
-                    myCard.SetNumber(myCard.Number * 2);
+                    myCard.SetBattleNumber(myCard.BattleNumber * 2);
                 break;
 
             case EmotionType.Trust:
@@ -69,28 +69,28 @@ public static class SkillEffectApplier
                 // 相手と自分のカードの数字を入れ替える
                 if (myCard != null && opponentCard != null)
                 {
-                    var temp = myCard.Number;
-                    myCard.SetNumber(opponentCard.Number);
-                    opponentCard.SetNumber(temp);
+                    var temp = myCard.BattleNumber;
+                    myCard.SetBattleNumber(opponentCard.BattleNumber);
+                    opponentCard.SetBattleNumber(temp);
                 }
                 break;
 
             case EmotionType.Surprise:
                 // 自分の出したカードの数字をランダムに変える
                 if (myCard != null)
-                    myCard.SetNumber(Random.Range(1, 7));
+                    myCard.SetBattleNumber(Random.Range(1, 7));
                 break;
 
             case EmotionType.Disgust:
                 // 自分の出したカードの数字を2分の1にする（切り捨て、最低1）
                 if (myCard != null)
-                    myCard.SetNumber(Mathf.Max(1, myCard.Number / 2));
+                    myCard.SetBattleNumber(Mathf.Max(1, myCard.BattleNumber / 2));
                 break;
 
             case EmotionType.Sadness:
                 // 未使用カードから1枚を選んで数字を3に変える
                 if (targetCardForSadness != null)
-                    targetCardForSadness.SetNumber(GameConstants.DEFAULT_CARD_NUMBER);
+                    targetCardForSadness.SetBattleNumber(GameConstants.DEFAULT_CARD_NUMBER);
                 break;
         }
     }

@@ -61,22 +61,21 @@ ThemeAnnouncement → CardReveal → DialoguePhase → BiddingPhase
 【新フロー】
 ThemeAnnouncement → CardReveal → DialoguePhase → BiddingPhase
 → AuctionResult (CompetitionPhase) → ResultPhase → DeckSelection
-→ CardBattle → BattleResult → MemoryGrowth → BattleEnd
+→ CardBattle → MemoryGrowth → BattleEnd
 ```
 
 ### 2.2 変更の大きさ
 
 | 項目 | 変更の大きさ | 内容 |
 |------|:----------:|------|
-| GameState enum | 中 | RewardPhase → ResultPhase に改名、DeckSelection/CardBattle/BattleResult を追加 |
+| GameState enum | 中 | RewardPhase → ResultPhase に改名、DeckSelection/CardBattle を追加 |
 | RewardCalculator | 大 | 感情マッチ倍率・記憶タイプ倍率を組み込む |
 | CardData | 中 | EmotionType フィールドを追加 |
 | AuctionData | 小 | VictoryCondition フィールドを追加 |
-| BattlePresenter | 大 | 新フェーズ（デッキ選択・カードバトル・バトル結果）を追加 |
+| BattlePresenter | 大 | 新フェーズ（デッキ選択・カードバトル）を追加 |
 | BattleUIPresenter | 大 | 新View群への委譲メソッドを追加 |
 | 新規UI: DeckSelectionView | 大（新規） | デッキ選択画面 |
 | 新規UI: CardBattleView | 大（新規） | カードバトル画面 |
-| 新規UI: BattleResultView | 大（新規） | バトル結果&記憶選択画面 |
 | 新規ロジック: CardBattleHandler | 大（新規） | 3本勝負のロジック（ターン管理・勝敗判定・スキル処理） |
 | 新規ロジック: SkillEffectApplier | 中（新規） | 8種類のスキル効果適用 |
 | 新規モデル: BattleCardModel | 小（新規） | カードに数字を割り当てたバトル用モデル |
@@ -89,12 +88,12 @@ ThemeAnnouncement → CardReveal → DialoguePhase → BiddingPhase
 
 | ファイル | 変更内容 |
 |--------|---------|
-| `Assets/Scripts/Game/Core/Enums.cs` | GameState に DeckSelection, CardBattle, BattleResult を追加。RewardPhase → ResultPhase に改名 |
+| `Assets/Scripts/Game/Core/Enums.cs` | GameState に DeckSelection, CardBattle を追加。RewardPhase → ResultPhase に改名 |
 | `Assets/Scripts/Game/Core/GameConstants.cs` | バトル関連定数を追加 |
 | `Assets/Scripts/ScriptableObject/CardData.cs` | EmotionType フィールドを追加 |
 | `Assets/Scripts/ScriptableObject/AuctionData.cs` | VictoryCondition フィールドを追加 |
 | `Assets/Scripts/Game/Services/RewardCalculator.cs` | 感情マッチ・記憶タイプ倍率の本実装 |
-| `Assets/Scripts/Game/Logic/BattlePresenter.cs` | 新フェーズ群（DeckSelection, CardBattle, BattleResult）を追加 |
+| `Assets/Scripts/Game/Logic/BattlePresenter.cs` | 新フェーズ群（DeckSelection, CardBattle）を追加 |
 | `Assets/Scripts/UI/Main/BattleUIPresenter.cs` | 新View群への委譲メソッドを追加 |
 | `Assets/Scripts/UI/Auction/RewardPhaseView.cs` | ResultPhaseView に改名、感情マッチ表示を追加 |
 | `Assets/Scripts/UI/Auction/ResourceRewardView.cs` | 感情状態表示・スキル付与演出を追加 |
@@ -103,21 +102,23 @@ ThemeAnnouncement → CardReveal → DialoguePhase → BiddingPhase
 
 ### 3.2 新規作成ファイル
 
-| ファイル | 役割 |
-|--------|------|
-| `Assets/Scripts/Game/Core/VictoryCondition.cs` | 勝利条件 enum（LowerWins, HigherWins） |
-| `Assets/Scripts/Game/Models/BattleCardModel.cs` | バトル用カードモデル（数字割り当て付き） |
-| `Assets/Scripts/Game/Models/BattleDeckModel.cs` | デッキモデル（3枚 + 使用済み管理） |
-| `Assets/Scripts/Game/Logic/CardBattleHandler.cs` | カードバトルの3本勝負ロジック |
-| `Assets/Scripts/Game/Logic/CardNumberAssigner.cs` | オークション入札量に基づくカード数字割り当て |
-| `Assets/Scripts/Game/Logic/SkillEffectApplier.cs` | 8種スキル効果の適用ロジック |
-| `Assets/Scripts/UI/Battle/DeckSelectionView.cs` | デッキ選択UI |
-| `Assets/Scripts/UI/Battle/CardBattleView.cs` | カードバトル画面UI |
-| `Assets/Scripts/UI/Battle/BattleCardSlotView.cs` | バトル場のカードスロット表示 |
-| `Assets/Scripts/UI/Battle/SkillButtonView.cs` | スキル発動ボタンUI |
-| `Assets/Scripts/UI/Battle/BattleResultView.cs` | バトル結果&記憶選択UI |
-| `Assets/Scripts/UI/Battle/RoundIndicatorView.cs` | ラウンド表示（3本中何本目か） |
-| `Assets/Scripts/UI/Battle/CoinFlipView.cs` | コインフリップ演出UI |
+| ファイル | 役割 | 状態 |
+|--------|------|------|
+| `Assets/Scripts/Game/Core/VictoryCondition.cs` | 勝利条件 enum（LowerWins, HigherWins） | ✅ 作成済み |
+| `Assets/Scripts/Game/Models/BattleDeckModel.cs` | デッキモデル（3枚 + 使用済み管理） | ✅ 作成済み |
+| `Assets/Scripts/Game/Logic/CardBattleHandler.cs` | カードバトルの3本勝負ロジック | ✅ 作成済み |
+| `Assets/Scripts/Game/Logic/CardNumberAssigner.cs` | オークション入札量に基づくカード数字割り当て | ✅ 作成済み |
+| `Assets/Scripts/Game/Logic/SkillEffectApplier.cs` | 8種スキル効果の適用ロジック | ✅ 作成済み |
+| `Assets/Scripts/UI/Battle/DeckSelectionView.cs` | デッキ選択UI（D&D方式） | ✅ 作成済み |
+| `Assets/Scripts/UI/Battle/CardBattleView.cs` | カードバトル画面UI | ✅ 作成済み |
+| `Assets/Scripts/UI/Battle/BattleCardSlotView.cs` | バトル場のカードスロット表示 | ✅ 作成済み |
+| `Assets/Scripts/UI/Battle/SkillButtonView.cs` | スキル発動ボタンUI | ✅ 作成済み |
+| `Assets/Scripts/UI/Auction/DeckSlotView.cs` | デッキスロット（D&Dドロップ先） | ✅ 作成済み（旧RankingSlotView） |
+
+**プランから変更:**
+- `BattleCardModel.cs` → CardModel に統合（独立ファイルなし）
+- `RoundIndicatorView.cs` → CardBattleView 内に統合（独立ファイルなし）
+- `RankingSlotView.cs` → `DeckSlotView.cs` にリネーム
 
 ---
 
@@ -187,7 +188,6 @@ public enum GameState
     ResultPhase,        // 旧 RewardPhase → 改名
     DeckSelection,      // 新規: デッキ選択
     CardBattle,         // 新規: カードバトル
-    BattleResult,       // 新規: バトル結果
     MemoryGrowth,
     BattleEnd,
 }
@@ -230,28 +230,18 @@ public static class CardNumberAssigner
 }
 ```
 
-### 4.7 BattleCardModel
+### 4.7 BattleCardModel → CardModel に統合（実装済み）
+
+プランでは独立クラスとして設計したが、実装では CardModel に以下のプロパティを追加する形で統合した:
 
 ```csharp
-// Assets/Scripts/Game/Models/BattleCardModel.cs
-/// <summary>
-/// バトル用カードモデル（CardModel + 割り当て数字）
-/// </summary>
-public class BattleCardModel
-{
-    public CardModel Card { get; }
-    public int Number { get; private set; }
-    public EmotionType Emotion => Card.Data.CardEmotion;
-    public bool IsUsed { get; set; }
+// Assets/Scripts/Game/Models/CardModel.cs に追加されたバトル用プロパティ
+public int BattleNumber { get; private set; }       // カード数字（1〜6）
+public int AuctionBidTotal { get; private set; }    // タイブレーク用: オークション入札総量
+public bool IsUsed { get; set; }                    // バトルでの使用済みフラグ
 
-    public BattleCardModel(CardModel card, int number)
-    {
-        Card = card;
-        Number = number;
-    }
-
-    public void SetNumber(int number) => Number = number;
-}
+public void SetBattleNumber(int number) => BattleNumber = number;
+public void SetAuctionBidTotal(int total) => AuctionBidTotal = total;
 ```
 
 ### 4.8 BattleDeckModel
@@ -556,20 +546,6 @@ CardBattleView (CanvasGroup, CardBattleView.cs)
  └─ NextButton (Button, カードオープン後の進行)
 ```
 
-#### BattleResultView.prefab
-**パス**: `Assets/Prefabs/NewBattleSceneView/Battle/BattleResultView.prefab`
-
-```
-BattleResultView (CanvasGroup, BattleResultView.cs)
- ├─ Background
- ├─ ResultText ("WIN!" / "LOSE" TextMeshProUGUI)
- ├─ ResultDescription ("記憶に入れるカードを選んでください" / "望まぬ記憶が...")
- ├─ CardSelectionContainer (勝利時: 所持カードから1枚選択)
- │   └─ (カード × N を動的生成)
- ├─ PlantedMemoryDisplay (敗北時: テキスト演出のみ。ゲームメカニクスへの影響は後で設計)
- └─ ConfirmButton (Button, "次へ")
-```
-
 #### BattleCardSlotView.prefab
 **パス**: `Assets/Prefabs/NewBattleSceneView/Battle/BattleCardSlotView.prefab`
 
@@ -583,14 +559,20 @@ BattleCardSlotView (BattleCardSlotView.cs)
  └─ SelectionHighlight (Image, 選択時のハイライト)
 ```
 
-#### CoinFlipView.prefab
+#### CoinFlipView.prefab ✅ 作成済み
 **パス**: `Assets/Prefabs/NewBattleSceneView/Battle/CoinFlipView.prefab`
 
 ```
-CoinFlipView (CanvasGroup, CoinFlipView.cs)
- ├─ CoinImage (Image, コインのスプライト)
- └─ ResultText ("先攻" / "後攻")
+CoinFlipView (CanvasGroup, Animator[CoinFlip.controller], CoinFlipView.cs)
+ ├─ Background (Image, 黒半透明 rgba(0,0,0,0.7))
+ ├─ CoinContainer (RectTransform, アニメーション対象)
+ │   └─ CoinImage (Image, 金色プレースホルダー 150x150)
+ └─ ResultText (TextMeshProUGUI, "先攻"/"後攻", fontSize=60)
 ```
+
+**アニメーション**: `Assets/Animations/CoinFlip/`
+- `CoinFlipAnimation.anim` (1.4秒): ScaleYフリップ(2回) → 放物線落下 → 高速バウンス着地
+- `CoinFlip.controller`: Idle ↔ CoinFlip (Flipトリガー)
 
 ### 5.2 改修するPrefab
 
@@ -614,7 +596,6 @@ Canvas
  ├─ ResultPhaseView           ← 改名（旧 RewardPhaseView）
  ├─ DeckSelectionView         ← 新規追加
  ├─ CardBattleView            ← 新規追加
- ├─ BattleResultView          ← 新規追加
  ├─ CoinFlipView              ← 新規追加
  ├─ MemoryGrowthView
  └─ ...
@@ -628,7 +609,7 @@ Canvas
 
 #### Step 1.1: GameState enum の変更
 - RewardPhase → ResultPhase に改名
-- DeckSelection, CardBattle, BattleResult を追加
+- DeckSelection, CardBattle を追加
 
 #### Step 1.2: GameConstants に定数を追加
 - BATTLE_ROUND_COUNT, BATTLE_WINS_REQUIRED, DECK_SIZE, DEFAULT_CARD_NUMBER
@@ -782,41 +763,22 @@ Canvas
 
 ---
 
-### Phase 7: バトル結果フェーズ
+### Phase 7: 統合・テスト・調整
 
-#### Step 7.1: BattleResultView 新規作成
-- 勝利時: 所持カードから1枚を記憶に入れる選択UI
-- 敗北時: テキスト演出のみ（ゲームメカニクスへの影響は後で設計）
-
-#### Step 7.2: BattleResultView.prefab 作成 (uLoop)
-
-#### Step 7.3: BattlePresenter に HandleBattleResult を追加
-- 勝利: カード選択 → 記憶に入れる処理
-- 敗北: 演出テキスト表示のみ（メカニクス影響は未実装）
-- セーブデータへの反映
-
-#### Step 7.4: BattleUIPresenter にバトル結果メソッドを追加
-
-#### Step 7.5: コンパイル確認 + フォーマット修正
-
----
-
-### Phase 8: 統合・テスト・調整
-
-#### Step 8.1: BattlePresenter の全フロー統合
+#### Step 7.1: BattlePresenter の全フロー統合
 - StartGame メソッドに新フェーズ群を組み込み
 - フェーズ間のデータ受け渡し確認
 
-#### Step 8.2: VContainer の登録更新
+#### Step 7.2: VContainer の登録更新
 - BattleLifetimeScope に新サービスを登録
 
-#### Step 8.3: ScriptableObject アセットの更新
+#### Step 7.3: ScriptableObject アセットの更新
 - CardData アセットに EmotionType を設定
 - AuctionData アセットに VictoryCondition を設定
 
-#### Step 8.4: UI レイアウト調整・演出
+#### Step 7.4: UI レイアウト調整・演出
 
-#### Step 8.5: 全フロー通しテスト
+#### Step 7.5: 全フロー通しテスト
 
 ---
 
@@ -867,20 +829,15 @@ private async UniTask StartGame()
 
     // 9. カードバトル（3本勝負）
     _currentGameState.Value = GameState.CardBattle;
-    var battleResult = await HandleCardBattle(
-        playerDeck, enemyDeck, emotionState);
-
-    // 10. バトル結果
-    _currentGameState.Value = GameState.BattleResult;
-    await HandleBattleResult(battleResult);
+    await HandleCardBattle(playerDeck, enemyDeck, emotionState);
 
     // ===== 終了処理 =====
 
-    // 11. 記憶育成フェーズ
+    // 10. 記憶育成フェーズ
     _currentGameState.Value = GameState.MemoryGrowth;
     await HandleMemoryGrowth();
 
-    // 12. 終了
+    // 11. 終了
     _currentGameState.Value = GameState.BattleEnd;
     await HandleBattleEnd();
 }
@@ -894,15 +851,14 @@ private async UniTask StartGame()
    - 例: 入札合計 [5, 3, 3, 2, 0, 0] → 数字 [1, 2, 2, 4, 5, 5]
 2. **勝利条件**: AuctionData にフィールドとして持たせる
 3. **スキル効果**: 企画書の8種類をそのまま実装
-4. **バトル結果**: 勝利→記憶に入れる、敗北→望まぬ記憶を植えつけられる
-5. **感情マッチの基本報酬**: **固定値（1リソース）**。倍率で1.5または2になるのみ
-6. **敗北時の「望まぬ記憶」**: **演出のみ（ゲームメカニクスへの影響は後で設計）**
-7. **バトル回数**: 1回のBattleScene内にオークション→バトルは **1回のみ**。デッキ使用制限は将来対応
-8. **感情の強さ順（同数字時のタイブレーク）**: **そのカードのオークション入札リソース総量**で比較
-9. **信頼スキル**: **直前に使ったカード**が自動的に手札に戻る（選択不要）
-10. **悲しみスキル**: **未使用カード（手札にあるカード）のみ**から1枚選択して数字を3に変更
-11. **敵AIのスキル使用**: **後で決める**（まずはランダム確率で仮実装）
-12. **RewardPhaseView → ResultPhaseView のリネーム**: Prefabアセットの参照切れに注意
+4. **感情マッチの基本報酬**: **固定値（1リソース）**。倍率で1.5または2になるのみ
+5. **バトル回数**: 1回のBattleScene内にオークション→バトルは **1回のみ**。デッキ使用制限は将来対応
+6. **感情の強さ順（同数字時のタイブレーク）**: **そのカードのオークション入札リソース総量**で比較
+7. **信頼スキル**: **直前に使ったカード**が自動的に手札に戻る（選択不要）
+8. **悲しみスキル**: **未使用カード（手札にあるカード）のみ**から1枚選択して数字を3に変更
+9. **敵AIのスキル使用**: **後で決める**（まずはランダム確率で仮実装）
+10. **RewardPhaseView → ResultPhaseView のリネーム**: Prefabアセットの参照切れに注意
+11. **バトル結果画面**: 仕様未定のためスコープ外。カードバトル後は直接 MemoryGrowth へ遷移
 
 ---
 
@@ -914,7 +870,7 @@ private async UniTask StartGame()
 4. **カードバトルUIの複雑さ**: 先攻後攻の交互進行、スキル発動タイミング、カードオープン演出など、UIのステートマシンが複雑
 5. **スキルの相互作用**: 一部スキルは効果が矛盾する場合がある（例: 怒り+恐れの組み合わせ）
 6. **敵AIの賢さ**: 単純すぎるとつまらなく、複雑すぎると実装コスト増大
-7. **実装規模**: Phase 4〜7 が特に大きいため、段階的にテスト可能な形で進める
+7. **実装規模**: Phase 4〜6 が特に大きいため、段階的にテスト可能な形で進める
 
 ---
 
@@ -922,7 +878,7 @@ private async UniTask StartGame()
 
 ```
 Phase 1: 基盤変更 ✅ 完了
-  [x] 1.1 GameState enum 変更（ResultPhase, DeckSelection, CardBattle, BattleResult 追加）
+  [x] 1.1 GameState enum 変更（ResultPhase, DeckSelection, CardBattle 追加）
   [x] 1.2 GameConstants に定数追加
   [x] 1.3 VictoryCondition enum 新規作成
   [x] 1.4 CardData に EmotionType フィールド追加
@@ -930,23 +886,24 @@ Phase 1: 基盤変更 ✅ 完了
   [x] 1.6 コンパイル確認 + RewardPhase→ResultPhase 参照修正
   [x] フォーマット修正
 
-Phase 2: リザルトパート改修 ✅ 完了
+Phase 2: リザルトパート改修 ⚠️ 一部未完了
   [x] 2.1 RewardCalculator 本実装（感情マッチ・記憶タイプ倍率）
-  [x] 2.2 CardAcquisitionView に感情マッチ情報表示
-  [x] 2.3 ResourceRewardView に感情状態判定・スキル表示追加
+  [ ] 2.2 CardAcquisitionView に感情マッチ情報表示 ← 未実装
+  [ ] 2.3 ResourceRewardView に感情状態判定・スキル表示追加 ← 未実装
   [x] 2.4 BattlePresenter HandleResultPhase 実装
   [x] 2.5 コンパイル確認 + フォーマット修正
+  [ ] RewardPhaseView → ResultPhaseView リネーム ← 未実施
 
 Phase 3: カード数字割り当て ✅ 完了
-  [x] 3.1 CardNumberAssigner 新規作成
-  [x] 3.2 BattleCardModel 新規作成
+  [x] 3.1 CardNumberAssigner 新規作成（CardNumberInfo構造体でnumber+totalBidを返す）
+  [x] 3.2 BattleCardModel → CardModelに統合（BattleNumber, AuctionBidTotalプロパティ）
   [x] 3.3 BattleDeckModel 新規作成
   [x] 3.4 BattlePresenter に数字割り当て処理追加
   [x] 3.5 コンパイル確認
 
 Phase 4: デッキ選択フェーズ ✅ 完了（D&D UI統合済み）
   [x] 4.1 DeckSelectionView 新規作成（D&D方式に改修済み）
-  [x] 4.2 DeckSelectionView Prefab 再構築（DraggableCardView + RankingSlotView×3 + DragLineView + StaggeredSlideInGroup）
+  [x] 4.2 DeckSelectionView Prefab 再構築（DraggableCardView + DeckSlotView×3 + DragLineView + StaggeredSlideInGroup）
   [x] 4.3 敵AIデッキ選択ロジック（BattlePresenter.SelectEnemyDeck）
   [x] 4.4 BattlePresenter HandleDeckSelection 実装
   [x] 4.5 BattleUIPresenter にメソッド追加
@@ -960,52 +917,76 @@ Phase 5: カードバトルロジック ✅ 完了
 
 Phase 6: カードバトルUI ✅ 完了
   [x] 6.1 BattleCardSlotView 新規作成
-  [-] 6.2 CoinFlipView → 未作成（BattlePresenter内でログ出力のみ）
+  [x] 6.2 CoinFlipView 新規作成（Animator + AnimationClip + LitMotionテキストフェード）
   [x] 6.3 CardBattleView 新規作成
-  [-] 6.4 SkillButtonView → CardBattleView内に統合済み（独立Viewなし）
+  [x] 6.4 SkillButtonView 新規作成（独立Prefab）
   [-] 6.5 RoundIndicatorView → CardBattleView内に統合済み（独立Viewなし）
-  [x] 6.6 Prefab群の作成（CardBattleView.prefab, BattleCardSlotView.prefab）
+  [x] 6.6 Prefab群の作成（CardBattleView.prefab, BattleCardSlotView.prefab, SkillButtonView.prefab）
   [x] 6.7 BattlePresenter HandleCardBattle 実装
   [x] 6.8 BattleUIPresenter にメソッド追加
   [x] 6.9 コンパイル確認 + フォーマット修正
 
-Phase 7: バトル結果フェーズ ✅ 完了
-  [x] 7.1 BattleResultView 新規作成
-  [x] 7.2 BattleResultView.prefab 作成
-  [x] 7.3 BattlePresenter HandleBattleResult 実装
-  [x] 7.4 BattleUIPresenter にメソッド追加
-  [x] 7.5 コンパイル確認 + フォーマット修正
-
-Phase 8: 統合・テスト ⚠️ 全フロー通しテスト未実施
-  [x] 8.1 BattlePresenter 全フロー統合（StartGame に全フェーズ組み込み済み）
-  [-] 8.2 VContainer 登録更新 → 不要（新サービスは全てPresenter内で生成）
-  [x] 8.3 ScriptableObject アセット更新（CardData EmotionType, AuctionData VictoryCondition 設定済み）
-  [x] 8.4 Prefab 作成 & ヒエラルキー配置（全View Prefab化 + BattleScene配置完了）
-  [ ] 8.5 全フロー通しテスト ← 未実施
+Phase 7: 統合・テスト ⚠️ 一部未完了
+  [x] 7.1 BattlePresenter 全フロー統合（StartGame に全フェーズ組み込み済み）
+  [-] 7.2 VContainer 登録更新 → 不要（新サービスは全てPresenter内で生成）
+  [x] 7.3 ScriptableObject アセット更新（CardData EmotionType, AuctionData VictoryCondition 設定済み）
+  [x] 7.4 Prefab 作成 & ヒエラルキー配置（全View完了）
+  [ ] 7.5 全フロー通しテスト ← 未実施
 ```
 
 ## 11. 残作業サマリー
 
-### スクリプト: 全て完了 ✅
-全スクリプト（ロジック・UI View・Presenter）は実装済み。コンパイルエラー0件、VUA警告0件。
+### スクリプト実装状況
 
-### Prefab・アセット・ヒエラルキー: 全て完了 ✅
-- DeckSelectionView.prefab（D&D方式: DraggableCardView + RankingSlotView×3 + DragLineView + StaggeredSlideInGroup）
-- CardBattleView.prefab（BattleCardSlotView, SkillButton, RoundIndicator, FieldSlot 等）
-- BattleResultView.prefab（ResultText, CardSelectionContainer, ConfirmButton）
-- BattleCardSlotView.prefab（表裏切替, 数字テキスト, 感情アイコン, ハイライト）
-- DraggableCardView.prefab に numberText 追加
-- ScriptableObject: CardData EmotionType, AuctionData VictoryCondition 設定済み
-- BattleScene Canvas に全View配置済み（Prefabインスタンス）
+#### ロジック・モデル: ✅ 完了
+- CardNumberAssigner（CardNumberInfo構造体で返却）, CardModel（BattleNumber/AuctionBidTotal統合）, BattleDeckModel, CardBattleHandler, SkillEffectApplier, RewardCalculator
 
-### 未実施
+#### UI View: ⚠️ 一部未完了
+- DeckSelectionView ✅, CardBattleView ✅, BattleCardSlotView ✅, SkillButtonView ✅, CoinFlipView ✅
+- DraggableCardView ✅（BattleNumber対応済み, numberText表示）, DeckSlotView ✅（旧RankingSlotView相当）
+- CardAcquisitionView — 感情マッチ表示 ❌ 未実装
+- ResourceRewardView — 感情状態・スキル表示 ❌ 未実装
+
+#### Presenter: ✅ 完了
+- BattlePresenter: HandleResultPhase ✅, HandleDeckSelection ✅, HandleCardBattle ✅
+- BattleUIPresenter: デッキ選択・カードバトル関連メソッド ✅
+
+### Prefab・アセット・ヒエラルキー: ✅ 完了
+- DeckSelectionView.prefab ✅（D&D方式: DraggableCardView + DeckSlotView×3 + DragLineView + StaggeredSlideInGroup）
+- CardBattleView.prefab ✅（BattleCardSlotView, SkillButton, RoundIndicator, FieldSlot 等）
+- BattleCardSlotView.prefab ✅（表裏切替, 数字テキスト, 感情アイコン, ハイライト）
+- SkillButtonView.prefab ✅（感情アイコン, 名前, 説明テキスト）
+- DraggableCardView.prefab ✅（numberText 追加済み）
+- ScriptableObject: CardData EmotionType, AuctionData VictoryCondition 設定済み ✅
+- CoinFlipView.prefab ✅（Animator + AnimationClip、Background + CoinContainer + ResultText）
+- BattleScene Canvas に DeckSelectionView, CardBattleView, CoinFlipView 配置済み ✅
+
+### 実装設計のプランからの差分
+
+| 項目 | プラン | 実装 |
+|------|--------|------|
+| BattleCardModel | 独立クラス `BattleCardModel.cs` | CardModel に `BattleNumber`, `AuctionBidTotal` プロパティとして統合 |
+| RankingSlotView | `RankingSlotView.cs` | `DeckSlotView.cs` にリネーム |
+| CardNumberAssigner 戻り値 | `Dictionary<CardModel, int>` | `Dictionary<CardModel, CardNumberInfo>`（number + totalBid） |
+| RoundIndicatorView | 独立View | CardBattleView 内に統合 |
+| CoinFlipView | 独立Prefab | ✅ 作成済み（Animator + AnimationClip、Prefab配置済み） |
+
+### 未実施作業一覧
 
 | # | 作業 | 種別 | 優先度 |
 |---|------|------|--------|
-| 1 | **全フロー通しテスト** | テスト | 高 |
-|   | オークション → リザルト → デッキ選択(D&D) → カードバトル → バトル結果 | | |
+| 1 | CardAcquisitionView に感情マッチ表示追加 | スクリプト | 中 |
+|   | 各カード横に「感情マッチ! x1.5」「自己記憶! x2.0」等の表示 | | |
+| 2 | ResourceRewardView に感情状態判定・スキル表示追加 | スクリプト | 中 |
+|   | 最多感情の判定→感情状態表示→スキル名と効果の表示 | | |
+| 3 | RewardPhaseView → ResultPhaseView リネーム | リファクタ | 低 |
+|   | クラス名・Prefab名の改名（参照切れに注意） | | |
+| 4 | **全フロー通しテスト** | テスト | 高 |
+|   | オークション → リザルト → デッキ選択(D&D) → カードバトル → 記憶育成 | | |
+
+### スコープ外（仕様未定）
+- **BattleResultView**: バトル結果画面（勝利時の記憶選択・敗北時の演出）は仕様が未定のためスコープ外。現在のフローは CardBattle → MemoryGrowth に直接遷移
 
 ### 設計で省略したもの（後回し可）
-- CoinFlipView: コインフリップ演出（現在はログ出力のみ）
 - 敵AIの高度化（現在はランダム選択・50%スキル使用）
-- 敗北時の「望まぬ記憶」のゲームメカニクス影響（現在は演出テキストのみ）
+- HandleDialoguePhase の対話ボタン本実装（現在は TODO コメントあり）

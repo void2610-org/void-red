@@ -28,10 +28,10 @@ public class CardBattleHandler
     public bool IsPlayerWon => PlayerWins >= GameConstants.BATTLE_WINS_REQUIRED;
 
     /// <summary>現ラウンドでプレイヤーが伏せたカード</summary>
-    public BattleCardModel PlayerCard { get; private set; }
+    public CardModel PlayerCard { get; private set; }
 
     /// <summary>現ラウンドで敵が伏せたカード</summary>
-    public BattleCardModel EnemyCard { get; private set; }
+    public CardModel EnemyCard { get; private set; }
 
     /// <summary>プレイヤーのスキルが使用可能か</summary>
     public bool PlayerSkillAvailable { get; private set; } = true;
@@ -51,10 +51,10 @@ public class CardBattleHandler
     public void DecideFirstPlayer() => IsPlayerFirst = Random.value > 0.5f;
 
     /// <summary>プレイヤーがカードを伏せる</summary>
-    public void PlacePlayerCard(BattleCardModel card) => PlayerCard = card;
+    public void PlacePlayerCard(CardModel card) => PlayerCard = card;
 
     /// <summary>敵がカードを伏せる</summary>
-    public void PlaceEnemyCard(BattleCardModel card) => EnemyCard = card;
+    public void PlaceEnemyCard(CardModel card) => EnemyCard = card;
 
     /// <summary>怒りスキル: 次ターンの勝利条件を反転させる</summary>
     public void ReverseConditionNextTurn() => _conditionReversedNextTurn = true;
@@ -63,7 +63,7 @@ public class CardBattleHandler
     public bool TryActivatePlayerSkill(
         EmotionType skill,
         BattleDeckModel playerDeck,
-        BattleCardModel targetCardForSadness = null)
+        CardModel targetCardForSadness = null)
     {
         if (!PlayerSkillAvailable) return false;
         PlayerSkillAvailable = false;
@@ -96,11 +96,11 @@ public class CardBattleHandler
         _conditionReversedNextTurn = false;
 
         // 数字が異なる場合
-        if (PlayerCard.Number != EnemyCard.Number)
+        if (PlayerCard.BattleNumber != EnemyCard.BattleNumber)
         {
             var playerWins = condition == VictoryCondition.LowerWins
-                ? PlayerCard.Number < EnemyCard.Number
-                : PlayerCard.Number > EnemyCard.Number;
+                ? PlayerCard.BattleNumber < EnemyCard.BattleNumber
+                : PlayerCard.BattleNumber > EnemyCard.BattleNumber;
 
             return RecordResult(playerWins);
         }

@@ -2,7 +2,7 @@
 
 ## 方針
 
-**案B: DraggableCardView + RankingSlotView を DeckSelectionView に組み込む**
+**案B: DraggableCardView + DeckSlotView を DeckSelectionView に組み込む**
 
 既存の DeckSelectionView の構造を維持しつつ、クリック選択 → D&D選択に差し替える。
 ValueRankingView のD&Dロジック（扇形配置、スナップアニメ、スロット管理）を DeckSelectionView に移植する。
@@ -14,14 +14,14 @@ ValueRankingView のD&Dロジック（扇形配置、スナップアニメ、ス
 | ファイル | アクション |
 |---------|-----------|
 | `UI/Auction/DraggableCardView.cs` | **改修** — BattleCardModel対応、数字テキスト追加 |
-| `UI/Auction/RankingSlotView.cs` | **変更なし** — そのまま流用 |
+| `UI/Auction/DeckSlotView.cs`（旧DeckSlotView） | **改名済み** — DeckSlotViewとして流用 |
 | `UI/Auction/DragLineView.cs` | **変更なし** — そのまま流用 |
 | `UI/Auction/ValueRankingView.cs` | **削除** — D&Dロジックは DeckSelectionView に移植 |
 | `Game/Models/ValueRankingModel.cs` | **削除** — 順位管理は不要 |
 | Prefab: `ValueRankingView.prefab` | **削除** |
 | Prefab: `RankTextPrefab.prefab` | **削除** |
 | Prefab: `DraggableCardView.prefab` | **Prefab再構築**（CardView → 数字テキスト付きに） |
-| Prefab: `RankingSlotView.prefab` | **変更なし** |
+| Prefab: `DeckSlotView.prefab`（旧DeckSlotView） | **改名済み** |
 | `Sprites/Auction/ValueRanking/` | 保持（スロット背景として活用可能） |
 
 ### 既存ファイルの変更
@@ -99,7 +99,7 @@ public class DeckSelectionView : BasePhaseView
     [SerializeField] private Transform handContainer;
 
     // --- 追加: D&D関連 ---
-    [SerializeField] private List<RankingSlotView> deckSlots;  // 3つのドロップスロット
+    [SerializeField] private List<DeckSlotView> deckSlots;  // 3つのドロップスロット
     [SerializeField] private DragLineView dragLineView;
     [SerializeField] private float fanSpreadWidth = 400f;
     [SerializeField] private float fanHeightCurve = 30f;
@@ -133,7 +133,7 @@ public class DeckSelectionView : BasePhaseView
 
 ### Step 5: Prefab調整（後続作業）
 
-- DeckSelectionView Prefab に RankingSlotView × 3、DragLineView を配置
+- DeckSelectionView Prefab に DeckSlotView × 3、DragLineView を配置
 - DraggableCardView Prefab に numberText を追加
 - StaggeredSlideInGroup コンポーネント設定
 
@@ -150,7 +150,7 @@ DeckSelectionView.Initialize(wonCards, condition)
   ↓ 各カードから DraggableCardView を生成
   ↓ DraggableCardView.Initialize(BattleCardModel, handIndex)
   ↓   └→ CardView.Initialize(battleCard.Card.Data) + numberText 表示
-  ↓ プレイヤーがD&Dで3つのRankingSlotViewに配置
+  ↓ プレイヤーがD&Dで3つのDeckSlotViewに配置
   ↓ 確定ボタン押下
 BattleUIPresenter.GetSelectedDeck()
   ↓ DeckSelectionView.SelectedCards
@@ -163,7 +163,7 @@ BattlePresenter → BattleDeckModel.SetDeck(selectedCards)
 ## 注意事項
 
 - **ダミーカード対応**: BattleCardModel.Card == null の場合、CardView は非表示にして数字だけ表示
-- **RankingSlotView.PlacedCard**: DraggableCardView を返す。そこから `.BattleCard` で BattleCardModel を取得
-- **DraggableCardView のプロパティ名変更**: `CardModel` → `BattleCard` に変更するため、RankingSlotView 等での参照も確認
-  - RankingSlotView 内では `PlacedCard.CardModel` は使っていない（DraggableCardView を保持するのみ）→ 影響なし
-- **namespace**: DraggableCardView, RankingSlotView, DragLineView は `UI/Auction` ディレクトリにあるが namespace は無し → 移動不要
+- **DeckSlotView.PlacedCard**: DraggableCardView を返す。そこから `.BattleCard` で BattleCardModel を取得
+- **DraggableCardView のプロパティ名変更**: `CardModel` → `BattleCard` に変更するため、DeckSlotView 等での参照も確認
+  - DeckSlotView 内では `PlacedCard.CardModel` は使っていない（DraggableCardView を保持するのみ）→ 影響なし
+- **namespace**: DraggableCardView, DeckSlotView, DragLineView は `UI/Auction` ディレクトリにあるが namespace は無し → 移動不要

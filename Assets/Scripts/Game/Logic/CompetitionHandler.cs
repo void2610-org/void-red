@@ -1,4 +1,3 @@
-using R3;
 using UnityEngine;
 
 /// <summary>
@@ -12,10 +11,6 @@ public class CompetitionHandler
     public int PlayerTotal { get; private set; }
     public int EnemyTotal { get; private set; }
     public bool IsActive { get; private set; }
-
-    // UI通知用
-    public Observable<(int playerTotal, int enemyTotal)> OnBidChanged => _onBidChanged;
-    public Observable<float> OnTimerReset => _onTimerReset;
 
     /// <summary>
     /// タイムアウト判定（10秒間上乗せ無し）
@@ -38,8 +33,6 @@ public class CompetitionHandler
         PlayerTotal < EnemyTotal ? false : null;
 
     private float _lastActionTime;
-    private readonly Subject<(int, int)> _onBidChanged = new();
-    private readonly Subject<float> _onTimerReset = new();
 
     /// <summary>
     /// 競合を終了
@@ -56,8 +49,6 @@ public class CompetitionHandler
 
         PlayerTotal++;
         _lastActionTime = Time.time;
-        _onBidChanged.OnNext((PlayerTotal, EnemyTotal));
-        _onTimerReset.OnNext(GameConstants.COMPETITION_TIMEOUT_SECONDS);
         return true;
     }
 
@@ -71,8 +62,6 @@ public class CompetitionHandler
 
         EnemyTotal++;
         _lastActionTime = Time.time;
-        _onBidChanged.OnNext((PlayerTotal, EnemyTotal));
-        _onTimerReset.OnNext(GameConstants.COMPETITION_TIMEOUT_SECONDS);
     }
 
     /// <summary>
@@ -85,12 +74,5 @@ public class CompetitionHandler
         EnemyTotal = enemyBid;
         _lastActionTime = Time.time;
         IsActive = true;
-        _onBidChanged.OnNext((PlayerTotal, EnemyTotal));
-    }
-
-    public void Dispose()
-    {
-        _onBidChanged.Dispose();
-        _onTimerReset.Dispose();
     }
 }

@@ -31,8 +31,8 @@ public class DeckSelectionView : BasePhaseView
     [SerializeField] private StaggeredSlideInGroup cardStagger;
 
     /// <summary>選択されたデッキ</summary>
-    public IReadOnlyList<BattleCardModel> SelectedCards =>
-        deckSlots.Where(s => s.IsOccupied).Select(s => s.PlacedCard.BattleCard).ToList();
+    public IReadOnlyList<CardModel> SelectedCards =>
+        deckSlots.Where(s => s.IsOccupied).Select(s => s.PlacedCard.CardModel).ToList();
 
     private readonly List<DraggableCardView> _handCards = new();
     private readonly Subject<Unit> _onConfirm = new();
@@ -59,7 +59,7 @@ public class DeckSelectionView : BasePhaseView
     /// <summary>
     /// デッキ選択を開始する
     /// </summary>
-    public void Initialize(IReadOnlyList<BattleCardModel> wonCards)
+    public void Initialize(IReadOnlyList<CardModel> wonCards)
     {
         Show();
         Clear();

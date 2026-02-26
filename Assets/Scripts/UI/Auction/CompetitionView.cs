@@ -19,7 +19,7 @@ public class CompetitionView : BasePhaseView
     [SerializeField] private TMP_Text timerText;
 
     [Header("天秤")]
-    [SerializeField] private Animator balanceAnimator;
+    [SerializeField] private BalanceTiltController balanceTilt;
 
     [Header("入札表示")]
     [SerializeField] private TMP_Text playerBidText;
@@ -37,8 +37,7 @@ public class CompetitionView : BasePhaseView
     // 感情選択が変更された時に発火
     public Observable<EmotionType> OnEmotionSelected => emotionResourceDisplayView.OnEmotionSelected;
 
-    private static readonly int BID_LEVEL_HASH = Animator.StringToHash("BidLevel");
-    private const int MAX_BID_FOR_TILT = 10;
+    private const int MAX_BID_FOR_TILT = 3;
 
     public override void Show() => CanvasGroup.Show();
 
@@ -55,7 +54,7 @@ public class CompetitionView : BasePhaseView
     {
         playerBidText.text = playerBid.ToString();
         enemyBidText.text = enemyBid.ToString();
-        UpdateBalanceTilt(playerBid, enemyBid);
+        UpdateBalanceTilt(playerBid, enemyBid, animate: false);
         emotionResourceDisplayView.UpdateResources(resources);
         emotionResourceDisplayView.SetSelectedEmotion(EmotionType.Joy);
         Show();
@@ -82,15 +81,16 @@ public class CompetitionView : BasePhaseView
     }
 
     /// <summary>
-    /// 天秤の傾きを更新（プレイヤー対敵の比率で）
+    /// 天秤の傾きを更新（プレイヤー対敵の差分で-1～+1に正規化）
     /// </summary>
-    private void UpdateBalanceTilt(int playerBid, int enemyBid)
+    private void UpdateBalanceTilt(int playerBid, int enemyBid, bool animate = true)
     {
-        if (!balanceAnimator) return;
-
-        // 差分を-MAX～+MAXの範囲で0-1に正規化
         var diff = playerBid - enemyBid;
-        var normalized = Mathf.Clamp01((float)(diff + MAX_BID_FOR_TILT) / (2f * MAX_BID_FOR_TILT));
-        balanceAnimator.SetFloat(BID_LEVEL_HASH, normalized);
+        var tilt = Mathf.Clamp((float)diff / MAX_BID_FOR_TILT, -1f, 1f);
+
+        if (animate)
+            balanceTilt.AnimateTilt(tilt);
+        else
+            balanceTilt.SetTilt(tilt);
     }
 }
