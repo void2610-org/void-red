@@ -98,6 +98,11 @@ public class CardBattleView : BasePhaseView
     /// <summary>プレイヤーのカードを場に配置（確定後に手札をクリア）</summary>
     public void PlacePlayerCard(CardModel card)
     {
+        // 配置済みカードを操作不可にする
+        var placedCard = playerFieldSlot.PlacedCard;
+        if (placedCard)
+            placedCard.CanvasGroup.blocksRaycasts = false;
+
         handContainer.gameObject.SetActive(false);
         ClearPlayerHand();
     }
