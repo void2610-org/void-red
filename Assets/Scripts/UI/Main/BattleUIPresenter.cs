@@ -39,6 +39,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly SkillButtonView _skillButtonView;
     private readonly DeckSelectionView _deckSelectionView;
     private readonly CardBattleView _cardBattleView;
+    private readonly CoinFlipView _coinFlipView;
     private BattlePresenter _battlePresenter;
 
     public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
@@ -58,6 +59,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _skillButtonView = Object.FindFirstObjectByType<SkillButtonView>(FindObjectsInactive.Include);
         _deckSelectionView = Object.FindFirstObjectByType<DeckSelectionView>();
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
+        _coinFlipView = Object.FindFirstObjectByType<CoinFlipView>(FindObjectsInactive.Include);
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
     }
@@ -105,6 +107,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // スキルボタン
     public void InitializeSkillButton(EmotionType emotion) => _skillButtonView.Initialize(emotion);
     public void SetSkillButtonVisible(bool visible) => _skillButtonView.SetVisible(visible);
+
+    // コインフリップ
+    public async UniTask PlayCoinFlipAsync(bool isPlayerFirst) =>
+        await _coinFlipView.PlayCoinFlipAsync(isPlayerFirst);
 
     // カードバトルフェーズ
     public void InitializeBattle(VictoryCondition condition) =>

@@ -582,7 +582,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             // コイントス
             handler.DecideFirstPlayer();
-            await UniTask.Delay(1000);
+            await _battleUIPresenter.PlayCoinFlipAsync(handler.IsPlayerFirst);
 
             // スキルボタン表示（カード選択中に使用可能）
             _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
