@@ -592,12 +592,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
             {
                 await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
                 EnemyPlaceCard(handler, enemyDeck);
-                _battleUIPresenter.PlaceEnemyCard();
+                _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
             }
             else
             {
                 EnemyPlaceCard(handler, enemyDeck);
-                _battleUIPresenter.PlaceEnemyCard();
+                _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
                 await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
             }
 

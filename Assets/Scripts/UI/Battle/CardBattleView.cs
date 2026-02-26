@@ -23,7 +23,6 @@ public class CardBattleView : BasePhaseView
     [Header("フィールド")]
     [SerializeField] private DeckSlotView playerFieldSlot;
     [SerializeField] private Transform enemyCardContainer;
-    [SerializeField] private BattleCardSlotView cardSlotPrefab;
 
     [Header("ドラッグ演出")]
     [SerializeField] private DragLineView dragLineView;
@@ -46,7 +45,6 @@ public class CardBattleView : BasePhaseView
     private readonly Subject<Unit> _onNextClicked = new();
     private CompositeDisposable _disposables = new();
     private RectTransform _handContainerRect;
-    private BattleCardSlotView _enemyFieldCardSlot;
     private DraggableCardView _enemyFieldCard;
 
     /// <summary>指示テキストを設定</summary>
@@ -105,14 +103,15 @@ public class CardBattleView : BasePhaseView
     }
 
     /// <summary>敵のカードを場に伏せる</summary>
-    public void PlaceEnemyCard()
+    public void PlaceEnemyCard(CardModel enemyCard)
     {
-        if (_enemyFieldCardSlot)
-            Destroy(_enemyFieldCardSlot.gameObject);
+        if (_enemyFieldCard)
+            Destroy(_enemyFieldCard.gameObject);
 
-        _enemyFieldCardSlot = Instantiate(cardSlotPrefab, enemyCardContainer);
-        _enemyFieldCardSlot.ShowBack();
-        _enemyFieldCardSlot.SetInteractable(false);
+        _enemyFieldCard = Instantiate(draggableCardPrefab, enemyCardContainer);
+        _enemyFieldCard.Initialize(enemyCard, 0);
+        _enemyFieldCard.ShowBack();
+        _enemyFieldCard.CanvasGroup.blocksRaycasts = false;
     }
 
     /// <summary>両者のカードをオープンする（横並びで比較表示）</summary>
@@ -123,16 +122,12 @@ public class CardBattleView : BasePhaseView
         if (placedCard)
             placedCard.UpdateNumber(playerCard.BattleNumber);
 
-        // 敵カードを開示: BattleCardSlotViewを破棄してDraggableCardViewに置き換え
-        if (_enemyFieldCardSlot)
+        // 敵カードを表面に切り替え、数字を更新
+        if (_enemyFieldCard)
         {
-            Destroy(_enemyFieldCardSlot.gameObject);
-            _enemyFieldCardSlot = null;
+            _enemyFieldCard.ShowFront();
+            _enemyFieldCard.UpdateNumber(enemyCard.BattleNumber);
         }
-
-        _enemyFieldCard = Instantiate(draggableCardPrefab, enemyCardContainer);
-        _enemyFieldCard.Initialize(enemyCard, 0);
-        _enemyFieldCard.CanvasGroup.blocksRaycasts = false;
     }
 
     /// <summary>次へボタンを表示して待機</summary>
@@ -152,12 +147,6 @@ public class CardBattleView : BasePhaseView
             Destroy(placedCard.gameObject);
 
         // 敵カードをクリア
-        if (_enemyFieldCardSlot)
-        {
-            Destroy(_enemyFieldCardSlot.gameObject);
-            _enemyFieldCardSlot = null;
-        }
-
         if (_enemyFieldCard)
         {
             Destroy(_enemyFieldCard.gameObject);

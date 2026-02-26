@@ -17,6 +17,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
 {
     [SerializeField] private CardView cardView;
     [SerializeField] private TextMeshProUGUI numberText;
+    [SerializeField] private GameObject cardBack;
     [SerializeField] private float dragAlpha = 0.8f;
     [SerializeField] private float dragScale = 1.05f;
 
@@ -51,6 +52,22 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private MotionHandle _rotateTween;
 
     public void SetSlot(DeckSlotView slot) => CurrentSlot = slot;
+
+    /// <summary>裏面を表示（伏せ状態）</summary>
+    public void ShowBack()
+    {
+        if (cardBack) cardBack.SetActive(true);
+        if (cardView) cardView.gameObject.SetActive(false);
+        if (numberText) numberText.gameObject.SetActive(false);
+    }
+
+    /// <summary>表面を表示</summary>
+    public void ShowFront()
+    {
+        if (cardBack) cardBack.SetActive(false);
+        if (cardView) cardView.gameObject.SetActive(true);
+        if (numberText) numberText.gameObject.SetActive(true);
+    }
 
     /// <summary>スキル効果等で変更された数字を反映する</summary>
     public void UpdateNumber(int number)
