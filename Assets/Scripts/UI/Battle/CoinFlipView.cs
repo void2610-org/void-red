@@ -13,7 +13,7 @@ public class CoinFlipView : BasePhaseView
     [SerializeField] private Animator coinAnimator;
     [SerializeField] private TextMeshProUGUI resultText;
 
-    private static readonly int FlipTrigger = Animator.StringToHash("Flip");
+    private static readonly int _flipTrigger = Animator.StringToHash("Flip");
 
     public async UniTask PlayCoinFlipAsync(bool isPlayerFirst)
     {
@@ -26,7 +26,7 @@ public class CoinFlipView : BasePhaseView
         await UniTask.Delay(200);
 
         // コインアニメーション
-        coinAnimator.SetTrigger(FlipTrigger);
+        coinAnimator.SetTrigger(_flipTrigger);
         await UniTask.Delay(1400);
 
         // 結果テキスト表示
