@@ -322,6 +322,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             {
                 if (handler.TryPlayerRaise(selectedEmotion, _player))
                 {
+                    SeManager.Instance.PlaySe(selectedEmotion.ToResourceSeName(), pitch: 1f);
                     _battleUIPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
                     _battleUIPresenter.UpdateCompetitionResources(_player.EmotionResources);
                 }

@@ -149,6 +149,20 @@ public static class EmotionTypeExtensions
         _ => "SE_FACE_REACT_JOY"
     };
 
+    // 感情タイプからリソース配置SE名を取得
+    public static string ToResourceSeName(this EmotionType emotion) => emotion switch
+    {
+        EmotionType.Joy => "SE_RESOURCE_JOY",
+        EmotionType.Trust => "SE_RESOURCE_TRUST",
+        EmotionType.Fear => "SE_RESOURCE_FEAR",
+        EmotionType.Surprise => "SE_RESOURCE_WONDER",
+        EmotionType.Sadness => "SE_RESOURCE_GRIEF",
+        EmotionType.Disgust => "SE_RESOURCE_HATE",
+        EmotionType.Anger => "SE_RESOURCE_ANGER",
+        EmotionType.Anticipation => "SE_RESOURCE_EXPECT",
+        _ => "SE_RESOURCE_JOY"
+    };
+
     /// <summary>
     /// 隣接する感情タイプを取得（感情の輪で時計回りに次の感情）
     /// </summary>
