@@ -260,8 +260,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             if (result.IsDraw)
             {
-                // 競合リストに追加（後で競合フェーズで処理）
+                // 競合リストに追加し、元の入札分は両者即消費（競合フェーズでの再利用を防ぐ）
                 drawResults.Add(result);
+                ConsumeBidForCard(_player, result.Card);
+                ConsumeBidForCard(_enemy, result.Card);
                 Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 引き分け → 競合へ（{result.PlayerBid} vs {result.EnemyBid}）");
                 continue;
             }
@@ -290,25 +292,16 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 競合カードがある場合は競合フェーズへ
         if (drawResults.Count > 0)
         {
+            _battleUIPresenter.HideAuctionView();
+
             _currentGameState.Value = GameState.CompetitionPhase;
-            await HandleCompetitions(drawResults);
+            foreach (var drawResult in drawResults)
+                await HandleSingleCompetition(drawResult);
         }
 
         await UniTask.Delay(1000);
         // オークション完全終了時にクリア
         _battleUIPresenter.ClearAuctionView();
-    }
-
-    // === 5.5 競合フェーズ ===
-
-    private async UniTask HandleCompetitions(List<AuctionJudge.AuctionResultEntry> drawResults)
-    {
-        _battleUIPresenter.HideAuctionView();
-
-        foreach (var drawResult in drawResults)
-        {
-            await HandleSingleCompetition(drawResult);
-        }
     }
 
     private async UniTask HandleSingleCompetition(AuctionJudge.AuctionResultEntry drawResult)
@@ -380,19 +373,36 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var winner = handler.IsPlayerWon;
         if (winner == true)
         {
-            ConsumeBidForCard(_player, card);
             _player.AddWonCard(card);
+            // 敗者（敵）の上乗せ分を返却
+            ReturnRaises(_enemy, handler.EnemyRaises);
             Debug.Log($"[BattlePresenter] 競合勝利: {card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
         }
         else if (winner == false)
         {
-            ConsumeBidForCard(_enemy, card);
             _enemy.AddWonCard(card);
+            // 敗者（プレイヤー）の上乗せ分を返却
+            ReturnRaises(_player, handler.PlayerRaises);
             Debug.Log($"[BattlePresenter] 競合敗北: {card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
         }
         else
         {
+            // 完全引き分け: 両者の上乗せ分を返却、カード消失
+            ReturnRaises(_player, handler.PlayerRaises);
+            ReturnRaises(_enemy, handler.EnemyRaises);
             Debug.Log($"[BattlePresenter] 競合引き分け: {card.Data.CardName} カード消失（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
+        }
+    }
+
+    /// <summary>
+    /// 競合の上乗せ分のリソースを返却する
+    /// </summary>
+    private static void ReturnRaises(PlayerPresenter player, IReadOnlyList<EmotionType> raises)
+    {
+        foreach (var emotion in raises)
+        {
+            player.AddEmotion(emotion, 1);
+            Debug.Log($"[BattlePresenter] リソース返却: {emotion} +1");
         }
     }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -11,6 +12,16 @@ public class CompetitionHandler
     public int PlayerTotal { get; private set; }
     public int EnemyTotal { get; private set; }
     public bool IsActive { get; private set; }
+
+    /// <summary>
+    /// プレイヤーの上乗せ履歴
+    /// </summary>
+    public IReadOnlyList<EmotionType> PlayerRaises => _playerRaises;
+
+    /// <summary>
+    /// 敵の上乗せ履歴
+    /// </summary>
+    public IReadOnlyList<EmotionType> EnemyRaises => _enemyRaises;
 
     /// <summary>
     /// タイムアウト判定（10秒間上乗せ無し）
@@ -33,6 +44,8 @@ public class CompetitionHandler
         PlayerTotal < EnemyTotal ? false : null;
 
     private float _lastActionTime;
+    private readonly List<EmotionType> _playerRaises = new();
+    private readonly List<EmotionType> _enemyRaises = new();
 
     /// <summary>
     /// 競合を終了
@@ -48,6 +61,7 @@ public class CompetitionHandler
         if (!player.TryConsumeEmotion(emotion, 1)) return false;
 
         PlayerTotal++;
+        _playerRaises.Add(emotion);
         _lastActionTime = Time.time;
         return true;
     }
@@ -61,6 +75,7 @@ public class CompetitionHandler
         if (!enemy.TryConsumeEmotion(emotion, 1)) return;
 
         EnemyTotal++;
+        _enemyRaises.Add(emotion);
         _lastActionTime = Time.time;
     }
 
@@ -72,6 +87,8 @@ public class CompetitionHandler
         Card = card;
         PlayerTotal = playerBid;
         EnemyTotal = enemyBid;
+        _playerRaises.Clear();
+        _enemyRaises.Clear();
         _lastActionTime = Time.time;
         IsActive = true;
     }
