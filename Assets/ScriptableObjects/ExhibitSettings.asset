@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eee8e9a6df8ed40f7adc2357ab11e98e, type: 3}
   m_Name: ExhibitSettings
   m_EditorClassIdentifier: 
-  enableExhibitMode: 1
+  enableExhibitMode: 0
   idleReturnSceneName: TitleScene
   sessionLimitSceneName: ThanksScene
   idleSkipSceneNames:
@@ -21,7 +21,7 @@ MonoBehaviour:
   enableIdlePauseAndReturn: 1
   idleToPauseSeconds: 45
   pauseToTitleSeconds: 10
-  enableSessionTimeLimit: 0
-  sessionTimeLimitSeconds: 600
+  enableSessionTimeLimit: 1
+  sessionTimeLimitSeconds: 900
   enableTitleIdlePV: 1
   titleIdleToPVSeconds: 20
