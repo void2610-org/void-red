@@ -36,13 +36,6 @@ public class CardBidInfoView : MonoBehaviour
     public void ShowPlayerBidOnly(int playerBid)
     {
         ClearPlayerBidIcons();
-        enemyBidText.text = "?";
-    }
-
-    // 入札額を非表示
-    public void HideBids()
-    {
-        ClearPlayerBidIcons();
         enemyBidText.text = "";
     }
 
