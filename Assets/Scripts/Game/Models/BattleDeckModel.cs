@@ -37,4 +37,15 @@ public class BattleDeckModel
         card.IsUsed = true;
         _usedHistory.Push(card);
     }
+
+    /// <summary>
+    /// 不足分をデフォルトカード（数字3）で補完する
+    /// </summary>
+    public static void FillWithDefaults(List<CardModel> cards)
+    {
+        while (cards.Count < GameConstants.DECK_SIZE)
+        {
+            cards.Add(new CardModel(GameConstants.DEFAULT_CARD_NUMBER));
+        }
+    }
 }

@@ -47,7 +47,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7355541710097526288}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -194,6 +194,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1780612484730660277, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1800
+      objectReference: {fileID: 0}
+    - target: {fileID: 1780612484730660277, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 400
+      objectReference: {fileID: 0}
     - target: {fileID: 3120208367642011151, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}
       propertyPath: m_SortingOrder
       value: -10
@@ -307,6 +315,7 @@ PrefabInstance:
     - {fileID: 7457983198419822165, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1867353964434569423, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}
+    - {fileID: 690958420151905754, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3228244f0704e4d0abc5126e5219d2d2, type: 3}

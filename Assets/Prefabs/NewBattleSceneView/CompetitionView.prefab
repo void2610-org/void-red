@@ -33,11 +33,11 @@ RectTransform:
   m_Children:
   - {fileID: 6825312723267608139}
   - {fileID: 1361344516273636967}
-  - {fileID: 3387243866520083495}
   - {fileID: 5788462100093895582}
   - {fileID: 7624692004369225846}
   - {fileID: 7615962996557899060}
   - {fileID: 916417057655093999}
+  - {fileID: 3387243866520083495}
   - {fileID: 6149213655632246403}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -62,7 +62,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 300435672328042387}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -1254,6 +1254,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6111961731886835815, guid: 63128d2577019407e89ab01b1d097d66, type: 3}
+      propertyPath: m_TargetGraphic
+      value: 
+      objectReference: {fileID: 8141103446028957795}
     - target: {fileID: 9214280517623030955, guid: 63128d2577019407e89ab01b1d097d66, type: 3}
       propertyPath: m_Name
       value: BalanceView
@@ -1277,6 +1281,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f8ccbf2ac1c349be8c7c419b466d34d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8141103446028957795 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6228242262339000681, guid: 63128d2577019407e89ab01b1d097d66, type: 3}
+  m_PrefabInstance: {fileID: 2779894310618341642}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &8234312904672561517 stripped

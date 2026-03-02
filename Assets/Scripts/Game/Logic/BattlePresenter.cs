@@ -17,6 +17,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllAuctionData _allAuctionData;
 
+    private readonly EnemyAIController _enemyAI;
+    private readonly AuctionProcessor _auctionProcessor;
+
     private readonly UniTaskCompletionSource _initializationComplete = new();
 
     private EnemyData _currentEnemyData;
@@ -43,6 +46,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _allAuctionData = allAuctionData;
+
+        _enemyAI = new EnemyAIController(_enemy);
+        _auctionProcessor = new AuctionProcessor(_player, _enemy, _battleUIPresenter, _enemyAI);
 
         InitializeAuctionData();
     }
@@ -129,7 +135,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 5. 落札者判定フェーズ
         _currentGameState.Value = GameState.AuctionResult;
-        await HandleAuctionResult();
+        await _auctionProcessor.ProcessAuctionResultAsync(_auctionCards, _currentEnemyData, _currentGameState);
 
         // ===== リザルトパート =====
 
@@ -217,7 +223,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             await _battleUIPresenter.StartTutorial("BiddingPhase");
 
         // 敵AIで入札を決定
-        _enemy.DecideBids(_auctionCards);
+        _enemyAI.DecideBids(_auctionCards);
         Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
 
         // プレイヤーの入札UI表示・待機
@@ -227,212 +233,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 入札対象カード公開演出
         await _battleUIPresenter.ShowBidTargetsAsync(_player.Bids, _enemy.Bids, 2f);
-    }
-
-    // === 5. 落札者判定フェーズ ===
-
-    private async UniTask HandleAuctionResult()
-    {
-        Debug.Log("[BattlePresenter] 落札者判定フェーズ開始");
-
-        // AuctionViewを再表示
-        _battleUIPresenter.ShowAuctionView();
-
-        if (_currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartTutorial("ResultDetermination");
-
-        // 全カードの落札者を判定
-        var results = AuctionJudge.JudgeAll(_auctionCards, _player.Bids, _enemy.Bids);
-
-        // 結果を格納しリソースを処理
-        _player.ClearWonCards();
-        _enemy.ClearWonCards();
-
-        var drawResults = new List<AuctionJudge.AuctionResultEntry>();
-
-        foreach (var result in results)
-        {
-            if (result.NoBids)
-            {
-                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 入札なし");
-                continue;
-            }
-
-            if (result.IsDraw)
-            {
-                // 競合リストに追加（後で競合フェーズで処理）
-                drawResults.Add(result);
-                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 引き分け → 競合へ（{result.PlayerBid} vs {result.EnemyBid}）");
-                continue;
-            }
-
-            if (result.IsPlayerWon)
-            {
-                // 勝者: リソース消費
-                ConsumeBidForCard(_player, result.Card);
-                _player.AddWonCard(result.Card);
-                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: プレイヤー落札（{result.PlayerBid} vs {result.EnemyBid}）");
-            }
-            else
-            {
-                // 敵勝者: リソース消費
-                ConsumeBidForCard(_enemy, result.Card);
-                _enemy.AddWonCard(result.Card);
-                Debug.Log($"[BattlePresenter] {result.Card.Data.CardName}: 敵落札（{result.PlayerBid} vs {result.EnemyBid}）");
-            }
-        }
-
-        Debug.Log($"[BattlePresenter] 落札結果: プレイヤー{_player.WonCards.Count}枚、敵{_enemy.WonCards.Count}枚、競合{drawResults.Count}枚");
-
-        // 順次演出で結果を表示
-        await _battleUIPresenter.ShowAuctionResultsSequentialAsync(results, _currentEnemyData.EnemyColor);
-
-        // 競合カードがある場合は競合フェーズへ
-        if (drawResults.Count > 0)
-        {
-            _currentGameState.Value = GameState.CompetitionPhase;
-            await HandleCompetitions(drawResults);
-        }
-
-        await UniTask.Delay(1000);
-        // オークション完全終了時にクリア
-        _battleUIPresenter.ClearAuctionView();
-    }
-
-    // === 5.5 競合フェーズ ===
-
-    private async UniTask HandleCompetitions(List<AuctionJudge.AuctionResultEntry> drawResults)
-    {
-        _battleUIPresenter.HideAuctionView();
-
-        foreach (var drawResult in drawResults)
-        {
-            await HandleSingleCompetition(drawResult);
-        }
-    }
-
-    private async UniTask HandleSingleCompetition(AuctionJudge.AuctionResultEntry drawResult)
-    {
-        var handler = new CompetitionHandler();
-        handler.Start(drawResult.Card, drawResult.PlayerBid, drawResult.EnemyBid);
-
-        var selectedEmotion = EmotionType.Joy;
-        var disposables = new CompositeDisposable();
-
-        // 競合UI表示
-        _battleUIPresenter.ShowCompetition(
-            handler.PlayerTotal, handler.EnemyTotal, _player.EmotionResources);
-
-        // プレイヤー上乗せボタン
-        _battleUIPresenter.OnCompetitionRaise
-            .Subscribe(_ =>
-            {
-                if (handler.TryPlayerRaise(selectedEmotion, _player))
-                {
-                    _battleUIPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
-                    _battleUIPresenter.UpdateCompetitionResources(_player.EmotionResources);
-                }
-            })
-            .AddTo(disposables);
-
-        // 感情選択変更
-        _battleUIPresenter.OnCompetitionEmotionSelected
-            .Subscribe(emotion => selectedEmotion = emotion)
-            .AddTo(disposables);
-
-        // 敵AIの次回上乗せ時刻
-        var nextEnemyRaiseTime = Time.time + Random.Range(2f, 5f);
-
-        // 競合ループ（タイムアウトまで）
-        while (!handler.IsTimedOut)
-        {
-            // タイマー更新
-            _battleUIPresenter.UpdateCompetitionTimer(
-                handler.RemainingTime, GameConstants.COMPETITION_TIMEOUT_SECONDS);
-
-            // 敵AI上乗せ判定
-            if (Time.time >= nextEnemyRaiseTime)
-            {
-                TryEnemyCompetitionRaise(handler);
-                nextEnemyRaiseTime = Time.time + Random.Range(2f, 5f);
-
-                _battleUIPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
-            }
-
-            await UniTask.Yield();
-        }
-
-        // 競合終了
-        handler.End();
-        disposables.Dispose();
-
-        ProcessCompetitionResult(handler, drawResult.Card);
-
-        _battleUIPresenter.HideCompetition();
-        await UniTask.Delay(500);
-    }
-
-    /// <summary>
-    /// 競合結果を処理（勝者判定・カード付与・ログ出力）
-    /// </summary>
-    private void ProcessCompetitionResult(CompetitionHandler handler, CardModel card)
-    {
-        var winner = handler.IsPlayerWon;
-        if (winner == true)
-        {
-            ConsumeBidForCard(_player, card);
-            _player.AddWonCard(card);
-            Debug.Log($"[BattlePresenter] 競合勝利: {card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
-        }
-        else if (winner == false)
-        {
-            ConsumeBidForCard(_enemy, card);
-            _enemy.AddWonCard(card);
-            Debug.Log($"[BattlePresenter] 競合敗北: {card.Data.CardName}（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
-        }
-        else
-        {
-            Debug.Log($"[BattlePresenter] 競合引き分け: {card.Data.CardName} カード消失（{handler.PlayerTotal} vs {handler.EnemyTotal}）");
-        }
-    }
-
-    /// <summary>
-    /// 敵AIの競合時上乗せ判定
-    /// </summary>
-    private void TryEnemyCompetitionRaise(CompetitionHandler handler)
-    {
-        // 既にプレイヤーより多い場合は無駄に消費しない
-        if (handler.EnemyTotal > handler.PlayerTotal) return;
-
-        // 50%の確率で上乗せしない
-        if (Random.value < 0.5f) return;
-
-        // リソースが残っている感情からランダムに選択
-        var emotions = (EmotionType[])System.Enum.GetValues(typeof(EmotionType));
-        var available = new List<EmotionType>();
-        foreach (var emotion in emotions)
-        {
-            if (_enemy.GetEmotionAmount(emotion) > 0)
-                available.Add(emotion);
-        }
-
-        if (available.Count == 0) return;
-
-        var chosen = available[Random.Range(0, available.Count)];
-        handler.EnemyRaise(chosen, _enemy);
-    }
-
-    /// <summary>
-    /// 特定カードの入札分のリソースを消費する（勝者のみ）
-    /// </summary>
-    private static void ConsumeBidForCard(PlayerPresenter player, CardModel card)
-    {
-        var bidsByEmotion = player.Bids.GetBidsByEmotion(card);
-        foreach (var (emotion, amount) in bidsByEmotion)
-        {
-            player.TryConsumeEmotion(emotion, amount);
-            Debug.Log($"[BattlePresenter] リソース消費: {emotion} -{amount}");
-        }
     }
 
     // === 6. リザルトフェーズ ===
@@ -504,7 +304,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             .ToList();
 
         // 不足分を補完（数字3のダミーカード）
-        FillDeckWithDefaults(playerWonBattleCards);
+        BattleDeckModel.FillWithDefaults(playerWonBattleCards);
 
         // デッキ選択UIとスキルボタンを表示
         _battleUIPresenter.InitializeDeckSelection(playerWonBattleCards);
@@ -523,38 +323,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var enemyWonBattleCards = _enemy.WonCards
             .Where(c => _auctionCards.Contains(c))
             .ToList();
-        FillDeckWithDefaults(enemyWonBattleCards);
+        BattleDeckModel.FillWithDefaults(enemyWonBattleCards);
 
         var enemyDeck = new BattleDeckModel();
-        var enemySelectedCards = SelectEnemyDeck(enemyWonBattleCards);
-        enemyDeck.SetDeck(enemySelectedCards);
+        enemyDeck.SetDeck(_enemyAI.SelectDeck(enemyWonBattleCards));
 
         Debug.Log($"[BattlePresenter] プレイヤーデッキ: {playerDeck.Cards.Count}枚, 敵デッキ: {enemyDeck.Cards.Count}枚");
 
         return (playerDeck, enemyDeck);
-    }
-
-    /// <summary>
-    /// 不足分をデフォルトカード（数字3）で補完する
-    /// </summary>
-    private static void FillDeckWithDefaults(List<CardModel> cards)
-    {
-        while (cards.Count < GameConstants.DECK_SIZE)
-        {
-            // ダミーカード（数字3）
-            cards.Add(new CardModel(GameConstants.DEFAULT_CARD_NUMBER));
-        }
-    }
-
-    /// <summary>
-    /// 敵AIのデッキ選択（ランダムで3枚選択）
-    /// </summary>
-    private static List<CardModel> SelectEnemyDeck(List<CardModel> availableCards)
-    {
-        return availableCards
-            .OrderBy(_ => Random.value)
-            .Take(GameConstants.DECK_SIZE)
-            .ToList();
     }
 
     // === 9. カードバトルフェーズ ===
@@ -569,8 +345,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var handler = new CardBattleHandler(_currentAuctionData.VictoryCondition);
 
         // 敵の感情状態（ランダム）
-        var emotions = (EmotionType[])System.Enum.GetValues(typeof(EmotionType));
-        var enemyEmotionState = emotions[Random.Range(0, emotions.Length)];
+        var enemyEmotionState = _enemyAI.DecideEmotionState();
 
         // バトルUI初期化
         _battleUIPresenter.InitializeBattle(_currentAuctionData.VictoryCondition);
@@ -591,22 +366,21 @@ public class BattlePresenter : IStartable, ISceneInitializable
             if (handler.IsPlayerFirst)
             {
                 await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
-                EnemyPlaceCard(handler, enemyDeck);
+                _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
             }
             else
             {
-                EnemyPlaceCard(handler, enemyDeck);
+                _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
                 await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
             }
 
             _battleUIPresenter.SetSkillButtonVisible(false);
 
-            // 敵AIのスキル発動判定（ランダム50%）
-            if (handler.EnemySkillAvailable && Random.value > 0.5f)
+            // 敵AIのスキル発動判定
+            if (_enemyAI.TryActivateSkill(handler, enemyDeck, enemyEmotionState))
             {
-                handler.TryActivateEnemySkill(enemyEmotionState, enemyDeck);
                 _battleUIPresenter.SetBattleInstruction($"敵が{enemyEmotionState.ToJapaneseName()}スキルを発動！");
                 Debug.Log($"[BattlePresenter] 敵がスキル発動: {enemyEmotionState}");
                 await UniTask.Delay(1500);
@@ -673,19 +447,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
         handler.PlacePlayerCard(selectedCard);
         playerDeck.MarkAsUsed(selectedCard);
         _battleUIPresenter.PlacePlayerCard(selectedCard);
-    }
-
-    /// <summary>
-    /// 敵AIがカードを選んで伏せる
-    /// </summary>
-    private static void EnemyPlaceCard(CardBattleHandler handler, BattleDeckModel enemyDeck)
-    {
-        var availableCards = enemyDeck.GetAvailableCards();
-        if (availableCards.Count == 0) return;
-
-        var card = availableCards[Random.Range(0, availableCards.Count)];
-        handler.PlaceEnemyCard(card);
-        enemyDeck.MarkAsUsed(card);
     }
 
     // === 10. 記憶育成フェーズ ===
