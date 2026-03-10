@@ -476,8 +476,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log($"[BattlePresenter] 獲得テーマ作成: {acquiredTheme.ThemeName}");
         Debug.Log($"[BattlePresenter] 勝利{acquiredTheme.WonCount}枚、敗北{acquiredTheme.LostCount}枚");
 
-        // セーブデータに記録
-        _gameProgressService.RecordAcquiredThemeAndSave(acquiredTheme);
+        // メモリに記録（ディスク保存はシーン遷移直前に行う）
+        _gameProgressService.RecordAcquiredTheme(acquiredTheme);
 
         // 全獲得テーマを取得
         var allThemes = _gameProgressService.GetAcquiredThemes();
