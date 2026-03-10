@@ -115,6 +115,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         await UniTask.Delay(1000);
 
+#if UNITY_EDITOR
+        if (DebugBattleSettings.SkipAuction)
+        {
+            await StartDebugBattleAsync();
+            return;
+        }
+#endif
+
         // ===== オークションパート =====
 
         // 1. テーマ公開
@@ -155,7 +163,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 9. カードバトル（3本勝負）
         _currentGameState.Value = GameState.CardBattle;
-        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState);
+        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, _currentAuctionData.VictoryCondition);
 
         // ===== 終了処理 =====
 
@@ -338,17 +346,18 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private async UniTask<bool> HandleCardBattle(
         BattleDeckModel playerDeck,
         BattleDeckModel enemyDeck,
-        EmotionType playerEmotionState)
+        EmotionType playerEmotionState,
+        VictoryCondition victoryCondition)
     {
         Debug.Log("[BattlePresenter] カードバトルフェーズ開始");
 
-        var handler = new CardBattleHandler(_currentAuctionData.VictoryCondition);
+        var handler = new CardBattleHandler(victoryCondition);
 
         // 敵の感情状態（ランダム）
         var enemyEmotionState = _enemyAI.DecideEmotionState();
 
         // バトルUI初期化
-        _battleUIPresenter.InitializeBattle(_currentAuctionData.VictoryCondition);
+        _battleUIPresenter.InitializeBattle(victoryCondition);
 
         // ラウンドループ
         while (!handler.IsFinished)
@@ -571,4 +580,56 @@ public class BattlePresenter : IStartable, ISceneInitializable
         InitializeGameAsync().Forget();
         BgmManager.Instance.PlayBGM("Battle");
     }
+
+#if UNITY_EDITOR
+    // === デバッグ: オークションスキップ ===
+
+    /// <summary>
+    /// デバッグ用：オークションをスキップしてバトルフェーズから開始する
+    /// </summary>
+    private async UniTask StartDebugBattleAsync()
+    {
+        Debug.Log("[BattlePresenter] デバッグ: オークションスキップ開始");
+
+        // デバッグ用カード（数字1〜6）を生成
+        _auctionCards.Clear();
+        for (var i = 1; i <= GameConstants.AUCTION_CARD_COUNT; i++)
+            _auctionCards.Add(new CardModel(i));
+
+        // カード番号マップを構築（入札0、数字は順番通り）
+        _cardNumbers = new System.Collections.Generic.Dictionary<CardModel, CardNumberAssigner.CardNumberInfo>();
+        for (var i = 0; i < _auctionCards.Count; i++)
+        {
+            _cardNumbers[_auctionCards[i]] = new CardNumberAssigner.CardNumberInfo
+            {
+                Number = i + 1,
+                TotalBid = 0,
+            };
+        }
+
+        // プレイヤーに全カードを付与（デッキ選択フェーズで3枚選ぶ）
+        foreach (var card in _auctionCards)
+            _player.AddWonCard(card);
+
+        // スキルボタン初期化（DebugBattleSettingsで設定したスキルを使用）
+        var playerEmotionState = DebugBattleSettings.PlayerSkill;
+        Debug.Log($"[BattlePresenter] デバッグ: スキル={playerEmotionState}, 勝利条件={DebugBattleSettings.VictoryCondition}");
+
+        _battleUIPresenter.InitializeSkillButton(playerEmotionState);
+        _currentGameState.Value = GameState.DeckSelection;
+
+        // デッキ選択（通常フローと同じ）
+        var (playerDeck, enemyDeck) = await HandleDeckSelection();
+
+        // カードバトル（通常フローと同じ）
+        _currentGameState.Value = GameState.CardBattle;
+        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, DebugBattleSettings.VictoryCondition);
+
+        // 終了（記憶育成はスキップしてHome遷移）
+        _currentGameState.Value = GameState.BattleEnd;
+        VolumeController.Instance.ResetToDefault();
+        await UniTask.Delay(1000);
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+    }
+#endif
 }
