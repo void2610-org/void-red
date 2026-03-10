@@ -7,12 +7,22 @@ using UnityEngine;
 public static class SkillEffectApplier
 {
     /// <summary>
+    /// デッキ選択中に使用できるスキルか
+    /// </summary>
+    public static bool CanUseInDeckSelection(EmotionType emotion) => emotion switch
+    {
+        // 現状のデッキ選択UIで完結して処理できるのはAnticipationだけ
+        EmotionType.Anticipation => true,
+        _ => false
+    };
+
+    /// <summary>
     /// スキル効果の日本語説明を取得
     /// </summary>
     public static string GetDescription(EmotionType emotion) => emotion switch
     {
         EmotionType.Anger => "次のターンのみ勝利条件が逆になる",
-        EmotionType.Anticipation => "自分の残りカードの数字を全てランダムに変える",
+        EmotionType.Anticipation => "自分のデッキの数字を全てランダムに変える",
         EmotionType.Joy => "自分の出したカードの数字を2倍にする",
         EmotionType.Trust => "一度使ったカードがもう一度使える",
         EmotionType.Fear => "相手と自分のカードの数字を入れ替える",
@@ -47,8 +57,8 @@ public static class SkillEffectApplier
                 break;
 
             case EmotionType.Anticipation:
-                // 自分の残りカードの数字を全てランダムに変える（被りあり）
-                foreach (var card in myDeck.GetAvailableCards())
+                // 自分のデッキ内の全カードの数字をランダムに変える（被りあり）
+                foreach (var card in myDeck.Cards)
                     card.SetBattleNumber(Random.Range(1, 7));
                 break;
 

@@ -40,6 +40,9 @@ public class CardBattleView : BasePhaseView
     /// <summary>次へボタンが押された</summary>
     public Observable<Unit> OnNextClicked => _onNextClicked;
 
+    /// <summary>現在フィールドに仮置きされているカード</summary>
+    public CardModel SelectedFieldCard => playerFieldSlot.IsOccupied ? playerFieldSlot.PlacedCard.CardModel : null;
+
     private readonly List<DraggableCardView> _handCards = new();
     private readonly Subject<CardModel> _onCardSelected = new();
     private readonly Subject<Unit> _onNextClicked = new();
@@ -117,6 +120,23 @@ public class CardBattleView : BasePhaseView
         _enemyFieldCard.Initialize(enemyCard, 0);
         _enemyFieldCard.ShowBack();
         _enemyFieldCard.CanvasGroup.blocksRaycasts = false;
+    }
+
+    /// <summary>表示中カードの数字を再描画する</summary>
+    public void RefreshDisplayedCardNumbers()
+    {
+        // 手札・仮置き・敵札のどこに表示されていても再描画できるようにする
+        foreach (var card in _handCards)
+        {
+            if (card)
+                card.UpdateNumber(card.CardModel.BattleNumber);
+        }
+
+        if (playerFieldSlot.IsOccupied)
+            playerFieldSlot.PlacedCard.UpdateNumber(playerFieldSlot.PlacedCard.CardModel.BattleNumber);
+
+        if (_enemyFieldCard)
+            _enemyFieldCard.UpdateNumber(_enemyFieldCard.CardModel.BattleNumber);
     }
 
     /// <summary>両者のカードをオープンする（横並びで比較表示）</summary>

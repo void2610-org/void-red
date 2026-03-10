@@ -42,9 +42,11 @@ public class CardBattleHandler
     // 勝利条件の一時反転（怒りスキル用）
     private bool _conditionReversedNextTurn;
 
-    public CardBattleHandler(VictoryCondition condition)
+    public CardBattleHandler(VictoryCondition condition, bool isPlayerSkillAvailable = true)
     {
         BaseCondition = condition;
+        // デッキ選択中に使ったスキルは、バトル開始時点で使用済みとして引き継ぐ
+        PlayerSkillAvailable = isPlayerSkillAvailable;
     }
 
     /// <summary>コイントスで先攻後攻を決定</summary>
@@ -68,6 +70,15 @@ public class CardBattleHandler
         if (!PlayerSkillAvailable) return false;
         PlayerSkillAvailable = false;
         SkillEffectApplier.Apply(skill, PlayerCard, EnemyCard, playerDeck, this, targetCardForSadness);
+        return true;
+    }
+
+    /// <summary>スキル使用権のみ消費する（効果は後から適用する場合に使用）</summary>
+    public bool MarkPlayerSkillUsed()
+    {
+        if (!PlayerSkillAvailable) return false;
+        // 効果の適用タイミングを後ろへずらす場合でも、使用権だけは先に消費する
+        PlayerSkillAvailable = false;
         return true;
     }
 
