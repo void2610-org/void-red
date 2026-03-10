@@ -505,6 +505,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
                     {
                         SkillEffectApplier.Apply(playerSkill, selectedBattleCard, handler.EnemyCard, playerDeck, handler,
                             isPlayerSide: true);
+                        handler.PreviewPlayerNextCardEffects(selectedBattleCard);
 
                         _battleUIPresenter.RefreshBattleCardNumbers();
                     }
@@ -519,6 +520,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
                     {
                         case EmotionType.Anger:
                         case EmotionType.Anticipation:
+                        case EmotionType.Joy:
                         case EmotionType.Trust:
                         case EmotionType.Disgust:
                             // カードを選ばなくても成立するスキルは即時処理する

@@ -23,7 +23,7 @@ public static class SkillEffectApplier
     {
         EmotionType.Anger => "次のターンのみ勝利条件が逆になる",
         EmotionType.Anticipation => "自分のデッキの数字を全てランダムに変える",
-        EmotionType.Joy => "自分の出したカードの数字を2倍にする",
+        EmotionType.Joy => "自分の次に出すカードの数字を2倍にする",
         EmotionType.Trust => "一度使ったカードがもう一度使える",
         EmotionType.Fear => "相手と自分のカードの数字を入れ替える",
         EmotionType.Surprise => "自分の出したカードの数字をランダムに変える",
@@ -65,9 +65,11 @@ public static class SkillEffectApplier
                 break;
 
             case EmotionType.Joy:
-                // 自分の出したカードの数字を2倍にする
-                if (myCard != null)
-                    myCard.SetBattleNumber(myCard.BattleNumber * 2);
+                // 次に出すカードの数字を2倍にする
+                if (isPlayerSide)
+                    handler.QueuePlayerNextCardDoubled();
+                else
+                    handler.QueueEnemyNextCardDoubled();
                 break;
 
             case EmotionType.Trust:

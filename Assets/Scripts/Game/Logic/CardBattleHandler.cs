@@ -41,6 +41,9 @@ public class CardBattleHandler
 
     // 勝利条件の一時反転（怒りスキル用）
     private bool _conditionReversedNextTurn;
+    // 次に出すカードへの2倍予約（喜びスキル用）
+    private bool _isPlayerNextCardDoubled;
+    private bool _isEnemyNextCardDoubled;
     // 次に出すカードへの半減予約（嫌悪スキル用）
     private bool _isPlayerNextCardHalved;
     private bool _isEnemyNextCardHalved;
@@ -114,10 +117,16 @@ public class CardBattleHandler
     /// <summary>嫌悪スキル: 次に出す敵カードを半減する</summary>
     public void QueueEnemyNextCardHalved() => _isEnemyNextCardHalved = true;
 
+    /// <summary>喜びスキル: 次に出すプレイヤーカードを2倍にする</summary>
+    public void QueuePlayerNextCardDoubled() => _isPlayerNextCardDoubled = true;
+
+    /// <summary>喜びスキル: 次に出す敵カードを2倍にする</summary>
+    public void QueueEnemyNextCardDoubled() => _isEnemyNextCardDoubled = true;
+
     /// <summary>嫌悪スキルの予約結果を仮置きカードへ先に反映する</summary>
     public void PreviewPlayerNextCardEffects(CardModel card)
     {
-        if (!_isPlayerNextCardHalved || card == null) return;
+        if ((!_isPlayerNextCardDoubled && !_isPlayerNextCardHalved) || card == null) return;
 
         if (_previewedPlayerNextCard != null && _previewedPlayerNextCard != card)
             _previewedPlayerNextCard.SetBattleNumber(_previewedPlayerNextCardOriginalNumber);
@@ -126,7 +135,7 @@ public class CardBattleHandler
         {
             _previewedPlayerNextCard = card;
             _previewedPlayerNextCardOriginalNumber = card.BattleNumber;
-            card.SetBattleNumber(Mathf.Max(1, card.BattleNumber / 2));
+            card.SetBattleNumber(ApplyReservedModifiers(_previewedPlayerNextCardOriginalNumber, isPlayerSide: true));
         }
     }
 
@@ -191,14 +200,16 @@ public class CardBattleHandler
     {
         if (card == null) return;
 
-        if (isPlayerSide && _isPlayerNextCardHalved)
+        if (isPlayerSide && (_isPlayerNextCardDoubled || _isPlayerNextCardHalved))
         {
-            card.SetBattleNumber(Mathf.Max(1, card.BattleNumber / 2));
+            card.SetBattleNumber(ApplyReservedModifiers(card.BattleNumber, isPlayerSide: true));
+            _isPlayerNextCardDoubled = false;
             _isPlayerNextCardHalved = false;
         }
-        else if (!isPlayerSide && _isEnemyNextCardHalved)
+        else if (!isPlayerSide && (_isEnemyNextCardDoubled || _isEnemyNextCardHalved))
         {
-            card.SetBattleNumber(Mathf.Max(1, card.BattleNumber / 2));
+            card.SetBattleNumber(ApplyReservedModifiers(card.BattleNumber, isPlayerSide: false));
+            _isEnemyNextCardDoubled = false;
             _isEnemyNextCardHalved = false;
         }
     }
@@ -207,9 +218,25 @@ public class CardBattleHandler
     {
         if (_previewedPlayerNextCard != card) return;
 
+        _isPlayerNextCardDoubled = false;
         _isPlayerNextCardHalved = false;
         _previewedPlayerNextCard = null;
         _previewedPlayerNextCardOriginalNumber = 0;
+    }
+
+    private int ApplyReservedModifiers(int baseNumber, bool isPlayerSide)
+    {
+        var value = baseNumber;
+        var isNextCardDoubled = isPlayerSide ? _isPlayerNextCardDoubled : _isEnemyNextCardDoubled;
+        var isNextCardHalved = isPlayerSide ? _isPlayerNextCardHalved : _isEnemyNextCardHalved;
+
+        if (isNextCardDoubled)
+            value *= 2;
+
+        if (isNextCardHalved)
+            value = Mathf.Max(1, value / 2);
+
+        return value;
     }
 }
 
