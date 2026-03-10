@@ -461,11 +461,11 @@
       "hash": "06c86a519be33e07c5bf194ef39678395b62a16c"
     },
     "com.yujiap.unity-toolbar-extension": {
-      "version": "https://github.com/Yusuke57/UnityToolbarExtension.git",
+      "version": "https://github.com/void2610/UnityToolbarExtension.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "4a8cec6d056e7673ce19d892d2bee1129ad33044"
+      "hash": "1c76d70c1db88a977f1e070897a794dcd4951ff0"
     },
     "io.github.hatayama.uloopmcp": {
       "version": "https://github.com/hatayama/uLoopMCP.git?path=/Packages/src",

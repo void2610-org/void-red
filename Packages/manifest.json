@@ -23,7 +23,7 @@
     "com.unity.visualscripting": "1.9.9",
     "com.unityroom.client": "https://github.com/naichilab/unityroom-client-library.git?path=Assets/unityroom",
     "com.void2610.unity-template": "https://github.com/void2610/my-unity-template.git",
-    "com.yujiap.unity-toolbar-extension": "https://github.com/Yusuke57/UnityToolbarExtension.git",
+    "com.yujiap.unity-toolbar-extension": "https://github.com/void2610/UnityToolbarExtension.git",
     "io.github.hatayama.uloopmcp": "https://github.com/hatayama/uLoopMCP.git?path=/Packages/src",
     "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer",
     "com.unity.modules.accessibility": "1.0.0",
