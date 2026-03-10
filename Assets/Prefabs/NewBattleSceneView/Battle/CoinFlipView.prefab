@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c4718242629ec4e3db746bd2ef418464, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 85a0f702b1be1466fb096a8414c898d8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -324,6 +324,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -446,4 +447,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coinAnimator: {fileID: 387823868266795462}
+  coinImage: {fileID: 5186290739688258127}
+  frontSprite: {fileID: 21300000, guid: 85a0f702b1be1466fb096a8414c898d8, type: 3}
+  backSprite: {fileID: 21300000, guid: 524436def536c41d68d77f7d1ce63200, type: 3}
   resultText: {fileID: 4221134157490979748}

@@ -155,13 +155,12 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// 獲得テーマを記録して保存
+    /// 獲得テーマをメモリに記録（ディスク保存は行わない）
     /// </summary>
     /// <param name="theme">獲得したテーマ</param>
-    public void RecordAcquiredThemeAndSave(AcquiredTheme theme)
+    public void RecordAcquiredTheme(AcquiredTheme theme)
     {
         _repository.MemoryProgress.AddAcquiredTheme(theme);
-        _repository.SaveAll();
         Debug.Log($"[GameProgressService] 獲得テーマを記録: {theme.ThemeName} ({theme.AcquiredCards.Count}枚, 感情: {theme.DominantEmotionResult})");
     }
 
