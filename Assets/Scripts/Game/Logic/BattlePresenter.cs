@@ -392,25 +392,19 @@ public class BattlePresenter : IStartable, ISceneInitializable
             _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
 
             // カード伏せフェーズ
+            var shouldApplyDeferredPlayerSkill = false;
             if (handler.IsPlayerFirst)
             {
                 // 先攻時は敵カードが未確定なので、相手依存スキルは後段で解決する
-                var shouldApplySkillAfterEnemyPlacement = await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
+                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
                 _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
-
-                if (shouldApplySkillAfterEnemyPlacement)
-                {
-                    SkillEffectApplier.Apply(playerEmotionState, handler.PlayerCard, handler.EnemyCard, playerDeck, handler,
-                        isPlayerSide: true);
-                    _battleUIPresenter.RefreshBattleCardNumbers();
-                }
             }
             else
             {
                 _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
-                await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
+                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
             }
 
             _battleUIPresenter.SetSkillButtonVisible(false);
@@ -421,6 +415,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 _battleUIPresenter.SetBattleInstruction($"敵が{enemyEmotionState.ToJapaneseName()}スキルを発動！");
                 Debug.Log($"[BattlePresenter] 敵がスキル発動: {enemyEmotionState}");
                 await UniTask.Delay(1500);
+            }
+
+            if (shouldApplyDeferredPlayerSkill)
+            {
+                // Fearは相手カードが見える直前まで見た目の入れ替えを遅らせる
+                SkillEffectApplier.Apply(playerEmotionState, handler.PlayerCard, handler.EnemyCard, playerDeck, handler,
+                    isPlayerSide: true);
+                _battleUIPresenter.RefreshBattleCardNumbers();
             }
 
             // カードオープン
@@ -464,8 +466,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // カード選択前にスキルボタンが押された場合のフラグ
         // カード未選択で押したスキルを、カード確定後に解決するためのフラグ
         var isSkillActivatedBeforePlacement = false;
-        // 相手カードが必要なスキルを、敵配置後へ持ち越すためのフラグ
-        var shouldApplySkillAfterEnemyPlacement = false;
+        // 相手カードの開示直前まで遅らせるスキルを保持するためのフラグ
+        var shouldApplyDeferredSkill = false;
 
         _battleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
         _battleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
@@ -492,7 +494,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
                     if (playerSkill == EmotionType.Fear && handler.EnemyCard == null)
                     {
                         // Fearは相手カードが出るまで解決できないので後ろへ送る
-                        shouldApplySkillAfterEnemyPlacement = true;
+                        shouldApplyDeferredSkill = true;
+                    }
+                    else if (playerSkill == EmotionType.Fear)
+                    {
+                        // 敵カードが伏せられていても見えてはいないので、開示直前まで遅らせる
+                        shouldApplyDeferredSkill = true;
                     }
                     else
                     {
@@ -542,8 +549,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
         {
             if (playerSkill == EmotionType.Fear && handler.EnemyCard == null)
             {
-                // 先攻時のFearは敵カード確定後に適用する
-                shouldApplySkillAfterEnemyPlacement = true;
+                // 先攻時のFearは敵カード確定後も、開示直前まで適用を待つ
+                shouldApplyDeferredSkill = true;
+            }
+            else if (playerSkill == EmotionType.Fear)
+            {
+                // 後攻時のFearも、相手カードが見えるまで表示反映は遅らせる
+                shouldApplyDeferredSkill = true;
             }
             else
             {
@@ -552,7 +564,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             }
         }
 
-        return shouldApplySkillAfterEnemyPlacement;
+        return shouldApplyDeferredSkill;
     }
 
     // === 10. 記憶育成フェーズ ===
