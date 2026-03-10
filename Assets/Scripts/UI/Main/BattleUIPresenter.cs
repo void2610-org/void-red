@@ -14,6 +14,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
     public Observable<CardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
+    public Observable<CardModel> OnBattleFieldCardChanged => _cardBattleView.OnFieldCardChanged;
     // 仮置き中カードを参照して、確定前でもスキル適用できるようにする
     public CardModel SelectedBattleCard => _cardBattleView.SelectedFieldCard;
     public Observable<Unit> OnSkillActivated => _skillButtonView.OnActivated;

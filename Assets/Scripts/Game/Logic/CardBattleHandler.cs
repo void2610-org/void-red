@@ -41,6 +41,11 @@ public class CardBattleHandler
 
     // 勝利条件の一時反転（怒りスキル用）
     private bool _conditionReversedNextTurn;
+    // 次に出すカードへの半減予約（嫌悪スキル用）
+    private bool _isPlayerNextCardHalved;
+    private bool _isEnemyNextCardHalved;
+    private CardModel _previewedPlayerNextCard;
+    private int _previewedPlayerNextCardOriginalNumber;
 
     public CardBattleHandler(VictoryCondition condition, bool isPlayerSkillAvailable = true)
     {
@@ -53,10 +58,19 @@ public class CardBattleHandler
     public void DecideFirstPlayer() => IsPlayerFirst = Random.value > 0.5f;
 
     /// <summary>プレイヤーがカードを伏せる</summary>
-    public void PlacePlayerCard(CardModel card) => PlayerCard = card;
+    public void PlacePlayerCard(CardModel card)
+    {
+        PlayerCard = card;
+        ConsumePlayerNextCardPreview(card);
+        ApplyPendingCardEffects(isPlayerSide: true, PlayerCard);
+    }
 
     /// <summary>敵がカードを伏せる</summary>
-    public void PlaceEnemyCard(CardModel card) => EnemyCard = card;
+    public void PlaceEnemyCard(CardModel card)
+    {
+        EnemyCard = card;
+        ApplyPendingCardEffects(isPlayerSide: false, EnemyCard);
+    }
 
     /// <summary>怒りスキル: 次ターンの勝利条件を反転させる</summary>
     public void ReverseConditionNextTurn() => _conditionReversedNextTurn = true;
@@ -69,7 +83,7 @@ public class CardBattleHandler
     {
         if (!PlayerSkillAvailable) return false;
         PlayerSkillAvailable = false;
-        SkillEffectApplier.Apply(skill, PlayerCard, EnemyCard, playerDeck, this, targetCardForSadness);
+        SkillEffectApplier.Apply(skill, PlayerCard, EnemyCard, playerDeck, this, isPlayerSide: true, targetCardForSadness);
         return true;
     }
 
@@ -90,8 +104,30 @@ public class CardBattleHandler
         if (!EnemySkillAvailable) return false;
         EnemySkillAvailable = false;
         // 敵視点: 自分のカード=EnemyCard, 相手=PlayerCard
-        SkillEffectApplier.Apply(skill, EnemyCard, PlayerCard, enemyDeck, this);
+        SkillEffectApplier.Apply(skill, EnemyCard, PlayerCard, enemyDeck, this, isPlayerSide: false);
         return true;
+    }
+
+    /// <summary>嫌悪スキル: 次に出すプレイヤーカードを半減する</summary>
+    public void QueuePlayerNextCardHalved() => _isPlayerNextCardHalved = true;
+
+    /// <summary>嫌悪スキル: 次に出す敵カードを半減する</summary>
+    public void QueueEnemyNextCardHalved() => _isEnemyNextCardHalved = true;
+
+    /// <summary>嫌悪スキルの予約結果を仮置きカードへ先に反映する</summary>
+    public void PreviewPlayerNextCardEffects(CardModel card)
+    {
+        if (!_isPlayerNextCardHalved || card == null) return;
+
+        if (_previewedPlayerNextCard != null && _previewedPlayerNextCard != card)
+            _previewedPlayerNextCard.SetBattleNumber(_previewedPlayerNextCardOriginalNumber);
+
+        if (_previewedPlayerNextCard != card)
+        {
+            _previewedPlayerNextCard = card;
+            _previewedPlayerNextCardOriginalNumber = card.BattleNumber;
+            card.SetBattleNumber(Mathf.Max(1, card.BattleNumber / 2));
+        }
     }
 
     /// <summary>
@@ -150,6 +186,31 @@ public class CardBattleHandler
         condition == VictoryCondition.LowerWins
             ? VictoryCondition.HigherWins
             : VictoryCondition.LowerWins;
+
+    private void ApplyPendingCardEffects(bool isPlayerSide, CardModel card)
+    {
+        if (card == null) return;
+
+        if (isPlayerSide && _isPlayerNextCardHalved)
+        {
+            card.SetBattleNumber(Mathf.Max(1, card.BattleNumber / 2));
+            _isPlayerNextCardHalved = false;
+        }
+        else if (!isPlayerSide && _isEnemyNextCardHalved)
+        {
+            card.SetBattleNumber(Mathf.Max(1, card.BattleNumber / 2));
+            _isEnemyNextCardHalved = false;
+        }
+    }
+
+    private void ConsumePlayerNextCardPreview(CardModel card)
+    {
+        if (_previewedPlayerNextCard != card) return;
+
+        _isPlayerNextCardHalved = false;
+        _previewedPlayerNextCard = null;
+        _previewedPlayerNextCardOriginalNumber = 0;
+    }
 }
 
 /// <summary>

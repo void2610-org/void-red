@@ -27,7 +27,7 @@ public static class SkillEffectApplier
         EmotionType.Trust => "一度使ったカードがもう一度使える",
         EmotionType.Fear => "相手と自分のカードの数字を入れ替える",
         EmotionType.Surprise => "自分の出したカードの数字をランダムに変える",
-        EmotionType.Disgust => "自分の出したカードの数字を2分の1にする",
+        EmotionType.Disgust => "自分の次に出すカードの数字を2分の1にする",
         EmotionType.Sadness => "デッキ内の任意のカードの数字を3に変える",
         _ => ""
     };
@@ -40,6 +40,7 @@ public static class SkillEffectApplier
     /// <param name="opponentCard">相手の出したカード</param>
     /// <param name="myDeck">自分のデッキ</param>
     /// <param name="handler">バトルハンドラ</param>
+    /// <param name="isPlayerSide">プレイヤー側の発動か</param>
     /// <param name="targetCardForSadness">悲しみスキル: 数字を3に変える対象カード</param>
     public static void Apply(
         EmotionType emotion,
@@ -47,6 +48,7 @@ public static class SkillEffectApplier
         CardModel opponentCard,
         BattleDeckModel myDeck,
         CardBattleHandler handler,
+        bool isPlayerSide,
         CardModel targetCardForSadness = null)
     {
         switch (emotion)
@@ -92,9 +94,11 @@ public static class SkillEffectApplier
                 break;
 
             case EmotionType.Disgust:
-                // 自分の出したカードの数字を2分の1にする（切り捨て、最低1）
-                if (myCard != null)
-                    myCard.SetBattleNumber(Mathf.Max(1, myCard.BattleNumber / 2));
+                // 次に出すカードの数字を2分の1にする（切り捨て、最低1）
+                if (isPlayerSide)
+                    handler.QueuePlayerNextCardHalved();
+                else
+                    handler.QueueEnemyNextCardHalved();
                 break;
 
             case EmotionType.Sadness:

@@ -333,7 +333,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
                 // デッキ選択中に使った場合は、その後のカードバトルでは再使用させない
                 isPlayerSkillUsed = true;
-                SkillEffectApplier.Apply(playerSkill, null, null, previewDeck, null);
+                SkillEffectApplier.Apply(playerSkill, null, null, previewDeck, null, isPlayerSide: true);
                 _battleUIPresenter.RefreshDeckSelectionCardNumbers();
                 _battleUIPresenter.SetSkillButtonVisible(false);
                 Debug.Log($"[BattlePresenter] デッキ選択中にスキル発動: {playerSkill}");
@@ -401,7 +401,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
                 if (shouldApplySkillAfterEnemyPlacement)
                 {
-                    SkillEffectApplier.Apply(playerEmotionState, handler.PlayerCard, handler.EnemyCard, playerDeck, handler);
+                    SkillEffectApplier.Apply(playerEmotionState, handler.PlayerCard, handler.EnemyCard, playerDeck, handler,
+                        isPlayerSide: true);
                     _battleUIPresenter.RefreshBattleCardNumbers();
                 }
             }
@@ -469,6 +470,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _battleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
         _battleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
 
+        _battleUIPresenter.OnBattleFieldCardChanged
+            .Subscribe(card =>
+            {
+                handler.PreviewPlayerNextCardEffects(card);
+                _battleUIPresenter.RefreshBattleCardNumbers();
+            })
+            .AddTo(disposables);
+
         // スキル発動の購読（カード選択と同時に使用可能）
         _battleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
@@ -487,7 +496,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
                     }
                     else
                     {
-                        SkillEffectApplier.Apply(playerSkill, selectedBattleCard, handler.EnemyCard, playerDeck, handler);
+                        SkillEffectApplier.Apply(playerSkill, selectedBattleCard, handler.EnemyCard, playerDeck, handler,
+                            isPlayerSide: true);
 
                         _battleUIPresenter.RefreshBattleCardNumbers();
                     }
@@ -503,8 +513,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
                         case EmotionType.Anger:
                         case EmotionType.Anticipation:
                         case EmotionType.Trust:
+                        case EmotionType.Disgust:
                             // カードを選ばなくても成立するスキルは即時処理する
-                            SkillEffectApplier.Apply(playerSkill, null, handler.EnemyCard, playerDeck, handler);
+                            SkillEffectApplier.Apply(playerSkill, null, handler.EnemyCard, playerDeck, handler, isPlayerSide: true);
                             _battleUIPresenter.RefreshBattleCardNumbers();
                             break;
 
@@ -536,7 +547,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             }
             else
             {
-                SkillEffectApplier.Apply(playerSkill, handler.PlayerCard, handler.EnemyCard, playerDeck, handler);
+                SkillEffectApplier.Apply(playerSkill, handler.PlayerCard, handler.EnemyCard, playerDeck, handler, isPlayerSide: true);
                 _battleUIPresenter.RefreshBattleCardNumbers();
             }
         }

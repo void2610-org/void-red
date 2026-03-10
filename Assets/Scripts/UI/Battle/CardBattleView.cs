@@ -43,8 +43,12 @@ public class CardBattleView : BasePhaseView
     /// <summary>現在フィールドに仮置きされているカード</summary>
     public CardModel SelectedFieldCard => playerFieldSlot.IsOccupied ? playerFieldSlot.PlacedCard.CardModel : null;
 
+    /// <summary>フィールドへ仮置きしたカードが変わった</summary>
+    public Observable<CardModel> OnFieldCardChanged => _onFieldCardChanged;
+
     private readonly List<DraggableCardView> _handCards = new();
     private readonly Subject<CardModel> _onCardSelected = new();
+    private readonly Subject<CardModel> _onFieldCardChanged = new();
     private readonly Subject<Unit> _onNextClicked = new();
     private CompositeDisposable _disposables = new();
     private RectTransform _handContainerRect;
@@ -104,7 +108,11 @@ public class CardBattleView : BasePhaseView
         // 配置済みカードを操作不可にする
         var placedCard = playerFieldSlot.PlacedCard;
         if (placedCard)
+        {
+            // 確定直前に変わった数値をスロット上の表示へ同期する
+            placedCard.UpdateNumber(card.BattleNumber);
             placedCard.CanvasGroup.blocksRaycasts = false;
+        }
 
         handContainer.gameObject.SetActive(false);
         ClearPlayerHand();
@@ -215,6 +223,8 @@ public class CardBattleView : BasePhaseView
 
         playerFieldSlot.PlaceCard(droppedCard);
         droppedCard.PlaySnapToSlotAsync(playerFieldSlot.CardAnchor, Vector2.zero).Forget();
+        droppedCard.UpdateNumber(droppedCard.CardModel.BattleNumber);
+        _onFieldCardChanged.OnNext(droppedCard.CardModel);
 
         // カードを枠に配置した時のSE
         SeManager.Instance.PlaySe("SE_FRAME_LIGHT", pitch: 1f);
@@ -296,6 +306,7 @@ public class CardBattleView : BasePhaseView
     {
         _disposables.Dispose();
         _onCardSelected.Dispose();
+        _onFieldCardChanged.Dispose();
         _onNextClicked.Dispose();
     }
 }
