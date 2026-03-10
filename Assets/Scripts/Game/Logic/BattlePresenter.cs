@@ -503,8 +503,16 @@ public class BattlePresenter : IStartable, ISceneInitializable
                     }
                     else
                     {
+                        if (playerSkill == EmotionType.Anticipation)
+                            // 仮置きしたカード自身は「残りカード」に含めない
+                            selectedBattleCard.IsUsed = true;
+
                         SkillEffectApplier.Apply(playerSkill, selectedBattleCard, handler.EnemyCard, playerDeck, handler,
                             isPlayerSide: true);
+
+                        if (playerSkill == EmotionType.Anticipation)
+                            selectedBattleCard.IsUsed = false;
+
                         handler.PreviewPlayerNextCardEffects(selectedBattleCard);
 
                         _battleUIPresenter.RefreshBattleCardNumbers();
