@@ -19,6 +19,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     private readonly EnemyAIController _enemyAI;
     private readonly AuctionProcessor _auctionProcessor;
+    private readonly CompetitionPhaseRunner _competitionPhaseRunner;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
 
@@ -48,7 +49,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _allAuctionData = allAuctionData;
 
         _enemyAI = new EnemyAIController(_enemy);
-        _auctionProcessor = new AuctionProcessor(_player, _enemy, _battleUIPresenter, _enemyAI);
+        _competitionPhaseRunner = new CompetitionPhaseRunner(_player, _enemyAI, _battleUIPresenter);
+        _auctionProcessor = new AuctionProcessor(_player, _enemy, _battleUIPresenter, _competitionPhaseRunner);
 
         InitializeAuctionData();
     }
@@ -446,7 +448,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
             await UniTask.Delay(1000);
 
             // 勝敗判定
-            var result = handler.ResolveRound();
+            bool? competitionWinner = null;
+            if (handler.RequiresCompetition)
+                competitionWinner = await HandleBattleCompetitionAsync(handler);
+
+            var result = handler.ResolveRound(competitionWinner);
 
             var resultText = result == RoundResult.PlayerWin ? "プレイヤー勝利！" : "敵の勝利...";
             _battleUIPresenter.SetBattleInstruction(resultText);
@@ -489,6 +495,23 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _battleUIPresenter.PlacePlayerCard(selectedCard);
         await playerSkillSession.CompleteCardPlacementAsync();
         return playerSkillSession.ShouldApplyDeferredSkill;
+    }
+
+    /// <summary>
+    /// バトル中に同数になった時の競合フェーズを実行し、勝者を返す
+    /// </summary>
+    /// <param name="handler">現在ラウンドのカード情報を持つバトルハンドラ</param>
+    /// <returns>競合勝者。完全同数ならnull</returns>
+    private async UniTask<bool?> HandleBattleCompetitionAsync(CardBattleHandler handler)
+    {
+        _currentGameState.Value = GameState.CompetitionPhase;
+        var competitionHandler = await _competitionPhaseRunner.RunAsync(
+            handler.PlayerCard,
+            handler.PlayerCard.AuctionBidTotal,
+            handler.EnemyCard.AuctionBidTotal,
+            "同数のため競合発生！");
+        _currentGameState.Value = GameState.CardBattle;
+        return competitionHandler.IsPlayerWon;
     }
 
     // === 10. 記憶育成フェーズ ===
