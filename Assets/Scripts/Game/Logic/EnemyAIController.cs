@@ -105,6 +105,10 @@ public class EnemyAIController
     /// <summary>
     /// スキル発動判定（50%確率）
     /// </summary>
+    /// <param name="handler">現在ラウンドの状態とスキル予約を保持するハンドラ</param>
+    /// <param name="enemyDeck">敵が現在使用しているバトル用デッキ</param>
+    /// <param name="emotionState">今回のバトルで敵に割り当てられた感情状態</param>
+    /// <returns>実際にスキルを発動した場合はtrue</returns>
     public bool TryActivateSkill(CardBattleHandler handler, BattleDeckModel enemyDeck, EmotionType emotionState)
     {
         if (!handler.EnemySkillAvailable) return false;

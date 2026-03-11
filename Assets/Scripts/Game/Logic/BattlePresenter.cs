@@ -299,6 +299,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <summary>
     /// プレイヤーと敵のバトルデッキを構築し、デッキ選択中のスキル使用有無も返す
     /// </summary>
+    /// <param name="playerSkill">このバトルでプレイヤーに割り当てられた感情スキル</param>
+    /// <returns>プレイヤーデッキ、敵デッキ、デッキ選択中にスキルを使ったかを返す</returns>
     private async UniTask<(BattleDeckModel playerDeck, BattleDeckModel enemyDeck, bool isPlayerSkillUsed)> HandleDeckSelection(EmotionType playerSkill)
     {
         Debug.Log("[BattlePresenter] デッキ選択フェーズ開始");
@@ -372,6 +374,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <summary>
     /// 3本勝負のカードバトル全体を進行する
     /// </summary>
+    /// <param name="playerDeck">プレイヤーのバトル用デッキ</param>
+    /// <param name="enemyDeck">敵のバトル用デッキ</param>
+    /// <param name="playerEmotionState">プレイヤーの感情状態。スキル種別としても使う</param>
+    /// <param name="victoryCondition">このバトルの基本勝利条件</param>
+    /// <param name="isPlayerSkillUsedInDeckSelection">デッキ選択中にスキルを使っている場合はtrue</param>
+    /// <returns>バトルに勝利した場合はtrue</returns>
     private async UniTask<bool> HandleCardBattle(BattleDeckModel playerDeck, BattleDeckModel enemyDeck, EmotionType playerEmotionState,
         VictoryCondition victoryCondition, bool isPlayerSkillUsedInDeckSelection)
     {
@@ -466,6 +474,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <summary>
     /// プレイヤーがカードを選んで伏せる（スキルボタンも同時に操作可能）
     /// </summary>
+    /// <param name="handler">現在ラウンドの状態を管理するバトルハンドラ</param>
+    /// <param name="playerDeck">プレイヤーのバトル用デッキ</param>
+    /// <param name="playerSkillSession">このラウンド中のプレイヤースキル制御</param>
+    /// <returns>開示直前に遅延適用するスキルが残っている場合はtrue</returns>
     private async UniTask<bool> PlayerPlaceCard(CardBattleHandler handler, BattleDeckModel playerDeck, PlayerBattleSkillSession playerSkillSession)
     {
         _battleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");

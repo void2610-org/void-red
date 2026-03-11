@@ -47,6 +47,9 @@ public static class BattleSkillExecutor
     /// <summary>
     /// デッキ選択中のスキルを発動する
     /// </summary>
+    /// <param name="skill">発動するスキル種別</param>
+    /// <param name="previewDeck">デッキ選択画面で操作中の作業デッキ</param>
+    /// <returns>デッキ選択中に発動できた場合はtrue</returns>
     public static bool TryActivateInDeckSelection(EmotionType skill, BattleDeckModel previewDeck)
     {
         if (!CanUseInDeckSelection(skill)) return false;
@@ -58,6 +61,13 @@ public static class BattleSkillExecutor
     /// <summary>
     /// バトル中のスキルを発動または予約する
     /// </summary>
+    /// <param name="skill">発動するスキル種別</param>
+    /// <param name="myCard">スキル発動側がこのラウンドで出したカード。未選択時はnull</param>
+    /// <param name="opponentCard">相手がこのラウンドで出したカード。未配置時はnull</param>
+    /// <param name="myDeck">スキル発動側のバトル用デッキ</param>
+    /// <param name="handler">予約効果やラウンド状態を保持するバトルハンドラ</param>
+    /// <param name="isPlayerSide">発動側がプレイヤーならtrue、敵ならfalse</param>
+    /// <param name="targetCardForSadness">悲しみスキルで3に変更する対象カード</param>
     public static void Execute(
         EmotionType skill,
         CardModel myCard,
