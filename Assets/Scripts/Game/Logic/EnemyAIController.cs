@@ -110,6 +110,9 @@ public class EnemyAIController
         if (!handler.EnemySkillAvailable) return false;
         if (Random.value <= 0.5f) return false;
 
-        return handler.TryActivateEnemySkill(emotionState, enemyDeck);
+        if (!handler.TryConsumeEnemySkill()) return false;
+
+        BattleSkillExecutor.Execute(emotionState, handler.EnemyCard, handler.PlayerCard, enemyDeck, handler, isPlayerSide: false);
+        return true;
     }
 }

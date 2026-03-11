@@ -296,6 +296,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     // === 8. デッキ選択フェーズ ===
 
+    /// <summary>
+    /// プレイヤーと敵のバトルデッキを構築し、デッキ選択中のスキル使用有無も返す
+    /// </summary>
     private async UniTask<(BattleDeckModel playerDeck, BattleDeckModel enemyDeck, bool isPlayerSkillUsed)> HandleDeckSelection(EmotionType playerSkill)
     {
         Debug.Log("[BattlePresenter] デッキ選択フェーズ開始");
@@ -323,17 +326,17 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // デッキ選択UIとスキルボタンを表示
         _battleUIPresenter.InitializeDeckSelection(playerWonBattleCards);
-        _battleUIPresenter.SetSkillButtonVisible(SkillEffectApplier.CanUseInDeckSelection(playerSkill));
+        _battleUIPresenter.SetSkillButtonVisible(true);
+        _battleUIPresenter.SetSkillButtonInteractable(BattleSkillExecutor.CanUseInDeckSelection(playerSkill));
 
         _battleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
             {
-                if (isPlayerSkillUsed || !SkillEffectApplier.CanUseInDeckSelection(playerSkill))
+                if (isPlayerSkillUsed || !BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck))
                     return;
 
                 // デッキ選択中に使った場合は、その後のカードバトルでは再使用させない
                 isPlayerSkillUsed = true;
-                SkillEffectApplier.Apply(playerSkill, null, null, previewDeck, null, isPlayerSide: true);
                 _battleUIPresenter.RefreshDeckSelectionCardNumbers();
                 _battleUIPresenter.SetSkillButtonVisible(false);
                 Debug.Log($"[BattlePresenter] デッキ選択中にスキル発動: {playerSkill}");
@@ -343,6 +346,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await _battleUIPresenter.WaitForDeckSelectionAsync();
 
         _battleUIPresenter.SetSkillButtonVisible(false);
+        _battleUIPresenter.SetSkillButtonInteractable(true);
 
         // プレイヤーのデッキ構築
         var playerDeck = new BattleDeckModel();
@@ -365,6 +369,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     // === 9. カードバトルフェーズ ===
 
+    /// <summary>
+    /// 3本勝負のカードバトル全体を進行する
+    /// </summary>
     private async UniTask<bool> HandleCardBattle(BattleDeckModel playerDeck, BattleDeckModel enemyDeck, EmotionType playerEmotionState,
         VictoryCondition victoryCondition, bool isPlayerSkillUsedInDeckSelection)
     {
@@ -390,13 +397,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             // スキルボタン表示（カード選択中に使用可能）
             _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
+            _battleUIPresenter.SetSkillButtonInteractable(handler.PlayerSkillAvailable);
 
             // カード伏せフェーズ
             var shouldApplyDeferredPlayerSkill = false;
+            using var playerSkillSession = new PlayerBattleSkillSession(_battleUIPresenter, handler, playerDeck, playerEmotionState);
+            playerSkillSession.BeginListening();
             if (handler.IsPlayerFirst)
             {
-                // 先攻時は敵カードが未確定なので、相手依存スキルは後段で解決する
-                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
+                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);
                 _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
             }
@@ -404,7 +413,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             {
                 _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
-                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
+                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);
             }
 
             _battleUIPresenter.SetSkillButtonVisible(false);
@@ -420,9 +429,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             if (shouldApplyDeferredPlayerSkill)
             {
                 // Fearは相手カードが見える直前まで見た目の入れ替えを遅らせる
-                SkillEffectApplier.Apply(playerEmotionState, handler.PlayerCard, handler.EnemyCard, playerDeck, handler,
-                    isPlayerSide: true);
-                _battleUIPresenter.RefreshBattleCardNumbers();
+                playerSkillSession.ApplyDeferredSkill();
             }
 
             // カードオープン
@@ -459,122 +466,17 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <summary>
     /// プレイヤーがカードを選んで伏せる（スキルボタンも同時に操作可能）
     /// </summary>
-    private async UniTask<bool> PlayerPlaceCard(CardBattleHandler handler, BattleDeckModel playerDeck, EmotionType playerSkill)
+    private async UniTask<bool> PlayerPlaceCard(CardBattleHandler handler, BattleDeckModel playerDeck, PlayerBattleSkillSession playerSkillSession)
     {
-        using var disposables = new CompositeDisposable();
-
-        // カード選択前にスキルボタンが押された場合のフラグ
-        // カード未選択で押したスキルを、カード確定後に解決するためのフラグ
-        var isSkillActivatedBeforePlacement = false;
-        // 相手カードの開示直前まで遅らせるスキルを保持するためのフラグ
-        var shouldApplyDeferredSkill = false;
-
         _battleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
         _battleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
-
-        _battleUIPresenter.OnBattleFieldCardChanged
-            .Subscribe(card =>
-            {
-                handler.PreviewPlayerNextCardEffects(card);
-                _battleUIPresenter.RefreshBattleCardNumbers();
-            })
-            .AddTo(disposables);
-
-        // スキル発動の購読（カード選択と同時に使用可能）
-        _battleUIPresenter.OnSkillActivated
-            .Subscribe(_ =>
-            {
-                var selectedBattleCard = _battleUIPresenter.SelectedBattleCard;
-                if (selectedBattleCard != null)
-                {
-                    // 複数回押されても最初の1回だけを有効にする
-                    if (!handler.MarkPlayerSkillUsed())
-                        return;
-
-                    if (playerSkill == EmotionType.Fear && handler.EnemyCard == null)
-                    {
-                        // Fearは相手カードが出るまで解決できないので後ろへ送る
-                        shouldApplyDeferredSkill = true;
-                    }
-                    else if (playerSkill == EmotionType.Fear)
-                    {
-                        // 敵カードが伏せられていても見えてはいないので、開示直前まで遅らせる
-                        shouldApplyDeferredSkill = true;
-                    }
-                    else
-                    {
-                        if (playerSkill == EmotionType.Anticipation)
-                            // 仮置きしたカード自身は「残りカード」に含めない
-                            selectedBattleCard.IsUsed = true;
-
-                        SkillEffectApplier.Apply(playerSkill, selectedBattleCard, handler.EnemyCard, playerDeck, handler,
-                            isPlayerSide: true);
-
-                        if (playerSkill == EmotionType.Anticipation)
-                            selectedBattleCard.IsUsed = false;
-
-                        handler.PreviewPlayerNextCardEffects(selectedBattleCard);
-
-                        _battleUIPresenter.RefreshBattleCardNumbers();
-                    }
-
-                    _battleUIPresenter.SetSkillButtonVisible(false);
-                    _battleUIPresenter.SetBattleInstruction($"{playerSkill.ToJapaneseName()}スキル発動！");
-                    Debug.Log($"[BattlePresenter] プレイヤーがスキル発動: {playerSkill}");
-                }
-                else if (handler.MarkPlayerSkillUsed())
-                {
-                    switch (playerSkill)
-                    {
-                        case EmotionType.Anger:
-                        case EmotionType.Anticipation:
-                        case EmotionType.Joy:
-                        case EmotionType.Trust:
-                        case EmotionType.Disgust:
-                            // カードを選ばなくても成立するスキルは即時処理する
-                            SkillEffectApplier.Apply(playerSkill, null, handler.EnemyCard, playerDeck, handler, isPlayerSide: true);
-                            _battleUIPresenter.RefreshBattleCardNumbers();
-                            break;
-
-                        default:
-                            // カード依存スキルはカード選択後まで予約する
-                            isSkillActivatedBeforePlacement = true;
-                            break;
-                    }
-
-                    _battleUIPresenter.SetSkillButtonVisible(false);
-                    _battleUIPresenter.SetBattleInstruction($"{playerSkill.ToJapaneseName()}スキル発動！");
-                    Debug.Log($"[BattlePresenter] プレイヤーがスキル発動（カード選択前）: {playerSkill}");
-                }
-            })
-            .AddTo(disposables);
 
         var selectedCard = await _battleUIPresenter.OnBattleCardSelected.FirstAsync();
         handler.PlacePlayerCard(selectedCard);
         playerDeck.MarkAsUsed(selectedCard);
         _battleUIPresenter.PlacePlayerCard(selectedCard);
-
-        // カード選択前にスキルが押されていた場合、カード確定後に効果を適用
-        if (isSkillActivatedBeforePlacement)
-        {
-            if (playerSkill == EmotionType.Fear && handler.EnemyCard == null)
-            {
-                // 先攻時のFearは敵カード確定後も、開示直前まで適用を待つ
-                shouldApplyDeferredSkill = true;
-            }
-            else if (playerSkill == EmotionType.Fear)
-            {
-                // 後攻時のFearも、相手カードが見えるまで表示反映は遅らせる
-                shouldApplyDeferredSkill = true;
-            }
-            else
-            {
-                SkillEffectApplier.Apply(playerSkill, handler.PlayerCard, handler.EnemyCard, playerDeck, handler, isPlayerSide: true);
-                _battleUIPresenter.RefreshBattleCardNumbers();
-            }
-        }
-
-        return shouldApplyDeferredSkill;
+        playerSkillSession.CompleteCardPlacement();
+        return playerSkillSession.ShouldApplyDeferredSkill;
     }
 
     // === 10. 記憶育成フェーズ ===

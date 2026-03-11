@@ -32,7 +32,7 @@ public class SkillButtonView : MonoBehaviour
             emotionIcon.sprite = sprite;
 
         emotionNameText.text = emotion.ToJapaneseName();
-        skillDescText.text = SkillEffectApplier.GetDescription(emotion);
+        skillDescText.text = BattleSkillExecutor.GetDescription(emotion);
     }
 
     private void Awake()

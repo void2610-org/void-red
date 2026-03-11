@@ -60,6 +60,27 @@ public class CardBattleHandler
     /// <summary>コイントスで先攻後攻を決定</summary>
     public void DecideFirstPlayer() => IsPlayerFirst = Random.value > 0.5f;
 
+    /// <summary>怒りスキル: 次ターンの勝利条件を反転する予約を積む</summary>
+    public void QueueConditionReversedNextTurn() => _conditionReversedNextTurn = true;
+
+    /// <summary>嫌悪スキル: 次に出すカードの半減予約を積む</summary>
+    public void QueueNextCardHalved(bool isPlayerSide)
+    {
+        if (isPlayerSide)
+            _isPlayerNextCardHalved = true;
+        else
+            _isEnemyNextCardHalved = true;
+    }
+
+    /// <summary>喜びスキル: 次に出すカードの2倍予約を積む</summary>
+    public void QueueNextCardDoubled(bool isPlayerSide)
+    {
+        if (isPlayerSide)
+            _isPlayerNextCardDoubled = true;
+        else
+            _isEnemyNextCardDoubled = true;
+    }
+
     /// <summary>プレイヤーがカードを伏せる</summary>
     public void PlacePlayerCard(CardModel card)
     {
@@ -75,23 +96,8 @@ public class CardBattleHandler
         ApplyPendingCardEffects(isPlayerSide: false, EnemyCard);
     }
 
-    /// <summary>怒りスキル: 次ターンの勝利条件を反転させる</summary>
-    public void ReverseConditionNextTurn() => _conditionReversedNextTurn = true;
-
-    /// <summary>プレイヤーがスキルを発動</summary>
-    public bool TryActivatePlayerSkill(
-        EmotionType skill,
-        BattleDeckModel playerDeck,
-        CardModel targetCardForSadness = null)
-    {
-        if (!PlayerSkillAvailable) return false;
-        PlayerSkillAvailable = false;
-        SkillEffectApplier.Apply(skill, PlayerCard, EnemyCard, playerDeck, this, isPlayerSide: true, targetCardForSadness);
-        return true;
-    }
-
     /// <summary>スキル使用権のみ消費する（効果は後から適用する場合に使用）</summary>
-    public bool MarkPlayerSkillUsed()
+    public bool TryConsumePlayerSkill()
     {
         if (!PlayerSkillAvailable) return false;
         // 効果の適用タイミングを後ろへずらす場合でも、使用権だけは先に消費する
@@ -99,29 +105,13 @@ public class CardBattleHandler
         return true;
     }
 
-    /// <summary>敵がスキルを発動</summary>
-    public bool TryActivateEnemySkill(
-        EmotionType skill,
-        BattleDeckModel enemyDeck)
+    /// <summary>敵スキルの使用権を消費する</summary>
+    public bool TryConsumeEnemySkill()
     {
         if (!EnemySkillAvailable) return false;
         EnemySkillAvailable = false;
-        // 敵視点: 自分のカード=EnemyCard, 相手=PlayerCard
-        SkillEffectApplier.Apply(skill, EnemyCard, PlayerCard, enemyDeck, this, isPlayerSide: false);
         return true;
     }
-
-    /// <summary>嫌悪スキル: 次に出すプレイヤーカードを半減する</summary>
-    public void QueuePlayerNextCardHalved() => _isPlayerNextCardHalved = true;
-
-    /// <summary>嫌悪スキル: 次に出す敵カードを半減する</summary>
-    public void QueueEnemyNextCardHalved() => _isEnemyNextCardHalved = true;
-
-    /// <summary>喜びスキル: 次に出すプレイヤーカードを2倍にする</summary>
-    public void QueuePlayerNextCardDoubled() => _isPlayerNextCardDoubled = true;
-
-    /// <summary>喜びスキル: 次に出す敵カードを2倍にする</summary>
-    public void QueueEnemyNextCardDoubled() => _isEnemyNextCardDoubled = true;
 
     /// <summary>嫌悪スキルの予約結果を仮置きカードへ先に反映する</summary>
     public void PreviewPlayerNextCardEffects(CardModel card)
@@ -147,7 +137,7 @@ public class CardBattleHandler
     {
         // 勝利条件を決定（怒りスキルによる反転チェック）
         var condition = _conditionReversedNextTurn
-            ? ReverseCondition(BaseCondition)
+            ? GetReversedCondition(BaseCondition)
             : BaseCondition;
         _conditionReversedNextTurn = false;
 
@@ -179,6 +169,9 @@ public class CardBattleHandler
         EnemyCard = null;
     }
 
+    /// <summary>
+    /// ラウンド結果を勝利数へ反映する
+    /// </summary>
     private RoundResult RecordResult(bool playerWins)
     {
         if (playerWins)
@@ -191,11 +184,17 @@ public class CardBattleHandler
         return RoundResult.EnemyWin;
     }
 
-    private static VictoryCondition ReverseCondition(VictoryCondition condition) =>
+    /// <summary>
+    /// 勝利条件を逆転した値へ変換する
+    /// </summary>
+    private static VictoryCondition GetReversedCondition(VictoryCondition condition) =>
         condition == VictoryCondition.LowerWins
             ? VictoryCondition.HigherWins
             : VictoryCondition.LowerWins;
 
+    /// <summary>
+    /// 予約されている次カード補正を、確定カードへ消費する
+    /// </summary>
     private void ApplyPendingCardEffects(bool isPlayerSide, CardModel card)
     {
         if (card == null) return;
@@ -214,6 +213,9 @@ public class CardBattleHandler
         }
     }
 
+    /// <summary>
+    /// 仮置きプレビューが確定した時に、予約状態を消費してプレビュー情報をクリアする
+    /// </summary>
     private void ConsumePlayerNextCardPreview(CardModel card)
     {
         if (_previewedPlayerNextCard != card) return;
@@ -224,6 +226,9 @@ public class CardBattleHandler
         _previewedPlayerNextCardOriginalNumber = 0;
     }
 
+    /// <summary>
+    /// 予約済みの2倍・半減補正を数字へ適用する
+    /// </summary>
     private int ApplyReservedModifiers(int baseNumber, bool isPlayerSide)
     {
         var value = baseNumber;
