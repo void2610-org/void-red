@@ -102,7 +102,8 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     {
         if (!_handler.TryConsumePlayerSkill()) return;
 
-        if (BattleSkillExecutor.ShouldDeferUntilReveal(_playerSkill) || RequiresTargetSelection())
+        if (RequiresTargetSelection()) ApplySkillAsync(selectedBattleCard).Forget();
+        else if (BattleSkillExecutor.ShouldDeferUntilReveal(_playerSkill))
         {
             _isSkillActivatedBeforePlacement = true;
         }
@@ -118,7 +119,8 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     {
         if (!_handler.TryConsumePlayerSkill()) return;
 
-        if (BattleSkillExecutor.CanActivateWithoutSelectedCard(_playerSkill) && !RequiresTargetSelection())
+        if (RequiresTargetSelection()) ApplySkillAsync(null).Forget();
+        else if (BattleSkillExecutor.CanActivateWithoutSelectedCard(_playerSkill))
             ApplySkillAsync(null).Forget();
         else
         {

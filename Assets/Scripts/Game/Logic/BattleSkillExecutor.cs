@@ -36,6 +36,7 @@ public static class BattleSkillExecutor
         EmotionType.Joy => true,
         EmotionType.Trust => true,
         EmotionType.Disgust => true,
+        EmotionType.Sadness => true,
         _ => false
     };
 

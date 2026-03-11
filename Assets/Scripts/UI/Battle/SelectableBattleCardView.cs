@@ -23,7 +23,7 @@ public class SelectableBattleCardView : MonoBehaviour
         numberView.SetNumber(cardModel.BattleNumber);
     }
 
-    private void Awake()
+    private void Start()
     {
         cardView.OnClicked
             .Subscribe(_ => _onClicked.OnNext(_cardModel))
