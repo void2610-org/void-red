@@ -112,6 +112,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // スキルボタン
     public void InitializeSkillButton(EmotionType emotion) => _skillButtonView.Initialize(emotion);
     public void SetSkillButtonVisible(bool visible) => _skillButtonView.SetVisible(visible);
+    public void SetSkillButtonInteractable(bool isInteractable) => _skillButtonView.SetInteractable(isInteractable);
 
     // コインフリップ
     public async UniTask PlayCoinFlipAsync(bool isPlayerFirst) =>

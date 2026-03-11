@@ -45,7 +45,7 @@ public class CoinFlipView : BasePhaseView
         coinAnimator.speed = 1f;
 
         // 結果テキスト表示
-        resultText.FadeIn(0.3f, Ease.OutQuart);
+        resultText.FadeIn(0.3f, Ease.OutQuart).ToUniTask().Forget();
         await UniTask.Delay(700);
 
         // 非表示
