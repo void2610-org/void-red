@@ -465,7 +465,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "1c76d70c1db88a977f1e070897a794dcd4951ff0"
+      "hash": "cbf717052593d41648cf65c1f8d7e8228a06dadd"
     },
     "io.github.hatayama.uloopmcp": {
       "version": "https://github.com/hatayama/uLoopMCP.git?path=/Packages/src",

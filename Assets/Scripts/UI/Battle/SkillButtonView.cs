@@ -22,6 +22,9 @@ public class SkillButtonView : MonoBehaviour
     /// <summary>表示/非表示を切り替える</summary>
     public void SetVisible(bool visible) => gameObject.SetActive(visible);
 
+    /// <summary>押下可否を切り替える</summary>
+    public void SetInteractable(bool isInteractable) => skillButton.interactable = isInteractable;
+
     /// <summary>感情タイプに応じてアイコン・スキル名・説明テキストを設定</summary>
     public void Initialize(EmotionType emotion)
     {
@@ -29,8 +32,12 @@ public class SkillButtonView : MonoBehaviour
             emotionIcon.sprite = sprite;
 
         emotionNameText.text = emotion.ToJapaneseName();
-        skillDescText.text = SkillEffectApplier.GetDescription(emotion);
+        skillDescText.text = BattleSkillExecutor.GetDescription(emotion);
     }
 
-    private void Awake() => gameObject.SetActive(false);
+    private void Awake()
+    {
+        gameObject.SetActive(false);
+        skillButton.interactable = true;
+    }
 }

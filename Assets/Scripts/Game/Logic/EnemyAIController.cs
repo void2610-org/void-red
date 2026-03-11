@@ -105,11 +105,37 @@ public class EnemyAIController
     /// <summary>
     /// スキル発動判定（50%確率）
     /// </summary>
+    /// <param name="handler">現在ラウンドの状態とスキル予約を保持するハンドラ</param>
+    /// <param name="enemyDeck">敵が現在使用しているバトル用デッキ</param>
+    /// <param name="emotionState">今回のバトルで敵に割り当てられた感情状態</param>
+    /// <returns>実際にスキルを発動した場合はtrue</returns>
     public bool TryActivateSkill(CardBattleHandler handler, BattleDeckModel enemyDeck, EmotionType emotionState)
     {
         if (!handler.EnemySkillAvailable) return false;
         if (Random.value <= 0.5f) return false;
 
-        return handler.TryActivateEnemySkill(emotionState, enemyDeck);
+        if (!handler.TryConsumeEnemySkill()) return false;
+
+        var targetCardForSadness = emotionState == EmotionType.Sadness
+            ? SelectSadnessTarget(enemyDeck)
+            : null;
+        BattleSkillExecutor.Execute(
+            emotionState,
+            handler.EnemyCard,
+            handler.PlayerCard,
+            enemyDeck,
+            handler,
+            isPlayerSide: false,
+            targetCardForSadness);
+        return true;
+    }
+
+    /// <summary>悲しみスキルで数字を3に変える対象カードをランダム選択する</summary>
+    private static CardModel SelectSadnessTarget(BattleDeckModel enemyDeck)
+    {
+        var availableCards = enemyDeck.GetAvailableCards();
+        if (availableCards.Count == 0) return null;
+
+        return availableCards[Random.Range(0, availableCards.Count)];
     }
 }

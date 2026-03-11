@@ -43,6 +43,17 @@ public class DeckSelectionView : BasePhaseView
     /// <summary>確定ボタンが押されるまで待機</summary>
     public async UniTask WaitForSelectionAsync() => await _onConfirm.FirstAsync();
 
+    /// <summary>表示中カードの数字を再描画する</summary>
+    public void RefreshCardNumbers()
+    {
+        // デッキ選択中のスキルで変わった数字を一覧へ反映する
+        foreach (var card in _handCards)
+        {
+            if (card)
+                card.UpdateNumber(card.CardModel.BattleNumber);
+        }
+    }
+
     public override void Show()
     {
         base.Show();

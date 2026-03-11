@@ -14,6 +14,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
     public Observable<CardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
+    public Observable<CardModel> OnBattleFieldCardChanged => _cardBattleView.OnFieldCardChanged;
+    // 仮置き中カードを参照して、確定前でもスキル適用できるようにする
+    public CardModel SelectedBattleCard => _cardBattleView.SelectedFieldCard;
     public Observable<Unit> OnSkillActivated => _skillButtonView.OnActivated;
     public Observable<Unit> OnBattleNextClicked => _cardBattleView.OnNextClicked;
 
@@ -39,6 +42,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly SkillButtonView _skillButtonView;
     private readonly DeckSelectionView _deckSelectionView;
     private readonly CardBattleView _cardBattleView;
+    private readonly TargetCardSelectionView _targetCardSelectionView;
     private readonly CoinFlipView _coinFlipView;
     private BattlePresenter _battlePresenter;
 
@@ -59,6 +63,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _skillButtonView = Object.FindFirstObjectByType<SkillButtonView>(FindObjectsInactive.Include);
         _deckSelectionView = Object.FindFirstObjectByType<DeckSelectionView>();
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
+        _targetCardSelectionView = Object.FindFirstObjectByType<TargetCardSelectionView>(FindObjectsInactive.Include);
         _coinFlipView = Object.FindFirstObjectByType<CoinFlipView>(FindObjectsInactive.Include);
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
@@ -102,11 +107,14 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _deckSelectionView.Initialize(wonCards);
     public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
     public IReadOnlyList<CardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
+    // デッキ選択中スキルの結果をViewへ反映する
+    public void RefreshDeckSelectionCardNumbers() => _deckSelectionView.RefreshCardNumbers();
     public void HideDeckSelection() => _deckSelectionView.Hide();
 
     // スキルボタン
     public void InitializeSkillButton(EmotionType emotion) => _skillButtonView.Initialize(emotion);
     public void SetSkillButtonVisible(bool visible) => _skillButtonView.SetVisible(visible);
+    public void SetSkillButtonInteractable(bool isInteractable) => _skillButtonView.SetInteractable(isInteractable);
 
     // コインフリップ
     public async UniTask PlayCoinFlipAsync(bool isPlayerFirst) =>
@@ -121,6 +129,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void PlaceEnemyCard(CardModel card) => _cardBattleView.PlaceEnemyCard(card);
     public void RevealCards(CardModel playerCard, CardModel enemyCard) =>
         _cardBattleView.RevealCards(playerCard, enemyCard);
+    public async UniTask<CardModel> WaitForTargetCardSelectionAsync(string instruction, IReadOnlyList<CardModel> selectableCards) =>
+        await _targetCardSelectionView.WaitForSelectionAsync(instruction, selectableCards);
+    // バトル中スキルの結果を、現在表示中のカードへまとめて反映する
+    public void RefreshBattleCardNumbers() => _cardBattleView.RefreshDisplayedCardNumbers();
     public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);
     public async UniTask WaitForBattleNextAsync() => await _cardBattleView.WaitForNextAsync();
     public void ClearBattleField() => _cardBattleView.ClearField();

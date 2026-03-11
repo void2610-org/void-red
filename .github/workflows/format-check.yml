@@ -29,7 +29,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: |
+            8.0.x
+            7.0.x
 
       - name: Build analyzer
         run: dotnet build unity-analyzers/src/Void2610.Unity.Analyzers/Void2610.Unity.Analyzers.csproj -c Release

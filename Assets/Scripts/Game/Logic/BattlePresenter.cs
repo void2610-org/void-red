@@ -115,6 +115,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         await UniTask.Delay(1000);
 
+#if UNITY_EDITOR
+        if (DebugBattleSettings.SkipAuction)
+        {
+            await StartDebugBattleAsync();
+            return;
+        }
+#endif
+
         // ===== オークションパート =====
 
         // 1. テーマ公開
@@ -151,11 +159,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 8. スキルボタン初期化 → デッキ選択
         _battleUIPresenter.InitializeSkillButton(playerEmotionState);
         _currentGameState.Value = GameState.DeckSelection;
-        var (playerDeck, enemyDeck) = await HandleDeckSelection();
+        var (playerDeck, enemyDeck, isPlayerSkillUsedInDeckSelection) = await HandleDeckSelection(playerEmotionState);
 
         // 9. カードバトル（3本勝負）
         _currentGameState.Value = GameState.CardBattle;
-        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState);
+        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, _currentAuctionData.VictoryCondition,
+            isPlayerSkillUsedInDeckSelection);
 
         // ===== 終了処理 =====
 
@@ -287,7 +296,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     // === 8. デッキ選択フェーズ ===
 
-    private async UniTask<(BattleDeckModel playerDeck, BattleDeckModel enemyDeck)> HandleDeckSelection()
+    /// <summary>
+    /// プレイヤーと敵のバトルデッキを構築し、デッキ選択中のスキル使用有無も返す
+    /// </summary>
+    /// <param name="playerSkill">このバトルでプレイヤーに割り当てられた感情スキル</param>
+    /// <returns>プレイヤーデッキ、敵デッキ、デッキ選択中にスキルを使ったかを返す</returns>
+    private async UniTask<(BattleDeckModel playerDeck, BattleDeckModel enemyDeck, bool isPlayerSkillUsed)> HandleDeckSelection(EmotionType playerSkill)
     {
         Debug.Log("[BattlePresenter] デッキ選択フェーズ開始");
 
@@ -306,13 +320,35 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 不足分を補完（数字3のダミーカード）
         BattleDeckModel.FillWithDefaults(playerWonBattleCards);
 
+        // デッキ選択中のスキル適用結果を、そのまま選択UIへ反映させるための作業用デッキ
+        var previewDeck = new BattleDeckModel();
+        previewDeck.SetDeck(playerWonBattleCards);
+        var isPlayerSkillUsed = false;
+        using var disposables = new CompositeDisposable();
+
         // デッキ選択UIとスキルボタンを表示
         _battleUIPresenter.InitializeDeckSelection(playerWonBattleCards);
         _battleUIPresenter.SetSkillButtonVisible(true);
+        _battleUIPresenter.SetSkillButtonInteractable(BattleSkillExecutor.CanUseInDeckSelection(playerSkill));
+
+        _battleUIPresenter.OnSkillActivated
+            .Subscribe(_ =>
+            {
+                if (isPlayerSkillUsed || !BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck))
+                    return;
+
+                // デッキ選択中に使った場合は、その後のカードバトルでは再使用させない
+                isPlayerSkillUsed = true;
+                _battleUIPresenter.RefreshDeckSelectionCardNumbers();
+                _battleUIPresenter.SetSkillButtonVisible(false);
+                Debug.Log($"[BattlePresenter] デッキ選択中にスキル発動: {playerSkill}");
+            })
+            .AddTo(disposables);
 
         await _battleUIPresenter.WaitForDeckSelectionAsync();
 
         _battleUIPresenter.SetSkillButtonVisible(false);
+        _battleUIPresenter.SetSkillButtonInteractable(true);
 
         // プレイヤーのデッキ構築
         var playerDeck = new BattleDeckModel();
@@ -330,25 +366,33 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         Debug.Log($"[BattlePresenter] プレイヤーデッキ: {playerDeck.Cards.Count}枚, 敵デッキ: {enemyDeck.Cards.Count}枚");
 
-        return (playerDeck, enemyDeck);
+        return (playerDeck, enemyDeck, isPlayerSkillUsed);
     }
 
     // === 9. カードバトルフェーズ ===
 
-    private async UniTask<bool> HandleCardBattle(
-        BattleDeckModel playerDeck,
-        BattleDeckModel enemyDeck,
-        EmotionType playerEmotionState)
+    /// <summary>
+    /// 3本勝負のカードバトル全体を進行する
+    /// </summary>
+    /// <param name="playerDeck">プレイヤーのバトル用デッキ</param>
+    /// <param name="enemyDeck">敵のバトル用デッキ</param>
+    /// <param name="playerEmotionState">プレイヤーの感情状態。スキル種別としても使う</param>
+    /// <param name="victoryCondition">このバトルの基本勝利条件</param>
+    /// <param name="isPlayerSkillUsedInDeckSelection">デッキ選択中にスキルを使っている場合はtrue</param>
+    /// <returns>バトルに勝利した場合はtrue</returns>
+    private async UniTask<bool> HandleCardBattle(BattleDeckModel playerDeck, BattleDeckModel enemyDeck, EmotionType playerEmotionState,
+        VictoryCondition victoryCondition, bool isPlayerSkillUsedInDeckSelection)
     {
         Debug.Log("[BattlePresenter] カードバトルフェーズ開始");
 
-        var handler = new CardBattleHandler(_currentAuctionData.VictoryCondition);
+        // デッキ選択中に使用済みなら、バトル開始時点でスキル使用権を閉じる
+        var handler = new CardBattleHandler(victoryCondition, !isPlayerSkillUsedInDeckSelection);
 
         // 敵の感情状態（ランダム）
         var enemyEmotionState = _enemyAI.DecideEmotionState();
 
         // バトルUI初期化
-        _battleUIPresenter.InitializeBattle(_currentAuctionData.VictoryCondition);
+        _battleUIPresenter.InitializeBattle(victoryCondition);
 
         // ラウンドループ
         while (!handler.IsFinished)
@@ -361,11 +405,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             // スキルボタン表示（カード選択中に使用可能）
             _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
+            _battleUIPresenter.SetSkillButtonInteractable(handler.PlayerSkillAvailable);
 
             // カード伏せフェーズ
+            var shouldApplyDeferredPlayerSkill = false;
+            using var playerSkillSession = new PlayerBattleSkillSession(_battleUIPresenter, handler, playerDeck, playerEmotionState);
+            playerSkillSession.BeginListening();
             if (handler.IsPlayerFirst)
             {
-                await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
+                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);
                 _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
             }
@@ -373,7 +421,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             {
                 _enemyAI.PlaceCard(handler, enemyDeck);
                 _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
-                await PlayerPlaceCard(handler, playerDeck, playerEmotionState);
+                shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);
             }
 
             _battleUIPresenter.SetSkillButtonVisible(false);
@@ -384,6 +432,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 _battleUIPresenter.SetBattleInstruction($"敵が{enemyEmotionState.ToJapaneseName()}スキルを発動！");
                 Debug.Log($"[BattlePresenter] 敵がスキル発動: {enemyEmotionState}");
                 await UniTask.Delay(1500);
+            }
+
+            if (shouldApplyDeferredPlayerSkill)
+            {
+                // Fearは相手カードが見える直前まで見た目の入れ替えを遅らせる
+                playerSkillSession.ApplyDeferredSkill();
             }
 
             // カードオープン
@@ -420,33 +474,21 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <summary>
     /// プレイヤーがカードを選んで伏せる（スキルボタンも同時に操作可能）
     /// </summary>
-    private async UniTask PlayerPlaceCard(
-        CardBattleHandler handler,
-        BattleDeckModel playerDeck,
-        EmotionType playerSkill)
+    /// <param name="handler">現在ラウンドの状態を管理するバトルハンドラ</param>
+    /// <param name="playerDeck">プレイヤーのバトル用デッキ</param>
+    /// <param name="playerSkillSession">このラウンド中のプレイヤースキル制御</param>
+    /// <returns>開示直前に遅延適用するスキルが残っている場合はtrue</returns>
+    private async UniTask<bool> PlayerPlaceCard(CardBattleHandler handler, BattleDeckModel playerDeck, PlayerBattleSkillSession playerSkillSession)
     {
-        using var disposables = new CompositeDisposable();
-
         _battleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
         _battleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
-
-        // スキル発動の購読（カード選択と同時に使用可能）
-        _battleUIPresenter.OnSkillActivated
-            .Subscribe(_ =>
-            {
-                if (handler.TryActivatePlayerSkill(playerSkill, playerDeck))
-                {
-                    _battleUIPresenter.SetSkillButtonVisible(false);
-                    _battleUIPresenter.SetBattleInstruction($"{playerSkill.ToJapaneseName()}スキル発動！");
-                    Debug.Log($"[BattlePresenter] プレイヤーがスキル発動: {playerSkill}");
-                }
-            })
-            .AddTo(disposables);
 
         var selectedCard = await _battleUIPresenter.OnBattleCardSelected.FirstAsync();
         handler.PlacePlayerCard(selectedCard);
         playerDeck.MarkAsUsed(selectedCard);
         _battleUIPresenter.PlacePlayerCard(selectedCard);
+        await playerSkillSession.CompleteCardPlacementAsync();
+        return playerSkillSession.ShouldApplyDeferredSkill;
     }
 
     // === 10. 記憶育成フェーズ ===
@@ -571,4 +613,57 @@ public class BattlePresenter : IStartable, ISceneInitializable
         InitializeGameAsync().Forget();
         BgmManager.Instance.PlayBGM("Battle");
     }
+
+#if UNITY_EDITOR
+    // === デバッグ: オークションスキップ ===
+
+    /// <summary>
+    /// デバッグ用：オークションをスキップしてバトルフェーズから開始する
+    /// </summary>
+    private async UniTask StartDebugBattleAsync()
+    {
+        Debug.Log("[BattlePresenter] デバッグ: オークションスキップ開始");
+
+        // デバッグ用カード（数字1〜6）を生成
+        _auctionCards.Clear();
+        for (var i = 1; i <= GameConstants.AUCTION_CARD_COUNT; i++)
+            _auctionCards.Add(new CardModel(i));
+
+        // カード番号マップを構築（入札0、数字は順番通り）
+        _cardNumbers = new System.Collections.Generic.Dictionary<CardModel, CardNumberAssigner.CardNumberInfo>();
+        for (var i = 0; i < _auctionCards.Count; i++)
+        {
+            _cardNumbers[_auctionCards[i]] = new CardNumberAssigner.CardNumberInfo
+            {
+                Number = i + 1,
+                TotalBid = 0,
+            };
+        }
+
+        // プレイヤーに全カードを付与（デッキ選択フェーズで3枚選ぶ）
+        foreach (var card in _auctionCards)
+            _player.AddWonCard(card);
+
+        // スキルボタン初期化（DebugBattleSettingsで設定したスキルを使用）
+        var playerEmotionState = DebugBattleSettings.PlayerSkill;
+        Debug.Log($"[BattlePresenter] デバッグ: スキル={playerEmotionState}, 勝利条件={DebugBattleSettings.VictoryCondition}");
+
+        _battleUIPresenter.InitializeSkillButton(playerEmotionState);
+        _currentGameState.Value = GameState.DeckSelection;
+
+        // デッキ選択（通常フローと同じ）
+        var (playerDeck, enemyDeck, isPlayerSkillUsedInDeckSelection) = await HandleDeckSelection(playerEmotionState);
+
+        // カードバトル（通常フローと同じ）
+        _currentGameState.Value = GameState.CardBattle;
+        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, DebugBattleSettings.VictoryCondition,
+            isPlayerSkillUsedInDeckSelection);
+
+        // 終了（記憶育成はスキップしてHome遷移）
+        _currentGameState.Value = GameState.BattleEnd;
+        VolumeController.Instance.ResetToDefault();
+        await UniTask.Delay(1000);
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+    }
+#endif
 }
