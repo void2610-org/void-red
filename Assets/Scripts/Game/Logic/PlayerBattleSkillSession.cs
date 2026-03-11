@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using R3;
 
 /// <summary>
@@ -44,7 +45,7 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     /// <summary>
     /// カード確定後に予約済みスキルを処理する
     /// </summary>
-    public void CompleteCardPlacement()
+    public async UniTask CompleteCardPlacementAsync()
     {
         if (!_isSkillActivatedBeforePlacement) return;
 
@@ -55,7 +56,7 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
             return;
         }
 
-        ApplySkill(_handler.PlayerCard);
+        await ApplySkillAsync(_handler.PlayerCard);
     }
 
     /// <summary>
@@ -101,14 +102,11 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     {
         if (!_handler.TryConsumePlayerSkill()) return;
 
-        if (BattleSkillExecutor.ShouldDeferUntilReveal(_playerSkill))
+        if (BattleSkillExecutor.ShouldDeferUntilReveal(_playerSkill) || RequiresTargetSelection())
         {
-            ShouldApplyDeferredSkill = true;
+            _isSkillActivatedBeforePlacement = true;
         }
-        else
-        {
-            ApplySkill(selectedBattleCard);
-        }
+        else ApplySkillAsync(selectedBattleCard).Forget();
 
         NotifySkillActivated(false);
     }
@@ -120,10 +118,8 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     {
         if (!_handler.TryConsumePlayerSkill()) return;
 
-        if (BattleSkillExecutor.CanActivateWithoutSelectedCard(_playerSkill))
-        {
-            ApplySkill(null);
-        }
+        if (BattleSkillExecutor.CanActivateWithoutSelectedCard(_playerSkill) && !RequiresTargetSelection())
+            ApplySkillAsync(null).Forget();
         else
         {
             // カード依存スキルはカード確定後まで予約する
@@ -136,8 +132,10 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     /// <summary>
     /// 現在の状況に対してスキル効果を適用し、表示を更新する
     /// </summary>
-    private void ApplySkill(CardModel selectedBattleCard)
+    private async UniTask ApplySkillAsync(CardModel selectedBattleCard)
     {
+        var targetCardForSadness = await SelectTargetCardAsync();
+
         if (_playerSkill == EmotionType.Anticipation && selectedBattleCard != null)
         {
             // 仮置きしたカード自身は「残りカード」に含めない
@@ -150,7 +148,8 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
             _handler.EnemyCard,
             _playerDeck,
             _handler,
-            isPlayerSide: true);
+            isPlayerSide: true,
+            targetCardForSadness);
 
         if (_playerSkill == EmotionType.Anticipation && selectedBattleCard != null)
             selectedBattleCard.IsUsed = false;
@@ -158,6 +157,17 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
         _handler.PreviewPlayerNextCardEffects(selectedBattleCard);
         _battleUIPresenter.RefreshBattleCardNumbers();
     }
+
+    /// <summary>対象選択が必要なスキルなら、選択UIを開いて結果カードを返す</summary>
+    private async UniTask<CardModel> SelectTargetCardAsync()
+    {
+        if (!RequiresTargetSelection()) return null;
+
+        return await _battleUIPresenter.WaitForTargetCardSelectionAsync("カードを選択してください", _playerDeck.GetAvailableCards());
+    }
+
+    /// <summary>現在のスキルが対象選択UIを必要とするかを返す</summary>
+    private bool RequiresTargetSelection() => _playerSkill == EmotionType.Sadness;
 
     /// <summary>
     /// スキル発動後のUI表示とログ出力を行う

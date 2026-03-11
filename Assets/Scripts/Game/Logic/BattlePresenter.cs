@@ -487,7 +487,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         handler.PlacePlayerCard(selectedCard);
         playerDeck.MarkAsUsed(selectedCard);
         _battleUIPresenter.PlacePlayerCard(selectedCard);
-        playerSkillSession.CompleteCardPlacement();
+        await playerSkillSession.CompleteCardPlacementAsync();
         return playerSkillSession.ShouldApplyDeferredSkill;
     }
 

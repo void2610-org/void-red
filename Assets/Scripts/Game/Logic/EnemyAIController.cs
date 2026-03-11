@@ -116,7 +116,26 @@ public class EnemyAIController
 
         if (!handler.TryConsumeEnemySkill()) return false;
 
-        BattleSkillExecutor.Execute(emotionState, handler.EnemyCard, handler.PlayerCard, enemyDeck, handler, isPlayerSide: false);
+        var targetCardForSadness = emotionState == EmotionType.Sadness
+            ? SelectSadnessTarget(enemyDeck)
+            : null;
+        BattleSkillExecutor.Execute(
+            emotionState,
+            handler.EnemyCard,
+            handler.PlayerCard,
+            enemyDeck,
+            handler,
+            isPlayerSide: false,
+            targetCardForSadness);
         return true;
+    }
+
+    /// <summary>悲しみスキルで数字を3に変える対象カードをランダム選択する</summary>
+    private static CardModel SelectSadnessTarget(BattleDeckModel enemyDeck)
+    {
+        var availableCards = enemyDeck.GetAvailableCards();
+        if (availableCards.Count == 0) return null;
+
+        return availableCards[Random.Range(0, availableCards.Count)];
     }
 }

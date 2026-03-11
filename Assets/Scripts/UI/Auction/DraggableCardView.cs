@@ -2,10 +2,8 @@ using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
 using R3;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using Void2610.UnityTemplate;
 
 /// <summary>
@@ -16,7 +14,7 @@ using Void2610.UnityTemplate;
 public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
     [SerializeField] private CardView cardView;
-    [SerializeField] private TextMeshProUGUI numberText;
+    [SerializeField] private BattleCardNumberLabel numberView;
     [SerializeField] private GameObject cardBack;
     [SerializeField] private float dragAlpha = 0.8f;
     [SerializeField] private float dragScale = 1.05f;
@@ -56,24 +54,23 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     /// <summary>裏面を表示（伏せ状態）</summary>
     public void ShowBack()
     {
-        if (cardBack) cardBack.SetActive(true);
-        if (cardView) cardView.gameObject.SetActive(false);
-        if (numberText) numberText.gameObject.SetActive(false);
+        cardBack.SetActive(true);
+        cardView.gameObject.SetActive(false);
+        numberView.SetVisible(false);
     }
 
     /// <summary>表面を表示</summary>
     public void ShowFront()
     {
-        if (cardBack) cardBack.SetActive(false);
-        if (cardView) cardView.gameObject.SetActive(true);
-        if (numberText) numberText.gameObject.SetActive(true);
+        cardBack.SetActive(false);
+        cardView.gameObject.SetActive(true);
+        numberView.SetVisible(true);
     }
 
     /// <summary>スキル効果等で変更された数字を反映する</summary>
     public void UpdateNumber(int number)
     {
-        if (numberText)
-            numberText.text = number.ToString();
+        numberView.SetNumber(number);
     }
 
     public void Initialize(CardModel cardModel, int handIndex)
@@ -86,8 +83,7 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
             cardView.Initialize(cardModel.Data);
 
         // 数字表示
-        if (numberText)
-            numberText.text = cardModel.BattleNumber.ToString();
+        numberView.SetNumber(cardModel.BattleNumber);
     }
 
     public async UniTask PlaySnapToSlotAsync(Transform targetParent, Vector2 targetPosition)

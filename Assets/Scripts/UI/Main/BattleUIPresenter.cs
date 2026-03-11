@@ -42,6 +42,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly SkillButtonView _skillButtonView;
     private readonly DeckSelectionView _deckSelectionView;
     private readonly CardBattleView _cardBattleView;
+    private readonly TargetCardSelectionView _targetCardSelectionView;
     private readonly CoinFlipView _coinFlipView;
     private BattlePresenter _battlePresenter;
 
@@ -62,6 +63,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _skillButtonView = Object.FindFirstObjectByType<SkillButtonView>(FindObjectsInactive.Include);
         _deckSelectionView = Object.FindFirstObjectByType<DeckSelectionView>();
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
+        _targetCardSelectionView = Object.FindFirstObjectByType<TargetCardSelectionView>(FindObjectsInactive.Include);
         _coinFlipView = Object.FindFirstObjectByType<CoinFlipView>(FindObjectsInactive.Include);
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
@@ -127,6 +129,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void PlaceEnemyCard(CardModel card) => _cardBattleView.PlaceEnemyCard(card);
     public void RevealCards(CardModel playerCard, CardModel enemyCard) =>
         _cardBattleView.RevealCards(playerCard, enemyCard);
+    public async UniTask<CardModel> WaitForTargetCardSelectionAsync(string instruction, IReadOnlyList<CardModel> selectableCards) =>
+        await _targetCardSelectionView.WaitForSelectionAsync(instruction, selectableCards);
     // バトル中スキルの結果を、現在表示中のカードへまとめて反映する
     public void RefreshBattleCardNumbers() => _cardBattleView.RefreshDisplayedCardNumbers();
     public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);

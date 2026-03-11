@@ -36,12 +36,6 @@ public class CardView : BaseCardView
     private static readonly int _value = Shader.PropertyToID("_Value");
     private static readonly int _color2 = Shader.PropertyToID("_Color2");
 
-    // BaseCardView 抽象プロパティの実装
-    protected override Image CardImage => cardImage;
-    protected override TextMeshProUGUI CardNameText => cardNameText;
-    protected override Image CardFrame => cardFrame;
-    protected override Image GaugeImage => gaugeImage;
-
     private RectTransform _rectTransform;
     private CardDisplayState _displayState = CardDisplayState.Normal;
     // Tween管理用
@@ -139,4 +133,10 @@ public class CardView : BaseCardView
         _backTransitionTween.TryCancel();
         _growAlphaHandle.TryCancel();
     }
+
+    // BaseCardView 抽象プロパティの実装
+    protected override Image CardImage => cardImage;
+    protected override TextMeshProUGUI CardNameText => cardNameText;
+    protected override Image CardFrame => cardFrame;
+    protected override Image GaugeImage => gaugeImage;
 }
