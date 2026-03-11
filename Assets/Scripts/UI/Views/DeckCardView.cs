@@ -105,12 +105,9 @@ public class DeckCardView : BaseCardView
     private void Awake()
     {
         // カードボタンのクリックイベントを購読
-        if (cardButton)
-        {
-            cardButton.OnClickAsObservable()
-                .Subscribe(_ => OnCardButtonClicked())
-                .AddTo(this);
-        }
+        cardButton.OnClickAsObservable()
+            .Subscribe(_ => OnCardButtonClicked())
+            .AddTo(this);
     }
 
     private void OnDestroy()

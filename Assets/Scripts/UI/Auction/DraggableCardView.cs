@@ -50,6 +50,8 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private MotionHandle _rotateTween;
 
     public void SetSlot(DeckSlotView slot) => CurrentSlot = slot;
+    /// <summary>スキル効果等で変更された数字を反映する</summary>
+    public void UpdateNumber(int number) => numberView.SetNumber(number);
 
     /// <summary>裏面を表示（伏せ状態）</summary>
     public void ShowBack()
@@ -65,12 +67,6 @@ public class DraggableCardView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         cardBack.SetActive(false);
         cardView.gameObject.SetActive(true);
         numberView.SetVisible(true);
-    }
-
-    /// <summary>スキル効果等で変更された数字を反映する</summary>
-    public void UpdateNumber(int number)
-    {
-        numberView.SetNumber(number);
     }
 
     public void Initialize(CardModel cardModel, int handIndex)

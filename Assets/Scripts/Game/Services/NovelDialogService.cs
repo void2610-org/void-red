@@ -11,6 +11,7 @@ public class NovelDialogService
 {
     private const string GOOGLE_KEY_FILE_NAME = "void-red-c7ec6e87a6c6.json";
     private const string SPREADSHEET_ID = "1cPwaMiTwriP5eGhxYqIYvdpjJ81xsnwDdBtULMlP82I";
+
     private readonly bool _useLocalExcel; // trueでローカルExcel、falseでスプレッドシート
 
     public NovelDialogService(bool useLocalExcel)
