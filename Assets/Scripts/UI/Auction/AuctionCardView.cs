@@ -18,8 +18,6 @@ public class AuctionCardView : MonoBehaviour
 
     public Observable<AuctionCardView> OnCardClicked => cardView.OnClicked.Select(_ => this);
     public Observable<AuctionCardView> OnDialogueClicked => dialogueButton.OnClickAsObservable().Select(_ => this);
-    public void SetInteractable(bool interactable) => cardView.SetInteractable(interactable);
-    public void SetDialogueButtonState(bool isVisible) => dialogueButton.gameObject.SetActive(isVisible);
 
     /// <summary>
     /// カードデータで初期化
@@ -30,6 +28,5 @@ public class AuctionCardView : MonoBehaviour
         cardView.Initialize(cardModel.Data);
         cardBidInfoView.ShowPlayerBidOnly(0);
         cardBidInfoView.HideResult();
-        SetDialogueButtonState(false);
     }
 }

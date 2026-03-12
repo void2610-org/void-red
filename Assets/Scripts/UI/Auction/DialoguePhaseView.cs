@@ -61,8 +61,6 @@ public class DialoguePhaseView : BasePhaseView
         Show();
         await HideAllAsync();
 
-        portraitView.SetPortraitImmediate(playerPortraitSprite);
-        portraitView.SlideIn();
         choicesView.Show();
 
         try

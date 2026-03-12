@@ -57,8 +57,6 @@ public class AuctionView : BasePhaseView
 
         foreach (var auctionCard in _auctionCardViews)
         {
-            auctionCard.SetInteractable(true);
-            auctionCard.SetDialogueButtonState(true);
             auctionCard.OnCardClicked.Subscribe(OnDialogueCardClicked).AddTo(_dialogueDisposables);
             auctionCard.OnDialogueClicked.Subscribe(OnDialogueCardClicked).AddTo(_dialogueDisposables);
         }
@@ -71,12 +69,6 @@ public class AuctionView : BasePhaseView
     {
         _dialogueDisposables.Dispose();
         _dialogueDisposables = new CompositeDisposable();
-
-        foreach (var auctionCard in _auctionCardViews)
-        {
-            auctionCard.SetInteractable(false);
-            auctionCard.SetDialogueButtonState(true);
-        }
     }
 
     // カード表示（6枚共有表示）
@@ -88,7 +80,6 @@ public class AuctionView : BasePhaseView
         {
             var auctionCard = Instantiate(auctionCardPrefab, cardContainer);
             auctionCard.Initialize(card);
-            auctionCard.SetInteractable(false);
             _auctionCardViews.Add(auctionCard);
         }
 
@@ -108,11 +99,9 @@ public class AuctionView : BasePhaseView
             ShowCards(auctionCards);
         }
 
-        // カードをクリック可能に
+        // カードのクリックイベントを購読
         foreach (var auctionCard in _auctionCardViews)
         {
-            auctionCard.SetInteractable(true);
-            auctionCard.SetDialogueButtonState(true);
             auctionCard.OnCardClicked
                 .Subscribe(OnCardClicked)
                 .AddTo(_disposables);
@@ -174,20 +163,10 @@ public class AuctionView : BasePhaseView
             var playerBid = playerBids.GetTotalBid(auctionCard.CardModel);
             var enemyBid = enemyBids.GetTotalBid(auctionCard.CardModel);
 
-            auctionCard.SetInteractable(false);
             auctionCard.BidInfoView.ShowBidTargetReveal(playerBid, enemyBid > 0);
         }
 
         await UniTask.Delay((int)(duration * 1000));
-    }
-
-    // 全カードを再表示
-    public void ShowAllCards()
-    {
-        foreach (var auctionCard in _auctionCardViews)
-        {
-            auctionCard.gameObject.SetActive(true);
-        }
     }
 
     // 順次結果表示
@@ -200,8 +179,6 @@ public class AuctionView : BasePhaseView
         foreach (var auctionCard in _auctionCardViews)
         {
             auctionCard.gameObject.SetActive(true);
-            auctionCard.SetInteractable(false);
-            auctionCard.SetDialogueButtonState(true);
         }
 
         DeselectCard();
@@ -209,7 +186,7 @@ public class AuctionView : BasePhaseView
         foreach (var result in results)
         {
             var targetAuctionCard = FindAuctionCardView(result.Card);
-            if (targetAuctionCard == null) continue;
+            if (!targetAuctionCard) continue;
 
             var bidInfoView = targetAuctionCard.BidInfoView;
             var cardView = targetAuctionCard.CardView;

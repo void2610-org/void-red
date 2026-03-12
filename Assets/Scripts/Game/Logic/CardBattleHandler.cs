@@ -136,7 +136,7 @@ public class CardBattleHandler
 
     /// <summary>
     /// カードオープンして勝敗判定
-    /// 同数の場合はオークション入札リソース総量で比較
+    /// 同数の場合は競合フェーズ結果で判定し、未決定なら入札リソース総量で比較
     /// </summary>
     /// <param name="competitionWinner">競合フェーズで勝者が決まっていればその結果。完全同数ならnull</param>
     public RoundResult ResolveRound(bool? competitionWinner = null)
