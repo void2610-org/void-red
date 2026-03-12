@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -11,14 +10,6 @@ public class DialoguePhaseView : BasePhaseView
     [Header("立ち絵")]
     [SerializeField] private DialoguePortraitView portraitView;
     [SerializeField] private Sprite playerPortraitSprite;
-
-    private static readonly List<string> _choiceLabels = new()
-    {
-        "挑発する",
-        "共感する",
-        "説得する",
-        "沈黙する",
-    };
 
     private static readonly string[] _playerDialogueTexts =
     {
@@ -72,7 +63,7 @@ public class DialoguePhaseView : BasePhaseView
 
         portraitView.SetPortraitImmediate(playerPortraitSprite);
         portraitView.SlideIn();
-        choicesView.Setup(_choiceLabels);
+        choicesView.Setup();
 
         try
         {
