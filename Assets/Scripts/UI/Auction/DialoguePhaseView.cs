@@ -63,7 +63,7 @@ public class DialoguePhaseView : BasePhaseView
 
         portraitView.SetPortraitImmediate(playerPortraitSprite);
         portraitView.SlideIn();
-        choicesView.Setup();
+        choicesView.Show();
 
         try
         {

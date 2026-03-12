@@ -150,6 +150,7 @@ GameObject:
   - component: {fileID: 6882031426847463832}
   - component: {fileID: 7170240235071087821}
   - component: {fileID: 5037747274776359112}
+  - component: {fileID: 2125497680955539080}
   m_Layer: 5
   m_Name: DialogueChoicesView
   m_TagString: Untagged
@@ -204,6 +205,18 @@ MonoBehaviour:
   - {fileID: 1483957876039358800}
   - {fileID: 7715378477173991420}
   - {fileID: 3111886004199634927}
+--- !u!225 &2125497680955539080
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6991872696553816092}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1275334553530119874
 PrefabInstance:
   m_ObjectHideFlags: 0

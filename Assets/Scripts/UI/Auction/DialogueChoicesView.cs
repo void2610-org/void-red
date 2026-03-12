@@ -9,12 +9,13 @@ using Void2610.UnityTemplate;
 /// 対話フェーズの選択肢表示View
 /// 4つのボタンを持つ対話選択View
 /// </summary>
+[RequireComponent(typeof(CanvasGroup))]
 public class DialogueChoicesView : MonoBehaviour
 {
     [SerializeField] private StaggeredSlideInGroup buttonStagger;
     [SerializeField] private List<Button> choiceButtons;
 
-    private CompositeDisposable _disposables = new();
+    private CanvasGroup _canvasGroup;
     private UniTaskCompletionSource<int> _selectionCompletionSource;
 
     /// <summary>
@@ -23,37 +24,36 @@ public class DialogueChoicesView : MonoBehaviour
     /// <returns>押された選択肢の番号</returns>
     public UniTask<int> WaitForSelectionAsync() => _selectionCompletionSource.Task;
 
-    public void Setup()
+    public void Show()
     {
-        _disposables.Dispose();
-        _disposables = new CompositeDisposable();
         _selectionCompletionSource = new UniTaskCompletionSource<int>();
-
-        for (var i = 0; i < choiceButtons.Count; i++)
-        {
-            var index = i;
-            choiceButtons[i].gameObject.SetActive(true);
-            choiceButtons[i].OnClickAsObservable()
-                .Subscribe(_ => _selectionCompletionSource.TrySetResult(index))
-                .AddTo(_disposables);
-        }
-
-        gameObject.SetActive(true);
+        _canvasGroup.Show();
         buttonStagger.Play();
     }
 
     public void Hide()
     {
         buttonStagger.Cancel();
-        _disposables.Dispose();
-        _disposables = new CompositeDisposable();
         _selectionCompletionSource?.TrySetCanceled();
-        gameObject.SetActive(false);
+        _canvasGroup.Hide();
+    }
+
+    private void Awake()
+    {
+        _canvasGroup = GetComponent<CanvasGroup>();
+        _canvasGroup.Hide();
+
+        for (var i = 0; i < choiceButtons.Count; i++)
+        {
+            var index = i;
+            choiceButtons[i].OnClickAsObservable()
+                .Subscribe(_ => _selectionCompletionSource?.TrySetResult(index))
+                .AddTo(this);
+        }
     }
 
     private void OnDestroy()
     {
-        _disposables.Dispose();
         _selectionCompletionSource?.TrySetCanceled();
     }
 }
