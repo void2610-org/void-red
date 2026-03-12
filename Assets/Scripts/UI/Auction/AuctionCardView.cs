@@ -16,19 +16,10 @@ public class AuctionCardView : MonoBehaviour
     public CardBidInfoView BidInfoView => cardBidInfoView;
     public CardModel CardModel { get; private set; }
 
-    // カードクリックイベント
-    public Observable<AuctionCardView> OnCardClicked =>
-        cardView.OnClicked.Select(_ => this);
-
-    // 対話ボタンクリックイベント
-    public Observable<AuctionCardView> OnDialogueClicked =>
-        dialogueButton.OnClickAsObservable().Select(_ => this);
-
-    /// <summary>
-    /// 対話ボタンの表示/非表示
-    /// </summary>
-    public void SetDialogueButtonVisible(bool visible) =>
-        dialogueButton.gameObject.SetActive(visible);
+    public Observable<AuctionCardView> OnCardClicked => cardView.OnClicked.Select(_ => this);
+    public Observable<AuctionCardView> OnDialogueClicked => dialogueButton.OnClickAsObservable().Select(_ => this);
+    public void SetInteractable(bool interactable) => cardView.SetInteractable(interactable);
+    public void SetDialogueButtonState(bool isVisible) => dialogueButton.gameObject.SetActive(isVisible);
 
     /// <summary>
     /// カードデータで初期化
@@ -39,14 +30,6 @@ public class AuctionCardView : MonoBehaviour
         cardView.Initialize(cardModel.Data);
         cardBidInfoView.ShowPlayerBidOnly(0);
         cardBidInfoView.HideResult();
-    }
-
-    /// <summary>
-    /// カードの操作可否を設定
-    /// </summary>
-    public void SetInteractable(bool interactable)
-    {
-        cardView.SetInteractable(interactable);
-        dialogueButton.interactable = interactable;
+        SetDialogueButtonState(false);
     }
 }

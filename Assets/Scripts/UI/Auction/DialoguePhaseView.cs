@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using R3;
 using UnityEngine;
 
 public class DialoguePhaseView : BasePhaseView
@@ -12,7 +12,29 @@ public class DialoguePhaseView : BasePhaseView
     [SerializeField] private DialoguePortraitView portraitView;
     [SerializeField] private Sprite playerPortraitSprite;
 
-    public Observable<int> OnChoiceSelected => choicesView.OnChoiceSelected;
+    private static readonly List<string> _choiceLabels = new()
+    {
+        "挑発する",
+        "共感する",
+        "説得する",
+        "沈黙する",
+    };
+
+    private static readonly string[] _playerDialogueTexts =
+    {
+        "その記憶、こっちが暴いてやる",
+        "その気持ち、少しは分かる",
+        "落ち着いて話をしよう",
+        "今は黙って見極める",
+    };
+
+    private static readonly string[] _enemyDialogueTexts =
+    {
+        "その挑発、面白いね",
+        "分かったつもりで来るんだ",
+        "言葉で変えられると思う？",
+        "沈黙も答えのうちか",
+    };
 
     private Sprite _enemyPortraitSprite;
     private Sprite _enemyCutInSprite;
@@ -47,15 +69,26 @@ public class DialoguePhaseView : BasePhaseView
         Initialize(enemyData);
         Show();
         await HideAllAsync();
-        await ShowEnemyDialogueAsync(card.Data.Description);
-        Hide();
-    }
 
-    public void SetupChoices(List<string> labels)
-    {
         portraitView.SetPortraitImmediate(playerPortraitSprite);
         portraitView.SlideIn();
-        choicesView.Setup(labels);
+        choicesView.Setup(_choiceLabels);
+
+        try
+        {
+            var selectedIndex = await choicesView.WaitForSelectionAsync();
+            HideChoices();
+            await ShowPlayerDialogueAsync(BuildPlayerDialogueText(card, selectedIndex));
+            await ShowEnemyDialogueAsync(BuildEnemyDialogueText(card, selectedIndex));
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        finally
+        {
+            Hide();
+        }
     }
 
     public override void Show()
@@ -82,4 +115,22 @@ public class DialoguePhaseView : BasePhaseView
         portraitView.SlideOut();
         await cutInView.PlayCutInAsync(_enemyPortraitSprite, _enemyCutInSprite, text);
     }
+
+    /// <summary>
+    /// プレイヤー側のカットイン文言を組み立てる
+    /// </summary>
+    /// <param name="card">選択されたカード</param>
+    /// <param name="selectedIndex">選ばれた選択肢の番号</param>
+    /// <returns>プレイヤーのカットイン文言</returns>
+    private static string BuildPlayerDialogueText(CardModel card, int selectedIndex) =>
+        $"{card.Data.CardName}に向けて、{_playerDialogueTexts[selectedIndex]}";
+
+    /// <summary>
+    /// 敵側のカットイン文言を組み立てる
+    /// </summary>
+    /// <param name="card">選択されたカード</param>
+    /// <param name="selectedIndex">選ばれた選択肢の番号</param>
+    /// <returns>敵のカットイン文言</returns>
+    private static string BuildEnemyDialogueText(CardModel card, int selectedIndex) =>
+        $"{card.Data.CardName}を見て、{_enemyDialogueTexts[selectedIndex]}";
 }

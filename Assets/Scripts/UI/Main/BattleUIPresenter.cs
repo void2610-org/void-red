@@ -13,6 +13,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
 {
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
+    public Observable<CardModel> OnAuctionDialogueRequested => _auctionView.OnDialogueRequested;
     public Observable<CardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
     public Observable<CardModel> OnBattleFieldCardChanged => _cardBattleView.OnFieldCardChanged;
     // 仮置き中カードを参照して、確定前でもスキル適用できるようにする
@@ -34,6 +35,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly TutorialPresenter _tutorialPresenter;
     private ThemeData _currentTheme;
     private readonly AuctionView _auctionView;
+    private readonly DialoguePhaseView _dialoguePhaseView;
     private readonly CompetitionView _competitionView;
     private readonly RewardPhaseView _rewardPhaseView;
     private readonly MemoryGrowthView _memoryGrowthView;
@@ -55,6 +57,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _blackOverlayView = Object.FindFirstObjectByType<BlackOverlayView>();
         _eyeBlinkTransitionView = Object.FindFirstObjectByType<EyeBlinkTransitionView>();
         _auctionView = Object.FindFirstObjectByType<AuctionView>();
+        _dialoguePhaseView = Object.FindFirstObjectByType<DialoguePhaseView>(FindObjectsInactive.Include);
         _competitionView = Object.FindFirstObjectByType<CompetitionView>();
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
@@ -80,11 +83,15 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask WaitForCardAcquisitionCompleteAsync() =>
         await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
     public void ShowAuctionView() => _auctionView.Show();
+    public void StartAuctionDialogueSelection() => _auctionView.StartDialogueSelection();
+    public void StopAuctionDialogueSelection() => _auctionView.StopDialogueSelection();
     public async UniTask ShowAuctionResultsSequentialAsync(
         IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) =>
         await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
+    public async UniTask ShowAuctionCardDialogueAsync(CardModel card, EnemyData enemyData) =>
+        await _dialoguePhaseView.ShowCardDialogueAsync(card, enemyData);
     public void HideRewardView() => _rewardPhaseView.Hide();
     public void ShowMemoryGrowthView(IReadOnlyList<AcquiredTheme> allThemes) => _memoryGrowthView.ShowMemoryGrowth(allThemes);
     public UniTask WaitForMemoryGrowthCompleteAsync() => _memoryGrowthView.WaitForContinueAsync();

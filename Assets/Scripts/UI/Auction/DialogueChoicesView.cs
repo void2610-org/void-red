@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -15,15 +16,20 @@ public class DialogueChoicesView : MonoBehaviour
     [SerializeField] private List<Button> choiceButtons;
     [SerializeField] private List<TextMeshProUGUI> choiceLabels;
 
-    public Observable<int> OnChoiceSelected => _onChoiceSelected;
-
-    private readonly Subject<int> _onChoiceSelected = new();
     private CompositeDisposable _disposables = new();
+    private UniTaskCompletionSource<int> _selectionCompletionSource;
+
+    /// <summary>
+    /// 選択肢が押されるまで待機する
+    /// </summary>
+    /// <returns>押された選択肢の番号</returns>
+    public UniTask<int> WaitForSelectionAsync() => _selectionCompletionSource.Task;
 
     public void Setup(List<string> labels)
     {
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
+        _selectionCompletionSource = new UniTaskCompletionSource<int>();
 
         for (var i = 0; i < choiceButtons.Count; i++)
         {
@@ -33,7 +39,7 @@ public class DialogueChoicesView : MonoBehaviour
                 choiceLabels[i].text = labels[i];
                 choiceButtons[i].gameObject.SetActive(true);
                 choiceButtons[i].OnClickAsObservable()
-                    .Subscribe(_ => _onChoiceSelected.OnNext(index))
+                    .Subscribe(_ => _selectionCompletionSource.TrySetResult(index))
                     .AddTo(_disposables);
             }
             else
@@ -51,12 +57,13 @@ public class DialogueChoicesView : MonoBehaviour
         buttonStagger.Cancel();
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
+        _selectionCompletionSource?.TrySetCanceled();
         gameObject.SetActive(false);
     }
 
     private void OnDestroy()
     {
         _disposables.Dispose();
-        _onChoiceSelected.Dispose();
+        _selectionCompletionSource?.TrySetCanceled();
     }
 }
