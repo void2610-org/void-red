@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
-using Void2610.UnityTemplate;
 
 /// <summary>
 /// オークション結果判定・リソース消費・競合フェーズの実行を統合管理する
@@ -11,15 +10,16 @@ public class AuctionProcessor
 {
     private readonly Player _player;
     private readonly Enemy _enemy;
+    private readonly CompetitionPhaseRunner _competitionPhaseRunner;
     private readonly BattleUIPresenter _uiPresenter;
-    private readonly EnemyAIController _enemyAI;
 
-    public AuctionProcessor(Player player, Enemy enemy, BattleUIPresenter uiPresenter, EnemyAIController enemyAI)
+    public AuctionProcessor(Player player, Enemy enemy, BattleUIPresenter uiPresenter,
+        CompetitionPhaseRunner competitionPhaseRunner)
     {
         _player = player;
         _enemy = enemy;
+        _competitionPhaseRunner = competitionPhaseRunner;
         _uiPresenter = uiPresenter;
-        _enemyAI = enemyAI;
     }
 
     /// <summary>
@@ -106,64 +106,13 @@ public class AuctionProcessor
     /// </summary>
     private async UniTask HandleSingleCompetition(AuctionJudge.AuctionResultEntry drawResult)
     {
-        var handler = new CompetitionHandler();
-        handler.Start(drawResult.Card, drawResult.PlayerBid, drawResult.EnemyBid);
-
-        var selectedEmotion = EmotionType.Joy;
-        var disposables = new CompositeDisposable();
-
-        // 競合UI表示
-        _uiPresenter.ShowCompetition(
-            handler.PlayerTotal, handler.EnemyTotal, _player.EmotionResources);
-
-        // プレイヤー上乗せボタン
-        _uiPresenter.OnCompetitionRaise
-            .Subscribe(_ =>
-            {
-                if (handler.TryPlayerRaise(selectedEmotion, _player))
-                {
-                    SeManager.Instance.PlaySe(selectedEmotion.ToResourceSeName(), pitch: 1f);
-                    _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
-                    _uiPresenter.UpdateCompetitionResources(_player.EmotionResources);
-                }
-            })
-            .AddTo(disposables);
-
-        // 感情選択変更
-        _uiPresenter.OnCompetitionEmotionSelected
-            .Subscribe(emotion => selectedEmotion = emotion)
-            .AddTo(disposables);
-
-        // 敵AIの次回上乗せ時刻
-        var nextEnemyRaiseTime = Time.time + Random.Range(2f, 5f);
-
-        // 競合ループ（タイムアウトまで）
-        while (!handler.IsTimedOut)
-        {
-            // タイマー更新
-            _uiPresenter.UpdateCompetitionTimer(
-                handler.RemainingTime, GameConstants.COMPETITION_TIMEOUT_SECONDS);
-
-            // 敵AI上乗せ判定
-            if (Time.time >= nextEnemyRaiseTime)
-            {
-                _enemyAI.TryCompetitionRaise(handler);
-                nextEnemyRaiseTime = Time.time + Random.Range(2f, 5f);
-
-                _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
-            }
-
-            await UniTask.Yield();
-        }
-
-        // 競合終了
-        handler.End();
-        disposables.Dispose();
+        var handler = await _competitionPhaseRunner.RunAsync(
+            drawResult.Card,
+            drawResult.PlayerBid,
+            drawResult.EnemyBid,
+            "競合発生！");
 
         ProcessCompetitionResult(handler, drawResult.Card);
-
-        _uiPresenter.HideCompetition();
-        await UniTask.Delay(500);
     }
 
     /// <summary>

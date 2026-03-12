@@ -26,9 +26,12 @@ public class AuctionView : BasePhaseView
     [SerializeField] private StaggeredSlideInGroup cardStagger;
 
     public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
+    public Observable<CardModel> OnDialogueRequested => _onDialogueRequested;
 
     private readonly List<AuctionCardView> _auctionCardViews = new();
+    private readonly Subject<CardModel> _onDialogueRequested = new();
     private CompositeDisposable _disposables = new();
+    private CompositeDisposable _dialogueDisposables = new();
 
     private AuctionCardView _selectedAuctionCard;
     private BidModel _playerBids;
@@ -42,6 +45,32 @@ public class AuctionView : BasePhaseView
 
     public override void Show() => CanvasGroup.Show();
 
+    /// <summary>
+    /// 対話フェーズ用にカードクリックだけを受け付ける
+    /// </summary>
+    public void StartDialogueSelection()
+    {
+        _dialogueDisposables.Dispose();
+        _dialogueDisposables = new CompositeDisposable();
+        DeselectCard();
+        bidWindowView.Hide();
+
+        foreach (var auctionCard in _auctionCardViews)
+        {
+            auctionCard.OnCardClicked.Subscribe(OnDialogueCardClicked).AddTo(_dialogueDisposables);
+            auctionCard.OnDialogueClicked.Subscribe(OnDialogueCardClicked).AddTo(_dialogueDisposables);
+        }
+    }
+
+    /// <summary>
+    /// 対話フェーズ用のクリック受付を終了する
+    /// </summary>
+    public void StopDialogueSelection()
+    {
+        _dialogueDisposables.Dispose();
+        _dialogueDisposables = new CompositeDisposable();
+    }
+
     // カード表示（6枚共有表示）
     public void ShowCards(IReadOnlyList<CardModel> auctionCards)
     {
@@ -51,7 +80,6 @@ public class AuctionView : BasePhaseView
         {
             var auctionCard = Instantiate(auctionCardPrefab, cardContainer);
             auctionCard.Initialize(card);
-            auctionCard.SetInteractable(false);
             _auctionCardViews.Add(auctionCard);
         }
 
@@ -71,10 +99,9 @@ public class AuctionView : BasePhaseView
             ShowCards(auctionCards);
         }
 
-        // カードをクリック可能に
+        // カードのクリックイベントを購読
         foreach (var auctionCard in _auctionCardViews)
         {
-            auctionCard.SetInteractable(true);
             auctionCard.OnCardClicked
                 .Subscribe(OnCardClicked)
                 .AddTo(_disposables);
@@ -136,20 +163,10 @@ public class AuctionView : BasePhaseView
             var playerBid = playerBids.GetTotalBid(auctionCard.CardModel);
             var enemyBid = enemyBids.GetTotalBid(auctionCard.CardModel);
 
-            auctionCard.SetInteractable(false);
             auctionCard.BidInfoView.ShowBidTargetReveal(playerBid, enemyBid > 0);
         }
 
         await UniTask.Delay((int)(duration * 1000));
-    }
-
-    // 全カードを再表示
-    public void ShowAllCards()
-    {
-        foreach (var auctionCard in _auctionCardViews)
-        {
-            auctionCard.gameObject.SetActive(true);
-        }
     }
 
     // 順次結果表示
@@ -162,7 +179,6 @@ public class AuctionView : BasePhaseView
         foreach (var auctionCard in _auctionCardViews)
         {
             auctionCard.gameObject.SetActive(true);
-            auctionCard.SetInteractable(false);
         }
 
         DeselectCard();
@@ -170,7 +186,7 @@ public class AuctionView : BasePhaseView
         foreach (var result in results)
         {
             var targetAuctionCard = FindAuctionCardView(result.Card);
-            if (targetAuctionCard == null) continue;
+            if (!targetAuctionCard) continue;
 
             var bidInfoView = targetAuctionCard.BidInfoView;
             var cardView = targetAuctionCard.CardView;
@@ -223,6 +239,8 @@ public class AuctionView : BasePhaseView
         cardStagger.Cancel();
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
+        _dialogueDisposables.Dispose();
+        _dialogueDisposables = new CompositeDisposable();
 
         DeselectCard();
 
@@ -245,10 +263,8 @@ public class AuctionView : BasePhaseView
         return null;
     }
 
-    private static void OnDialogueClicked(AuctionCardView auctionCard)
-    {
-        Debug.Log($"[対話] {auctionCard.CardModel.Data.CardName} の対話ボタンが押されました");
-    }
+    private void OnDialogueClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
+    private void OnDialogueCardClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
 
     private void OnCardClicked(AuctionCardView auctionCard)
     {
@@ -411,5 +427,7 @@ public class AuctionView : BasePhaseView
     private void OnDestroy()
     {
         _disposables.Dispose();
+        _dialogueDisposables.Dispose();
+        _onDialogueRequested.Dispose();
     }
 }

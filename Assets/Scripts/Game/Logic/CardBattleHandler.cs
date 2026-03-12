@@ -33,6 +33,11 @@ public class CardBattleHandler
     /// <summary>現ラウンドで敵が伏せたカード</summary>
     public CardModel EnemyCard { get; private set; }
 
+    /// <summary>バトル数字が同数で競合が必要か</summary>
+    public bool RequiresCompetition => PlayerCard != null
+                                    && EnemyCard != null
+                                    && PlayerCard.BattleNumber == EnemyCard.BattleNumber;
+
     /// <summary>プレイヤーのスキルが使用可能か</summary>
     public bool PlayerSkillAvailable { get; private set; } = true;
 
@@ -131,9 +136,10 @@ public class CardBattleHandler
 
     /// <summary>
     /// カードオープンして勝敗判定
-    /// 同数の場合はオークション入札リソース総量で比較
+    /// 同数の場合は競合フェーズ結果で判定し、未決定なら入札リソース総量で比較
     /// </summary>
-    public RoundResult ResolveRound()
+    /// <param name="competitionWinner">競合フェーズで勝者が決まっていればその結果。完全同数ならnull</param>
+    public RoundResult ResolveRound(bool? competitionWinner = null)
     {
         // 勝利条件を決定（怒りスキルによる反転チェック）
         var condition = _conditionReversedNextTurn
@@ -150,6 +156,12 @@ public class CardBattleHandler
 
             return RecordResult(playerWins);
         }
+
+        if (competitionWinner == true)
+            return RecordResult(true);
+
+        if (competitionWinner == false)
+            return RecordResult(false);
 
         // 同数の場合: オークション入札リソース総量で比較
         if (PlayerCard.AuctionBidTotal != EnemyCard.AuctionBidTotal)

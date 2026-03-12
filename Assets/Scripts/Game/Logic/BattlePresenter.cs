@@ -19,6 +19,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     private readonly EnemyAIController _enemyAI;
     private readonly AuctionProcessor _auctionProcessor;
+    private readonly CompetitionPhaseRunner _competitionPhaseRunner;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
 
@@ -48,7 +49,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _allAuctionData = allAuctionData;
 
         _enemyAI = new EnemyAIController(_enemy);
-        _auctionProcessor = new AuctionProcessor(_player, _enemy, _battleUIPresenter, _enemyAI);
+        _competitionPhaseRunner = new CompetitionPhaseRunner(_player, _enemyAI, _battleUIPresenter);
+        _auctionProcessor = new AuctionProcessor(_player, _enemy, _battleUIPresenter, _competitionPhaseRunner);
 
         InitializeAuctionData();
     }
@@ -217,9 +219,18 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     private async UniTask HandleDialoguePhase()
     {
-        // 対話ボタンは入札フェーズ中にカード上で利用可能
-        // TODO: 対話ボタン押下時の本実装に置き換え
-        await UniTask.CompletedTask;
+        _battleUIPresenter.StartAuctionDialogueSelection();
+
+        try
+        {
+            var selectedCard = await _battleUIPresenter.OnAuctionDialogueRequested.FirstAsync();
+            _battleUIPresenter.StopAuctionDialogueSelection();
+            await _battleUIPresenter.ShowAuctionCardDialogueAsync(selectedCard, _currentEnemyData);
+        }
+        finally
+        {
+            _battleUIPresenter.StopAuctionDialogueSelection();
+        }
     }
 
     // === 4. 入札フェーズ ===
@@ -235,6 +246,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _enemyAI.DecideBids(_auctionCards);
         Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
 
+        using var disposables = new CompositeDisposable();
+        _battleUIPresenter.OnAuctionDialogueRequested
+            .Subscribe(card => ShowAuctionDialogueAsync(card).Forget())
+            .AddTo(disposables);
+
         // プレイヤーの入札UI表示・待機
         await _battleUIPresenter.WaitForBiddingAsync(_auctionCards, _player.Bids, EmotionType.Joy, _player.EmotionResources);
 
@@ -242,6 +258,17 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 入札対象カード公開演出
         await _battleUIPresenter.ShowBidTargetsAsync(_player.Bids, _enemy.Bids, 2f);
+    }
+
+    /// <summary>
+    /// オークション中にカード対話を表示する
+    /// </summary>
+    /// <param name="card">対話対象のカード</param>
+    private async UniTask ShowAuctionDialogueAsync(CardModel card)
+    {
+        _currentGameState.Value = GameState.DialoguePhase;
+        await _battleUIPresenter.ShowAuctionCardDialogueAsync(card, _currentEnemyData);
+        _currentGameState.Value = GameState.BiddingPhase;
     }
 
     // === 6. リザルトフェーズ ===
@@ -446,7 +473,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
             await UniTask.Delay(1000);
 
             // 勝敗判定
-            var result = handler.ResolveRound();
+            bool? competitionWinner = null;
+            if (handler.RequiresCompetition)
+                competitionWinner = await HandleBattleCompetitionAsync(handler);
+
+            var result = handler.ResolveRound(competitionWinner);
 
             var resultText = result == RoundResult.PlayerWin ? "プレイヤー勝利！" : "敵の勝利...";
             _battleUIPresenter.SetBattleInstruction(resultText);
@@ -489,6 +520,23 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _battleUIPresenter.PlacePlayerCard(selectedCard);
         await playerSkillSession.CompleteCardPlacementAsync();
         return playerSkillSession.ShouldApplyDeferredSkill;
+    }
+
+    /// <summary>
+    /// バトル中に同数になった時の競合フェーズを実行し、勝者を返す
+    /// </summary>
+    /// <param name="handler">現在ラウンドのカード情報を持つバトルハンドラ</param>
+    /// <returns>競合勝者。完全同数ならnull</returns>
+    private async UniTask<bool?> HandleBattleCompetitionAsync(CardBattleHandler handler)
+    {
+        _currentGameState.Value = GameState.CompetitionPhase;
+        var competitionHandler = await _competitionPhaseRunner.RunAsync(
+            handler.PlayerCard,
+            handler.PlayerCard.AuctionBidTotal,
+            handler.EnemyCard.AuctionBidTotal,
+            "同数のため競合発生！");
+        _currentGameState.Value = GameState.CardBattle;
+        return competitionHandler.IsPlayerWon;
     }
 
     // === 10. 記憶育成フェーズ ===
