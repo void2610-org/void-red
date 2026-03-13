@@ -43,6 +43,12 @@ public class TutorialBattlePresenter : BattlePresenter
     protected override bool IsBattleSkillAvailable(CardBattleHandler handler) =>
         handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
 
+    protected override VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) =>
+        _tutorialBattlePlayerData.BattleVictoryCondition;
+
+    protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
+        EnemyAI.DecideEmotionState();
+
     protected override async UniTask HandleAuctionResult()
     {
         await BattleUIPresenter.StartTutorial("ResultDetermination");

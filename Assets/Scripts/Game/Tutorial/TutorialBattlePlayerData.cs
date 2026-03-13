@@ -14,6 +14,7 @@ public sealed class TutorialBattlePlayerData
 
     public int[] DeckAllowedCardIndices => new[] { 0, 1, 2 };
 
+    public VictoryCondition BattleVictoryCondition => VictoryCondition.LowerWins;
     public bool[] CoinFlipPerRound => new[] { true, false, true };
     public int?[] ForcedCardPerRound => new int?[] { 0, null, null };
     public int SkillRoundIndex => 1;

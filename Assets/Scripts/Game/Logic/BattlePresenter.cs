@@ -72,6 +72,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual bool IsBattleSkillAvailable(CardBattleHandler handler) => handler.PlayerSkillAvailable;
 
+    protected virtual VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => defaultVictoryCondition;
+
+    protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
+        currentEmotionState;
+
     protected virtual async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {
         BattleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
@@ -228,7 +233,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 9. カードバトル（3本勝負）
         CurrentGameStateInternal.Value = GameState.CardBattle;
-        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, _currentAuctionData.VictoryCondition,
+        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, GetBattleVictoryCondition(_currentAuctionData.VictoryCondition),
             isPlayerSkillUsedInDeckSelection);
 
         // ===== 終了処理 =====
@@ -412,6 +417,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         while (!handler.IsFinished)
         {
             Debug.Log($"[BattlePresenter] ラウンド {handler.CurrentRound + 1} 開始");
+            enemyEmotionState = GetEnemyBattleEmotionState(handler, enemyEmotionState);
 
             // コイントス
             DecideFirstPlayer(handler);
