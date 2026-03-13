@@ -40,8 +40,19 @@ public class TutorialBattlePresenter : BattlePresenter
     protected override void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) =>
         BattleUIPresenter.InitializeDeckSelection(wonCards, _tutorialBattlePlayerData.DeckAllowedCardIndices);
 
+    protected override EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) =>
+        _tutorialBattlePlayerData.DeckSelectionForcedSkillEmotion;
+
+    protected override EmotionType GetBattleSkill(EmotionType defaultSkill) =>
+        _tutorialBattlePlayerData.BattleForcedSkillEmotion;
+
+    protected override bool ShouldAutoActivateDeckSelectionSkill(EmotionType playerSkill) => true;
+
     protected override bool IsBattleSkillAvailable(CardBattleHandler handler) =>
         handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
+
+    protected override bool ShouldAutoActivateBattleSkill(CardBattleHandler handler, EmotionType playerSkill) =>
+        handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
 
     protected override VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) =>
         _tutorialBattlePlayerData.BattleVictoryCondition;

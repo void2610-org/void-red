@@ -71,6 +71,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
     protected virtual void DecideFirstPlayer(CardBattleHandler handler) => handler.DecideFirstPlayer();
 
     protected virtual bool IsBattleSkillAvailable(CardBattleHandler handler) => handler.PlayerSkillAvailable;
+    protected virtual EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => defaultSkill;
+    protected virtual EmotionType GetBattleSkill(EmotionType defaultSkill) => defaultSkill;
+    protected virtual bool ShouldAutoActivateDeckSelectionSkill(EmotionType playerSkill) => false;
+    protected virtual bool ShouldAutoActivateBattleSkill(CardBattleHandler handler, EmotionType playerSkill) => false;
 
     protected virtual VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => defaultVictoryCondition;
 
@@ -220,6 +224,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // 6. リザルトフェーズ（獲得カード表示 + 感情リソース報酬 + 感情状態判定）
         CurrentGameStateInternal.Value = GameState.ResultPhase;
         var playerEmotionState = await HandleResultPhase();
+        var deckSelectionSkill = GetDeckSelectionSkill(playerEmotionState);
+        var battleSkill = GetBattleSkill(playerEmotionState);
 
         // ===== バトルパート =====
 
@@ -227,13 +233,14 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _cardNumbers = CardNumberAssigner.AssignNumbers(AuctionCards, Player.Bids, Enemy.Bids);
 
         // 8. スキルボタン初期化 → デッキ選択
-        BattleUIPresenter.InitializeSkillButton(playerEmotionState);
+        BattleUIPresenter.InitializeSkillButton(deckSelectionSkill);
         CurrentGameStateInternal.Value = GameState.DeckSelection;
-        var (playerDeck, enemyDeck, isPlayerSkillUsedInDeckSelection) = await HandleDeckSelection(playerEmotionState);
+        var (playerDeck, enemyDeck, isPlayerSkillUsedInDeckSelection) = await HandleDeckSelection(deckSelectionSkill);
 
         // 9. カードバトル（3本勝負）
+        BattleUIPresenter.InitializeSkillButton(battleSkill);
         CurrentGameStateInternal.Value = GameState.CardBattle;
-        await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, GetBattleVictoryCondition(_currentAuctionData.VictoryCondition),
+        await HandleCardBattle(playerDeck, enemyDeck, battleSkill, GetBattleVictoryCondition(_currentAuctionData.VictoryCondition),
             isPlayerSkillUsedInDeckSelection);
 
         // ===== 終了処理 =====
@@ -350,6 +357,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
         BattleUIPresenter.SetSkillButtonVisible(true);
         BattleUIPresenter.SetSkillButtonInteractable(BattleSkillExecutor.CanUseInDeckSelection(playerSkill));
 
+        if (ShouldAutoActivateDeckSelectionSkill(playerSkill) &&
+            BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck))
+        {
+            isPlayerSkillUsed = true;
+            BattleUIPresenter.RefreshDeckSelectionCardNumbers();
+            BattleUIPresenter.SetSkillButtonVisible(false);
+            Debug.Log($"[BattlePresenter] デッキ選択中にスキル自動発動: {playerSkill}");
+        }
+
         BattleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
             {
@@ -432,6 +448,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
             bool shouldApplyDeferredPlayerSkill;
             using var playerSkillSession = new PlayerBattleSkillSession(BattleUIPresenter, handler, playerDeck, playerEmotionState);
             playerSkillSession.BeginListening();
+            if (ShouldAutoActivateBattleSkill(handler, playerEmotionState))
+                playerSkillSession.ForceActivate();
             if (handler.IsPlayerFirst)
             {
                 shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);

@@ -28,6 +28,8 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
         _playerSkill = playerSkill;
     }
 
+    public void ForceActivate() => OnSkillActivated();
+
     /// <summary>現在のスキルが対象選択UIを必要とするかを返す</summary>
     private bool RequiresTargetSelection() => _playerSkill == EmotionType.Sadness;
 

@@ -15,10 +15,11 @@ public sealed class TutorialBattlePlayerData
     public EmotionType BattleCompetitionForcedEmotion => EmotionType.Trust;
 
     public int[] DeckAllowedCardIndices => new[] { 0, 1, 2 };
+    public EmotionType DeckSelectionForcedSkillEmotion => EmotionType.Anticipation;
 
     public VictoryCondition BattleVictoryCondition => VictoryCondition.LowerWins;
     public bool[] CoinFlipPerRound => new[] { true, false, true };
     public int?[] ForcedCardPerRound => new int?[] { 0, null, null };
     public int SkillRoundIndex => 1;
-    public EmotionType ForcedSkillEmotion => EmotionType.Joy;
+    public EmotionType BattleForcedSkillEmotion => EmotionType.Joy;
 }
