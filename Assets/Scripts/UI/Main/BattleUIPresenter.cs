@@ -112,6 +112,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // デッキ選択フェーズ
     public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards) =>
         _deckSelectionView.Initialize(wonCards);
+    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards, int[] allowedCardIndices) =>
+        _deckSelectionView.Initialize(wonCards, allowedCardIndices);
     public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
     public IReadOnlyList<CardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
     // デッキ選択中スキルの結果をViewへ反映する
@@ -132,6 +134,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardBattleView.Initialize(condition);
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) =>
         _cardBattleView.ShowPlayerHand(availableCards);
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int forcedCardIndex) =>
+        _cardBattleView.ShowPlayerHand(availableCards, forcedCardIndex);
     public void PlacePlayerCard(CardModel card) => _cardBattleView.PlacePlayerCard(card);
     public void PlaceEnemyCard(CardModel card) => _cardBattleView.PlaceEnemyCard(card);
     public void RevealCards(CardModel playerCard, CardModel enemyCard) =>

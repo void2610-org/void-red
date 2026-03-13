@@ -8,30 +8,30 @@ using Void2610.UnityTemplate;
 
 public class BattlePresenter : IStartable, ISceneInitializable
 {
-    public ReadOnlyReactiveProperty<GameState> CurrentGameState => _currentGameState;
+    public ReadOnlyReactiveProperty<GameState> CurrentGameState => CurrentGameStateInternal;
 
-    private readonly BattleUIPresenter _battleUIPresenter;
-    private readonly Player _player;
-    private readonly Enemy _enemy;
+    protected readonly BattleUIPresenter BattleUIPresenter;
+    protected readonly Player Player;
+    protected readonly Enemy Enemy;
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllAuctionData _allAuctionData;
 
-    private readonly IEnemyAIController _enemyAI;
-    private readonly AuctionProcessor _auctionProcessor;
-    private readonly CompetitionPhaseRunner _competitionPhaseRunner;
+    protected IEnemyAIController EnemyAI;
+    protected AuctionProcessor AuctionProcessor;
+    protected CompetitionPhaseRunner CompetitionPhaseRunner;
 
     private readonly UniTaskCompletionSource _initializationComplete = new();
 
     private EnemyData _currentEnemyData;
     private ThemeData _currentTheme;
     private AuctionData _currentAuctionData;
-    private readonly List<CardModel> _auctionCards = new();
+    protected readonly List<CardModel> AuctionCards = new();
 
     // バトル関連
     private Dictionary<CardModel, CardNumberAssigner.CardNumberInfo> _cardNumbers;
 
-    private readonly ReactiveProperty<GameState> _currentGameState = new(GameState.ThemeAnnouncement);
+    protected readonly ReactiveProperty<GameState> CurrentGameStateInternal = new(GameState.ThemeAnnouncement);
 
     public BattlePresenter(
         BattleUIPresenter battleUIPresenter,
@@ -41,37 +41,85 @@ public class BattlePresenter : IStartable, ISceneInitializable
         SceneTransitionManager sceneTransitionManager,
         AllAuctionData allAuctionData)
     {
-        _battleUIPresenter = battleUIPresenter;
-        _player = player;
-        _enemy = enemy;
+        BattleUIPresenter = battleUIPresenter;
+        Player = player;
+        Enemy = enemy;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _allAuctionData = allAuctionData;
 
-        // チュートリアル判定
-        var currentNode = gameProgressService.GetCurrentNode();
-        var isTutorial = false;
-        if (currentNode is BattleNode battleNode)
-        {
-            isTutorial = allAuctionData.GetAuctionById(battleNode.AuctionId).Enemy.EnemyId == "alv";
-        }
-
-        _enemyAI = isTutorial ? new TutorialEnemyAIController(_enemy) : new EnemyAIController(_enemy);
-        _competitionPhaseRunner = new CompetitionPhaseRunner(_player, _enemyAI, _battleUIPresenter);
-        _auctionProcessor = new AuctionProcessor(_player, _enemy, _battleUIPresenter, _competitionPhaseRunner);
+        EnemyAI = new EnemyAIController(Enemy);
+        CompetitionPhaseRunner = new CompetitionPhaseRunner(Player, EnemyAI, BattleUIPresenter);
+        AuctionProcessor = new AuctionProcessor(Player, Enemy, BattleUIPresenter, CompetitionPhaseRunner);
 
         InitializeAuctionData();
     }
 
     public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
 
+    protected virtual async UniTask HandleAuctionResult() => await AuctionProcessor.ProcessAuctionResultAsync(AuctionCards, _currentEnemyData, CurrentGameStateInternal);
+
+    protected virtual UniTask OnAfterCardsDisplayed() => UniTask.CompletedTask;
+
+    protected virtual UniTask OnAfterResourceGaugesDisplayed() => UniTask.CompletedTask;
+
+    protected virtual UniTask OnBeforeMemoryGrowthContinueAsync() => UniTask.CompletedTask;
+
+    protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) =>
+        BattleUIPresenter.InitializeDeckSelection(wonCards);
+
+    protected virtual void DecideFirstPlayer(CardBattleHandler handler) => handler.DecideFirstPlayer();
+
+    protected virtual bool IsBattleSkillAvailable(CardBattleHandler handler) => handler.PlayerSkillAvailable;
+
+    protected virtual async UniTask<CardModel> SelectBattleCardAsync(BattleDeckModel playerDeck)
+    {
+        BattleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
+        return await BattleUIPresenter.OnBattleCardSelected.FirstAsync();
+    }
+
+    // === 1. テーマ公開 ===
+
+    protected virtual async UniTask HandleThemeAnnouncement()
+    {
+        // オークションデータからテーマを取得
+        _currentTheme = _currentAuctionData.Theme;
+
+        // 記憶テーマを表示
+        await BattleUIPresenter.SetTheme(_currentTheme, isMainTheme: true);
+    }
+
+    // === 3. 入札フェーズ ===
+
+    protected virtual async UniTask HandleBiddingPhase()
+    {
+        Debug.Log("[BattlePresenter] 入札フェーズ開始");
+
+        // 敵AIで入札を決定
+        EnemyAI.DecideBids(AuctionCards);
+        Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{Enemy.Bids.GetTotalBidAmount()}リソース");
+
+        using var disposables = new CompositeDisposable();
+        BattleUIPresenter.OnAuctionDialogueRequested
+            .Subscribe(card => ShowAuctionDialogueAsync(card).Forget())
+            .AddTo(disposables);
+
+        // プレイヤーの入札UI表示・待機
+        await BattleUIPresenter.WaitForBiddingAsync(AuctionCards, Player.Bids, EmotionType.Joy, Player.EmotionResources);
+
+        Debug.Log($"[BattlePresenter] プレイヤーの入札完了: 合計{Player.Bids.GetTotalBidAmount()}リソース");
+
+        // 入札対象カード公開演出
+        await BattleUIPresenter.ShowBidTargetsAsync(Player.Bids, Enemy.Bids);
+    }
+
     private void InitializeAuctionData()
     {
-        _auctionCards.Clear();
+        AuctionCards.Clear();
 
         // Player/Enemyの状態をリセット
-        _player.ResetPlayerState();
-        _enemy.ResetPlayerState();
+        Player.ResetPlayerState();
+        Enemy.ResetPlayerState();
     }
 
     private async UniTaskVoid InitializeGameAsync()
@@ -113,11 +161,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
         }
 
         // 敵を初期化して表示
-        _enemy.SetEnemyData(_currentEnemyData);
-        _battleUIPresenter.InitializeEnemy(_currentEnemyData);
+        Enemy.SetEnemyData(_currentEnemyData);
+        BattleUIPresenter.InitializeEnemy(_currentEnemyData);
 
         // 敵情報をアナウンス
-        await _battleUIPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
+        await BattleUIPresenter.ShowAnnouncement(_currentEnemyData.EnemyName, 1.5f);
         return true;
     }
 
@@ -136,65 +184,51 @@ public class BattlePresenter : IStartable, ISceneInitializable
         // ===== オークションパート =====
 
         // 1. テーマ公開
-        _currentGameState.Value = GameState.ThemeAnnouncement;
+        CurrentGameStateInternal.Value = GameState.ThemeAnnouncement;
         await HandleThemeAnnouncement();
 
         // 2. カード提示（6枚を場に並べる）
-        _currentGameState.Value = GameState.CardReveal;
+        CurrentGameStateInternal.Value = GameState.CardReveal;
         await HandleCardReveal();
 
         // 3. 入札フェーズ（対話は入札中にオプションで実施）
-        _currentGameState.Value = GameState.BiddingPhase;
+        CurrentGameStateInternal.Value = GameState.BiddingPhase;
         await HandleBiddingPhase();
 
         // 5. 落札者判定フェーズ
-        _currentGameState.Value = GameState.AuctionResult;
-        await _auctionProcessor.ProcessAuctionResultAsync(_auctionCards, _currentEnemyData, _currentGameState);
+        CurrentGameStateInternal.Value = GameState.AuctionResult;
+        await HandleAuctionResult();
 
         // ===== リザルトパート =====
 
         // 6. リザルトフェーズ（獲得カード表示 + 感情リソース報酬 + 感情状態判定）
-        _currentGameState.Value = GameState.ResultPhase;
+        CurrentGameStateInternal.Value = GameState.ResultPhase;
         var playerEmotionState = await HandleResultPhase();
 
         // ===== バトルパート =====
 
         // 7. カード数字割り当て
-        _cardNumbers = CardNumberAssigner.AssignNumbers(_auctionCards, _player.Bids, _enemy.Bids);
+        _cardNumbers = CardNumberAssigner.AssignNumbers(AuctionCards, Player.Bids, Enemy.Bids);
 
         // 8. スキルボタン初期化 → デッキ選択
-        _battleUIPresenter.InitializeSkillButton(playerEmotionState);
-        _currentGameState.Value = GameState.DeckSelection;
+        BattleUIPresenter.InitializeSkillButton(playerEmotionState);
+        CurrentGameStateInternal.Value = GameState.DeckSelection;
         var (playerDeck, enemyDeck, isPlayerSkillUsedInDeckSelection) = await HandleDeckSelection(playerEmotionState);
 
         // 9. カードバトル（3本勝負）
-        _currentGameState.Value = GameState.CardBattle;
+        CurrentGameStateInternal.Value = GameState.CardBattle;
         await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, _currentAuctionData.VictoryCondition,
             isPlayerSkillUsedInDeckSelection);
 
         // ===== 終了処理 =====
 
         // 10. 記憶育成フェーズ
-        _currentGameState.Value = GameState.MemoryGrowth;
+        CurrentGameStateInternal.Value = GameState.MemoryGrowth;
         await HandleMemoryGrowth();
 
         // 12. 終了
-        _currentGameState.Value = GameState.BattleEnd;
+        CurrentGameStateInternal.Value = GameState.BattleEnd;
         await HandleBattleEnd();
-    }
-
-    // === 1. テーマ公開 ===
-
-    private async UniTask HandleThemeAnnouncement()
-    {
-        // オークションデータからテーマを取得
-        _currentTheme = _currentAuctionData.Theme;
-
-        // 記憶テーマを表示
-        await _battleUIPresenter.SetTheme(_currentTheme, isMainTheme: true);
-
-        if (_currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
     }
 
     // === 2. カード提示（6枚共有表示） ===
@@ -204,46 +238,19 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log("[BattlePresenter] カード提示フェーズ開始");
 
         // AuctionDataから6枚取得（プレイヤー/敵の区別なし）
-        _auctionCards.Clear();
+        AuctionCards.Clear();
         foreach (var cardData in _currentAuctionData.AuctionCards)
         {
-            _auctionCards.Add(new CardModel(cardData));
+            AuctionCards.Add(new CardModel(cardData));
         }
 
-        Debug.Log($"[BattlePresenter] オークション対象カード: {_auctionCards.Count}枚");
+        Debug.Log($"[BattlePresenter] オークション対象カード: {AuctionCards.Count}枚");
 
         // カードを表示
-        _battleUIPresenter.ShowAuctionCards(_auctionCards, _player.EmotionResources);
+        BattleUIPresenter.ShowAuctionCards(AuctionCards, Player.EmotionResources);
 
         // トランジション：開く（黒フェードから復帰）
-        await _battleUIPresenter.PlayPhaseTransitionOpenAsync();
-    }
-
-    // === 3. 入札フェーズ ===
-
-    private async UniTask HandleBiddingPhase()
-    {
-        Debug.Log("[BattlePresenter] 入札フェーズ開始");
-
-        if (_currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartTutorial("BiddingPhase");
-
-        // 敵AIで入札を決定
-        _enemyAI.DecideBids(_auctionCards);
-        Debug.Log($"[BattlePresenter] 敵の入札完了: 合計{_enemy.Bids.GetTotalBidAmount()}リソース");
-
-        using var disposables = new CompositeDisposable();
-        _battleUIPresenter.OnAuctionDialogueRequested
-            .Subscribe(card => ShowAuctionDialogueAsync(card).Forget())
-            .AddTo(disposables);
-
-        // プレイヤーの入札UI表示・待機
-        await _battleUIPresenter.WaitForBiddingAsync(_auctionCards, _player.Bids, EmotionType.Joy, _player.EmotionResources);
-
-        Debug.Log($"[BattlePresenter] プレイヤーの入札完了: 合計{_player.Bids.GetTotalBidAmount()}リソース");
-
-        // 入札対象カード公開演出
-        await _battleUIPresenter.ShowBidTargetsAsync(_player.Bids, _enemy.Bids, 2f);
+        await BattleUIPresenter.PlayPhaseTransitionOpenAsync();
     }
 
     /// <summary>
@@ -252,9 +259,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <param name="card">対話対象のカード</param>
     private async UniTask ShowAuctionDialogueAsync(CardModel card)
     {
-        _currentGameState.Value = GameState.DialoguePhase;
-        await _battleUIPresenter.ShowAuctionCardDialogueAsync(card, _currentEnemyData);
-        _currentGameState.Value = GameState.BiddingPhase;
+        CurrentGameStateInternal.Value = GameState.DialoguePhase;
+        await BattleUIPresenter.ShowAuctionCardDialogueAsync(card, _currentEnemyData);
+        CurrentGameStateInternal.Value = GameState.BiddingPhase;
     }
 
     // === 6. リザルトフェーズ ===
@@ -263,10 +270,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         Debug.Log("[BattlePresenter] リザルトフェーズ開始");
 
-        var isTutorial = _currentEnemyData.EnemyId == "alv";
-
         // プレイヤーの報酬を計算
-        var rewardResults = RewardCalculator.CalculateAll(_player.WonCards, _player.Bids);
+        var rewardResults = RewardCalculator.CalculateAll(Player.WonCards, Player.Bids);
 
         // 最大リソース値を設定（デフォルト値の3倍を仮の上限とする）
         var maxResources = new Dictionary<EmotionType, int>();
@@ -275,32 +280,28 @@ public class BattlePresenter : IStartable, ISceneInitializable
             maxResources[emotion] = GameConstants.DEFAULT_EMOTION_VALUE * 3;
         }
 
-        await _battleUIPresenter.DisplayCardsAsync(rewardResults);
+        await BattleUIPresenter.DisplayCardsAsync(rewardResults);
+        await OnAfterCardsDisplayed();
 
-        if (isTutorial)
-            await _battleUIPresenter.StartTutorial("RewardPhase");
+        await BattleUIPresenter.WaitForCardAcquisitionCompleteAsync();
 
-        await _battleUIPresenter.WaitForCardAcquisitionCompleteAsync();
+        BattleUIPresenter.DisplayResourceGauges(Player.EmotionResources, maxResources);
+        await OnAfterResourceGaugesDisplayed();
 
-        _battleUIPresenter.DisplayResourceGauges(_player.EmotionResources, maxResources);
-
-        if (isTutorial)
-            await _battleUIPresenter.StartTutorial("RewardPhase2");
-
-        var rewardedAmounts = await _battleUIPresenter.AnimateResourceRewardsAsync(rewardResults);
+        var rewardedAmounts = await BattleUIPresenter.AnimateResourceRewardsAsync(rewardResults);
 
         // 報酬を各感情リソースに加算
         foreach (var (emotion, amount) in rewardedAmounts)
         {
             if (amount > 0)
             {
-                _player.AddEmotion(emotion, amount);
+                Player.AddEmotion(emotion, amount);
                 Debug.Log($"[BattlePresenter] プレイヤーに報酬付与: {emotion} +{amount}リソース");
             }
         }
 
         // 感情状態を判定（最も多い感情リソース = スキルの種類）
-        var emotionState = MemoryEmotionCalculator.CalculateFromEmotionTotals(_player.EmotionResources);
+        var emotionState = MemoryEmotionCalculator.CalculateFromEmotionTotals(Player.EmotionResources);
         Debug.Log($"[BattlePresenter] プレイヤーの感情状態: {emotionState}");
 
         await UniTask.Delay(2000);
@@ -319,15 +320,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log("[BattlePresenter] デッキ選択フェーズ開始");
 
         // カードにバトルデータを初期化
-        foreach (var card in _auctionCards)
+        foreach (var card in AuctionCards)
         {
             var info = _cardNumbers[card];
             card.InitializeBattleData(info.Number, info.TotalBid);
         }
 
         // プレイヤーの獲得カード
-        var playerWonBattleCards = _player.WonCards
-            .Where(c => _auctionCards.Contains(c))
+        var playerWonBattleCards = Player.WonCards
+            .Where(c => AuctionCards.Contains(c))
             .ToList();
 
         // 不足分を補完（数字3のダミーカード）
@@ -340,11 +341,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
         using var disposables = new CompositeDisposable();
 
         // デッキ選択UIとスキルボタンを表示
-        _battleUIPresenter.InitializeDeckSelection(playerWonBattleCards);
-        _battleUIPresenter.SetSkillButtonVisible(true);
-        _battleUIPresenter.SetSkillButtonInteractable(BattleSkillExecutor.CanUseInDeckSelection(playerSkill));
+        InitializeDeckSelectionView(playerWonBattleCards);
+        BattleUIPresenter.SetSkillButtonVisible(true);
+        BattleUIPresenter.SetSkillButtonInteractable(BattleSkillExecutor.CanUseInDeckSelection(playerSkill));
 
-        _battleUIPresenter.OnSkillActivated
+        BattleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
             {
                 if (isPlayerSkillUsed || !BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck))
@@ -352,30 +353,30 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
                 // デッキ選択中に使った場合は、その後のカードバトルでは再使用させない
                 isPlayerSkillUsed = true;
-                _battleUIPresenter.RefreshDeckSelectionCardNumbers();
-                _battleUIPresenter.SetSkillButtonVisible(false);
+                BattleUIPresenter.RefreshDeckSelectionCardNumbers();
+                BattleUIPresenter.SetSkillButtonVisible(false);
                 Debug.Log($"[BattlePresenter] デッキ選択中にスキル発動: {playerSkill}");
             })
             .AddTo(disposables);
 
-        await _battleUIPresenter.WaitForDeckSelectionAsync();
+        await BattleUIPresenter.WaitForDeckSelectionAsync();
 
-        _battleUIPresenter.SetSkillButtonVisible(false);
-        _battleUIPresenter.SetSkillButtonInteractable(true);
+        BattleUIPresenter.SetSkillButtonVisible(false);
+        BattleUIPresenter.SetSkillButtonInteractable(true);
 
         // プレイヤーのデッキ構築
         var playerDeck = new BattleDeckModel();
-        playerDeck.SetDeck(_battleUIPresenter.GetSelectedDeck().ToList());
-        _battleUIPresenter.HideDeckSelection();
+        playerDeck.SetDeck(BattleUIPresenter.GetSelectedDeck().ToList());
+        BattleUIPresenter.HideDeckSelection();
 
         // 敵AIのデッキ選択
-        var enemyWonBattleCards = _enemy.WonCards
-            .Where(c => _auctionCards.Contains(c))
+        var enemyWonBattleCards = Enemy.WonCards
+            .Where(c => AuctionCards.Contains(c))
             .ToList();
         BattleDeckModel.FillWithDefaults(enemyWonBattleCards);
 
         var enemyDeck = new BattleDeckModel();
-        enemyDeck.SetDeck(_enemyAI.SelectDeck(enemyWonBattleCards));
+        enemyDeck.SetDeck(EnemyAI.SelectDeck(enemyWonBattleCards));
 
         Debug.Log($"[BattlePresenter] プレイヤーデッキ: {playerDeck.Cards.Count}枚, 敵デッキ: {enemyDeck.Cards.Count}枚");
 
@@ -402,10 +403,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var handler = new CardBattleHandler(victoryCondition, !isPlayerSkillUsedInDeckSelection);
 
         // 敵の感情状態（ランダム）
-        var enemyEmotionState = _enemyAI.DecideEmotionState();
+        var enemyEmotionState = EnemyAI.DecideEmotionState();
 
         // バトルUI初期化
-        _battleUIPresenter.InitializeBattle(victoryCondition);
+        BattleUIPresenter.InitializeBattle(victoryCondition);
 
         // ラウンドループ
         while (!handler.IsFinished)
@@ -413,36 +414,37 @@ public class BattlePresenter : IStartable, ISceneInitializable
             Debug.Log($"[BattlePresenter] ラウンド {handler.CurrentRound + 1} 開始");
 
             // コイントス
-            handler.DecideFirstPlayer();
-            await _battleUIPresenter.PlayCoinFlipAsync(handler.IsPlayerFirst);
+            DecideFirstPlayer(handler);
+            await BattleUIPresenter.PlayCoinFlipAsync(handler.IsPlayerFirst);
 
             // スキルボタン表示（カード選択中に使用可能）
-            _battleUIPresenter.SetSkillButtonVisible(handler.PlayerSkillAvailable);
-            _battleUIPresenter.SetSkillButtonInteractable(handler.PlayerSkillAvailable);
+            var showSkillButton = IsBattleSkillAvailable(handler);
+            BattleUIPresenter.SetSkillButtonVisible(showSkillButton);
+            BattleUIPresenter.SetSkillButtonInteractable(showSkillButton);
 
             // カード伏せフェーズ
-            var shouldApplyDeferredPlayerSkill = false;
-            using var playerSkillSession = new PlayerBattleSkillSession(_battleUIPresenter, handler, playerDeck, playerEmotionState);
+            bool shouldApplyDeferredPlayerSkill;
+            using var playerSkillSession = new PlayerBattleSkillSession(BattleUIPresenter, handler, playerDeck, playerEmotionState);
             playerSkillSession.BeginListening();
             if (handler.IsPlayerFirst)
             {
                 shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);
-                _enemyAI.PlaceCard(handler, enemyDeck);
-                _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
+                EnemyAI.PlaceCard(handler, enemyDeck);
+                BattleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
             }
             else
             {
-                _enemyAI.PlaceCard(handler, enemyDeck);
-                _battleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
+                EnemyAI.PlaceCard(handler, enemyDeck);
+                BattleUIPresenter.PlaceEnemyCard(handler.EnemyCard);
                 shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);
             }
 
-            _battleUIPresenter.SetSkillButtonVisible(false);
+            BattleUIPresenter.SetSkillButtonVisible(false);
 
             // 敵AIのスキル発動判定
-            if (_enemyAI.TryActivateSkill(handler, enemyDeck, enemyEmotionState))
+            if (EnemyAI.TryActivateSkill(handler, enemyDeck, enemyEmotionState))
             {
-                _battleUIPresenter.SetBattleInstruction($"敵が{enemyEmotionState.ToJapaneseName()}スキルを発動！");
+                BattleUIPresenter.SetBattleInstruction($"敵が{enemyEmotionState.ToJapaneseName()}スキルを発動！");
                 Debug.Log($"[BattlePresenter] 敵がスキル発動: {enemyEmotionState}");
                 await UniTask.Delay(1500);
             }
@@ -454,8 +456,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
             }
 
             // カードオープン
-            _battleUIPresenter.SetBattleInstruction("カードオープン！");
-            _battleUIPresenter.RevealCards(handler.PlayerCard, handler.EnemyCard);
+            BattleUIPresenter.SetBattleInstruction("カードオープン！");
+            BattleUIPresenter.RevealCards(handler.PlayerCard, handler.EnemyCard);
             await UniTask.Delay(1000);
 
             // 勝敗判定
@@ -466,17 +468,17 @@ public class BattlePresenter : IStartable, ISceneInitializable
             var result = handler.ResolveRound(competitionWinner);
 
             var resultText = result == RoundResult.PlayerWin ? "プレイヤー勝利！" : "敵の勝利...";
-            _battleUIPresenter.SetBattleInstruction(resultText);
+            BattleUIPresenter.SetBattleInstruction(resultText);
             Debug.Log($"[BattlePresenter] ラウンド {handler.CurrentRound + 1} 結果: {result}");
 
             // 次へボタン待機
-            await _battleUIPresenter.WaitForBattleNextAsync();
+            await BattleUIPresenter.WaitForBattleNextAsync();
 
             // 次ラウンド準備
             if (!handler.IsFinished)
             {
                 handler.NextRound();
-                _battleUIPresenter.ClearBattleField();
+                BattleUIPresenter.ClearBattleField();
             }
         }
 
@@ -484,7 +486,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var isPlayerWon = handler.IsPlayerWon;
         Debug.Log($"[BattlePresenter] バトル終了: {(isPlayerWon ? "プレイヤー勝利" : "プレイヤー敗北")}");
 
-        _battleUIPresenter.HideBattle();
+        BattleUIPresenter.HideBattle();
         return isPlayerWon;
     }
 
@@ -495,15 +497,16 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <param name="playerDeck">プレイヤーのバトル用デッキ</param>
     /// <param name="playerSkillSession">このラウンド中のプレイヤースキル制御</param>
     /// <returns>開示直前に遅延適用するスキルが残っている場合はtrue</returns>
-    private async UniTask<bool> PlayerPlaceCard(CardBattleHandler handler, BattleDeckModel playerDeck, PlayerBattleSkillSession playerSkillSession)
+    private async UniTask<bool> PlayerPlaceCard(
+        CardBattleHandler handler,
+        BattleDeckModel playerDeck,
+        PlayerBattleSkillSession playerSkillSession)
     {
-        _battleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
-        _battleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
-
-        var selectedCard = await _battleUIPresenter.OnBattleCardSelected.FirstAsync();
+        BattleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
+        var selectedCard = await SelectBattleCardAsync(playerDeck);
         handler.PlacePlayerCard(selectedCard);
         playerDeck.MarkAsUsed(selectedCard);
-        _battleUIPresenter.PlacePlayerCard(selectedCard);
+        BattleUIPresenter.PlacePlayerCard(selectedCard);
         await playerSkillSession.CompleteCardPlacementAsync();
         return playerSkillSession.ShouldApplyDeferredSkill;
     }
@@ -515,13 +518,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
     /// <returns>競合勝者。完全同数ならnull</returns>
     private async UniTask<bool?> HandleBattleCompetitionAsync(CardBattleHandler handler)
     {
-        _currentGameState.Value = GameState.CompetitionPhase;
-        var competitionHandler = await _competitionPhaseRunner.RunAsync(
+        CurrentGameStateInternal.Value = GameState.CompetitionPhase;
+        var competitionHandler = await CompetitionPhaseRunner.RunAsync(
             handler.PlayerCard,
             handler.PlayerCard.AuctionBidTotal,
             handler.EnemyCard.AuctionBidTotal,
             "同数のため競合発生！");
-        _currentGameState.Value = GameState.CardBattle;
+        CurrentGameStateInternal.Value = GameState.CardBattle;
         return competitionHandler.IsPlayerWon;
     }
 
@@ -538,7 +541,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         if (allCardInfoList.Count == 0)
         {
             Debug.Log("[BattlePresenter] 入札カードなし - 記憶育成フェーズをスキップ");
-            _battleUIPresenter.HideRewardView();
+            BattleUIPresenter.HideRewardView();
             return;
         }
 
@@ -559,13 +562,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var allThemes = _gameProgressService.GetAcquiredThemes();
         Debug.Log($"[BattlePresenter] 全獲得テーマ数: {allThemes.Count}");
 
-        _battleUIPresenter.ShowMemoryGrowthView(allThemes);
-        _battleUIPresenter.HideRewardView();
-
-        if (_currentEnemyData.EnemyId == "alv")
-            await _battleUIPresenter.StartTutorial("MemoryGrowthPhase");
-
-        await _battleUIPresenter.WaitForMemoryGrowthCompleteAsync();
+        BattleUIPresenter.ShowMemoryGrowthView(allThemes);
+        BattleUIPresenter.HideRewardView();
+        await OnBeforeMemoryGrowthContinueAsync();
+        await BattleUIPresenter.WaitForMemoryGrowthCompleteAsync();
     }
 
     /// <summary>
@@ -575,16 +575,16 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         var result = new List<CardAcquisitionInfo>();
 
-        foreach (var card in _auctionCards)
+        foreach (var card in AuctionCards)
         {
-            var playerBids = _player.Bids.GetBidsByEmotion(card);
-            var enemyBids = _enemy.Bids.GetBidsByEmotion(card);
+            var playerBids = Player.Bids.GetBidsByEmotion(card);
+            var enemyBids = Enemy.Bids.GetBidsByEmotion(card);
 
             // どちらも入札していないカードは除外
             if (playerBids.Count == 0 && enemyBids.Count == 0)
                 continue;
 
-            var playerWon = _player.WonCards.Contains(card);
+            var playerWon = Player.WonCards.Contains(card);
             var cardInfo = new CardAcquisitionInfo(card, playerBids, enemyBids, playerWon);
             result.Add(cardInfo);
         }
@@ -599,9 +599,9 @@ public class BattlePresenter : IStartable, ISceneInitializable
     {
         var result = new Dictionary<EmotionType, int>();
 
-        foreach (var card in _auctionCards)
+        foreach (var card in AuctionCards)
         {
-            var bidsByEmotion = _player.Bids.GetBidsByEmotion(card);
+            var bidsByEmotion = Player.Bids.GetBidsByEmotion(card);
             foreach (var kvp in bidsByEmotion)
             {
                 result.TryAdd(kvp.Key, 0);
@@ -649,15 +649,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
         Debug.Log("[BattlePresenter] デバッグ: オークションスキップ開始");
 
         // デバッグ用カード（数字1〜6）を生成
-        _auctionCards.Clear();
+        AuctionCards.Clear();
         for (var i = 1; i <= GameConstants.AUCTION_CARD_COUNT; i++)
-            _auctionCards.Add(new CardModel(i));
+            AuctionCards.Add(new CardModel(i));
 
         // カード番号マップを構築（入札0、数字は順番通り）
         _cardNumbers = new Dictionary<CardModel, CardNumberAssigner.CardNumberInfo>();
-        for (var i = 0; i < _auctionCards.Count; i++)
+        for (var i = 0; i < AuctionCards.Count; i++)
         {
-            _cardNumbers[_auctionCards[i]] = new CardNumberAssigner.CardNumberInfo
+            _cardNumbers[AuctionCards[i]] = new CardNumberAssigner.CardNumberInfo
             {
                 Number = i + 1,
                 TotalBid = 0,
@@ -665,26 +665,26 @@ public class BattlePresenter : IStartable, ISceneInitializable
         }
 
         // プレイヤーに全カードを付与（デッキ選択フェーズで3枚選ぶ）
-        foreach (var card in _auctionCards)
-            _player.AddWonCard(card);
+        foreach (var card in AuctionCards)
+            Player.AddWonCard(card);
 
         // スキルボタン初期化（DebugBattleSettingsで設定したスキルを使用）
         var playerEmotionState = DebugBattleSettings.PlayerSkill;
         Debug.Log($"[BattlePresenter] デバッグ: スキル={playerEmotionState}, 勝利条件={DebugBattleSettings.VictoryCondition}");
 
-        _battleUIPresenter.InitializeSkillButton(playerEmotionState);
-        _currentGameState.Value = GameState.DeckSelection;
+        BattleUIPresenter.InitializeSkillButton(playerEmotionState);
+        CurrentGameStateInternal.Value = GameState.DeckSelection;
 
         // デッキ選択（通常フローと同じ）
         var (playerDeck, enemyDeck, isPlayerSkillUsedInDeckSelection) = await HandleDeckSelection(playerEmotionState);
 
         // カードバトル（通常フローと同じ）
-        _currentGameState.Value = GameState.CardBattle;
+        CurrentGameStateInternal.Value = GameState.CardBattle;
         await HandleCardBattle(playerDeck, enemyDeck, playerEmotionState, DebugBattleSettings.VictoryCondition,
             isPlayerSkillUsedInDeckSelection);
 
         // 終了（記憶育成はスキップしてHome遷移）
-        _currentGameState.Value = GameState.BattleEnd;
+        CurrentGameStateInternal.Value = GameState.BattleEnd;
         VolumeController.Instance.ResetToDefault();
         await UniTask.Delay(1000);
         await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
@@ -693,7 +693,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     public void Start()
     {
-        _battleUIPresenter.SetBattlePresenter(this);
+        BattleUIPresenter.SetBattlePresenter(this);
 
         InitializeGameAsync().Forget();
         BgmManager.Instance.PlayBGM("Battle");

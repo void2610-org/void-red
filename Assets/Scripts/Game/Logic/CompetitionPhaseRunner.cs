@@ -6,7 +6,7 @@ using Void2610.UnityTemplate;
 /// <summary>
 /// オークション/バトル共通の競合フェーズ進行を担当する
 /// </summary>
-public sealed class CompetitionPhaseRunner
+public class CompetitionPhaseRunner
 {
     private readonly Player _player;
     private readonly IEnemyAIController _enemyAI;
@@ -26,7 +26,7 @@ public sealed class CompetitionPhaseRunner
     /// <param name="playerTotal">プレイヤー側の初期値</param>
     /// <param name="enemyTotal">敵側の初期値</param>
     /// <param name="instruction">競合開始時に表示する文言</param>
-    public async UniTask<CompetitionHandler> RunAsync(CardModel card, int playerTotal, int enemyTotal, string instruction)
+    public virtual async UniTask<CompetitionHandler> RunAsync(CardModel card, int playerTotal, int enemyTotal, string instruction)
     {
         var handler = new CompetitionHandler();
         handler.Start(card, playerTotal, enemyTotal);

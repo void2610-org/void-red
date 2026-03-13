@@ -57,6 +57,9 @@ public class CardBattleView : BasePhaseView
     /// <summary>指示テキストを設定</summary>
     public void SetInstruction(string text) => instructionText.text = text;
 
+    /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => ShowPlayerHand(availableCards, null);
+
     private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
     /// <summary>バトルを初期化する</summary>
@@ -71,8 +74,7 @@ public class CardBattleView : BasePhaseView
         nextButton.gameObject.SetActive(false);
     }
 
-    /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
-    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards)
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int? forcedCardIndex)
     {
         ClearPlayerHand();
         handContainer.gameObject.SetActive(true);

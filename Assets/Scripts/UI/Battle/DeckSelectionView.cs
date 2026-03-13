@@ -43,6 +43,11 @@ public class DeckSelectionView : BasePhaseView
     /// <summary>確定ボタンが押されるまで待機</summary>
     public async UniTask WaitForSelectionAsync() => await _onConfirm.FirstAsync();
 
+    /// <summary>
+    /// デッキ選択を開始する
+    /// </summary>
+    public void Initialize(IReadOnlyList<CardModel> wonCards) => Initialize(wonCards, null);
+
     private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
     private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled();
@@ -73,10 +78,7 @@ public class DeckSelectionView : BasePhaseView
         base.Hide();
     }
 
-    /// <summary>
-    /// デッキ選択を開始する
-    /// </summary>
-    public void Initialize(IReadOnlyList<CardModel> wonCards)
+    public void Initialize(IReadOnlyList<CardModel> wonCards, int[] allowedCardIndices)
     {
         Show();
         Clear();

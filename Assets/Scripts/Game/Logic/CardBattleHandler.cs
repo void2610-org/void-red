@@ -65,6 +65,9 @@ public class CardBattleHandler
     /// <summary>コイントスで先攻後攻を決定</summary>
     public void DecideFirstPlayer() => IsPlayerFirst = Random.value > 0.5f;
 
+    /// <summary>先攻後攻を直接設定する</summary>
+    public void SetFirstPlayer(bool isPlayerFirst) => IsPlayerFirst = isPlayerFirst;
+
     /// <summary>怒りスキル: 次ターンの勝利条件を反転する予約を積む</summary>
     public void QueueConditionReversedNextTurn() => _conditionReversedNextTurn = true;
 
