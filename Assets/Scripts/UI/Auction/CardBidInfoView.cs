@@ -23,24 +23,22 @@ public class CardBidInfoView : MonoBehaviour
     private readonly List<BidAmountIconView> _spawnedIcons = new();
 
     // 結果を非表示
-    public void HideResult() => resultText.gameObject.SetActive(false);
+    public void HideResult()
+    {
+        resultText.gameObject.SetActive(false);
+        ClearPlayerBidIcons();
+        enemyBidText.text = "";
+    }
 
     // 入札額を表示（両方公開）
-    public void ShowBidAmounts(int playerBid, int enemyBid)
+    public void ShowBidAmounts(int enemyBid)
     {
         ClearPlayerBidIcons();
         enemyBidText.text = $"{enemyBid}";
     }
 
-    // プレイヤーの入札額のみ表示（敵は非公開）
-    public void ShowPlayerBidOnly(int playerBid)
-    {
-        ClearPlayerBidIcons();
-        enemyBidText.text = "";
-    }
-
     // 入札対象公開用（自分の入札額は数値、相手は?）
-    public void ShowBidTargetReveal(int playerBid, bool enemyHasBid)
+    public void ShowBidTargetReveal(bool enemyHasBid)
     {
         ClearPlayerBidIcons();
         enemyBidText.text = enemyHasBid ? "?" : "";

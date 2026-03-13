@@ -163,7 +163,7 @@ public class AuctionView : BasePhaseView
             var playerBid = playerBids.GetTotalBid(auctionCard.CardModel);
             var enemyBid = enemyBids.GetTotalBid(auctionCard.CardModel);
 
-            auctionCard.BidInfoView.ShowBidTargetReveal(playerBid, enemyBid > 0);
+            auctionCard.BidInfoView.ShowBidTargetReveal(enemyBid > 0);
         }
 
         await UniTask.Delay((int)(duration * 1000));
@@ -192,12 +192,12 @@ public class AuctionView : BasePhaseView
             var cardView = targetAuctionCard.CardView;
 
             // 入札額を公開
-            bidInfoView.ShowBidAmounts(result.PlayerBid, result.EnemyBid);
+            bidInfoView.ShowBidAmounts(result.EnemyBid);
 
             if (result.NoBids)
             {
                 // 入札なし → フェードアウト
-                await cardView.PlayFadeOutAsync();
+                await targetAuctionCard.FadeOutAsync();
             }
             else if (result.IsDraw)
             {
