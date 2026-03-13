@@ -143,11 +143,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _currentGameState.Value = GameState.CardReveal;
         await HandleCardReveal();
 
-        // 3. 対話フェーズ（入札前に実施）
-        _currentGameState.Value = GameState.DialoguePhase;
-        await HandleDialoguePhase();
-
-        // 4. 入札フェーズ
+        // 3. 入札フェーズ（対話は入札中にオプションで実施）
         _currentGameState.Value = GameState.BiddingPhase;
         await HandleBiddingPhase();
 
@@ -223,25 +219,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await _battleUIPresenter.PlayPhaseTransitionOpenAsync();
     }
 
-    // === 3. 対話フェーズ（入札と同時進行） ===
-
-    private async UniTask HandleDialoguePhase()
-    {
-        _battleUIPresenter.StartAuctionDialogueSelection();
-
-        try
-        {
-            var selectedCard = await _battleUIPresenter.OnAuctionDialogueRequested.FirstAsync();
-            _battleUIPresenter.StopAuctionDialogueSelection();
-            await _battleUIPresenter.ShowAuctionCardDialogueAsync(selectedCard, _currentEnemyData);
-        }
-        finally
-        {
-            _battleUIPresenter.StopAuctionDialogueSelection();
-        }
-    }
-
-    // === 4. 入札フェーズ ===
+    // === 3. 入札フェーズ ===
 
     private async UniTask HandleBiddingPhase()
     {
