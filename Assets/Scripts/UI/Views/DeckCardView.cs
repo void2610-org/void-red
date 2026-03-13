@@ -43,6 +43,13 @@ public class DeckCardView : BaseCardView
     public Observable<CardData> OnCardClicked => _onCardClicked;
 
     private readonly Subject<CardData> _onCardClicked = new();
+    protected override CardData GetCardData() => CardModel?.Data;
+
+    // BaseCardView 抽象プロパティの実装
+    protected override Image CardImage => cardImage;
+    protected override TextMeshProUGUI CardNameText => cardNameText;
+    protected override Image CardFrame => cardFrame;
+    protected override Image GaugeImage => gaugeImage;
 
     /// <summary>
     /// カードモデルを設定して表示を更新
@@ -54,13 +61,6 @@ public class DeckCardView : BaseCardView
         CardModel = cardModel;
         UpdateDisplay(displayState);
     }
-
-    // BaseCardView 抽象プロパティの実装
-    protected override Image CardImage => cardImage;
-    protected override TextMeshProUGUI CardNameText => cardNameText;
-    protected override Image CardFrame => cardFrame;
-    protected override Image GaugeImage => gaugeImage;
-    protected override CardData GetCardData() => CardModel?.Data;
 
     /// <summary>
     /// 表示を更新
