@@ -46,12 +46,12 @@ public class TutorialBattlePresenter : BattlePresenter
     protected override EmotionType GetBattleSkill(EmotionType defaultSkill) =>
         _tutorialBattlePlayerData.BattleForcedSkillEmotion;
 
-    protected override bool ShouldAutoActivateDeckSelectionSkill(EmotionType playerSkill) => true;
+    protected override bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => true;
 
     protected override bool IsBattleSkillAvailable(CardBattleHandler handler) =>
         handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
 
-    protected override bool ShouldAutoActivateBattleSkill(CardBattleHandler handler, EmotionType playerSkill) =>
+    protected override bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill) =>
         handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
 
     protected override VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) =>
@@ -115,6 +115,9 @@ public class TutorialBattlePresenter : BattlePresenter
 
     protected override async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {
+        if (RequiresBattleSkillActivation(handler, GetBattleSkill(EmotionType.Joy)))
+            await BattleUIPresenter.OnSkillActivated.FirstAsync();
+
         var round = handler.CurrentRound;
         var forcedCardPerRound = _tutorialBattlePlayerData.ForcedCardPerRound;
         if (round < 0 || round >= forcedCardPerRound.Length || !forcedCardPerRound[round].HasValue)

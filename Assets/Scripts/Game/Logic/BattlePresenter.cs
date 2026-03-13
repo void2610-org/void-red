@@ -73,8 +73,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
     protected virtual bool IsBattleSkillAvailable(CardBattleHandler handler) => handler.PlayerSkillAvailable;
     protected virtual EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => defaultSkill;
     protected virtual EmotionType GetBattleSkill(EmotionType defaultSkill) => defaultSkill;
-    protected virtual bool ShouldAutoActivateDeckSelectionSkill(EmotionType playerSkill) => false;
-    protected virtual bool ShouldAutoActivateBattleSkill(CardBattleHandler handler, EmotionType playerSkill) => false;
+    protected virtual bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
+    protected virtual bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill) => false;
 
     protected virtual VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => defaultVictoryCondition;
 
@@ -356,15 +356,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         InitializeDeckSelectionView(playerWonBattleCards);
         BattleUIPresenter.SetSkillButtonVisible(true);
         BattleUIPresenter.SetSkillButtonInteractable(BattleSkillExecutor.CanUseInDeckSelection(playerSkill));
-
-        if (ShouldAutoActivateDeckSelectionSkill(playerSkill) &&
-            BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck))
-        {
-            isPlayerSkillUsed = true;
-            BattleUIPresenter.RefreshDeckSelectionCardNumbers();
-            BattleUIPresenter.SetSkillButtonVisible(false);
-            Debug.Log($"[BattlePresenter] デッキ選択中にスキル自動発動: {playerSkill}");
-        }
+        BattleUIPresenter.SetDeckSelectionConfirmInteractable(!RequiresDeckSelectionSkillActivation(playerSkill));
 
         BattleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
@@ -375,6 +367,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 // デッキ選択中に使った場合は、その後のカードバトルでは再使用させない
                 isPlayerSkillUsed = true;
                 BattleUIPresenter.RefreshDeckSelectionCardNumbers();
+                BattleUIPresenter.SetDeckSelectionConfirmInteractable(true);
                 BattleUIPresenter.SetSkillButtonVisible(false);
                 Debug.Log($"[BattlePresenter] デッキ選択中にスキル発動: {playerSkill}");
             })
@@ -384,6 +377,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         BattleUIPresenter.SetSkillButtonVisible(false);
         BattleUIPresenter.SetSkillButtonInteractable(true);
+        BattleUIPresenter.SetDeckSelectionConfirmInteractable(true);
 
         // プレイヤーのデッキ構築
         var playerDeck = new BattleDeckModel();
@@ -448,8 +442,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
             bool shouldApplyDeferredPlayerSkill;
             using var playerSkillSession = new PlayerBattleSkillSession(BattleUIPresenter, handler, playerDeck, playerEmotionState);
             playerSkillSession.BeginListening();
-            if (ShouldAutoActivateBattleSkill(handler, playerEmotionState))
-                playerSkillSession.ForceActivate();
             if (handler.IsPlayerFirst)
             {
                 shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);

@@ -145,6 +145,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public IReadOnlyList<CardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
     // デッキ選択中スキルの結果をViewへ反映する
     public void RefreshDeckSelectionCardNumbers() => _deckSelectionView.RefreshCardNumbers();
+    public void SetDeckSelectionConfirmInteractable(bool interactable) => _deckSelectionView.SetConfirmInteractable(interactable);
     public void HideDeckSelection() => _deckSelectionView.Hide();
 
     // スキルボタン

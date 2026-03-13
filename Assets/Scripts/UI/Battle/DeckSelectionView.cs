@@ -48,6 +48,8 @@ public class DeckSelectionView : BasePhaseView
     /// </summary>
     public void Initialize(IReadOnlyList<CardModel> wonCards) => Initialize(wonCards, null);
 
+    public void SetConfirmInteractable(bool interactable) => confirmButton.interactable = interactable;
+
     private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
     private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled();
