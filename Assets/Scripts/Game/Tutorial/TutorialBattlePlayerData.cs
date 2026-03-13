@@ -10,7 +10,7 @@ public sealed class TutorialBattlePlayerData
     public int BidRequiredAmount => 3;
 
     public int CompetitionRequiredRaises => 2;
-    public EmotionType CompetitionForcedEmotion => EmotionType.Joy;
+    public EmotionType CompetitionForcedEmotion => EmotionType.Trust;
 
     public int[] DeckAllowedCardIndices => new[] { 0, 1, 2 };
 
