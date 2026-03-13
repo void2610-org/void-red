@@ -42,6 +42,8 @@ public class BidWindowView : BaseWindowView
         _ => 2,
     };
 
+    public void SetIncreaseInteractable(bool interactable) => increaseButton.interactable = interactable;
+
     public void UpdateBidAmount(int amount)
     {
         bidAmountText.text = amount.ToString();

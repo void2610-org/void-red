@@ -89,6 +89,9 @@ public class CardBattleView : BasePhaseView
             draggableCard.OnDragEnded.Subscribe(OnCardDragEnded).AddTo(_disposables);
             draggableCard.OnDragging.Subscribe(OnCardDragging).AddTo(_disposables);
 
+            if (forcedCardIndex.HasValue)
+                draggableCard.SetInteractable(forcedCardIndex.Value == i);
+
             _handCards.Add(draggableCard);
         }
 

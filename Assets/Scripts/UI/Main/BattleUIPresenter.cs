@@ -14,6 +14,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
     public Observable<CardModel> OnAuctionDialogueRequested => _auctionView.OnDialogueRequested;
+    public Observable<EmotionType> OnAuctionEmotionSelected => _auctionView.OnEmotionSelected;
+    public Observable<int> OnAuctionCardClicked => _auctionView.OnCardClickedByIndex;
+    public Observable<Unit> OnAuctionBidIncreased => _auctionView.OnBidIncreased;
+    public Observable<Unit> OnAuctionBiddingConfirmed => _auctionView.OnBiddingConfirmed;
     public Observable<CardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
     public Observable<CardModel> OnBattleFieldCardChanged => _cardBattleView.OnFieldCardChanged;
     // 仮置き中カードを参照して、確定前でもスキル適用できるようにする
@@ -83,8 +87,22 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask WaitForCardAcquisitionCompleteAsync() =>
         await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
     public void ShowAuctionView() => _auctionView.Show();
+    public void StartAuctionBidding(
+        IReadOnlyList<CardModel> auctionCards,
+        BidModel playerBids,
+        EmotionType initialEmotion,
+        IReadOnlyDictionary<EmotionType, int> emotionResources) =>
+        _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
     public void StartAuctionDialogueSelection() => _auctionView.StartDialogueSelection();
     public void StopAuctionDialogueSelection() => _auctionView.StopDialogueSelection();
+    public void SetAuctionCardInteractable(int index, bool interactable) =>
+        _auctionView.SetCardInteractable(index, interactable);
+    public void SetAuctionAllCardsInteractable(bool interactable) =>
+        _auctionView.SetAllCardsInteractable(interactable);
+    public void SetAuctionConfirmInteractable(bool interactable) =>
+        _auctionView.SetConfirmInteractable(interactable);
+    public void SetAuctionBidIncreaseInteractable(bool interactable) =>
+        _auctionView.SetBidIncreaseInteractable(interactable);
     public async UniTask ShowAuctionResultsSequentialAsync(
         IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) =>
         await _auctionView.ShowResultsSequentialAsync(results, enemyColor);

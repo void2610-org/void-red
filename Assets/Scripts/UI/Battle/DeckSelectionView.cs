@@ -95,6 +95,9 @@ public class DeckSelectionView : BasePhaseView
             draggableCard.OnClicked.Subscribe(OnCardClicked).AddTo(_disposables);
             draggableCard.OnDragging.Subscribe(OnCardDragging).AddTo(_disposables);
 
+            if (allowedCardIndices != null)
+                draggableCard.SetInteractable(System.Array.IndexOf(allowedCardIndices, i) >= 0);
+
             _handCards.Add(draggableCard);
         }
 

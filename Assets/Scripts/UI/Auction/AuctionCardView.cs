@@ -23,6 +23,13 @@ public class AuctionCardView : MonoBehaviour
     public Observable<AuctionCardView> OnCardClicked => cardView.OnClicked.Select(_ => this);
     public Observable<AuctionCardView> OnDialogueClicked => dialogueButton.OnClickAsObservable().Select(_ => this);
 
+    public void SetInteractable(bool interactable)
+    {
+        GetComponent<CanvasGroup>().blocksRaycasts = interactable;
+        cardView.SetInteractable(interactable);
+        dialogueButton.interactable = interactable;
+    }
+
     /// <summary>
     /// カードデータで初期化
     /// </summary>
