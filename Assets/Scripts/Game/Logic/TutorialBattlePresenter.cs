@@ -191,6 +191,14 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
 
     public override async UniTask<CompetitionHandler> RunAsync(CardModel card, int playerTotal, int enemyTotal, string instruction)
     {
+        var isAuctionCompetition = instruction == "競合発生！";
+        var requiredRaises = isAuctionCompetition
+            ? _tutorialBattlePlayerData.AuctionCompetitionRequiredRaises
+            : _tutorialBattlePlayerData.BattleCompetitionRequiredRaises;
+        var forcedEmotion = isAuctionCompetition
+            ? _tutorialBattlePlayerData.AuctionCompetitionForcedEmotion
+            : _tutorialBattlePlayerData.BattleCompetitionForcedEmotion;
+
         var handler = new CompetitionHandler();
         handler.Start(card, playerTotal, enemyTotal);
 
@@ -198,28 +206,28 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
 
         _uiPresenter.SetBattleInstruction(instruction);
         _uiPresenter.ShowCompetition(handler.PlayerTotal, handler.EnemyTotal, _player.EmotionResources);
-        _uiPresenter.SetCompetitionEmotion(_tutorialBattlePlayerData.CompetitionForcedEmotion.GetPreviousEmotion());
+        _uiPresenter.SetCompetitionEmotion(forcedEmotion.GetPreviousEmotion());
         _uiPresenter.SetCompetitionRaiseInteractable(false);
         _uiPresenter.SetCompetitionEmotionInteractable(true);
 
         await _uiPresenter.OnCompetitionEmotionSelected
-            .Where(emotion => emotion == _tutorialBattlePlayerData.CompetitionForcedEmotion)
+            .Where(emotion => emotion == forcedEmotion)
             .FirstAsync();
 
         _uiPresenter.SetCompetitionEmotionInteractable(false);
         _uiPresenter.SetCompetitionRaiseInteractable(true);
 
-        while (handler.PlayerRaises.Count < _tutorialBattlePlayerData.CompetitionRequiredRaises)
+        while (handler.PlayerRaises.Count < requiredRaises)
         {
             await _uiPresenter.OnCompetitionRaise.FirstAsync();
-            if (!handler.TryPlayerRaise(_tutorialBattlePlayerData.CompetitionForcedEmotion, _player))
+            if (!handler.TryPlayerRaise(forcedEmotion, _player))
                 continue;
 
-            SeManager.Instance.PlaySe(_tutorialBattlePlayerData.CompetitionForcedEmotion.ToResourceSeName(), pitch: 1f);
+            SeManager.Instance.PlaySe(forcedEmotion.ToResourceSeName(), pitch: 1f);
             _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
             _uiPresenter.UpdateCompetitionResources(_player.EmotionResources);
 
-            if (handler.PlayerRaises.Count >= _tutorialBattlePlayerData.CompetitionRequiredRaises)
+            if (handler.PlayerRaises.Count >= requiredRaises)
                 break;
 
             _enemyAI.TryCompetitionRaise(handler);
