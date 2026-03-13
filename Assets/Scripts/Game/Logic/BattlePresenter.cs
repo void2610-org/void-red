@@ -81,6 +81,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
     protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
         currentEmotionState;
 
+    protected virtual List<CardModel> BuildPlayerDeckCards(
+        IReadOnlyList<CardModel> selectedCards,
+        IReadOnlyList<CardModel> wonCards) => selectedCards.ToList();
+
     protected virtual async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {
         BattleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
@@ -381,7 +385,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // プレイヤーのデッキ構築
         var playerDeck = new BattleDeckModel();
-        playerDeck.SetDeck(BattleUIPresenter.GetSelectedDeck().ToList());
+        playerDeck.SetDeck(BuildPlayerDeckCards(BattleUIPresenter.GetSelectedDeck(), playerWonBattleCards));
         BattleUIPresenter.HideDeckSelection();
 
         // 敵AIのデッキ選択

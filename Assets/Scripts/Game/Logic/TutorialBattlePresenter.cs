@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
@@ -59,6 +60,18 @@ public class TutorialBattlePresenter : BattlePresenter
 
     protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
         EnemyAI.DecideEmotionState();
+
+    protected override List<CardModel> BuildPlayerDeckCards(
+        IReadOnlyList<CardModel> selectedCards,
+        IReadOnlyList<CardModel> wonCards)
+    {
+        var wonCardOrder = wonCards
+            .Select((card, index) => new { card, index })
+            .ToDictionary(x => x.card, x => x.index);
+        return selectedCards
+            .OrderBy(card => wonCardOrder[card])
+            .ToList();
+    }
 
     protected override async UniTask HandleAuctionResult()
     {
@@ -123,8 +136,32 @@ public class TutorialBattlePresenter : BattlePresenter
         if (round < 0 || round >= forcedCardPerRound.Length || !forcedCardPerRound[round].HasValue)
             return await base.SelectBattleCardAsync(handler, playerDeck);
 
-        var forcedCardIndex = forcedCardPerRound[round].Value;
-        BattleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards(), forcedCardIndex);
+        var forcedDeckCardIndex = forcedCardPerRound[round].Value;
+        if (forcedDeckCardIndex < 0 || forcedDeckCardIndex >= playerDeck.Cards.Count)
+        {
+            Debug.LogError($"[TutorialBattlePresenter] 不正な強制カードインデックス: {forcedDeckCardIndex}");
+            return await base.SelectBattleCardAsync(handler, playerDeck);
+        }
+
+        var forcedCard = playerDeck.Cards[forcedDeckCardIndex];
+        var availableCards = playerDeck.GetAvailableCards();
+        var forcedAvailableCardIndex = -1;
+        for (var i = 0; i < availableCards.Count; i++)
+        {
+            if (availableCards[i] != forcedCard)
+                continue;
+
+            forcedAvailableCardIndex = i;
+            break;
+        }
+
+        if (forcedAvailableCardIndex < 0)
+        {
+            Debug.LogError($"[TutorialBattlePresenter] 強制カードが未使用札に存在しません: {forcedCard}");
+            return await base.SelectBattleCardAsync(handler, playerDeck);
+        }
+
+        BattleUIPresenter.ShowPlayerHand(availableCards, forcedAvailableCardIndex);
         return await BattleUIPresenter.OnBattleCardSelected.FirstAsync();
     }
 

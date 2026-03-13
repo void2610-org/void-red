@@ -12,7 +12,7 @@ public class TutorialEnemyAIController : IEnemyAIController
     private static readonly int[] _enemyDeckCardIndices = { 0, 1, 2 };
     // バトル感情（ラウンド毎）
     private static readonly EmotionType[] _enemyEmotionPerRound = { EmotionType.Fear, EmotionType.Joy, EmotionType.Sadness };
-    // カード配置（ラウンド毎、enemyDeck.GetAvailableCards()内のインデックス）
+    // カード配置（ラウンド毎、enemyDeck.Cards 内の固定インデックス）
     private static readonly int[] _enemyCardIndexPerRound = { 0, 1, 2 };
     // スキル発動（ラウンド毎）
     private static readonly bool[] _enemySkillPerRound = { false, true, false };
@@ -36,8 +36,20 @@ public class TutorialEnemyAIController : IEnemyAIController
 
     public void PlaceCard(CardBattleHandler handler, BattleDeckModel enemyDeck)
     {
-        var cards = enemyDeck.GetAvailableCards();
-        var card = cards[_enemyCardIndexPerRound[_roundIndex]];
+        var deckCardIndex = _enemyCardIndexPerRound[_roundIndex];
+        if (deckCardIndex < 0 || deckCardIndex >= enemyDeck.Cards.Count)
+        {
+            UnityEngine.Debug.LogError($"[TutorialEnemyAIController] 不正なカードインデックス: {deckCardIndex}");
+            return;
+        }
+
+        var card = enemyDeck.Cards[deckCardIndex];
+        if (card.IsUsed)
+        {
+            UnityEngine.Debug.LogError($"[TutorialEnemyAIController] 使用済みカードが指定されました: {card}");
+            return;
+        }
+
         handler.PlaceEnemyCard(card);
         enemyDeck.MarkAsUsed(card);
     }
