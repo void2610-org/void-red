@@ -61,11 +61,6 @@ public class TutorialBattlePresenter : BattlePresenter
 
         EnemyAI.DecideBids(AuctionCards);
 
-        using var disposables = new CompositeDisposable();
-        BattleUIPresenter.OnAuctionDialogueRequested
-            .Subscribe(card => ShowAuctionDialogueAsync(card).Forget())
-            .AddTo(disposables);
-
         await BattleUIPresenter.StartTutorial("BiddingPhase");
         await RunTutorialBiddingAsync();
 
@@ -115,14 +110,30 @@ public class TutorialBattlePresenter : BattlePresenter
 
     private async UniTask RunTutorialBiddingAsync()
     {
+        var forcedCard = AuctionCards[_tutorialBattlePlayerData.BidForcedCardIndex];
         BattleUIPresenter.StartAuctionBidding(
             AuctionCards,
             Player.Bids,
             _tutorialBattlePlayerData.BidForcedEmotion.GetPreviousEmotion(),
             Player.EmotionResources);
         BattleUIPresenter.SetAuctionAllCardsInteractable(false);
+        BattleUIPresenter.SetAuctionAllDialogueInteractable(false);
         BattleUIPresenter.SetAuctionConfirmInteractable(false);
         BattleUIPresenter.SetAuctionBidIncreaseInteractable(false);
+        BattleUIPresenter.SetAuctionEmotionInteractable(false);
+        BattleUIPresenter.SetAuctionCardInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
+        BattleUIPresenter.SetAuctionDialogueInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
+        BattleUIPresenter.StartAuctionDialogueSelection();
+
+        await BattleUIPresenter.OnAuctionDialogueRequested
+            .Where(card => card == forcedCard)
+            .FirstAsync();
+
+        await ShowAuctionDialogueAsync(forcedCard);
+
+        BattleUIPresenter.StopAuctionDialogueSelection();
+        BattleUIPresenter.SetAuctionAllCardsInteractable(false);
+        BattleUIPresenter.SetAuctionAllDialogueInteractable(false);
         BattleUIPresenter.SetAuctionEmotionInteractable(true);
 
         await BattleUIPresenter.OnAuctionEmotionSelected
@@ -131,6 +142,7 @@ public class TutorialBattlePresenter : BattlePresenter
 
         BattleUIPresenter.SetAuctionEmotionInteractable(false);
         BattleUIPresenter.SetAuctionCardInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
+        BattleUIPresenter.SetAuctionAllDialogueInteractable(false);
 
         await BattleUIPresenter.OnAuctionCardClicked
             .Where(index => index == _tutorialBattlePlayerData.BidForcedCardIndex)

@@ -99,6 +99,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _auctionView.SetEmotionInteractable(interactable);
     public void SetAuctionCardInteractable(int index, bool interactable) =>
         _auctionView.SetCardInteractable(index, interactable);
+    public void SetAuctionDialogueInteractable(int index, bool interactable) =>
+        _auctionView.SetDialogueInteractable(index, interactable);
+    public void SetAuctionAllDialogueInteractable(bool interactable) =>
+        _auctionView.SetAllDialogueInteractable(interactable);
     public void SetAuctionAllCardsInteractable(bool interactable) =>
         _auctionView.SetAllCardsInteractable(interactable);
     public void SetAuctionConfirmInteractable(bool interactable) =>

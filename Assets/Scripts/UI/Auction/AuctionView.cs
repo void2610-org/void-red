@@ -76,6 +76,20 @@ public class AuctionView : BasePhaseView
         _auctionCardViews[index].SetInteractable(interactable);
     }
 
+    public void SetAllDialogueInteractable(bool interactable)
+    {
+        foreach (var auctionCardView in _auctionCardViews)
+            auctionCardView.SetDialogueInteractable(interactable);
+    }
+
+    public void SetDialogueInteractable(int index, bool interactable)
+    {
+        if (index < 0 || index >= _auctionCardViews.Count)
+            return;
+
+        _auctionCardViews[index].SetDialogueInteractable(interactable);
+    }
+
     /// <summary>
     /// 対話フェーズ用にカードクリックだけを受け付ける
     /// </summary>
