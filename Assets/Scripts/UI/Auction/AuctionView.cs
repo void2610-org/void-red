@@ -28,14 +28,14 @@ public class AuctionView : BasePhaseView
     public Observable<CardModel> OnDialogueRequested => _onDialogueRequested;
     public Observable<EmotionType> OnEmotionSelected => _onEmotionSelected;
     public Observable<int> OnCardClickedByIndex => _onCardClickedByIndex;
-    public Observable<Unit> OnBidIncreased => _onBidIncreased;
+    public Observable<Unit> OnBidChanged => _onBidChanged;
     public Observable<Unit> OnBiddingConfirmed => _onBiddingConfirmed;
 
     private readonly List<AuctionCardView> _auctionCardViews = new();
     private readonly Subject<CardModel> _onDialogueRequested = new();
     private readonly Subject<EmotionType> _onEmotionSelected = new();
     private readonly Subject<int> _onCardClickedByIndex = new();
-    private readonly Subject<Unit> _onBidIncreased = new();
+    private readonly Subject<Unit> _onBidChanged = new();
     private readonly Subject<Unit> _onBiddingConfirmed = new();
     private CompositeDisposable _disposables = new();
 
@@ -347,7 +347,7 @@ public class AuctionView : BasePhaseView
         UpdateRemainingResourceDisplay();
         UpdateCardBidInfoDisplay(_selectedAuctionCard);
         UpdateBidWindowAmount();
-        _onBidIncreased.OnNext(Unit.Default);
+        _onBidChanged.OnNext(Unit.Default);
     }
 
     private void OnDecreaseBid()
@@ -370,6 +370,7 @@ public class AuctionView : BasePhaseView
         UpdateRemainingResourceDisplay();
         UpdateCardBidInfoDisplay(_selectedAuctionCard);
         UpdateBidWindowAmount();
+        _onBidChanged.OnNext(Unit.Default);
     }
 
     private void UpdateCardBidInfoDisplay(AuctionCardView auctionCard)
@@ -446,7 +447,7 @@ public class AuctionView : BasePhaseView
         _onDialogueRequested.Dispose();
         _onEmotionSelected.Dispose();
         _onCardClickedByIndex.Dispose();
-        _onBidIncreased.Dispose();
+        _onBidChanged.Dispose();
         _onBiddingConfirmed.Dispose();
     }
 }

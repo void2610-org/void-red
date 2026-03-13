@@ -71,6 +71,9 @@ public class TutorialBattlePresenter : BattlePresenter
     protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
         EnemyAI.DecideEmotionState();
 
+    private void UpdateTutorialBidConfirmState() =>
+        BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() >= _tutorialBattlePlayerData.BidRequiredAmount);
+
     protected override List<CardModel> BuildPlayerDeckCards(
         IReadOnlyList<CardModel> selectedCards,
         IReadOnlyList<CardModel> wonCards)
@@ -213,14 +216,24 @@ public class TutorialBattlePresenter : BattlePresenter
             .FirstAsync();
 
         BattleUIPresenter.SetAuctionBidIncreaseInteractable(true);
+        var bidChangedDisposable = BattleUIPresenter.OnAuctionBidChanged
+            .Subscribe(_ => UpdateTutorialBidConfirmState());
+        UpdateTutorialBidConfirmState();
 
-        await BattleUIPresenter.OnAuctionBidIncreased
+        await BattleUIPresenter.OnAuctionBidChanged
             .Where(_ => Player.Bids.GetTotalBidAmount() >= _tutorialBattlePlayerData.BidRequiredAmount)
             .FirstAsync();
 
-        BattleUIPresenter.SetAuctionBidIncreaseInteractable(false);
-        BattleUIPresenter.SetAuctionConfirmInteractable(true);
-        await BattleUIPresenter.OnAuctionBiddingConfirmed.FirstAsync();
+        UpdateTutorialBidConfirmState();
+
+        try
+        {
+            await BattleUIPresenter.OnAuctionBiddingConfirmed.FirstAsync();
+        }
+        finally
+        {
+            bidChangedDisposable.Dispose();
+        }
     }
 }
 

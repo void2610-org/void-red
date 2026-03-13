@@ -16,7 +16,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public Observable<CardModel> OnAuctionDialogueRequested => _auctionView.OnDialogueRequested;
     public Observable<EmotionType> OnAuctionEmotionSelected => _auctionView.OnEmotionSelected;
     public Observable<int> OnAuctionCardClicked => _auctionView.OnCardClickedByIndex;
-    public Observable<Unit> OnAuctionBidIncreased => _auctionView.OnBidIncreased;
+    public Observable<Unit> OnAuctionBidChanged => _auctionView.OnBidChanged;
     public Observable<Unit> OnAuctionBiddingConfirmed => _auctionView.OnBiddingConfirmed;
     public Observable<CardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
     public Observable<CardModel> OnBattleFieldCardChanged => _cardBattleView.OnFieldCardChanged;

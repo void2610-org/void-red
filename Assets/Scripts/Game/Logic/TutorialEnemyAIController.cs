@@ -17,15 +17,14 @@ public class TutorialEnemyAIController : IEnemyAIController
     // スキル発動（ラウンド毎）
     private static readonly bool[] _enemySkillPerRound = { false, true, false };
 
-    // 競合上乗せを行うか
-    private const bool ENEMY_COMPETITION_DO_RAISE = true;
-
     private readonly Enemy _enemy;
     private int _roundIndex;
 
     public TutorialEnemyAIController(Enemy enemy) => _enemy = enemy;
 
     public EmotionType DecideEmotionState() => _enemyEmotionPerRound[_roundIndex];
+
+    public void TryCompetitionRaise(CompetitionHandler handler) => handler.EnemyRaise(EmotionType.Fear, _enemy);
 
     public List<CardModel> SelectDeck(List<CardModel> availableCards)
     {
@@ -84,11 +83,5 @@ public class TutorialEnemyAIController : IEnemyAIController
         var result = _enemySkillPerRound[_roundIndex];
         _roundIndex++;  // スキル判定がラウンド最後の呼び出し
         return result;
-    }
-
-    public void TryCompetitionRaise(CompetitionHandler handler)
-    {
-        if (!ENEMY_COMPETITION_DO_RAISE) return;
-        handler.EnemyRaise(EmotionType.Fear, _enemy);
     }
 }
