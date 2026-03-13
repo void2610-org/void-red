@@ -1,6 +1,6 @@
 # チュートリアルバトル実装プラン
 
-対象ドキュメントは `Docs/turorial-battle-plan/tutorial-battle-player-restrictions.md`。
+対象ドキュメントは `Docs/tutorial-battle-plan/tutorial-battle-player-restrictions.md`。
 
 このディレクトリでは、実装をフェーズごとに分けて管理する。
 依存関係の強い作業を先に片付け、`TutorialBattlePresenter` 実装時の手戻りを減らす構成にしている。

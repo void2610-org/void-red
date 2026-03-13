@@ -137,7 +137,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // デッキ選択フェーズ
     public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards) =>
         _deckSelectionView.Initialize(wonCards);
-    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards, int[] allowedCardIndices) =>
+    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards, IReadOnlyList<int> allowedCardIndices) =>
         _deckSelectionView.Initialize(wonCards, allowedCardIndices);
     public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
     public IReadOnlyList<CardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
@@ -215,7 +215,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _auctionView.Show();
         _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
 
-        await _auctionView.OnBiddingComplete.FirstAsync();
+        await _auctionView.OnBiddingConfirmed.FirstAsync();
     }
 
     // AuctionViewをクリアして非表示

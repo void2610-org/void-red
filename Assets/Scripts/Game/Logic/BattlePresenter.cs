@@ -70,7 +70,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual void DecideFirstPlayer(CardBattleHandler handler) => handler.DecideFirstPlayer();
 
-    protected virtual bool IsBattleSkillAvailable(CardBattleHandler handler) => handler.PlayerSkillAvailable;
+    protected virtual bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) =>
+        handler.PlayerSkillAvailable;
+    protected virtual bool CanUseDeckSelectionSkill(EmotionType playerSkill) =>
+        BattleSkillExecutor.CanUseInDeckSelection(playerSkill);
     protected virtual EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => defaultSkill;
     protected virtual EmotionType GetBattleSkill(EmotionType defaultSkill) => defaultSkill;
     protected virtual bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
@@ -354,12 +357,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
         var previewDeck = new BattleDeckModel();
         previewDeck.SetDeck(playerWonBattleCards);
         var isPlayerSkillUsed = false;
+        var canUseDeckSelectionSkill = CanUseDeckSelectionSkill(playerSkill);
         using var disposables = new CompositeDisposable();
 
         // デッキ選択UIとスキルボタンを表示
         InitializeDeckSelectionView(playerWonBattleCards);
         BattleUIPresenter.SetSkillButtonVisible(true);
-        BattleUIPresenter.SetSkillButtonInteractable(BattleSkillExecutor.CanUseInDeckSelection(playerSkill));
+        BattleUIPresenter.SetSkillButtonInteractable(canUseDeckSelectionSkill);
         BattleUIPresenter.SetDeckSelectionConfirmInteractable(!RequiresDeckSelectionSkillActivation(playerSkill));
 
         BattleUIPresenter.OnSkillActivated
@@ -372,14 +376,13 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 isPlayerSkillUsed = true;
                 BattleUIPresenter.RefreshDeckSelectionCardNumbers();
                 BattleUIPresenter.SetDeckSelectionConfirmInteractable(true);
-                BattleUIPresenter.SetSkillButtonVisible(false);
+                BattleUIPresenter.SetSkillButtonInteractable(false);
                 Debug.Log($"[BattlePresenter] デッキ選択中にスキル発動: {playerSkill}");
             })
             .AddTo(disposables);
 
         await BattleUIPresenter.WaitForDeckSelectionAsync();
 
-        BattleUIPresenter.SetSkillButtonVisible(false);
         BattleUIPresenter.SetSkillButtonInteractable(true);
         BattleUIPresenter.SetDeckSelectionConfirmInteractable(true);
 
@@ -438,8 +441,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
             await BattleUIPresenter.PlayCoinFlipAsync(handler.IsPlayerFirst);
 
             // スキルボタン表示（カード選択中に使用可能）
-            var showSkillButton = IsBattleSkillAvailable(handler);
-            BattleUIPresenter.SetSkillButtonVisible(showSkillButton);
+            var showSkillButton = CanUseBattleSkill(handler, playerEmotionState);
+            BattleUIPresenter.SetSkillButtonVisible(true);
             BattleUIPresenter.SetSkillButtonInteractable(showSkillButton);
 
             // カード伏せフェーズ
@@ -459,7 +462,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
                 shouldApplyDeferredPlayerSkill = await PlayerPlaceCard(handler, playerDeck, playerSkillSession);
             }
 
-            BattleUIPresenter.SetSkillButtonVisible(false);
+            BattleUIPresenter.SetSkillButtonInteractable(false);
 
             // 敵AIのスキル発動判定
             if (EnemyAI.TryActivateSkill(handler, enemyDeck, enemyEmotionState))

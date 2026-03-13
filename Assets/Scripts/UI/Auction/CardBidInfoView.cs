@@ -30,7 +30,7 @@ public class CardBidInfoView : MonoBehaviour
         enemyBidText.text = "";
     }
 
-    // 入札額を表示（両方公開）
+    // 敵の入札額を表示
     public void ShowBidAmounts(int enemyBid)
     {
         ClearPlayerBidIcons();

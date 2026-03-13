@@ -11,6 +11,7 @@ using Void2610.UnityTemplate;
 public class TutorialBattlePresenter : BattlePresenter
 {
     private readonly TutorialBattlePlayerData _tutorialBattlePlayerData;
+    private readonly TutorialCompetitionPhaseRunner _auctionCompetitionPhaseRunner;
 
     public TutorialBattlePresenter(
         BattleUIPresenter battleUIPresenter,
@@ -30,26 +31,35 @@ public class TutorialBattlePresenter : BattlePresenter
     {
         _tutorialBattlePlayerData = tutorialBattlePlayerData;
         EnemyAI = new TutorialEnemyAIController(Enemy);
+        _auctionCompetitionPhaseRunner = new TutorialCompetitionPhaseRunner(
+            Player,
+            EnemyAI,
+            BattleUIPresenter,
+            _tutorialBattlePlayerData.AuctionCompetitionRequiredRaises,
+            _tutorialBattlePlayerData.AuctionCompetitionForcedEmotion);
         CompetitionPhaseRunner = new TutorialCompetitionPhaseRunner(
             Player,
             EnemyAI,
             BattleUIPresenter,
-            _tutorialBattlePlayerData);
-        AuctionProcessor = new AuctionProcessor(Player, Enemy, BattleUIPresenter, CompetitionPhaseRunner);
+            _tutorialBattlePlayerData.BattleCompetitionRequiredRaises,
+            _tutorialBattlePlayerData.BattleCompetitionForcedEmotion);
+        AuctionProcessor = new AuctionProcessor(Player, Enemy, BattleUIPresenter, _auctionCompetitionPhaseRunner);
     }
 
     protected override void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) =>
         BattleUIPresenter.InitializeDeckSelection(wonCards, _tutorialBattlePlayerData.DeckAllowedCardIndices);
 
+    protected override bool CanUseDeckSelectionSkill(EmotionType playerSkill) => false;
+
     protected override EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) =>
-        _tutorialBattlePlayerData.DeckSelectionForcedSkillEmotion;
+        _tutorialBattlePlayerData.BattleForcedSkillEmotion;
 
     protected override EmotionType GetBattleSkill(EmotionType defaultSkill) =>
         _tutorialBattlePlayerData.BattleForcedSkillEmotion;
 
-    protected override bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => true;
+    protected override bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
 
-    protected override bool IsBattleSkillAvailable(CardBattleHandler handler) =>
+    protected override bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) =>
         handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
 
     protected override bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill) =>
@@ -117,7 +127,7 @@ public class TutorialBattlePresenter : BattlePresenter
     {
         var round = handler.CurrentRound;
         var coinFlipPerRound = _tutorialBattlePlayerData.CoinFlipPerRound;
-        if (round < 0 || round >= coinFlipPerRound.Length)
+        if (round < 0 || round >= coinFlipPerRound.Count)
         {
             base.DecideFirstPlayer(handler);
             return;
@@ -133,7 +143,7 @@ public class TutorialBattlePresenter : BattlePresenter
 
         var round = handler.CurrentRound;
         var forcedCardPerRound = _tutorialBattlePlayerData.ForcedCardPerRound;
-        if (round < 0 || round >= forcedCardPerRound.Length || !forcedCardPerRound[round].HasValue)
+        if (round < 0 || round >= forcedCardPerRound.Count || !forcedCardPerRound[round].HasValue)
             return await base.SelectBattleCardAsync(handler, playerDeck);
 
         var forcedDeckCardIndex = forcedCardPerRound[round].Value;
@@ -222,60 +232,52 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
     private readonly Player _player;
     private readonly IEnemyAIController _enemyAI;
     private readonly BattleUIPresenter _uiPresenter;
-    private readonly TutorialBattlePlayerData _tutorialBattlePlayerData;
+    private readonly int _requiredRaises;
+    private readonly EmotionType _forcedEmotion;
 
     public TutorialCompetitionPhaseRunner(
         Player player,
         IEnemyAIController enemyAI,
         BattleUIPresenter uiPresenter,
-        TutorialBattlePlayerData tutorialBattlePlayerData)
+        int requiredRaises,
+        EmotionType forcedEmotion)
         : base(player, enemyAI, uiPresenter)
     {
         _player = player;
         _enemyAI = enemyAI;
         _uiPresenter = uiPresenter;
-        _tutorialBattlePlayerData = tutorialBattlePlayerData;
+        _requiredRaises = requiredRaises;
+        _forcedEmotion = forcedEmotion;
     }
 
     public override async UniTask<CompetitionHandler> RunAsync(CardModel card, int playerTotal, int enemyTotal, string instruction)
     {
-        var isAuctionCompetition = instruction == "競合発生！";
-        var requiredRaises = isAuctionCompetition
-            ? _tutorialBattlePlayerData.AuctionCompetitionRequiredRaises
-            : _tutorialBattlePlayerData.BattleCompetitionRequiredRaises;
-        var forcedEmotion = isAuctionCompetition
-            ? _tutorialBattlePlayerData.AuctionCompetitionForcedEmotion
-            : _tutorialBattlePlayerData.BattleCompetitionForcedEmotion;
-
         var handler = new CompetitionHandler();
         handler.Start(card, playerTotal, enemyTotal);
-
-        using var disposables = new CompositeDisposable();
-
         _uiPresenter.SetBattleInstruction(instruction);
         _uiPresenter.ShowCompetition(handler.PlayerTotal, handler.EnemyTotal, _player.EmotionResources);
-        _uiPresenter.SetCompetitionEmotion(forcedEmotion.GetPreviousEmotion());
+        _uiPresenter.SetCompetitionEmotion(_forcedEmotion.GetPreviousEmotion());
         _uiPresenter.SetCompetitionRaiseInteractable(false);
         _uiPresenter.SetCompetitionEmotionInteractable(true);
 
         await _uiPresenter.OnCompetitionEmotionSelected
-            .Where(emotion => emotion == forcedEmotion)
+            .Where(emotion => emotion == _forcedEmotion)
             .FirstAsync();
 
         _uiPresenter.SetCompetitionEmotionInteractable(false);
         _uiPresenter.SetCompetitionRaiseInteractable(true);
 
-        while (handler.PlayerRaises.Count < requiredRaises)
+        while (handler.PlayerRaises.Count < _requiredRaises)
         {
             await _uiPresenter.OnCompetitionRaise.FirstAsync();
-            if (!handler.TryPlayerRaise(forcedEmotion, _player))
+            if (!handler.TryPlayerRaise(_forcedEmotion, _player))
                 continue;
 
-            SeManager.Instance.PlaySe(forcedEmotion.ToResourceSeName(), pitch: 1f);
+            SeManager.Instance.PlaySe(_forcedEmotion.ToResourceSeName(), pitch: 1f);
             _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
             _uiPresenter.UpdateCompetitionResources(_player.EmotionResources);
 
-            if (handler.PlayerRaises.Count >= requiredRaises)
+            if (handler.PlayerRaises.Count >= _requiredRaises)
                 break;
 
             _enemyAI.TryCompetitionRaise(handler);

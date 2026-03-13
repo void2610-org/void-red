@@ -182,7 +182,7 @@ public sealed class TutorialBattlePlayerData
 
     // 競合フェーズ（オークション）
     public const int COMPETITION_REQUIRED_RAISES = 2;
-    public const EmotionType COMPETITION_FORCED_EMOTION = EmotionType.Joy;
+    public const EmotionType COMPETITION_FORCED_EMOTION = EmotionType.Trust;
 
     // デッキ選択
     public static readonly int[] DECK_ALLOWED_CARD_INDICES = { 0, 1, 2 };

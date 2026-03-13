@@ -178,7 +178,7 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     /// </summary>
     private void NotifySkillActivated(bool isBeforePlacement)
     {
-        _battleUIPresenter.SetSkillButtonVisible(false);
+        _battleUIPresenter.SetSkillButtonInteractable(false);
         _battleUIPresenter.SetBattleInstruction($"{_playerSkill.ToJapaneseName()}スキル発動！");
 
         var suffix = isBeforePlacement ? "（カード選択前）" : "";

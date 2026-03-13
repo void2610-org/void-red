@@ -25,7 +25,6 @@ public class AuctionView : BasePhaseView
     [Header("カード登場アニメーション")]
     [SerializeField] private StaggeredSlideInGroup cardStagger;
 
-    public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
     public Observable<CardModel> OnDialogueRequested => _onDialogueRequested;
     public Observable<EmotionType> OnEmotionSelected => _onEmotionSelected;
     public Observable<int> OnCardClickedByIndex => _onCardClickedByIndex;

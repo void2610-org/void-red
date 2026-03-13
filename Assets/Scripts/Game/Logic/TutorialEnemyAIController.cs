@@ -24,14 +24,39 @@ public class TutorialEnemyAIController : IEnemyAIController
     private int _roundIndex;
 
     public TutorialEnemyAIController(Enemy enemy) => _enemy = enemy;
-    public List<CardModel> SelectDeck(List<CardModel> availableCards) => _enemyDeckCardIndices.Select(i => availableCards[i]).ToList();
+
     public EmotionType DecideEmotionState() => _enemyEmotionPerRound[_roundIndex];
+
+    public List<CardModel> SelectDeck(List<CardModel> availableCards)
+    {
+        var selectedCards = new List<CardModel>();
+        foreach (var index in _enemyDeckCardIndices)
+        {
+            if (index < 0 || index >= availableCards.Count)
+            {
+                UnityEngine.Debug.LogError($"[TutorialEnemyAIController] 不正なデッキカードインデックス: {index}");
+                continue;
+            }
+
+            selectedCards.Add(availableCards[index]);
+        }
+
+        return selectedCards;
+    }
 
     public void DecideBids(IReadOnlyList<CardModel> auctionCards)
     {
         _enemy.Bids.Clear();
         foreach (var (cardIdx, emotion, amount) in _enemyBids)
+        {
+            if (cardIdx < 0 || cardIdx >= auctionCards.Count)
+            {
+                UnityEngine.Debug.LogError($"[TutorialEnemyAIController] 不正な入札カードインデックス: {cardIdx}");
+                continue;
+            }
+
             _enemy.Bids.SetBid(auctionCards[cardIdx], emotion, amount);
+        }
     }
 
     public void PlaceCard(CardBattleHandler handler, BattleDeckModel enemyDeck)
