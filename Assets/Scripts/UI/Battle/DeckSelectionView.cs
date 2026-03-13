@@ -43,6 +43,12 @@ public class DeckSelectionView : BasePhaseView
     /// <summary>確定ボタンが押されるまで待機</summary>
     public async UniTask WaitForSelectionAsync() => await _onConfirm.FirstAsync();
 
+    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
+
+    private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled();
+
+    private bool IsAllSlotsFilled() => deckSlots.All(s => s.IsOccupied);
+
     /// <summary>表示中カードの数字を再描画する</summary>
     public void RefreshCardNumbers()
     {
@@ -143,8 +149,6 @@ public class DeckSelectionView : BasePhaseView
         ReturnCardToHand(card);
     }
 
-    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
-
     private void OnCardDroppedToSlot(DeckSlotView slot, DraggableCardView droppedCard)
     {
         _wasDroppedToSlot = true;
@@ -231,10 +235,6 @@ public class DeckSelectionView : BasePhaseView
 
         _onConfirm.OnNext(Unit.Default);
     }
-
-    private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled();
-
-    private bool IsAllSlotsFilled() => deckSlots.All(s => s.IsOccupied);
 
     protected override void Awake()
     {

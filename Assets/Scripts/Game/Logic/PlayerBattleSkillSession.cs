@@ -28,6 +28,9 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
         _playerSkill = playerSkill;
     }
 
+    /// <summary>現在のスキルが対象選択UIを必要とするかを返す</summary>
+    private bool RequiresTargetSelection() => _playerSkill == EmotionType.Sadness;
+
     /// <summary>
     /// ラウンド中のスキル監視を開始する
     /// </summary>
@@ -167,9 +170,6 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
 
         return await _battleUIPresenter.WaitForTargetCardSelectionAsync("カードを選択してください", _playerDeck.GetAvailableCards());
     }
-
-    /// <summary>現在のスキルが対象選択UIを必要とするかを返す</summary>
-    private bool RequiresTargetSelection() => _playerSkill == EmotionType.Sadness;
 
     /// <summary>
     /// スキル発動後のUI表示とログ出力を行う

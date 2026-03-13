@@ -57,6 +57,8 @@ public class CardBattleView : BasePhaseView
     /// <summary>指示テキストを設定</summary>
     public void SetInstruction(string text) => instructionText.text = text;
 
+    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
+
     /// <summary>バトルを初期化する</summary>
     public void Initialize(VictoryCondition condition)
     {
@@ -209,8 +211,6 @@ public class CardBattleView : BasePhaseView
         // スロット外にドロップされた場合、手札に戻す
         ReturnCardToHand(card);
     }
-
-    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
     private void OnCardDroppedToField(DraggableCardView droppedCard)
     {

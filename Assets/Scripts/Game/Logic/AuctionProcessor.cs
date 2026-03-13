@@ -35,9 +35,6 @@ public class AuctionProcessor
         // AuctionViewを再表示
         _uiPresenter.ShowAuctionView();
 
-        if (enemyData.EnemyId == "alv")
-            await _uiPresenter.StartTutorial("ResultDetermination");
-
         // 全カードの落札者を判定
         var results = AuctionJudge.JudgeAll(auctionCards, _player.Bids, _enemy.Bids);
 

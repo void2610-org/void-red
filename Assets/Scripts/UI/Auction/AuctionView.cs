@@ -45,6 +45,9 @@ public class AuctionView : BasePhaseView
 
     public override void Show() => CanvasGroup.Show();
 
+    private void OnDialogueClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
+    private void OnDialogueCardClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
+
     /// <summary>
     /// 対話フェーズ用にカードクリックだけを受け付ける
     /// </summary>
@@ -262,9 +265,6 @@ public class AuctionView : BasePhaseView
         }
         return null;
     }
-
-    private void OnDialogueClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
-    private void OnDialogueCardClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
 
     private void OnCardClicked(AuctionCardView auctionCard)
     {
