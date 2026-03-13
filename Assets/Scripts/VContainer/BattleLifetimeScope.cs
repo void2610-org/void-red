@@ -13,9 +13,11 @@ public class BattleLifetimeScope : LifetimeScope
     {
         // GameProgressServiceを親コンテナから取得
         var gameProgressService = Parent.Container.Resolve<GameProgressService>();
+        var isTutorialBattle = IsTutorialBattle(gameProgressService);
 
         // 全オークションデータを登録
         builder.RegisterInstance(allAuctionData);
+        builder.Register<TutorialBattlePlayerData>(Lifetime.Singleton);
 
         // Player Model・HandView の作成
         _player = new Player(gameProgressService);
@@ -25,7 +27,14 @@ public class BattleLifetimeScope : LifetimeScope
         _enemy = new Enemy(gameProgressService);
         builder.RegisterInstance(_enemy).AsSelf();
 
-        builder.RegisterEntryPoint<BattlePresenter>().AsSelf().As<ISceneInitializable>();
+        if (isTutorialBattle)
+        {
+            builder.RegisterEntryPoint<TutorialBattlePresenter>().As<BattlePresenter>().As<ISceneInitializable>();
+        }
+        else
+        {
+            builder.RegisterEntryPoint<BattlePresenter>().AsSelf().As<ISceneInitializable>();
+        }
         builder.RegisterEntryPoint<BattleUIPresenter>().AsSelf();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
         builder.RegisterEntryPoint<MentalPowerEffectController>();
@@ -34,5 +43,14 @@ public class BattleLifetimeScope : LifetimeScope
 
         // Settings機能を登録（バトル用：SettingButtonView無し）
         builder.RegisterSettingsFeatureForBattle();
+    }
+
+    private bool IsTutorialBattle(GameProgressService gameProgressService)
+    {
+        if (gameProgressService.GetCurrentNode() is not BattleNode battleNode)
+            return false;
+
+        var auctionData = allAuctionData.GetAuctionById(battleNode.AuctionId);
+        return auctionData && auctionData.Enemy && auctionData.Enemy.EnemyId == "alv";
     }
 }
