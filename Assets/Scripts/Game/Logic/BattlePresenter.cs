@@ -17,7 +17,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly AllAuctionData _allAuctionData;
 
-    private readonly EnemyAIController _enemyAI;
+    private readonly IEnemyAIController _enemyAI;
     private readonly AuctionProcessor _auctionProcessor;
     private readonly CompetitionPhaseRunner _competitionPhaseRunner;
 
@@ -48,7 +48,15 @@ public class BattlePresenter : IStartable, ISceneInitializable
         _sceneTransitionManager = sceneTransitionManager;
         _allAuctionData = allAuctionData;
 
-        _enemyAI = new EnemyAIController(_enemy);
+        // チュートリアル判定
+        var currentNode = gameProgressService.GetCurrentNode();
+        var isTutorial = false;
+        if (currentNode is BattleNode battleNode)
+        {
+            isTutorial = allAuctionData.GetAuctionById(battleNode.AuctionId).Enemy.EnemyId == "alv";
+        }
+
+        _enemyAI = isTutorial ? new TutorialEnemyAIController(_enemy) : new EnemyAIController(_enemy);
         _competitionPhaseRunner = new CompetitionPhaseRunner(_player, _enemyAI, _battleUIPresenter);
         _auctionProcessor = new AuctionProcessor(_player, _enemy, _battleUIPresenter, _competitionPhaseRunner);
 
@@ -654,17 +662,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         }
     }
 
-    public void Start()
-    {
-        _battleUIPresenter.SetBattlePresenter(this);
-
-        InitializeGameAsync().Forget();
-        BgmManager.Instance.PlayBGM("Battle");
-    }
-
 #if UNITY_EDITOR
-    // === デバッグ: オークションスキップ ===
-
     /// <summary>
     /// デバッグ用：オークションをスキップしてバトルフェーズから開始する
     /// </summary>
@@ -678,7 +676,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             _auctionCards.Add(new CardModel(i));
 
         // カード番号マップを構築（入札0、数字は順番通り）
-        _cardNumbers = new System.Collections.Generic.Dictionary<CardModel, CardNumberAssigner.CardNumberInfo>();
+        _cardNumbers = new Dictionary<CardModel, CardNumberAssigner.CardNumberInfo>();
         for (var i = 0; i < _auctionCards.Count; i++)
         {
             _cardNumbers[_auctionCards[i]] = new CardNumberAssigner.CardNumberInfo
@@ -714,4 +712,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
     }
 #endif
+
+    public void Start()
+    {
+        _battleUIPresenter.SetBattlePresenter(this);
+
+        InitializeGameAsync().Forget();
+        BgmManager.Instance.PlayBGM("Battle");
+    }
 }

@@ -9,10 +9,10 @@ using Void2610.UnityTemplate;
 public sealed class CompetitionPhaseRunner
 {
     private readonly Player _player;
-    private readonly EnemyAIController _enemyAI;
+    private readonly IEnemyAIController _enemyAI;
     private readonly BattleUIPresenter _uiPresenter;
 
-    public CompetitionPhaseRunner(Player player, EnemyAIController enemyAI, BattleUIPresenter uiPresenter)
+    public CompetitionPhaseRunner(Player player, IEnemyAIController enemyAI, BattleUIPresenter uiPresenter)
     {
         _player = player;
         _enemyAI = enemyAI;
