@@ -95,6 +95,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
     public void StartAuctionDialogueSelection() => _auctionView.StartDialogueSelection();
     public void StopAuctionDialogueSelection() => _auctionView.StopDialogueSelection();
+    public void SetAuctionEmotionInteractable(bool interactable) =>
+        _auctionView.SetEmotionInteractable(interactable);
     public void SetAuctionCardInteractable(int index, bool interactable) =>
         _auctionView.SetCardInteractable(index, interactable);
     public void SetAuctionAllCardsInteractable(bool interactable) =>
@@ -121,6 +123,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // 競合フェーズ
     public void ShowCompetition(int playerBid, int enemyBid, IReadOnlyDictionary<EmotionType, int> resources) =>
         _competitionView.Initialize(playerBid, enemyBid, resources);
+    public void SetCompetitionEmotion(EmotionType emotion) => _competitionView.SetSelectedEmotion(emotion);
+    public void SetCompetitionEmotionInteractable(bool interactable) => _competitionView.SetEmotionInteractable(interactable);
+    public void SetCompetitionRaiseInteractable(bool interactable) => _competitionView.SetRaiseInteractable(interactable);
     public void UpdateCompetitionBids(int playerBid, int enemyBid) => _competitionView.UpdateBids(playerBid, enemyBid);
     public void UpdateCompetitionTimer(float remaining, float max) => _competitionView.UpdateTimer(remaining, max);
     public void UpdateCompetitionResources(IReadOnlyDictionary<EmotionType, int> resources) =>

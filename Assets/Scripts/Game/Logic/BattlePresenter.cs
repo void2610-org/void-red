@@ -72,7 +72,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual bool IsBattleSkillAvailable(CardBattleHandler handler) => handler.PlayerSkillAvailable;
 
-    protected virtual async UniTask<CardModel> SelectBattleCardAsync(BattleDeckModel playerDeck)
+    protected virtual async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {
         BattleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
         return await BattleUIPresenter.OnBattleCardSelected.FirstAsync();
@@ -111,6 +111,17 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // 入札対象カード公開演出
         await BattleUIPresenter.ShowBidTargetsAsync(Player.Bids, Enemy.Bids);
+    }
+
+    /// <summary>
+    /// オークション中にカード対話を表示する
+    /// </summary>
+    /// <param name="card">対話対象のカード</param>
+    protected async UniTask ShowAuctionDialogueAsync(CardModel card)
+    {
+        CurrentGameStateInternal.Value = GameState.DialoguePhase;
+        await BattleUIPresenter.ShowAuctionCardDialogueAsync(card, _currentEnemyData);
+        CurrentGameStateInternal.Value = GameState.BiddingPhase;
     }
 
     private void InitializeAuctionData()
@@ -251,17 +262,6 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // トランジション：開く（黒フェードから復帰）
         await BattleUIPresenter.PlayPhaseTransitionOpenAsync();
-    }
-
-    /// <summary>
-    /// オークション中にカード対話を表示する
-    /// </summary>
-    /// <param name="card">対話対象のカード</param>
-    private async UniTask ShowAuctionDialogueAsync(CardModel card)
-    {
-        CurrentGameStateInternal.Value = GameState.DialoguePhase;
-        await BattleUIPresenter.ShowAuctionCardDialogueAsync(card, _currentEnemyData);
-        CurrentGameStateInternal.Value = GameState.BiddingPhase;
     }
 
     // === 6. リザルトフェーズ ===
@@ -503,7 +503,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         PlayerBattleSkillSession playerSkillSession)
     {
         BattleUIPresenter.SetBattleInstruction("伏せるカードを選んでください");
-        var selectedCard = await SelectBattleCardAsync(playerDeck);
+        var selectedCard = await SelectBattleCardAsync(handler, playerDeck);
         handler.PlacePlayerCard(selectedCard);
         playerDeck.MarkAsUsed(selectedCard);
         BattleUIPresenter.PlacePlayerCard(selectedCard);

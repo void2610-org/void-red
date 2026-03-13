@@ -30,6 +30,8 @@ public class EmotionResourceDisplayView : MonoBehaviour
     private float _currentAngle;
     private bool _isRotating;
 
+    public void SetInteractable(bool interactable) => wheelButton.interactable = interactable;
+
     public void SetSelectedEmotion(EmotionType emotion)
     {
         // emotionに対応するindexを見つけて即座に設定

@@ -55,6 +55,8 @@ public class AuctionView : BasePhaseView
 
     public void SetBidIncreaseInteractable(bool interactable) => bidWindowView.SetIncreaseInteractable(interactable);
 
+    public void SetEmotionInteractable(bool interactable) => emotionResourceDisplayView.SetInteractable(interactable);
+
     public override void Show() => CanvasGroup.Show();
 
     private void OnDialogueClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
