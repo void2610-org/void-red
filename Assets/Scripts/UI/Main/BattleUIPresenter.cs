@@ -93,8 +93,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         EmotionType initialEmotion,
         IReadOnlyDictionary<EmotionType, int> emotionResources) =>
         _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
-    public void StartAuctionDialogueSelection() => _auctionView.StartDialogueSelection();
-    public void StopAuctionDialogueSelection() => _auctionView.StopDialogueSelection();
     public void SetAuctionEmotionInteractable(bool interactable) =>
         _auctionView.SetEmotionInteractable(interactable);
     public void SetAuctionCardInteractable(int index, bool interactable) =>

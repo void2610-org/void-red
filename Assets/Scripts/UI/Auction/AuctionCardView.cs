@@ -23,13 +23,14 @@ public class AuctionCardView : MonoBehaviour
     public Observable<AuctionCardView> OnCardClicked => cardView.OnClicked.Select(_ => this);
     public Observable<AuctionCardView> OnDialogueClicked => dialogueButton.OnClickAsObservable().Select(_ => this);
 
+    public void SetCardInteractable(bool interactable) => cardView.SetInteractable(interactable);
+
     public void SetDialogueInteractable(bool interactable) => dialogueButton.interactable = interactable;
 
     public void SetInteractable(bool interactable)
     {
-        GetComponent<CanvasGroup>().blocksRaycasts = interactable;
-        cardView.SetInteractable(interactable);
-        dialogueButton.interactable = interactable;
+        SetCardInteractable(interactable);
+        SetDialogueInteractable(interactable);
     }
 
     /// <summary>

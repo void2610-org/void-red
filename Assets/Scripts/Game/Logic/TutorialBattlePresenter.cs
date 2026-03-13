@@ -178,9 +178,7 @@ public class TutorialBattlePresenter : BattlePresenter
         BattleUIPresenter.SetAuctionConfirmInteractable(false);
         BattleUIPresenter.SetAuctionBidIncreaseInteractable(false);
         BattleUIPresenter.SetAuctionEmotionInteractable(false);
-        BattleUIPresenter.SetAuctionCardInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
         BattleUIPresenter.SetAuctionDialogueInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
-        BattleUIPresenter.StartAuctionDialogueSelection();
 
         await BattleUIPresenter.OnAuctionDialogueRequested
             .Where(card => card == forcedCard)
@@ -188,7 +186,6 @@ public class TutorialBattlePresenter : BattlePresenter
 
         await ShowAuctionDialogueAsync(forcedCard);
 
-        BattleUIPresenter.StopAuctionDialogueSelection();
         BattleUIPresenter.SetAuctionAllCardsInteractable(false);
         BattleUIPresenter.SetAuctionAllDialogueInteractable(false);
         BattleUIPresenter.SetAuctionEmotionInteractable(true);
