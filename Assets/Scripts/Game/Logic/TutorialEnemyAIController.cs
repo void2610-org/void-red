@@ -7,7 +7,7 @@ using System.Linq;
 public class TutorialEnemyAIController : IEnemyAIController
 {
     // 入札: (カードインデックス, 感情, 量)
-    private static readonly (int cardIdx, EmotionType emotion, int amount)[] _enemyBids = { (1, EmotionType.Fear, 2) };
+    private static readonly (int cardIdx, EmotionType emotion, int amount)[] _enemyBids = { (0, EmotionType.Fear, 3) };
     // デッキ選択: enemy.Cardsリスト内のインデックス
     private static readonly int[] _enemyDeckCardIndices = { 0, 1, 2 };
     // バトル感情（ラウンド毎）
