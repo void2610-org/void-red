@@ -47,6 +47,12 @@ public class CompetitionView : BasePhaseView
     public void UpdateResources(IReadOnlyDictionary<EmotionType, int> resources) =>
         emotionResourceDisplayView.UpdateResources(resources);
 
+    public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
+
+    public void SetEmotionInteractable(bool interactable) => emotionResourceDisplayView.SetInteractable(interactable);
+
+    public void SetRaiseInteractable(bool interactable) => raiseButton.interactable = interactable;
+
     /// <summary>
     /// 競合UIを初期化して表示
     /// </summary>

@@ -8,9 +8,6 @@ using UnityEngine;
 /// </summary>
 public static class DebugBattleSettings
 {
-    private const string SKIP_AUCTION_KEY = "DebugBattleSettings.SkipAuction";
-    private const string PLAYER_SKILL_KEY = "DebugBattleSettings.PlayerSkill";
-    private const string VICTORY_CONDITION_KEY = "DebugBattleSettings.VictoryCondition";
 
     /// <summary>オークションをスキップしてバトルから開始するか</summary>
     public static bool SkipAuction
@@ -32,23 +29,12 @@ public static class DebugBattleSettings
         get => (VictoryCondition)EditorPrefs.GetInt(VICTORY_CONDITION_KEY, (int)VictoryCondition.HigherWins);
         set => EditorPrefs.SetInt(VICTORY_CONDITION_KEY, (int)value);
     }
-
-    [MenuItem("Debug/Battle/オークションスキップ ON")]
-    private static void EnableSkipAuction()
-    {
-        SkipAuction = true;
-        Debug.Log("[Debug] オークションスキップ: ON");
-    }
+    private const string SKIP_AUCTION_KEY = "DebugBattleSettings.SkipAuction";
+    private const string PLAYER_SKILL_KEY = "DebugBattleSettings.PlayerSkill";
+    private const string VICTORY_CONDITION_KEY = "DebugBattleSettings.VictoryCondition";
 
     [MenuItem("Debug/Battle/オークションスキップ ON", true)]
     private static bool EnableSkipAuctionValidate() => !SkipAuction;
-
-    [MenuItem("Debug/Battle/オークションスキップ OFF")]
-    private static void DisableSkipAuction()
-    {
-        SkipAuction = false;
-        Debug.Log("[Debug] オークションスキップ: OFF");
-    }
 
     [MenuItem("Debug/Battle/オークションスキップ OFF", true)]
     private static bool DisableSkipAuctionValidate() => SkipAuction;
@@ -76,6 +62,20 @@ public static class DebugBattleSettings
 
     [MenuItem("Debug/Battle/スキル設定/Sadness（数字を3に）")]
     private static void SetSkillSadness() => SetSkill(EmotionType.Sadness);
+
+    [MenuItem("Debug/Battle/オークションスキップ ON")]
+    private static void EnableSkipAuction()
+    {
+        SkipAuction = true;
+        Debug.Log("[Debug] オークションスキップ: ON");
+    }
+
+    [MenuItem("Debug/Battle/オークションスキップ OFF")]
+    private static void DisableSkipAuction()
+    {
+        SkipAuction = false;
+        Debug.Log("[Debug] オークションスキップ: OFF");
+    }
 
     [MenuItem("Debug/Battle/勝利条件/HigherWins（大きい数字が勝ち）")]
     private static void SetVictoryHigher()

@@ -57,6 +57,11 @@ public class CardBattleView : BasePhaseView
     /// <summary>指示テキストを設定</summary>
     public void SetInstruction(string text) => instructionText.text = text;
 
+    /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => ShowPlayerHand(availableCards, null);
+
+    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
+
     /// <summary>バトルを初期化する</summary>
     public void Initialize(VictoryCondition condition)
     {
@@ -69,8 +74,7 @@ public class CardBattleView : BasePhaseView
         nextButton.gameObject.SetActive(false);
     }
 
-    /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
-    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards)
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int? forcedCardIndex)
     {
         ClearPlayerHand();
         handContainer.gameObject.SetActive(true);
@@ -84,6 +88,9 @@ public class CardBattleView : BasePhaseView
             draggableCard.OnDragStarted.Subscribe(OnCardDragStarted).AddTo(_disposables);
             draggableCard.OnDragEnded.Subscribe(OnCardDragEnded).AddTo(_disposables);
             draggableCard.OnDragging.Subscribe(OnCardDragging).AddTo(_disposables);
+
+            if (forcedCardIndex.HasValue)
+                draggableCard.SetInteractable(forcedCardIndex.Value == i);
 
             _handCards.Add(draggableCard);
         }
@@ -209,8 +216,6 @@ public class CardBattleView : BasePhaseView
         // スロット外にドロップされた場合、手札に戻す
         ReturnCardToHand(card);
     }
-
-    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
     private void OnCardDroppedToField(DraggableCardView droppedCard)
     {

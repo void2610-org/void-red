@@ -22,21 +22,6 @@ public abstract class BaseCardView : MonoBehaviour
     protected abstract CardData GetCardData();
 
     /// <summary>
-    /// ゲージの表示を更新
-    /// </summary>
-    private void UpdateGaugeDisplay(CardData cardData, CardDisplayState displayState)
-    {
-        if (displayState == CardDisplayState.Backside)
-        {
-            GaugeImage.color = Color.clear;
-            return;
-        }
-
-        GaugeImage.color = cardData.MemoryType.ToGaugeColor();
-        GaugeImage.fillAmount = (float)cardData.EffectAmount / GameConstants.MAX_GAUGE_VALUE;
-    }
-
-    /// <summary>
     /// カードの基本表示を更新（画像、名前、バナー、フレーム）
     /// 状態に応じた色変更を適用
     /// </summary>
@@ -86,5 +71,20 @@ public abstract class BaseCardView : MonoBehaviour
                 CardNameText.text = string.Empty;
                 break;
         }
+    }
+
+    /// <summary>
+    /// ゲージの表示を更新
+    /// </summary>
+    private void UpdateGaugeDisplay(CardData cardData, CardDisplayState displayState)
+    {
+        if (displayState == CardDisplayState.Backside)
+        {
+            GaugeImage.color = Color.clear;
+            return;
+        }
+
+        GaugeImage.color = cardData.MemoryType.ToGaugeColor();
+        GaugeImage.fillAmount = (float)cardData.EffectAmount / GameConstants.MAX_GAUGE_VALUE;
     }
 }

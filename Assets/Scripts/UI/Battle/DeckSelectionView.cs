@@ -38,10 +38,28 @@ public class DeckSelectionView : BasePhaseView
     private readonly Subject<Unit> _onConfirm = new();
     private CompositeDisposable _disposables = new();
     private bool _wasDroppedToSlot;
+    private bool _isConfirmInteractableByPresenter = true;
     private RectTransform _handContainerRect;
 
     /// <summary>確定ボタンが押されるまで待機</summary>
     public async UniTask WaitForSelectionAsync() => await _onConfirm.FirstAsync();
+
+    /// <summary>
+    /// デッキ選択を開始する
+    /// </summary>
+    public void Initialize(IReadOnlyList<CardModel> wonCards) => Initialize(wonCards, null);
+
+    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
+
+    private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled() && _isConfirmInteractableByPresenter;
+
+    private bool IsAllSlotsFilled() => deckSlots.All(s => s.IsOccupied);
+
+    public void SetConfirmInteractable(bool interactable)
+    {
+        _isConfirmInteractableByPresenter = interactable;
+        UpdateConfirmButton();
+    }
 
     /// <summary>表示中カードの数字を再描画する</summary>
     public void RefreshCardNumbers()
@@ -67,10 +85,7 @@ public class DeckSelectionView : BasePhaseView
         base.Hide();
     }
 
-    /// <summary>
-    /// デッキ選択を開始する
-    /// </summary>
-    public void Initialize(IReadOnlyList<CardModel> wonCards)
+    public void Initialize(IReadOnlyList<CardModel> wonCards, IReadOnlyList<int> allowedCardIndices)
     {
         Show();
         Clear();
@@ -86,6 +101,9 @@ public class DeckSelectionView : BasePhaseView
             draggableCard.OnDragEnded.Subscribe(OnCardDragEnded).AddTo(_disposables);
             draggableCard.OnClicked.Subscribe(OnCardClicked).AddTo(_disposables);
             draggableCard.OnDragging.Subscribe(OnCardDragging).AddTo(_disposables);
+
+            if (allowedCardIndices != null)
+                draggableCard.SetInteractable(allowedCardIndices.Contains(i));
 
             _handCards.Add(draggableCard);
         }
@@ -110,6 +128,7 @@ public class DeckSelectionView : BasePhaseView
     {
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
+        _isConfirmInteractableByPresenter = true;
 
         foreach (var slot in deckSlots) slot.RemoveCard();
         foreach (var card in _handCards) Destroy(card.gameObject);
@@ -142,8 +161,6 @@ public class DeckSelectionView : BasePhaseView
 
         ReturnCardToHand(card);
     }
-
-    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
     private void OnCardDroppedToSlot(DeckSlotView slot, DraggableCardView droppedCard)
     {
@@ -231,10 +248,6 @@ public class DeckSelectionView : BasePhaseView
 
         _onConfirm.OnNext(Unit.Default);
     }
-
-    private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled();
-
-    private bool IsAllSlotsFilled() => deckSlots.All(s => s.IsOccupied);
 
     protected override void Awake()
     {

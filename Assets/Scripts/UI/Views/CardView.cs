@@ -46,6 +46,8 @@ public class CardView : BaseCardView
 
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
 
+    protected override CardData GetCardData() => CardData;
+
     /// <summary>
     /// カードデータを設定して初期化
     /// </summary>
@@ -113,8 +115,6 @@ public class CardView : BaseCardView
         var luminance = 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
         return Mathf.Lerp(4.0f, 1.5f, Mathf.Clamp01(luminance));
     }
-
-    protected override CardData GetCardData() => CardData;
 
     private void Awake()
     {

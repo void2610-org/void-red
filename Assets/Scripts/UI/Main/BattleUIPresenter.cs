@@ -14,6 +14,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public Observable<Unit> OnCompetitionRaise => _competitionView.OnRaise;
     public Observable<EmotionType> OnCompetitionEmotionSelected => _competitionView.OnEmotionSelected;
     public Observable<CardModel> OnAuctionDialogueRequested => _auctionView.OnDialogueRequested;
+    public Observable<EmotionType> OnAuctionEmotionSelected => _auctionView.OnEmotionSelected;
+    public Observable<int> OnAuctionCardClicked => _auctionView.OnCardClickedByIndex;
+    public Observable<Unit> OnAuctionBidChanged => _auctionView.OnBidChanged;
+    public Observable<Unit> OnAuctionBiddingConfirmed => _auctionView.OnBiddingConfirmed;
     public Observable<CardModel> OnBattleCardSelected => _cardBattleView.OnCardSelected;
     public Observable<CardModel> OnBattleFieldCardChanged => _cardBattleView.OnFieldCardChanged;
     // 仮置き中カードを参照して、確定前でもスキル適用できるようにする
@@ -83,8 +87,26 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask WaitForCardAcquisitionCompleteAsync() =>
         await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
     public void ShowAuctionView() => _auctionView.Show();
-    public void StartAuctionDialogueSelection() => _auctionView.StartDialogueSelection();
-    public void StopAuctionDialogueSelection() => _auctionView.StopDialogueSelection();
+    public void StartAuctionBidding(
+        IReadOnlyList<CardModel> auctionCards,
+        BidModel playerBids,
+        EmotionType initialEmotion,
+        IReadOnlyDictionary<EmotionType, int> emotionResources) =>
+        _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
+    public void SetAuctionEmotionInteractable(bool interactable) =>
+        _auctionView.SetEmotionInteractable(interactable);
+    public void SetAuctionCardInteractable(int index, bool interactable) =>
+        _auctionView.SetCardInteractable(index, interactable);
+    public void SetAuctionDialogueInteractable(int index, bool interactable) =>
+        _auctionView.SetDialogueInteractable(index, interactable);
+    public void SetAuctionAllDialogueInteractable(bool interactable) =>
+        _auctionView.SetAllDialogueInteractable(interactable);
+    public void SetAuctionAllCardsInteractable(bool interactable) =>
+        _auctionView.SetAllCardsInteractable(interactable);
+    public void SetAuctionConfirmInteractable(bool interactable) =>
+        _auctionView.SetConfirmInteractable(interactable);
+    public void SetAuctionBidIncreaseInteractable(bool interactable) =>
+        _auctionView.SetBidIncreaseInteractable(interactable);
     public async UniTask ShowAuctionResultsSequentialAsync(
         IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) =>
         await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
@@ -103,6 +125,9 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // 競合フェーズ
     public void ShowCompetition(int playerBid, int enemyBid, IReadOnlyDictionary<EmotionType, int> resources) =>
         _competitionView.Initialize(playerBid, enemyBid, resources);
+    public void SetCompetitionEmotion(EmotionType emotion) => _competitionView.SetSelectedEmotion(emotion);
+    public void SetCompetitionEmotionInteractable(bool interactable) => _competitionView.SetEmotionInteractable(interactable);
+    public void SetCompetitionRaiseInteractable(bool interactable) => _competitionView.SetRaiseInteractable(interactable);
     public void UpdateCompetitionBids(int playerBid, int enemyBid) => _competitionView.UpdateBids(playerBid, enemyBid);
     public void UpdateCompetitionTimer(float remaining, float max) => _competitionView.UpdateTimer(remaining, max);
     public void UpdateCompetitionResources(IReadOnlyDictionary<EmotionType, int> resources) =>
@@ -112,10 +137,13 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     // デッキ選択フェーズ
     public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards) =>
         _deckSelectionView.Initialize(wonCards);
+    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards, IReadOnlyList<int> allowedCardIndices) =>
+        _deckSelectionView.Initialize(wonCards, allowedCardIndices);
     public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
     public IReadOnlyList<CardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
     // デッキ選択中スキルの結果をViewへ反映する
     public void RefreshDeckSelectionCardNumbers() => _deckSelectionView.RefreshCardNumbers();
+    public void SetDeckSelectionConfirmInteractable(bool interactable) => _deckSelectionView.SetConfirmInteractable(interactable);
     public void HideDeckSelection() => _deckSelectionView.Hide();
 
     // スキルボタン
@@ -132,6 +160,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardBattleView.Initialize(condition);
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) =>
         _cardBattleView.ShowPlayerHand(availableCards);
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int forcedCardIndex) =>
+        _cardBattleView.ShowPlayerHand(availableCards, forcedCardIndex);
     public void PlacePlayerCard(CardModel card) => _cardBattleView.PlacePlayerCard(card);
     public void PlaceEnemyCard(CardModel card) => _cardBattleView.PlaceEnemyCard(card);
     public void RevealCards(CardModel playerCard, CardModel enemyCard) =>
@@ -185,7 +215,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _auctionView.Show();
         _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
 
-        await _auctionView.OnBiddingComplete.FirstAsync();
+        await _auctionView.OnBiddingConfirmed.FirstAsync();
     }
 
     // AuctionViewをクリアして非表示

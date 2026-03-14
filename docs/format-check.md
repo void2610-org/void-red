@@ -157,10 +157,13 @@ public int Calculate()
 | 4 | private fields | その他の private フィールド（readonly 含む） |
 | 5 | constructors | コンストラクタ |
 | 6 | public methods (one line) | 式本体 (`=>`) の public メソッド |
-| 7 | public methods (multi line) | ブロック本体の public メソッド |
-| 8 | private methods | private/protected/internal メソッド（Unity event、cleanup 以外） |
-| 9 | Unity events | `Awake`, `Start`, `Update`, `OnEnable`, `OnDisable` 等 |
-| 10 | cleanup | `OnDestroy`, `Dispose` |
+| 7 | protected methods (one line) | 式本体 (`=>`) の protected/internal メソッド |
+| 8 | private methods (one line) | 式本体 (`=>`) の private メソッド |
+| 9 | public methods (multi line) | ブロック本体の public メソッド |
+| 10 | protected methods (multi line) | ブロック本体の protected/internal メソッド |
+| 11 | private methods (multi line) | ブロック本体の private メソッド |
+| 12 | Unity events | `Awake`, `Start`, `Update`, `OnEnable`, `OnDisable` 等 |
+| 13 | cleanup | `OnDestroy`, `Dispose` |
 
 ```csharp
 public class Player : MonoBehaviour

@@ -25,13 +25,19 @@ public class AuctionView : BasePhaseView
     [Header("カード登場アニメーション")]
     [SerializeField] private StaggeredSlideInGroup cardStagger;
 
-    public Observable<Unit> OnBiddingComplete => confirmBiddingButton.OnClickAsObservable();
     public Observable<CardModel> OnDialogueRequested => _onDialogueRequested;
+    public Observable<EmotionType> OnEmotionSelected => _onEmotionSelected;
+    public Observable<int> OnCardClickedByIndex => _onCardClickedByIndex;
+    public Observable<Unit> OnBidChanged => _onBidChanged;
+    public Observable<Unit> OnBiddingConfirmed => _onBiddingConfirmed;
 
     private readonly List<AuctionCardView> _auctionCardViews = new();
     private readonly Subject<CardModel> _onDialogueRequested = new();
+    private readonly Subject<EmotionType> _onEmotionSelected = new();
+    private readonly Subject<int> _onCardClickedByIndex = new();
+    private readonly Subject<Unit> _onBidChanged = new();
+    private readonly Subject<Unit> _onBiddingConfirmed = new();
     private CompositeDisposable _disposables = new();
-    private CompositeDisposable _dialogueDisposables = new();
 
     private AuctionCardView _selectedAuctionCard;
     private BidModel _playerBids;
@@ -43,32 +49,42 @@ public class AuctionView : BasePhaseView
 
     public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
 
+    public void SetConfirmInteractable(bool interactable) => confirmBiddingButton.interactable = interactable;
+
+    public void SetBidIncreaseInteractable(bool interactable) => bidWindowView.SetIncreaseInteractable(interactable);
+
+    public void SetEmotionInteractable(bool interactable) => emotionResourceDisplayView.SetInteractable(interactable);
+
     public override void Show() => CanvasGroup.Show();
 
-    /// <summary>
-    /// 対話フェーズ用にカードクリックだけを受け付ける
-    /// </summary>
-    public void StartDialogueSelection()
-    {
-        _dialogueDisposables.Dispose();
-        _dialogueDisposables = new CompositeDisposable();
-        DeselectCard();
-        bidWindowView.Hide();
+    private void OnDialogueClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
 
-        foreach (var auctionCard in _auctionCardViews)
-        {
-            auctionCard.OnCardClicked.Subscribe(OnDialogueCardClicked).AddTo(_dialogueDisposables);
-            auctionCard.OnDialogueClicked.Subscribe(OnDialogueCardClicked).AddTo(_dialogueDisposables);
-        }
+    public void SetAllCardsInteractable(bool interactable)
+    {
+        foreach (var auctionCardView in _auctionCardViews)
+            auctionCardView.SetCardInteractable(interactable);
     }
 
-    /// <summary>
-    /// 対話フェーズ用のクリック受付を終了する
-    /// </summary>
-    public void StopDialogueSelection()
+    public void SetCardInteractable(int index, bool interactable)
     {
-        _dialogueDisposables.Dispose();
-        _dialogueDisposables = new CompositeDisposable();
+        if (index < 0 || index >= _auctionCardViews.Count)
+            return;
+
+        _auctionCardViews[index].SetCardInteractable(interactable);
+    }
+
+    public void SetAllDialogueInteractable(bool interactable)
+    {
+        foreach (var auctionCardView in _auctionCardViews)
+            auctionCardView.SetDialogueInteractable(interactable);
+    }
+
+    public void SetDialogueInteractable(int index, bool interactable)
+    {
+        if (index < 0 || index >= _auctionCardViews.Count)
+            return;
+
+        _auctionCardViews[index].SetDialogueInteractable(interactable);
     }
 
     // カード表示（6枚共有表示）
@@ -163,7 +179,7 @@ public class AuctionView : BasePhaseView
             var playerBid = playerBids.GetTotalBid(auctionCard.CardModel);
             var enemyBid = enemyBids.GetTotalBid(auctionCard.CardModel);
 
-            auctionCard.BidInfoView.ShowBidTargetReveal(playerBid, enemyBid > 0);
+            auctionCard.BidInfoView.ShowBidTargetReveal(enemyBid > 0);
         }
 
         await UniTask.Delay((int)(duration * 1000));
@@ -192,12 +208,12 @@ public class AuctionView : BasePhaseView
             var cardView = targetAuctionCard.CardView;
 
             // 入札額を公開
-            bidInfoView.ShowBidAmounts(result.PlayerBid, result.EnemyBid);
+            bidInfoView.ShowBidAmounts(result.EnemyBid);
 
             if (result.NoBids)
             {
                 // 入札なし → フェードアウト
-                await cardView.PlayFadeOutAsync();
+                await targetAuctionCard.FadeOutAsync();
             }
             else if (result.IsDraw)
             {
@@ -239,9 +255,6 @@ public class AuctionView : BasePhaseView
         cardStagger.Cancel();
         _disposables.Dispose();
         _disposables = new CompositeDisposable();
-        _dialogueDisposables.Dispose();
-        _dialogueDisposables = new CompositeDisposable();
-
         DeselectCard();
 
         foreach (var auctionCard in _auctionCardViews)
@@ -263,11 +276,10 @@ public class AuctionView : BasePhaseView
         return null;
     }
 
-    private void OnDialogueClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
-    private void OnDialogueCardClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
-
     private void OnCardClicked(AuctionCardView auctionCard)
     {
+        _onCardClickedByIndex.OnNext(_auctionCardViews.IndexOf(auctionCard));
+
         if (_selectedAuctionCard == auctionCard)
         {
             DeselectCard();
@@ -335,6 +347,7 @@ public class AuctionView : BasePhaseView
         UpdateRemainingResourceDisplay();
         UpdateCardBidInfoDisplay(_selectedAuctionCard);
         UpdateBidWindowAmount();
+        _onBidChanged.OnNext(Unit.Default);
     }
 
     private void OnDecreaseBid()
@@ -357,6 +370,7 @@ public class AuctionView : BasePhaseView
         UpdateRemainingResourceDisplay();
         UpdateCardBidInfoDisplay(_selectedAuctionCard);
         UpdateBidWindowAmount();
+        _onBidChanged.OnNext(Unit.Default);
     }
 
     private void UpdateCardBidInfoDisplay(AuctionCardView auctionCard)
@@ -367,6 +381,8 @@ public class AuctionView : BasePhaseView
 
     private void OnConfirmBidding()
     {
+        _onBiddingConfirmed.OnNext(Unit.Default);
+
         if (bidWindowView.IsShowing)
             bidWindowView.Hide();
         DeselectCard();
@@ -381,6 +397,7 @@ public class AuctionView : BasePhaseView
 
     private void OnEmotionChanged(EmotionType emotion)
     {
+        _onEmotionSelected.OnNext(emotion);
         _currentEmotion = emotion;
         UpdateRemainingResourceDisplay();
 
@@ -427,7 +444,10 @@ public class AuctionView : BasePhaseView
     private void OnDestroy()
     {
         _disposables.Dispose();
-        _dialogueDisposables.Dispose();
         _onDialogueRequested.Dispose();
+        _onEmotionSelected.Dispose();
+        _onCardClickedByIndex.Dispose();
+        _onBidChanged.Dispose();
+        _onBiddingConfirmed.Dispose();
     }
 }

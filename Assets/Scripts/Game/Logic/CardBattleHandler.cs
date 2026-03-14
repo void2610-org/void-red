@@ -65,8 +65,19 @@ public class CardBattleHandler
     /// <summary>コイントスで先攻後攻を決定</summary>
     public void DecideFirstPlayer() => IsPlayerFirst = Random.value > 0.5f;
 
+    /// <summary>先攻後攻を直接設定する</summary>
+    public void SetFirstPlayer(bool isPlayerFirst) => IsPlayerFirst = isPlayerFirst;
+
     /// <summary>怒りスキル: 次ターンの勝利条件を反転する予約を積む</summary>
     public void QueueConditionReversedNextTurn() => _conditionReversedNextTurn = true;
+
+    /// <summary>
+    /// 勝利条件を逆転した値へ変換する
+    /// </summary>
+    private static VictoryCondition GetReversedCondition(VictoryCondition condition) =>
+        condition == VictoryCondition.LowerWins
+            ? VictoryCondition.HigherWins
+            : VictoryCondition.LowerWins;
 
     /// <summary>嫌悪スキル: 次に出すカードの半減予約を積む</summary>
     public void QueueNextCardHalved(bool isPlayerSide)
@@ -195,14 +206,6 @@ public class CardBattleHandler
         EnemyWins++;
         return RoundResult.EnemyWin;
     }
-
-    /// <summary>
-    /// 勝利条件を逆転した値へ変換する
-    /// </summary>
-    private static VictoryCondition GetReversedCondition(VictoryCondition condition) =>
-        condition == VictoryCondition.LowerWins
-            ? VictoryCondition.HigherWins
-            : VictoryCondition.LowerWins;
 
     /// <summary>
     /// 予約されている次カード補正を、確定カードへ消費する

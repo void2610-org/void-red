@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 敵AIの全意思決定を一元管理するコントローラ
 /// </summary>
-public class EnemyAIController
+public class EnemyAIController : IEnemyAIController
 {
     private readonly Enemy _enemy;
 
