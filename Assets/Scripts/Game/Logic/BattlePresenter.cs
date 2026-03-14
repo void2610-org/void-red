@@ -65,15 +65,12 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual UniTask OnBeforeMemoryGrowthContinueAsync() => UniTask.CompletedTask;
 
-    protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) =>
-        BattleUIPresenter.InitializeDeckSelection(wonCards);
+    protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) => BattleUIPresenter.InitializeDeckSelection(wonCards);
 
     protected virtual void DecideFirstPlayer(CardBattleHandler handler) => handler.DecideFirstPlayer();
 
-    protected virtual bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) =>
-        handler.PlayerSkillAvailable;
-    protected virtual bool CanUseDeckSelectionSkill(EmotionType playerSkill) =>
-        BattleSkillExecutor.CanUseInDeckSelection(playerSkill);
+    protected virtual bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) => handler.PlayerSkillAvailable;
+    protected virtual bool CanUseDeckSelectionSkill(EmotionType playerSkill) => BattleSkillExecutor.CanUseInDeckSelection(playerSkill);
     protected virtual EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => defaultSkill;
     protected virtual EmotionType GetBattleSkill(EmotionType defaultSkill) => defaultSkill;
     protected virtual bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
@@ -81,8 +78,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => defaultVictoryCondition;
 
-    protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
-        currentEmotionState;
+    protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => currentEmotionState;
 
     protected virtual List<CardModel> BuildPlayerDeckCards(
         IReadOnlyList<CardModel> selectedCards,

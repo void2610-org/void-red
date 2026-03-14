@@ -63,8 +63,7 @@ public static class DialogParameterTypeExtensions
     /// <param name="typeString">パラメータタイプの文字列</param>
     /// <param name="parameterType">変換されたパラメータタイプ</param>
     /// <returns>変換に成功した場合はtrue</returns>
-    public static bool TryParseParameterType(string typeString, out DialogParameterType parameterType) =>
-        Enum.TryParse(typeString, true, out parameterType);
+    public static bool TryParseParameterType(string typeString, out DialogParameterType parameterType) => Enum.TryParse(typeString, true, out parameterType);
 
     /// <summary>
     /// パラメータタイプの期待する値の型を取得

@@ -22,11 +22,9 @@ public class RewardPhaseView : BasePhaseView
         IReadOnlyDictionary<EmotionType, int> maxResources) =>
         resourceRewardView.DisplayGauges(currentResources, maxResources);
 
-    public async UniTask AnimateResourceRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) =>
-        await resourceRewardView.AnimateRewardsAsync(results);
+    public async UniTask AnimateResourceRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) => await resourceRewardView.AnimateRewardsAsync(results);
 
-    public async UniTask WaitForCardAcquisitionCompleteAsync() =>
-        await cardAcquisitionView.WaitForNextAndHideAsync();
+    public async UniTask WaitForCardAcquisitionCompleteAsync() => await cardAcquisitionView.WaitForNextAndHideAsync();
 
     public override void Hide()
     {

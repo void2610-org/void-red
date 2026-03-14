@@ -40,8 +40,7 @@ public class DialoguePhaseView : BasePhaseView
     /// <param name="card">選択されたカード</param>
     /// <param name="selectedIndex">選ばれた選択肢の番号</param>
     /// <returns>プレイヤーのカットイン文言</returns>
-    private static string BuildPlayerDialogueText(CardModel card, int selectedIndex) =>
-        $"{card.Data.CardName}に向けて、{_playerDialogueTexts[selectedIndex]}";
+    private static string BuildPlayerDialogueText(CardModel card, int selectedIndex) => $"{card.Data.CardName}に向けて、{_playerDialogueTexts[selectedIndex]}";
 
     /// <summary>
     /// 敵側のカットイン文言を組み立てる
@@ -49,8 +48,7 @@ public class DialoguePhaseView : BasePhaseView
     /// <param name="card">選択されたカード</param>
     /// <param name="selectedIndex">選ばれた選択肢の番号</param>
     /// <returns>敵のカットイン文言</returns>
-    private static string BuildEnemyDialogueText(CardModel card, int selectedIndex) =>
-        $"{card.Data.CardName}を見て、{_enemyDialogueTexts[selectedIndex]}";
+    private static string BuildEnemyDialogueText(CardModel card, int selectedIndex) => $"{card.Data.CardName}を見て、{_enemyDialogueTexts[selectedIndex]}";
 
     public UniTask HideAllAsync()
     {

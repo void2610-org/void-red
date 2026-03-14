@@ -46,33 +46,25 @@ public class TutorialBattlePresenter : BattlePresenter
         AuctionProcessor = new AuctionProcessor(Player, Enemy, BattleUIPresenter, _auctionCompetitionPhaseRunner);
     }
 
-    protected override void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) =>
-        BattleUIPresenter.InitializeDeckSelection(wonCards, _tutorialBattlePlayerData.DeckAllowedCardIndices);
+    protected override void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) => BattleUIPresenter.InitializeDeckSelection(wonCards, _tutorialBattlePlayerData.DeckAllowedCardIndices);
 
     protected override bool CanUseDeckSelectionSkill(EmotionType playerSkill) => false;
 
-    protected override EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) =>
-        _tutorialBattlePlayerData.BattleForcedSkillEmotion;
+    protected override EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => _tutorialBattlePlayerData.BattleForcedSkillEmotion;
 
-    protected override EmotionType GetBattleSkill(EmotionType defaultSkill) =>
-        _tutorialBattlePlayerData.BattleForcedSkillEmotion;
+    protected override EmotionType GetBattleSkill(EmotionType defaultSkill) => _tutorialBattlePlayerData.BattleForcedSkillEmotion;
 
     protected override bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
 
-    protected override bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) =>
-        handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
+    protected override bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) => handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
 
-    protected override bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill) =>
-        handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
+    protected override bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill) => handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
 
-    protected override VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) =>
-        _tutorialBattlePlayerData.BattleVictoryCondition;
+    protected override VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => _tutorialBattlePlayerData.BattleVictoryCondition;
 
-    protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
-        EnemyAI.DecideEmotionState();
+    protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => EnemyAI.DecideEmotionState();
 
-    private void UpdateTutorialBidConfirmState() =>
-        BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() >= _tutorialBattlePlayerData.BidRequiredAmount);
+    private void UpdateTutorialBidConfirmState() => BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() >= _tutorialBattlePlayerData.BidRequiredAmount);
 
     protected override List<CardModel> BuildPlayerDeckCards(
         IReadOnlyList<CardModel> selectedCards,
