@@ -43,8 +43,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly CompetitionView _competitionView;
     private readonly RewardPhaseView _rewardPhaseView;
     private readonly MemoryGrowthView _memoryGrowthView;
-    private readonly PlayerFaceView _playerFaceView;
-    private readonly EnemyFaceView _enemyFaceView;
     private readonly SkillButtonView _skillButtonView;
     private readonly DeckSelectionView _deckSelectionView;
     private readonly CardBattleView _cardBattleView;
@@ -65,8 +63,8 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _competitionView = Object.FindFirstObjectByType<CompetitionView>();
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
-        _playerFaceView = Object.FindFirstObjectByType<PlayerFaceView>();
-        _enemyFaceView = Object.FindFirstObjectByType<EnemyFaceView>();
+        Object.FindFirstObjectByType<PlayerFaceView>();
+        Object.FindFirstObjectByType<EnemyFaceView>();
         _skillButtonView = Object.FindFirstObjectByType<SkillButtonView>(FindObjectsInactive.Include);
         _deckSelectionView = Object.FindFirstObjectByType<DeckSelectionView>();
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
@@ -77,68 +75,42 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
-    public void UpdatePlayerPainGauge(float value) => _playerFaceView.UpdatePainGauge(value);
-    public void UpdatePlayerDilutionGauge(float value) => _playerFaceView.UpdateDilutionGauge(value);
     public async UniTask PlayPhaseTransitionOpenAsync() => await _eyeBlinkTransitionView.PlayOpenAsync();
     public async UniTask PlayPhaseTransitionCloseAsync() => await _eyeBlinkTransitionView.PlayCloseAsync();
     public async UniTask StartTutorial(string tutorialId, params string[] args) => await _tutorialPresenter.StartTutorial(tutorialId, args);
-    public async UniTask DisplayCardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) =>
-        await _rewardPhaseView.DisplayCardsAsync(results);
-    public async UniTask WaitForCardAcquisitionCompleteAsync() =>
-        await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
+    public async UniTask DisplayCardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) => await _rewardPhaseView.DisplayCardsAsync(results);
+    public async UniTask WaitForCardAcquisitionCompleteAsync() => await _rewardPhaseView.WaitForCardAcquisitionCompleteAsync();
     public void ShowAuctionView() => _auctionView.Show();
-    public void StartAuctionBidding(
-        IReadOnlyList<CardModel> auctionCards,
-        BidModel playerBids,
-        EmotionType initialEmotion,
-        IReadOnlyDictionary<EmotionType, int> emotionResources) =>
-        _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
-    public void SetAuctionEmotionInteractable(bool interactable) =>
-        _auctionView.SetEmotionInteractable(interactable);
-    public void SetAuctionCardInteractable(int index, bool interactable) =>
-        _auctionView.SetCardInteractable(index, interactable);
-    public void SetAuctionDialogueInteractable(int index, bool interactable) =>
-        _auctionView.SetDialogueInteractable(index, interactable);
-    public void SetAuctionAllDialogueInteractable(bool interactable) =>
-        _auctionView.SetAllDialogueInteractable(interactable);
-    public void SetAuctionAllCardsInteractable(bool interactable) =>
-        _auctionView.SetAllCardsInteractable(interactable);
-    public void SetAuctionConfirmInteractable(bool interactable) =>
-        _auctionView.SetConfirmInteractable(interactable);
-    public void SetAuctionBidIncreaseInteractable(bool interactable) =>
-        _auctionView.SetBidIncreaseInteractable(interactable);
-    public async UniTask ShowAuctionResultsSequentialAsync(
-        IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) =>
-        await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
+    public void StartAuctionBidding(IReadOnlyList<CardModel> auctionCards, BidModel playerBids, EmotionType initialEmotion, IReadOnlyDictionary<EmotionType, int> emotionResources) => _auctionView.StartBidding(auctionCards, playerBids, initialEmotion, emotionResources);
+    public void SetAuctionEmotionInteractable(bool interactable) => _auctionView.SetEmotionInteractable(interactable);
+    public void SetAuctionCardInteractable(int index, bool interactable) => _auctionView.SetCardInteractable(index, interactable);
+    public void SetAuctionDialogueInteractable(int index, bool interactable) => _auctionView.SetDialogueInteractable(index, interactable);
+    public void SetAuctionAllDialogueInteractable(bool interactable) => _auctionView.SetAllDialogueInteractable(interactable);
+    public void SetAuctionAllCardsInteractable(bool interactable) => _auctionView.SetAllCardsInteractable(interactable);
+    public void SetAuctionConfirmInteractable(bool interactable) => _auctionView.SetConfirmInteractable(interactable);
+    public void SetAuctionBidIncreaseInteractable(bool interactable) => _auctionView.SetBidIncreaseInteractable(interactable);
+    public async UniTask ShowAuctionResultsSequentialAsync(IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) => await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
-    public async UniTask ShowAuctionCardDialogueAsync(CardModel card, EnemyData enemyData) =>
-        await _dialoguePhaseView.ShowCardDialogueAsync(card, enemyData);
+    public async UniTask ShowAuctionCardDialogueAsync(CardModel card, EnemyData enemyData) => await _dialoguePhaseView.ShowCardDialogueAsync(card, enemyData);
     public void HideRewardView() => _rewardPhaseView.Hide();
     public void ShowMemoryGrowthView(IReadOnlyList<AcquiredTheme> allThemes) => _memoryGrowthView.ShowMemoryGrowth(allThemes);
     public UniTask WaitForMemoryGrowthCompleteAsync() => _memoryGrowthView.WaitForContinueAsync();
-    public void DisplayResourceGauges(
-        IReadOnlyDictionary<EmotionType, int> currentResources,
-        IReadOnlyDictionary<EmotionType, int> maxResources) =>
-        _rewardPhaseView.DisplayResourceGauges(currentResources, maxResources);
+    public void DisplayResourceGauges(IReadOnlyDictionary<EmotionType, int> currentResources, IReadOnlyDictionary<EmotionType, int> maxResources) => _rewardPhaseView.DisplayResourceGauges(currentResources, maxResources);
 
     // 競合フェーズ
-    public void ShowCompetition(int playerBid, int enemyBid, IReadOnlyDictionary<EmotionType, int> resources) =>
-        _competitionView.Initialize(playerBid, enemyBid, resources);
+    public void ShowCompetition(int playerBid, int enemyBid, IReadOnlyDictionary<EmotionType, int> resources) => _competitionView.Initialize(playerBid, enemyBid, resources);
     public void SetCompetitionEmotion(EmotionType emotion) => _competitionView.SetSelectedEmotion(emotion);
     public void SetCompetitionEmotionInteractable(bool interactable) => _competitionView.SetEmotionInteractable(interactable);
     public void SetCompetitionRaiseInteractable(bool interactable) => _competitionView.SetRaiseInteractable(interactable);
     public void UpdateCompetitionBids(int playerBid, int enemyBid) => _competitionView.UpdateBids(playerBid, enemyBid);
     public void UpdateCompetitionTimer(float remaining, float max) => _competitionView.UpdateTimer(remaining, max);
-    public void UpdateCompetitionResources(IReadOnlyDictionary<EmotionType, int> resources) =>
-        _competitionView.UpdateResources(resources);
+    public void UpdateCompetitionResources(IReadOnlyDictionary<EmotionType, int> resources) => _competitionView.UpdateResources(resources);
     public void HideCompetition() => _competitionView.Hide();
 
     // デッキ選択フェーズ
-    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards) =>
-        _deckSelectionView.Initialize(wonCards);
-    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards, IReadOnlyList<int> allowedCardIndices) =>
-        _deckSelectionView.Initialize(wonCards, allowedCardIndices);
+    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards) => _deckSelectionView.Initialize(wonCards);
+    public void InitializeDeckSelection(IReadOnlyList<CardModel> wonCards, IReadOnlyList<int> allowedCardIndices) => _deckSelectionView.Initialize(wonCards, allowedCardIndices);
     public async UniTask WaitForDeckSelectionAsync() => await _deckSelectionView.WaitForSelectionAsync();
     public IReadOnlyList<CardModel> GetSelectedDeck() => _deckSelectionView.SelectedCards;
     // デッキ選択中スキルの結果をViewへ反映する
@@ -152,22 +124,16 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void SetSkillButtonInteractable(bool isInteractable) => _skillButtonView.SetInteractable(isInteractable);
 
     // コインフリップ
-    public async UniTask PlayCoinFlipAsync(bool isPlayerFirst) =>
-        await _coinFlipView.PlayCoinFlipAsync(isPlayerFirst);
+    public async UniTask PlayCoinFlipAsync(bool isPlayerFirst) => await _coinFlipView.PlayCoinFlipAsync(isPlayerFirst);
 
     // カードバトルフェーズ
-    public void InitializeBattle(VictoryCondition condition) =>
-        _cardBattleView.Initialize(condition);
-    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) =>
-        _cardBattleView.ShowPlayerHand(availableCards);
-    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int forcedCardIndex) =>
-        _cardBattleView.ShowPlayerHand(availableCards, forcedCardIndex);
+    public void InitializeBattle(VictoryCondition condition) => _cardBattleView.Initialize(condition);
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => _cardBattleView.ShowPlayerHand(availableCards);
+    public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int forcedCardIndex) => _cardBattleView.ShowPlayerHand(availableCards, forcedCardIndex);
     public void PlacePlayerCard(CardModel card) => _cardBattleView.PlacePlayerCard(card);
     public void PlaceEnemyCard(CardModel card) => _cardBattleView.PlaceEnemyCard(card);
-    public void RevealCards(CardModel playerCard, CardModel enemyCard) =>
-        _cardBattleView.RevealCards(playerCard, enemyCard);
-    public async UniTask<CardModel> WaitForTargetCardSelectionAsync(string instruction, IReadOnlyList<CardModel> selectableCards) =>
-        await _targetCardSelectionView.WaitForSelectionAsync(instruction, selectableCards);
+    public void RevealCards(CardModel playerCard, CardModel enemyCard) => _cardBattleView.RevealCards(playerCard, enemyCard);
+    public async UniTask<CardModel> WaitForTargetCardSelectionAsync(string instruction, IReadOnlyList<CardModel> selectableCards) => await _targetCardSelectionView.WaitForSelectionAsync(instruction, selectableCards);
     // バトル中スキルの結果を、現在表示中のカードへまとめて反映する
     public void RefreshBattleCardNumbers() => _cardBattleView.RefreshDisplayedCardNumbers();
     public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);
