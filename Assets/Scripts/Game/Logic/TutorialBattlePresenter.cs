@@ -96,7 +96,6 @@ public class TutorialBattlePresenter : BattlePresenter
 
         EnemyAI.DecideBids(AuctionCards);
 
-        await BattleUIPresenter.StartTutorial("BiddingPhase");
         await RunTutorialBiddingAsync();
 
         Debug.Log($"[TutorialBattlePresenter] プレイヤーの入札完了: 合計{Player.Bids.GetTotalBidAmount()}リソース");
@@ -183,6 +182,7 @@ public class TutorialBattlePresenter : BattlePresenter
         BattleUIPresenter.SetAuctionConfirmInteractable(false);
         BattleUIPresenter.SetAuctionBidIncreaseInteractable(false);
         BattleUIPresenter.SetAuctionEmotionInteractable(false);
+        await BattleUIPresenter.StartTutorial("BiddingPhase");
         BattleUIPresenter.SetAuctionDialogueInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
 
         await BattleUIPresenter.OnAuctionDialogueRequested

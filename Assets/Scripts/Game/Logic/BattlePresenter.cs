@@ -65,6 +65,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual UniTask OnBeforeMemoryGrowthContinueAsync() => UniTask.CompletedTask;
 
+    protected virtual UniTask OnAfterBattleEndAsync() => UniTask.CompletedTask;
+
     protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) => BattleUIPresenter.InitializeDeckSelection(wonCards);
 
     protected virtual void DecideFirstPlayer(CardBattleHandler handler) => handler.DecideFirstPlayer();
@@ -635,6 +637,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     private async UniTask HandleBattleEnd()
     {
+        await OnAfterBattleEndAsync();
         await UniTask.Delay(500);
 
         // Volumeエフェクトを全てデフォルトに戻す
