@@ -17,10 +17,7 @@ public class RewardPhaseView : BasePhaseView
     /// </summary>
     public IReadOnlyDictionary<EmotionType, int> RewardedAmounts => resourceRewardView.RewardedAmounts;
 
-    public void DisplayResourceGauges(
-        IReadOnlyDictionary<EmotionType, int> currentResources,
-        IReadOnlyDictionary<EmotionType, int> maxResources) =>
-        resourceRewardView.DisplayGauges(currentResources, maxResources);
+    public void DisplayResourceGauges(IReadOnlyDictionary<EmotionType, int> currentResources, IReadOnlyDictionary<EmotionType, int> maxResources) => resourceRewardView.DisplayGauges(currentResources, maxResources);
 
     public async UniTask AnimateResourceRewardsAsync(Dictionary<CardModel, RewardCalculator.RewardResult> results) => await resourceRewardView.AnimateRewardsAsync(results);
 
