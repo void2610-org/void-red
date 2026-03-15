@@ -63,8 +63,6 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _competitionView = Object.FindFirstObjectByType<CompetitionView>();
         _rewardPhaseView = Object.FindFirstObjectByType<RewardPhaseView>();
         _memoryGrowthView = Object.FindFirstObjectByType<MemoryGrowthView>();
-        Object.FindFirstObjectByType<PlayerFaceView>();
-        Object.FindFirstObjectByType<EnemyFaceView>();
         _skillButtonView = Object.FindFirstObjectByType<SkillButtonView>(FindObjectsInactive.Include);
         _deckSelectionView = Object.FindFirstObjectByType<DeckSelectionView>();
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
