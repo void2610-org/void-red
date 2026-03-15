@@ -59,6 +59,10 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual async UniTask HandleAuctionResult() => await AuctionProcessor.ProcessAuctionResultAsync(AuctionCards, _currentEnemyData, CurrentGameStateInternal);
 
+    protected virtual UniTask OnAfterCardRevealAsync() => UniTask.CompletedTask;
+
+    protected virtual UniTask OnDeckSelectionShownAsync() => UniTask.CompletedTask;
+
     protected virtual UniTask OnAfterCardsDisplayed() => UniTask.CompletedTask;
 
     protected virtual UniTask OnAfterResourceGaugesDisplayed() => UniTask.CompletedTask;
@@ -279,6 +283,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // トランジション：開く（黒フェードから復帰）
         await BattleUIPresenter.PlayPhaseTransitionOpenAsync();
+
+        await OnAfterCardRevealAsync();
     }
 
     // === 6. リザルトフェーズ ===
@@ -363,6 +369,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         BattleUIPresenter.SetSkillButtonVisible(true);
         BattleUIPresenter.SetSkillButtonInteractable(canUseDeckSelectionSkill);
         BattleUIPresenter.SetDeckSelectionConfirmInteractable(!RequiresDeckSelectionSkillActivation(playerSkill));
+        await OnDeckSelectionShownAsync();
 
         BattleUIPresenter.OnSkillActivated
             .Subscribe(_ =>

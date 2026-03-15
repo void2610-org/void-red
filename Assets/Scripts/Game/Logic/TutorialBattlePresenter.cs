@@ -64,6 +64,12 @@ public class TutorialBattlePresenter : BattlePresenter
 
     protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => EnemyAI.DecideEmotionState();
 
+    protected override async UniTask OnAfterCardRevealAsync() => await BattleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
+
+    protected override async UniTask OnDeckSelectionShownAsync() => await BattleUIPresenter.StartTutorial("DeckSelectionPhase");
+
+    protected override async UniTask OnBeforeMemoryGrowthContinueAsync() => await BattleUIPresenter.StartTutorial("MemoryGrowthPhase");
+
     private void UpdateTutorialBidConfirmState() => BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() >= _tutorialBattlePlayerData.BidRequiredAmount);
 
     protected override List<CardModel> BuildPlayerDeckCards(
@@ -76,18 +82,6 @@ public class TutorialBattlePresenter : BattlePresenter
         return selectedCards
             .OrderBy(card => wonCardOrder[card])
             .ToList();
-    }
-
-    protected override async UniTask HandleAuctionResult()
-    {
-        await BattleUIPresenter.StartTutorial("ResultDetermination");
-        await base.HandleAuctionResult();
-    }
-
-    protected override async UniTask HandleThemeAnnouncement()
-    {
-        await base.HandleThemeAnnouncement();
-        await BattleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
     }
 
     protected override async UniTask HandleBiddingPhase()
@@ -112,11 +106,6 @@ public class TutorialBattlePresenter : BattlePresenter
         await BattleUIPresenter.StartTutorial("RewardPhase2");
     }
 
-    protected override async UniTask OnBeforeMemoryGrowthContinueAsync()
-    {
-        await BattleUIPresenter.StartTutorial("MemoryGrowthPhase");
-    }
-
     protected override void DecideFirstPlayer(CardBattleHandler handler)
     {
         var round = handler.CurrentRound;
@@ -133,7 +122,10 @@ public class TutorialBattlePresenter : BattlePresenter
     protected override async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {
         if (RequiresBattleSkillActivation(handler, GetBattleSkill(EmotionType.Joy)))
+        {
+            await BattleUIPresenter.StartTutorial("BattleSkillPhase");
             await BattleUIPresenter.OnSkillActivated.FirstAsync();
+        }
 
         var round = handler.CurrentRound;
         var forcedCardPerRound = _tutorialBattlePlayerData.ForcedCardPerRound;
@@ -165,7 +157,10 @@ public class TutorialBattlePresenter : BattlePresenter
             return await base.SelectBattleCardAsync(handler, playerDeck);
         }
 
+        // カードを表示してからチュートリアルを再生
         BattleUIPresenter.ShowPlayerHand(availableCards, forcedAvailableCardIndex);
+        if (handler.CurrentRound == 0)
+            await BattleUIPresenter.StartTutorial("BattlePhase");
         return await BattleUIPresenter.OnBattleCardSelected.FirstAsync();
     }
 
@@ -177,36 +172,46 @@ public class TutorialBattlePresenter : BattlePresenter
             Player.Bids,
             _tutorialBattlePlayerData.BidForcedEmotion.GetPreviousEmotion(),
             Player.EmotionResources);
+
+        // === フェーズ1: 対話ボタンの説明 ===
         BattleUIPresenter.SetAuctionAllCardsInteractable(false);
         BattleUIPresenter.SetAuctionAllDialogueInteractable(false);
         BattleUIPresenter.SetAuctionConfirmInteractable(false);
         BattleUIPresenter.SetAuctionBidIncreaseInteractable(false);
         BattleUIPresenter.SetAuctionEmotionInteractable(false);
         await BattleUIPresenter.StartTutorial("BiddingPhase");
-        BattleUIPresenter.SetAuctionDialogueInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
 
+        // 対話ボタンのみ有効化 → プレイヤーが押す → 対話実行（挑発を選ぶ）
+        BattleUIPresenter.SetAuctionDialogueInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
         await BattleUIPresenter.OnAuctionDialogueRequested
             .Where(card => card == forcedCard)
             .FirstAsync();
-
         await ShowAuctionDialogueAsync(forcedCard);
 
+        // === フェーズ2: 感情リソース選択の説明 ===
         BattleUIPresenter.SetAuctionAllCardsInteractable(false);
         BattleUIPresenter.SetAuctionAllDialogueInteractable(false);
-        BattleUIPresenter.SetAuctionEmotionInteractable(true);
+        BattleUIPresenter.SetAuctionEmotionInteractable(false);
+        await BattleUIPresenter.StartTutorial("BiddingPhaseEmotion");
 
+        // 感情ボタンのみ有効化 → 正しい感情を選ぶ
+        BattleUIPresenter.SetAuctionEmotionInteractable(true);
         await BattleUIPresenter.OnAuctionEmotionSelected
             .Where(emotion => emotion == _tutorialBattlePlayerData.BidForcedEmotion)
             .FirstAsync();
 
+        // カード選択（対象カードをクリック）
         BattleUIPresenter.SetAuctionEmotionInteractable(false);
         BattleUIPresenter.SetAuctionCardInteractable(_tutorialBattlePlayerData.BidForcedCardIndex, true);
         BattleUIPresenter.SetAuctionAllDialogueInteractable(false);
-
         await BattleUIPresenter.OnAuctionCardClicked
             .Where(index => index == _tutorialBattlePlayerData.BidForcedCardIndex)
             .FirstAsync();
 
+        // === フェーズ3: 入札量の説明 ===
+        await BattleUIPresenter.StartTutorial("BiddingPhaseBid");
+
+        // 入札ボタン有効化 → 必要枚数ベット → 確定
         BattleUIPresenter.SetAuctionBidIncreaseInteractable(true);
         var bidChangedDisposable = BattleUIPresenter.OnAuctionBidChanged
             .Subscribe(_ => UpdateTutorialBidConfirmState());
@@ -263,6 +268,10 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
         _uiPresenter.ShowCompetition(handler.PlayerTotal, handler.EnemyTotal, _player.EmotionResources);
         _uiPresenter.SetCompetitionEmotion(_forcedEmotion.GetPreviousEmotion());
         _uiPresenter.SetCompetitionRaiseInteractable(false);
+        _uiPresenter.SetCompetitionEmotionInteractable(false);
+
+        // 競合UIが表示された後、操作を有効にする前にチュートリアルを表示
+        await _uiPresenter.StartTutorial("ResultDetermination");
         _uiPresenter.SetCompetitionEmotionInteractable(true);
 
         await _uiPresenter.OnCompetitionEmotionSelected
