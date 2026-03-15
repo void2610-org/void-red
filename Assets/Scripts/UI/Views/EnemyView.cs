@@ -28,7 +28,6 @@ public class EnemyView : MonoBehaviour
     /// </summary>
     private async UniTask PlaySpriteChangeAnimation(Sprite newSprite)
     {
-        if (!enemyImage || !enemyImageBack) return;
 
         // 現在のスプライトと同じ場合はアニメーションをスキップ
         if (enemyImage.sprite == newSprite) return;

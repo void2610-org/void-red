@@ -50,8 +50,6 @@ public class AnnouncementView : MonoBehaviour
 
         try
         {
-            // コンポーネントの存在確認
-            if (!announcementText || !announcementBackground) return;
 
             // テキストの位置をリセット（前回のアニメーションの影響を除去）
             var textRect = announcementText.rectTransform;
@@ -124,25 +122,19 @@ public class AnnouncementView : MonoBehaviour
             await UniTask.WhenAll(fadeOutTasks);
 
             // 最終クリーンアップ
-            if (announcementBackground && announcementText)
-            {
-                announcementBackground.gameObject.SetActive(false);
-                announcementText.gameObject.SetActive(false);
-                textRect.anchoredPosition = Vector2.zero;
-            }
+            announcementBackground.gameObject.SetActive(false);
+            announcementText.gameObject.SetActive(false);
+            textRect.anchoredPosition = Vector2.zero;
         }
         catch (System.OperationCanceledException)
         {
             // キャンセルされた場合のクリーンアップ
-            if (announcementBackground && announcementText)
+            announcementBackground.gameObject.SetActive(false);
+            announcementText.gameObject.SetActive(false);
+            var textRect = announcementText.rectTransform;
+            if (textRect)
             {
-                announcementBackground.gameObject.SetActive(false);
-                announcementText.gameObject.SetActive(false);
-                var textRect = announcementText.rectTransform;
-                if (textRect)
-                {
-                    textRect.anchoredPosition = Vector2.zero;
-                }
+                textRect.anchoredPosition = Vector2.zero;
             }
         }
         finally
