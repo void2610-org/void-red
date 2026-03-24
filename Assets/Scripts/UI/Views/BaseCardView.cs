@@ -13,7 +13,6 @@ public abstract class BaseCardView : MonoBehaviour
     protected abstract Image CardImage { get; }
     protected abstract TextMeshProUGUI CardNameText { get; }
     protected abstract Image CardFrame { get; }
-    protected abstract Image GaugeImage { get; }
 
     private TMProArchedText _archedText;
     private bool _archedTextCached;
@@ -40,8 +39,6 @@ public abstract class BaseCardView : MonoBehaviour
             _archedTextCached = true;
         }
         if (_archedText) _archedText.ForceUpdate();
-
-        UpdateGaugeDisplay(cardData, displayState);
 
         switch (displayState)
         {
@@ -71,20 +68,5 @@ public abstract class BaseCardView : MonoBehaviour
                 CardNameText.text = string.Empty;
                 break;
         }
-    }
-
-    /// <summary>
-    /// ゲージの表示を更新
-    /// </summary>
-    private void UpdateGaugeDisplay(CardData cardData, CardDisplayState displayState)
-    {
-        if (displayState == CardDisplayState.Backside)
-        {
-            GaugeImage.color = Color.clear;
-            return;
-        }
-
-        GaugeImage.color = cardData.MemoryType.ToGaugeColor();
-        GaugeImage.fillAmount = (float)cardData.EffectAmount / GameConstants.MAX_GAUGE_VALUE;
     }
 }

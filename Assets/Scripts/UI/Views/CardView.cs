@@ -26,7 +26,6 @@ public class CardView : BaseCardView
     [SerializeField] private Image cardFrame;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
-    [SerializeField] private Image gaugeImage;
     [SerializeField] private Image growImage;
 
     public CardData CardData { get; private set; }
@@ -138,5 +137,4 @@ public class CardView : BaseCardView
     protected override Image CardImage => cardImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardFrame => cardFrame;
-    protected override Image GaugeImage => gaugeImage;
 }

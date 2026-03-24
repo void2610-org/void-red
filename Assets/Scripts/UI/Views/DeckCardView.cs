@@ -32,7 +32,6 @@ public class DeckCardView : BaseCardView
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image cardTextBanner;
     [SerializeField] private Image cardFrame;
-    [SerializeField] private Image gaugeImage;
 
     [Header("色設定")]
     [SerializeField] private Color activeColor = Color.white;
@@ -49,7 +48,6 @@ public class DeckCardView : BaseCardView
     protected override Image CardImage => cardImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardFrame => cardFrame;
-    protected override Image GaugeImage => gaugeImage;
 
     /// <summary>
     /// カードモデルを設定して表示を更新
