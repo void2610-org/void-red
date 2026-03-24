@@ -135,17 +135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &567393851621667506 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 583448122867867901, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
-  m_PrefabInstance: {fileID: 1136907436948329039}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 938fce054c42f40a3969e27a88d9bdd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3225262181137470782 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2523552460966807409, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
@@ -155,17 +144,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5038293929098209787 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5344795189781855156, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
-  m_PrefabInstance: {fileID: 1136907436948329039}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &5589703205796823039 stripped
@@ -195,6 +173,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7704754934830102623 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7290151873224534544, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  m_PrefabInstance: {fileID: 1136907436948329039}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8089064917827832581 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9188815370780006730, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
@@ -214,12 +203,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardButton: {fileID: 5589703205796823039}
   cardImage: {fileID: 9175634261646429054}
+  curtainImage: {fileID: 8765739790736052687}
   cardNameText: {fileID: 3225262181137470782}
   backgroundImage: {fileID: 31008625205435812}
-  cardTextBanner: {fileID: 5038293929098209787}
+  cardTextBanner: {fileID: 0}
   cardFrame: {fileID: 7682182006361424895}
-  backUIEffect: {fileID: 8587612312980743197}
-  edgeUIEffect: {fileID: 567393851621667506}
+  gaugeImage: {fileID: 7704754934830102623}
+  curtainSprites:
+    _serializedList:
+    - key: 0
+      value: {fileID: 21300000, guid: e0beb9f20916e4c008e6c56e60b688aa, type: 3}
+    - key: 1
+      value: {fileID: 21300000, guid: b737b0b09db934e06b2faf7fef057305, type: 3}
+    - key: 2
+      value: {fileID: 21300000, guid: 3b8215a8eebb8428db2fe1b92997a3f1, type: 3}
+    - key: 3
+      value: {fileID: 21300000, guid: 3b8215a8eebb8428db2fe1b92997a3f1, type: 3}
   activeColor: {r: 1, g: 1, b: 1, a: 1}
   collapsedColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.7}
   veiledColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.9}
@@ -237,15 +236,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 5813258420573905695}
   selectedScale: 1.1
---- !u!114 &8587612312980743197 stripped
+--- !u!114 &8765739790736052687 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8712856333045659218, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  m_CorrespondingSourceObject: {fileID: 8530154899732317056, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
   m_PrefabInstance: {fileID: 1136907436948329039}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 938fce054c42f40a3969e27a88d9bdd8, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &9175634261646429054 stripped
