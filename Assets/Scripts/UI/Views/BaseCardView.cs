@@ -11,6 +11,7 @@ public abstract class BaseCardView : MonoBehaviour
 {
     // 抽象プロパティ：各サブクラスで実装
     protected abstract Image CardImage { get; }
+    protected abstract Image CurtainImage { get; }
     protected abstract TextMeshProUGUI CardNameText { get; }
     protected abstract Image CardFrame { get; }
 
@@ -19,6 +20,7 @@ public abstract class BaseCardView : MonoBehaviour
 
     // CardData取得メソッド（各サブクラスで実装）
     protected abstract CardData GetCardData();
+    protected abstract Sprite GetCurtainSprite();
 
     /// <summary>
     /// カードの基本表示を更新（画像、名前、バナー、フレーム）
@@ -32,6 +34,7 @@ public abstract class BaseCardView : MonoBehaviour
         // カード画像と名前を設定
         CardImage.sprite = cardData.CardImage;
         CardNameText.text = cardData.CardName;
+        CurtainImage.sprite = GetCurtainSprite();
 
         if (!_archedTextCached)
         {
