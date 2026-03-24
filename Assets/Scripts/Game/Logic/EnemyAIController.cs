@@ -17,11 +17,7 @@ public class EnemyAIController : IEnemyAIController
     /// <summary>
     /// デッキ選択（ランダム3枚）
     /// </summary>
-    public List<CardModel> SelectDeck(List<CardModel> availableCards) =>
-        availableCards
-            .OrderBy(_ => Random.value)
-            .Take(GameConstants.DECK_SIZE)
-            .ToList();
+    public List<CardModel> SelectDeck(List<CardModel> availableCards) => availableCards.OrderBy(_ => Random.value).Take(GameConstants.DECK_SIZE).ToList();
 
     /// <summary>
     /// 入札決定（ランダム感情・ランダム額）

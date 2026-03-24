@@ -36,14 +36,11 @@ public abstract class PlayerPresenter : IDisposable
 
     // === 感情リソース管理 ===
 
-    public bool TryConsumeEmotion(EmotionType emotion, int amount)
-        => _playerModel.TryConsumeEmotion(emotion, amount);
+    public bool TryConsumeEmotion(EmotionType emotion, int amount) => _playerModel.TryConsumeEmotion(emotion, amount);
 
-    public void AddEmotion(EmotionType emotion, int amount)
-        => _playerModel.AddEmotion(emotion, amount);
+    public void AddEmotion(EmotionType emotion, int amount) => _playerModel.AddEmotion(emotion, amount);
 
-    public int GetEmotionAmount(EmotionType emotion)
-        => _playerModel.GetEmotionAmount(emotion);
+    public int GetEmotionAmount(EmotionType emotion) => _playerModel.GetEmotionAmount(emotion);
 
     // === カード管理 ===
 

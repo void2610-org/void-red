@@ -10,11 +10,5 @@ public static class TutorialKeyBindings
     /// キーバインドを設定（TutorialPresenterから呼び出される）
     /// </summary>
     // チュートリアルを進める
-    public static void Setup(
-        InputActionsProvider inputActionsProvider,
-        TutorialView tutorialView,
-        CompositeDisposable disposables) =>
-        inputActionsProvider.UI.Advance.OnPerformedAsObservable()
-            .Subscribe(_ => tutorialView.NotifyAdvance())
-            .AddTo(disposables);
+    public static void Setup(InputActionsProvider inputActionsProvider, TutorialView tutorialView, CompositeDisposable disposables) => inputActionsProvider.UI.Advance.OnPerformedAsObservable().Subscribe(_ => tutorialView.NotifyAdvance()).AddTo(disposables);
 }

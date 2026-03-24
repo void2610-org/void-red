@@ -44,8 +44,7 @@ public class SceneTransitionManager : ISceneTransitionService, IDisposable
     /// <summary>
     /// クロスフェード演出付きでシーンを遷移（SceneType版）
     /// </summary>
-    public UniTask TransitionToSceneWithFade(SceneType targetScene, float fadeDuration = DEFAULT_FADE_DURATION)
-        => TransitionToSceneWithFade(targetScene.ToSceneName(), fadeDuration);
+    public UniTask TransitionToSceneWithFade(SceneType targetScene, float fadeDuration = DEFAULT_FADE_DURATION) => TransitionToSceneWithFade(targetScene.ToSceneName(), fadeDuration);
 
     /// <summary>
     /// クロスフェード演出付きでシーンを遷移（string版、ISceneTransitionService実装）

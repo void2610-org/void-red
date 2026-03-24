@@ -13,12 +13,10 @@ public class BattleDeckModel
     private readonly Stack<CardModel> _usedHistory = new();
 
     /// <summary>使用可能なカードを取得</summary>
-    public IReadOnlyList<CardModel> GetAvailableCards()
-        => _cards.Where(c => !c.IsUsed).ToList();
+    public IReadOnlyList<CardModel> GetAvailableCards() => _cards.Where(c => !c.IsUsed).ToList();
 
     /// <summary>直前に使用したカードを取得（信頼スキル用）</summary>
-    public CardModel GetLastUsedCard()
-        => _usedHistory.Count > 0 ? _usedHistory.Peek() : null;
+    public CardModel GetLastUsedCard() => _usedHistory.Count > 0 ? _usedHistory.Peek() : null;
 
     /// <summary>使用済みカードを未使用に戻す（信頼スキル用）</summary>
     public void RestoreUsedCard(CardModel card) => card.IsUsed = false;

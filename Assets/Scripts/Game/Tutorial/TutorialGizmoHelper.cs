@@ -15,7 +15,7 @@ public class TutorialGizmoHelper : MonoBehaviour
     /// </summary>
     private void OnDrawGizmos()
     {
-        if (!tutorialData || tutorialData.StepCount == 0) return;
+        if (tutorialData.StepCount == 0) return;
 
         // Canvas を取得してUI座標変換の基準にする
         var canvas = FindFirstObjectByType<Canvas>();

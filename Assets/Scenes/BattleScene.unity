@@ -1665,6 +1665,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DebugComponents
       objectReference: {fileID: 0}
+    - target: {fileID: 5862644883305084586, guid: 6df300d92e73a40cd93cd019c0105115, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2053,7 +2057,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1888547330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2066,7 +2070,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 874d10a8931c142e28c5aa552c9e08ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tutorialData: {fileID: 11400000, guid: b855191f7f2e04c258ce13bd0efe5ce2, type: 2}
+  tutorialData: {fileID: 11400000, guid: e42a846e2da004690b69ed8d26ed9863, type: 2}
 --- !u!4 &1888547331
 Transform:
   m_ObjectHideFlags: 0

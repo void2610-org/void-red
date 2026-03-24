@@ -44,8 +44,7 @@ public class CompetitionView : BasePhaseView
     /// <summary>
     /// 感情リソース表示を更新
     /// </summary>
-    public void UpdateResources(IReadOnlyDictionary<EmotionType, int> resources) =>
-        emotionResourceDisplayView.UpdateResources(resources);
+    public void UpdateResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
 
     public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
 

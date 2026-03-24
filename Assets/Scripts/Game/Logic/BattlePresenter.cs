@@ -59,21 +59,24 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual async UniTask HandleAuctionResult() => await AuctionProcessor.ProcessAuctionResultAsync(AuctionCards, _currentEnemyData, CurrentGameStateInternal);
 
+    protected virtual UniTask OnAfterCardRevealAsync() => UniTask.CompletedTask;
+
+    protected virtual UniTask OnDeckSelectionShownAsync() => UniTask.CompletedTask;
+
     protected virtual UniTask OnAfterCardsDisplayed() => UniTask.CompletedTask;
 
     protected virtual UniTask OnAfterResourceGaugesDisplayed() => UniTask.CompletedTask;
 
     protected virtual UniTask OnBeforeMemoryGrowthContinueAsync() => UniTask.CompletedTask;
 
-    protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) =>
-        BattleUIPresenter.InitializeDeckSelection(wonCards);
+    protected virtual UniTask OnAfterBattleEndAsync() => UniTask.CompletedTask;
+
+    protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) => BattleUIPresenter.InitializeDeckSelection(wonCards);
 
     protected virtual void DecideFirstPlayer(CardBattleHandler handler) => handler.DecideFirstPlayer();
 
-    protected virtual bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) =>
-        handler.PlayerSkillAvailable;
-    protected virtual bool CanUseDeckSelectionSkill(EmotionType playerSkill) =>
-        BattleSkillExecutor.CanUseInDeckSelection(playerSkill);
+    protected virtual bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) => handler.PlayerSkillAvailable;
+    protected virtual bool CanUseDeckSelectionSkill(EmotionType playerSkill) => BattleSkillExecutor.CanUseInDeckSelection(playerSkill);
     protected virtual EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => defaultSkill;
     protected virtual EmotionType GetBattleSkill(EmotionType defaultSkill) => defaultSkill;
     protected virtual bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
@@ -81,8 +84,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     protected virtual VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => defaultVictoryCondition;
 
-    protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) =>
-        currentEmotionState;
+    protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => currentEmotionState;
 
     protected virtual List<CardModel> BuildPlayerDeckCards(
         IReadOnlyList<CardModel> selectedCards,
@@ -281,6 +283,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
         // トランジション：開く（黒フェードから復帰）
         await BattleUIPresenter.PlayPhaseTransitionOpenAsync();
+
+        await OnAfterCardRevealAsync();
     }
 
     // === 6. リザルトフェーズ ===
@@ -365,6 +369,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         BattleUIPresenter.SetSkillButtonVisible(true);
         BattleUIPresenter.SetSkillButtonInteractable(canUseDeckSelectionSkill);
         BattleUIPresenter.SetDeckSelectionConfirmInteractable(!RequiresDeckSelectionSkillActivation(playerSkill));
+        await OnDeckSelectionShownAsync();
 
         BattleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
@@ -639,6 +644,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     private async UniTask HandleBattleEnd()
     {
+        await OnAfterBattleEndAsync();
         await UniTask.Delay(500);
 
         // Volumeエフェクトを全てデフォルトに戻す

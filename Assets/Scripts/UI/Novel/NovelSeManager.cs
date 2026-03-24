@@ -45,8 +45,7 @@ public class NovelSeManager : MonoBehaviour
     /// <param name="volume">音量倍率</param>
     /// <param name="pitch">ピッチ</param>
     /// <param name="important">重要なSEフラグ</param>
-    public void WaitAndPlaySe(string seName, float delayTime, float volume = 1.0f, float pitch = 1.0f) =>
-        WaitAndPlaySeAsync(seName, delayTime, volume, pitch).Forget();
+    public void WaitAndPlaySe(string seName, float delayTime, float volume = 1.0f, float pitch = 1.0f) => WaitAndPlaySeAsync(seName, delayTime, volume, pitch).Forget();
 
     /// <summary>
     /// 名前を指定してSEを再生
