@@ -19,8 +19,8 @@ MonoBehaviour:
     maskSize: {x: 145, y: 190}
   - message: "\u611F\u60C5\u30EA\u30BD\u30FC\u30B9\u306F\u30018\u7A2E\u985E\xD75\u679A\u3002\u5408\u8A0840\u679A\u304C\u3042\u306A\u305F\u306B\u4E0E\u3048\u3089\u308C\u3066\u3044\u307E\u3059\u3002"
     isPlayerDialog: 0
-    maskPosition: {x: 0, y: 0}
-    maskSize: {x: 0, y: 0}
+    maskPosition: {x: 460, y: -225}
+    maskSize: {x: 250, y: 250}
   - message: "1\u679A\u306E\u30AB\u30FC\u30C9\u306B\u30D9\u30C3\u30C8\u3067\u304D\u308B\u306E\u306F\u30011\u7A2E\u985E\u306E\u611F\u60C5\u30EA\u30BD\u30FC\u30B9\u306E\u307F\u3067\u3059\u3002"
     isPlayerDialog: 0
     maskPosition: {x: -225, y: 0}

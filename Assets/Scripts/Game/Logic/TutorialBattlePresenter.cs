@@ -70,7 +70,7 @@ public class TutorialBattlePresenter : BattlePresenter
 
     protected override async UniTask OnBeforeMemoryGrowthContinueAsync() => await BattleUIPresenter.StartTutorial("MemoryGrowthPhase");
 
-    private void UpdateTutorialBidConfirmState() => BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() >= _tutorialBattlePlayerData.BidRequiredAmount);
+    private void UpdateTutorialBidConfirmState() => BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() == _tutorialBattlePlayerData.BidRequiredAmount);
 
     protected override async UniTask OnAfterCardRevealAsync()
     {

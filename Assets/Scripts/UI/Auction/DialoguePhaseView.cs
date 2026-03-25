@@ -25,14 +25,14 @@ public class DialoguePhaseView : BasePhaseView
         Initialize(enemyData);
         Show();
         choicesView.Show();
-        
+
         if (forcedChoiceIndex.HasValue) choicesView.SetOnlyAllowed(forcedChoiceIndex.Value);
 
         try
         {
             _ = await choicesView.WaitForSelectionAsync();
             choicesView.Hide();
-            
+
             await ShowPlayerDialogueAsync("あなたにこの記憶は必要ないのでは？");
             await ShowEnemyDialogueAsync("あくまで、分かりやすい状況を作るためですよ。");
         }
