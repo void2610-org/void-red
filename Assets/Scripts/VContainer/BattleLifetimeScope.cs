@@ -39,7 +39,7 @@ public class BattleLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
         builder.RegisterEntryPoint<MentalPowerEffectController>();
 
-        builder.RegisterEntryPoint<HelpPresenter>();
+        builder.RegisterEntryPoint<HelpPresenter>().AsSelf();
 
         // Settings機能を登録（バトル用：SettingButtonView無し）
         builder.RegisterSettingsFeatureForBattle();

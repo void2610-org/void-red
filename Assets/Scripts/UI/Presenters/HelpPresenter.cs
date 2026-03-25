@@ -22,6 +22,16 @@ public class HelpPresenter : IStartable, IDisposable
     }
 
     /// <summary>
+    /// ヘルプ画面を表示
+    /// </summary>
+    public void ShowHelp()
+    {
+        _currentIndex = 0;
+        UpdateHelpDisplay();
+        _helpView.Show();
+    }
+
+    /// <summary>
     /// ヘルプ画面の表示/非表示を切り替え
     /// </summary>
     private void ToggleHelp()
@@ -30,16 +40,6 @@ public class HelpPresenter : IStartable, IDisposable
             _helpView.Hide();
         else
             ShowHelp();
-    }
-
-    /// <summary>
-    /// ヘルプ画面を表示
-    /// </summary>
-    private void ShowHelp()
-    {
-        _currentIndex = 0;
-        UpdateHelpDisplay();
-        _helpView.Show();
     }
 
     /// <summary>

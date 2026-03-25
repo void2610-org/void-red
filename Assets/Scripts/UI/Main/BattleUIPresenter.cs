@@ -24,6 +24,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public CardModel SelectedBattleCard => _cardBattleView.SelectedFieldCard;
     public Observable<Unit> OnSkillActivated => _skillButtonView.OnActivated;
     public Observable<Unit> OnBattleNextClicked => _cardBattleView.OnNextClicked;
+    public Observable<Unit> OnHelpButtonClickedInPause => _battlePauseView.OnHelpButtonClicked;
 
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
@@ -48,6 +49,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly CardBattleView _cardBattleView;
     private readonly TargetCardSelectionView _targetCardSelectionView;
     private readonly CoinFlipView _coinFlipView;
+    private readonly BattlePauseView _battlePauseView;
     private BattlePresenter _battlePresenter;
 
     public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
@@ -68,6 +70,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
         _targetCardSelectionView = Object.FindFirstObjectByType<TargetCardSelectionView>(FindObjectsInactive.Include);
         _coinFlipView = Object.FindFirstObjectByType<CoinFlipView>(FindObjectsInactive.Include);
+        _battlePauseView = Object.FindFirstObjectByType<BattlePauseView>();
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
     }

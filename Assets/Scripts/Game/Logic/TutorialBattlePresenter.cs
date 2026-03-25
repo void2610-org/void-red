@@ -64,13 +64,20 @@ public class TutorialBattlePresenter : BattlePresenter
 
     protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => EnemyAI.DecideEmotionState();
 
-    protected override async UniTask OnAfterCardRevealAsync() => await BattleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
-
     protected override async UniTask OnDeckSelectionShownAsync() => await BattleUIPresenter.StartTutorial("DeckSelectionPhase");
 
     protected override async UniTask OnBeforeMemoryGrowthContinueAsync() => await BattleUIPresenter.StartTutorial("MemoryGrowthPhase");
 
     private void UpdateTutorialBidConfirmState() => BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() >= _tutorialBattlePlayerData.BidRequiredAmount);
+
+    protected override async UniTask OnAfterCardRevealAsync()
+    {
+        await BattleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
+
+        // ポーズ→ヘルプへの誘導（プレイヤーが実際にヘルプボタンを押すまで待機）
+        await BattleUIPresenter.StartTutorial("HelpGuidance");
+        await BattleUIPresenter.OnHelpButtonClickedInPause.FirstAsync();
+    }
 
     protected override List<CardModel> BuildPlayerDeckCards(
         IReadOnlyList<CardModel> selectedCards,
