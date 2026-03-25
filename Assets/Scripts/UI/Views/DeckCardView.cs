@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using Coffee.UIEffects;
 using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カードの表示状態
@@ -28,11 +30,12 @@ public class DeckCardView : BaseCardView
     [Header("UIコンポーネント")]
     [SerializeField] private Button cardButton;
     [SerializeField] private Image cardImage;
+    [SerializeField] private Image curtainImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image cardTextBanner;
     [SerializeField] private Image cardFrame;
-    [SerializeField] private Image gaugeImage;
+    [SerializeField] private SerializableDictionary<MemoryType, Sprite> curtainSprites;
 
     [Header("色設定")]
     [SerializeField] private Color activeColor = Color.white;
@@ -44,12 +47,13 @@ public class DeckCardView : BaseCardView
 
     private readonly Subject<CardData> _onCardClicked = new();
     protected override CardData GetCardData() => CardModel?.Data;
+    protected override Sprite GetCurtainSprite() => curtainSprites.GetValueOrDefault(CardModel.Data.MemoryType);
 
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
+    protected override Image CurtainImage => curtainImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardFrame => cardFrame;
-    protected override Image GaugeImage => gaugeImage;
 
     /// <summary>
     /// カードモデルを設定して表示を更新

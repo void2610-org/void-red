@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Coffee.UIEffects;
 using Cysharp.Threading.Tasks;
 using LitMotion;
@@ -23,11 +24,13 @@ public class CardView : BaseCardView
 
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
+    // カードの記憶種類によって変わるカーテンの色
+    [SerializeField] private Image curtainImage;
     [SerializeField] private Image cardFrame;
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private Button cardButton;
-    [SerializeField] private Image gaugeImage;
     [SerializeField] private Image growImage;
+    [SerializeField] private SerializableDictionary<MemoryType, Sprite> curtainSprites;
 
     public CardData CardData { get; private set; }
     public Observable<CardView> OnClicked { get; private set; }
@@ -47,6 +50,7 @@ public class CardView : BaseCardView
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
 
     protected override CardData GetCardData() => CardData;
+    protected override Sprite GetCurtainSprite() => curtainSprites.GetValueOrDefault(CardData.MemoryType);
 
     /// <summary>
     /// カードデータを設定して初期化
@@ -136,7 +140,7 @@ public class CardView : BaseCardView
 
     // BaseCardView 抽象プロパティの実装
     protected override Image CardImage => cardImage;
+    protected override Image CurtainImage => curtainImage;
     protected override TextMeshProUGUI CardNameText => cardNameText;
     protected override Image CardFrame => cardFrame;
-    protected override Image GaugeImage => gaugeImage;
 }

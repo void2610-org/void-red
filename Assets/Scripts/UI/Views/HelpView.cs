@@ -10,6 +10,7 @@ public class HelpView : BaseWindowView
 {
     [Header("UIコンポーネント")]
     [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private Image bigHelpImage;
     [SerializeField] private Image helpImage;
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Button previousButton;
@@ -33,10 +34,22 @@ public class HelpView : BaseWindowView
     {
         if (!helpData) return;
 
+        bigHelpImage.gameObject.SetActive(helpData.IsImageOnly);
+        helpImage.gameObject.SetActive(!helpData.IsImageOnly);
         titleText.text = helpData.Title;
-        helpImage.sprite = helpData.Image;
-        descriptionText.text = helpData.Description;
 
+        if (helpData.IsImageOnly)
+        {
+            bigHelpImage.sprite = helpData.Image;
+            descriptionText.text = string.Empty;
+        }
+        else
+        {
+            helpImage.sprite = helpData.Image;
+            descriptionText.text = helpData.Description;
+
+        }
+        
         // ページ番号表示（1始まりで表示）
         pageText.text = $"{currentIndex + 1} / {totalCount}";
 
