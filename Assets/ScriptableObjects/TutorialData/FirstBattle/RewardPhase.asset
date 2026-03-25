@@ -11,12 +11,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
   m_Name: RewardPhase
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   steps:
-  - message: "\u3053\u306E\u30AB\u30FC\u30C9\u306F\u3042\u306A\u305F\u306E\u3082\u306E\u306B\u306A\u308A\u307E\u3057\u305F\u3002"
-    isPlayerDialog: 0
-    maskPosition: {x: 0, y: 0}
-    maskSize: {x: 0, y: 0}
   - message: "\u3053\u3061\u3089\u304C\u3001\u4ECA\u56DE\u3042\u306A\u305F\u304C\u7372\u5F97\u3057\u305F\u8A18\u61B6\u30AB\u30FC\u30C9\u3067\u3059\u3002"
     isPlayerDialog: 0
     maskPosition: {x: 0, y: 0}

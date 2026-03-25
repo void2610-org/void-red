@@ -49,7 +49,7 @@ public class HelpView : BaseWindowView
             descriptionText.text = helpData.Description;
 
         }
-        
+
         // ページ番号表示（1始まりで表示）
         pageText.text = $"{currentIndex + 1} / {totalCount}";
 
