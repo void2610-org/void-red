@@ -33,10 +33,16 @@ public class DialoguePhaseView : BasePhaseView
             _ = await choicesView.WaitForSelectionAsync();
             choicesView.Hide();
 
-            await ShowPlayerDialogueAsync("あなたにこの記憶は必要ないのでは？");
-            await ShowEnemyDialogueAsync("あくまで、分かりやすい状況を作るためですよ。");
+            if (forcedChoiceIndex.HasValue)
+            {
+                await ShowPlayerDialogueAsync("あなたにこの記憶は必要ないのでは？");
+                await ShowEnemyDialogueAsync("あくまで、分かりやすい状況を作るためですよ。");
+            }
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+            choicesView.Hide();
+        }
         finally
         {
             Hide();
