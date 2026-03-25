@@ -62,6 +62,19 @@ public class CardBattleView : BasePhaseView
 
     private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
 
+    /// <summary>表示中の手札全体の操作可否を切り替える</summary>
+    public void SetHandInteractable(bool interactable)
+    {
+        foreach (var card in _handCards)
+        {
+            if (card)
+                card.SetInteractable(interactable);
+        }
+
+        if (!interactable)
+            nextButton.gameObject.SetActive(false);
+    }
+
     /// <summary>バトルを初期化する</summary>
     public void Initialize(VictoryCondition condition)
     {

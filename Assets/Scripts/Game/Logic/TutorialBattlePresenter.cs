@@ -130,16 +130,23 @@ public class TutorialBattlePresenter : BattlePresenter
 
     protected override async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {
-        if (RequiresBattleSkillActivation(handler, GetBattleSkill(EmotionType.Joy)))
+        var availableCards = playerDeck.GetAvailableCards();
+        var requiresSkillActivation = RequiresBattleSkillActivation(handler, GetBattleSkill(EmotionType.Joy));
+        if (requiresSkillActivation)
         {
+            BattleUIPresenter.ShowPlayerHand(availableCards);
+            BattleUIPresenter.SetBattleHandInteractable(false);
             await BattleUIPresenter.StartTutorial("BattleSkillPhase");
             await BattleUIPresenter.OnSkillActivated.FirstAsync();
+            BattleUIPresenter.SetBattleHandInteractable(true);
         }
 
         var round = handler.CurrentRound;
         var forcedCardPerRound = _tutorialBattlePlayerData.ForcedCardPerRound;
         if (round < 0 || round >= forcedCardPerRound.Count || !forcedCardPerRound[round].HasValue)
-            return await base.SelectBattleCardAsync(handler, playerDeck);
+            return requiresSkillActivation
+                ? await BattleUIPresenter.OnBattleCardSelected.FirstAsync()
+                : await base.SelectBattleCardAsync(handler, playerDeck);
 
         var forcedDeckCardIndex = forcedCardPerRound[round].Value;
         if (forcedDeckCardIndex < 0 || forcedDeckCardIndex >= playerDeck.Cards.Count)
@@ -149,7 +156,6 @@ public class TutorialBattlePresenter : BattlePresenter
         }
 
         var forcedCard = playerDeck.Cards[forcedDeckCardIndex];
-        var availableCards = playerDeck.GetAvailableCards();
         var forcedAvailableCardIndex = -1;
         for (var i = 0; i < availableCards.Count; i++)
         {

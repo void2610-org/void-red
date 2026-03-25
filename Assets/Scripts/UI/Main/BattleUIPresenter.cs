@@ -131,6 +131,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void InitializeBattle(VictoryCondition condition) => _cardBattleView.Initialize(condition);
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => _cardBattleView.ShowPlayerHand(availableCards);
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int forcedCardIndex) => _cardBattleView.ShowPlayerHand(availableCards, forcedCardIndex);
+    public void SetBattleHandInteractable(bool interactable) => _cardBattleView.SetHandInteractable(interactable);
     public void PlacePlayerCard(CardModel card) => _cardBattleView.PlacePlayerCard(card);
     public void PlaceEnemyCard(CardModel card) => _cardBattleView.PlaceEnemyCard(card);
     public void RevealCards(CardModel playerCard, CardModel enemyCard) => _cardBattleView.RevealCards(playerCard, enemyCard);
