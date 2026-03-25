@@ -64,6 +64,8 @@ public class TutorialBattlePresenter : BattlePresenter
 
     protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => EnemyAI.DecideEmotionState();
 
+    protected override int? GetForcedDialogueChoiceIndex() => 0;
+
     protected override async UniTask OnDeckSelectionShownAsync() => await BattleUIPresenter.StartTutorial("DeckSelectionPhase");
 
     protected override async UniTask OnBeforeMemoryGrowthContinueAsync() => await BattleUIPresenter.StartTutorial("MemoryGrowthPhase");

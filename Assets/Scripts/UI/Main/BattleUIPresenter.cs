@@ -93,7 +93,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowAuctionResultsSequentialAsync(IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) => await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
-    public async UniTask ShowAuctionCardDialogueAsync(CardModel card, EnemyData enemyData) => await _dialoguePhaseView.ShowCardDialogueAsync(card, enemyData);
+    public async UniTask ShowAuctionCardDialogueAsync(CardModel card, EnemyData enemyData, int? forcedChoiceIndex = null) => await _dialoguePhaseView.ShowCardDialogueAsync(card, enemyData, forcedChoiceIndex);
     public void HideRewardView() => _rewardPhaseView.Hide();
     public void ShowMemoryGrowthView(IReadOnlyList<AcquiredTheme> allThemes) => _memoryGrowthView.ShowMemoryGrowth(allThemes);
     public UniTask WaitForMemoryGrowthCompleteAsync() => _memoryGrowthView.WaitForContinueAsync();

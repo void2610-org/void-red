@@ -71,13 +71,15 @@ public class DialoguePhaseView : BasePhaseView
     /// </summary>
     /// <param name="card">対話対象のカード</param>
     /// <param name="enemyData">対話演出に使う敵データ</param>
-    public async UniTask ShowCardDialogueAsync(CardModel card, EnemyData enemyData)
+    public async UniTask ShowCardDialogueAsync(CardModel card, EnemyData enemyData, int? forcedChoiceIndex = null)
     {
         Initialize(enemyData);
         Show();
         await HideAllAsync();
 
         choicesView.Show();
+        if (forcedChoiceIndex.HasValue)
+            choicesView.SetOnlyAllowed(forcedChoiceIndex.Value);
 
         try
         {

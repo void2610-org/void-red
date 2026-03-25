@@ -90,6 +90,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
         IReadOnlyList<CardModel> selectedCards,
         IReadOnlyList<CardModel> wonCards) => selectedCards.ToList();
 
+    /// <summary>
+    /// 対話選択肢を強制するインデックスを返す。null の場合は制限なし
+    /// </summary>
+    protected virtual int? GetForcedDialogueChoiceIndex() => null;
+
     protected virtual async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {
         BattleUIPresenter.ShowPlayerHand(playerDeck.GetAvailableCards());
@@ -138,7 +143,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
     protected async UniTask ShowAuctionDialogueAsync(CardModel card)
     {
         CurrentGameStateInternal.Value = GameState.DialoguePhase;
-        await BattleUIPresenter.ShowAuctionCardDialogueAsync(card, _currentEnemyData);
+        await BattleUIPresenter.ShowAuctionCardDialogueAsync(card, _currentEnemyData, GetForcedDialogueChoiceIndex());
         CurrentGameStateInternal.Value = GameState.BiddingPhase;
     }
 
