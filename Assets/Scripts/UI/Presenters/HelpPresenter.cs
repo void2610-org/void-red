@@ -83,15 +83,13 @@ public class HelpPresenter : IStartable, IDisposable
         _helpView = UnityEngine.Object.FindFirstObjectByType<HelpView>();
         _helpButtonView = UnityEngine.Object.FindFirstObjectByType<HelpButtonView>();
 
+        // シーンにHelpViewが存在しない場合は何もしない
+        if (_helpView == null) return;
+
         // Helpアクションの購読（トグル処理）
         _inputActionsProvider.UI.Help.OnPerformedAsObservable()
             .Subscribe(_ => ToggleHelp())
             .AddTo(_disposables);
-
-        // ヘルプボタンのイベント購読
-        // _helpButtonView.OnButtonClicked
-        //     .Subscribe(_ => ShowHelp())
-        //     .AddTo(_disposables);
 
         // イベント購読
         _helpView.OnPreviousClicked

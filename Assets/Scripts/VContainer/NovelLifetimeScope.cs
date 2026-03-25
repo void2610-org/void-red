@@ -16,6 +16,7 @@ public class NovelLifetimeScope : LifetimeScope
     {
         builder.RegisterInstance(novelSeManager);
 
+        builder.RegisterEntryPoint<HelpPresenter>().AsSelf();
         builder.RegisterEntryPoint<NovelPresenter>().WithParameter(useLocalExcel).AsSelf().As<ISceneInitializable>();
         builder.RegisterEntryPoint<PausePresenter>().AsSelf();
     }
