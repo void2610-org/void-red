@@ -8,7 +8,7 @@ public sealed class TutorialBattlePlayerData
 {
     public int BidForcedCardIndex => 0;
     public EmotionType BidForcedEmotion => EmotionType.Joy;
-    public int BidRequiredAmount => 3;
+    public int BidRequiredAmount => 2;
 
     public int AuctionCompetitionRequiredRaises => 2;
     public EmotionType AuctionCompetitionForcedEmotion => EmotionType.Trust;
@@ -17,7 +17,7 @@ public sealed class TutorialBattlePlayerData
 
     public IReadOnlyList<int> DeckAllowedCardIndices => _deckAllowedCardIndices;
 
-    public VictoryCondition BattleVictoryCondition => VictoryCondition.LowerWins;
+    public VictoryCondition BattleVictoryCondition => VictoryCondition.HigherWins;
     public IReadOnlyList<bool> CoinFlipPerRound => _coinFlipPerRound;
     public IReadOnlyList<int?> ForcedCardPerRound => _forcedCardPerRound;
     public int SkillRoundIndex => 1;

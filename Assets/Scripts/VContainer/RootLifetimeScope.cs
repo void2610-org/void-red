@@ -96,7 +96,7 @@ public class RootLifetimeScope : LifetimeScope
         allThemeData.RegisterAllThemes();
         allEnemyData.RegisterAllEnemies();
         allTutorialData.RegisterAllTutorials();
-        allHelpData.RegisterAllHelps();
+        // allHelpData.RegisterAllHelps();
 #endif
     }
 

@@ -14,15 +14,28 @@ public class PauseView : BaseWindowView, IPauseView
     public Observable<Unit> OnHomeButtonClicked { get; private set; }
     public Observable<Unit> OnResumeButtonClicked { get; private set; }
 
+#if UNITY_EDITOR
+    private float _savedTimeScale = 1f;
+#endif
+
     public override void Show()
     {
+#if UNITY_EDITOR
+        _savedTimeScale = Time.timeScale;
+#endif
         Time.timeScale = 0;
         base.Show();
     }
 
     public override void Hide()
     {
+#if UNITY_EDITOR
+        // ポーズ中にタイムスケールが外部から変更されていた場合はその値を維持
+        if (Time.timeScale == 0)
+            Time.timeScale = _savedTimeScale;
+#else
         Time.timeScale = 1;
+#endif
         base.Hide();
     }
 

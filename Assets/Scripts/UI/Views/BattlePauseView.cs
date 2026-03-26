@@ -32,6 +32,9 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
 
     private CanvasGroup _canvasGroup;
     private MotionHandle _slideHandle;
+#if UNITY_EDITOR
+    private float _savedTimeScale = 1f;
+#endif
 
     public void Toggle()
     {
@@ -41,6 +44,9 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
 
     public void Show()
     {
+#if UNITY_EDITOR
+        _savedTimeScale = Time.timeScale;
+#endif
         Time.timeScale = 0;
         IsShowing = true;
         _slideHandle.TryCancel();
@@ -53,7 +59,13 @@ public sealed class BattlePauseView : MonoBehaviour, IPauseView
 
     public void Hide()
     {
+#if UNITY_EDITOR
+        // ポーズ中にタイムスケールが外部から変更されていた場合はその値を維持
+        if (Time.timeScale == 0)
+            Time.timeScale = _savedTimeScale;
+#else
         Time.timeScale = 1;
+#endif
         IsShowing = false;
         _slideHandle.TryCancel();
         buttonStagger.Cancel();

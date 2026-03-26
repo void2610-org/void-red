@@ -27,8 +27,19 @@ public class DialogueChoicesView : MonoBehaviour
     public void Show()
     {
         _selectionCompletionSource = new UniTaskCompletionSource<int>();
+        foreach (var button in choiceButtons)
+            button.interactable = true;
         _canvasGroup.Show();
         buttonStagger.Play();
+    }
+
+    /// <summary>
+    /// 指定インデックスのボタンのみ選択可能にする
+    /// </summary>
+    public void SetOnlyAllowed(int allowedIndex)
+    {
+        for (var i = 0; i < choiceButtons.Count; i++)
+            choiceButtons[i].interactable = i == allowedIndex;
     }
 
     public void Hide()

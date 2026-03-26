@@ -57,8 +57,13 @@ public class SceneTransitionManager : ISceneTransitionService, IDisposable
 
         try
         {
-            // 念の為timeScaleを1に戻す
+            // 念の為timeScaleを1に戻す（エディタではポーズ中のみリセット）
+#if UNITY_EDITOR
+            if (Time.timeScale == 0)
+                Time.timeScale = 1;
+#else
             Time.timeScale = 1;
+#endif
 
             await FadeIn(fadeDuration);
 

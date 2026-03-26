@@ -24,6 +24,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public CardModel SelectedBattleCard => _cardBattleView.SelectedFieldCard;
     public Observable<Unit> OnSkillActivated => _skillButtonView.OnActivated;
     public Observable<Unit> OnBattleNextClicked => _cardBattleView.OnNextClicked;
+    public Observable<Unit> OnHelpButtonClickedInPause => _battlePauseView.OnHelpButtonClicked;
 
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly GameProgressService _gameProgressService;
@@ -48,6 +49,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     private readonly CardBattleView _cardBattleView;
     private readonly TargetCardSelectionView _targetCardSelectionView;
     private readonly CoinFlipView _coinFlipView;
+    private readonly BattlePauseView _battlePauseView;
     private BattlePresenter _battlePresenter;
 
     public BattleUIPresenter(Player player, AllTutorialData allTutorialData, InputActionsProvider inputActionsProvider)
@@ -68,6 +70,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
         _cardBattleView = Object.FindFirstObjectByType<CardBattleView>();
         _targetCardSelectionView = Object.FindFirstObjectByType<TargetCardSelectionView>(FindObjectsInactive.Include);
         _coinFlipView = Object.FindFirstObjectByType<CoinFlipView>(FindObjectsInactive.Include);
+        _battlePauseView = Object.FindFirstObjectByType<BattlePauseView>();
 
         _tutorialPresenter = new TutorialPresenter(allTutorialData, inputActionsProvider);
     }
@@ -90,7 +93,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public async UniTask ShowAuctionResultsSequentialAsync(IReadOnlyList<AuctionJudge.AuctionResultEntry> results, Color enemyColor) => await _auctionView.ShowResultsSequentialAsync(results, enemyColor);
     public async UniTask ShowBidTargetsAsync(BidModel playerBids, BidModel enemyBids, float duration = 2f) => await _auctionView.ShowBidTargetsAsync(playerBids, enemyBids, duration);
     public void HideAuctionView() => _auctionView.Hide();
-    public async UniTask ShowAuctionCardDialogueAsync(CardModel card, EnemyData enemyData) => await _dialoguePhaseView.ShowCardDialogueAsync(card, enemyData);
+    public async UniTask ShowAuctionCardDialogueAsync(CardModel card, EnemyData enemyData, int? forcedChoiceIndex = null) => await _dialoguePhaseView.ShowCardDialogueAsync(card, enemyData, forcedChoiceIndex);
     public void HideRewardView() => _rewardPhaseView.Hide();
     public void ShowMemoryGrowthView(IReadOnlyList<AcquiredTheme> allThemes) => _memoryGrowthView.ShowMemoryGrowth(allThemes);
     public UniTask WaitForMemoryGrowthCompleteAsync() => _memoryGrowthView.WaitForContinueAsync();
@@ -128,6 +131,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void InitializeBattle(VictoryCondition condition) => _cardBattleView.Initialize(condition);
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => _cardBattleView.ShowPlayerHand(availableCards);
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int forcedCardIndex) => _cardBattleView.ShowPlayerHand(availableCards, forcedCardIndex);
+    public void SetBattleHandInteractable(bool interactable) => _cardBattleView.SetHandInteractable(interactable);
     public void PlacePlayerCard(CardModel card) => _cardBattleView.PlacePlayerCard(card);
     public void PlaceEnemyCard(CardModel card) => _cardBattleView.PlaceEnemyCard(card);
     public void RevealCards(CardModel playerCard, CardModel enemyCard) => _cardBattleView.RevealCards(playerCard, enemyCard);

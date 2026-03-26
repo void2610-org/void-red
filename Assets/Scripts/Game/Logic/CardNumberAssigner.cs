@@ -3,8 +3,8 @@ using System.Linq;
 
 /// <summary>
 /// オークション入札量に基づいてカードに数字を割り当てる
-/// 両者の入札合計が多い順に1から割り当て（同値は同じ数字）
-/// 例: [5, 3, 3, 2, 0, 0] → [1, 2, 2, 4, 5, 5]
+/// 両者の入札合計が少ない順に1から割り当て（同値は同じ数字）
+/// 例: [5, 3, 3, 2, 0, 0] → [6, 4, 4, 3, 1, 1]
 /// </summary>
 public static class CardNumberAssigner
 {
@@ -27,10 +27,10 @@ public static class CardNumberAssigner
         BidModel playerBids,
         BidModel enemyBids)
     {
-        // 各カードの合計入札量（プレイヤー＋敵）を計算し降順ソート
+        // 各カードの合計入札量（プレイヤー＋敵）を計算し昇順ソート
         var cardTotals = auctionCards
             .Select(card => (card, total: playerBids.GetTotalBid(card) + enemyBids.GetTotalBid(card)))
-            .OrderByDescending(x => x.total)
+            .OrderBy(x => x.total)
             .ToList();
 
         // ランク方式: 同じ入札量は同じ数字
@@ -38,7 +38,7 @@ public static class CardNumberAssigner
         var rank = 1;
         for (var i = 0; i < cardTotals.Count; i++)
         {
-            if (i > 0 && cardTotals[i].total < cardTotals[i - 1].total)
+            if (i > 0 && cardTotals[i].total > cardTotals[i - 1].total)
                 rank = i + 1;
 
             result[cardTotals[i].card] = new CardNumberInfo

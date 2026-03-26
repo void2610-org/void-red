@@ -13,18 +13,19 @@ public class PausePresenter : IStartable, System.IDisposable
     private PauseButtonView _pauseButtonView;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly InputActionsProvider _inputActionsProvider;
+    private readonly HelpPresenter _helpPresenter;
     private readonly CompositeDisposable _disposables = new();
 
-    public PausePresenter(SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider)
+    public PausePresenter(SceneTransitionManager sceneTransitionManager, InputActionsProvider inputActionsProvider, HelpPresenter helpPresenter)
     {
         _sceneTransitionManager = sceneTransitionManager;
         _inputActionsProvider = inputActionsProvider;
+        _helpPresenter = helpPresenter;
     }
 
     private void ShowHelp()
     {
-        var helpView = Object.FindFirstObjectByType<HelpView>();
-        helpView.Show();
+        _helpPresenter.ShowHelp();
     }
 
     private void ShowOptions()
