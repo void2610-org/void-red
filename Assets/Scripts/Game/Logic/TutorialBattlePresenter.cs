@@ -77,8 +77,8 @@ public class TutorialBattlePresenter : BattlePresenter
         await BattleUIPresenter.StartTutorial("BeforeThemeAnnouncement");
 
         // ポーズ→ヘルプへの誘導（プレイヤーが実際にヘルプボタンを押すまで待機）
-        await BattleUIPresenter.StartTutorial("HelpGuidance");
-        await BattleUIPresenter.OnHelpButtonClickedInPause.FirstAsync();
+        // await BattleUIPresenter.StartTutorial("HelpGuidance");
+        // await BattleUIPresenter.OnHelpButtonClickedInPause.FirstAsync();
     }
 
     protected override List<CardModel> BuildPlayerDeckCards(
