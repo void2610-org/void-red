@@ -682,7 +682,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
       propertyPath: m_Interactable
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
