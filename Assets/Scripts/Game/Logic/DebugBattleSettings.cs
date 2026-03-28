@@ -8,7 +8,6 @@ using UnityEngine;
 /// </summary>
 public static class DebugBattleSettings
 {
-
     /// <summary>オークションをスキップしてバトルから開始するか</summary>
     public static bool SkipAuction
     {
@@ -33,35 +32,65 @@ public static class DebugBattleSettings
     private const string PLAYER_SKILL_KEY = "DebugBattleSettings.PlayerSkill";
     private const string VICTORY_CONDITION_KEY = "DebugBattleSettings.VictoryCondition";
 
-    [MenuItem("Debug/Battle/オークションスキップ ON", true)]
-    private static bool EnableSkipAuctionValidate() => !SkipAuction;
-
-    [MenuItem("Debug/Battle/オークションスキップ OFF", true)]
-    private static bool DisableSkipAuctionValidate() => SkipAuction;
-
-    [MenuItem("Debug/Battle/スキル設定/Joy（2倍）")]
-    private static void SetSkillJoy() => SetSkill(EmotionType.Joy);
-
     [MenuItem("Debug/Battle/スキル設定/Anger（条件反転）")]
-    private static void SetSkillAnger() => SetSkill(EmotionType.Anger);
-
-    [MenuItem("Debug/Battle/スキル設定/Anticipation（残り全ランダム）")]
-    private static void SetSkillAnticipation() => SetSkill(EmotionType.Anticipation);
-
-    [MenuItem("Debug/Battle/スキル設定/Trust（カード再使用）")]
-    private static void SetSkillTrust() => SetSkill(EmotionType.Trust);
-
-    [MenuItem("Debug/Battle/スキル設定/Fear（数字入れ替え）")]
-    private static void SetSkillFear() => SetSkill(EmotionType.Fear);
+    private static void SetSkillAnger()
+    {
+        SetSkill(EmotionType.Anger);
+    }
 
     [MenuItem("Debug/Battle/スキル設定/Surprise（ランダム変更）")]
-    private static void SetSkillSurprise() => SetSkill(EmotionType.Surprise);
+    private static void SetSkillSurprise()
+    {
+        SetSkill(EmotionType.Surprise);
+    }
 
-    [MenuItem("Debug/Battle/スキル設定/Disgust（半減）")]
-    private static void SetSkillDisgust() => SetSkill(EmotionType.Disgust);
+    [MenuItem("Debug/Battle/オークションスキップ OFF", true)]
+    private static bool DisableSkipAuctionValidate()
+    {
+        return SkipAuction;
+    }
+
+    [MenuItem("Debug/Battle/スキル設定/Trust（カード再使用）")]
+    private static void SetSkillTrust()
+    {
+        SetSkill(EmotionType.Trust);
+    }
 
     [MenuItem("Debug/Battle/スキル設定/Sadness（数字を3に）")]
-    private static void SetSkillSadness() => SetSkill(EmotionType.Sadness);
+    private static void SetSkillSadness()
+    {
+        SetSkill(EmotionType.Sadness);
+    }
+
+    [MenuItem("Debug/Battle/オークションスキップ ON", true)]
+    private static bool EnableSkipAuctionValidate()
+    {
+        return !SkipAuction;
+    }
+
+    [MenuItem("Debug/Battle/スキル設定/Joy（2倍）")]
+    private static void SetSkillJoy()
+    {
+        SetSkill(EmotionType.Joy);
+    }
+
+    [MenuItem("Debug/Battle/スキル設定/Anticipation（残り全ランダム）")]
+    private static void SetSkillAnticipation()
+    {
+        SetSkill(EmotionType.Anticipation);
+    }
+
+    [MenuItem("Debug/Battle/スキル設定/Fear（数字入れ替え）")]
+    private static void SetSkillFear()
+    {
+        SetSkill(EmotionType.Fear);
+    }
+
+    [MenuItem("Debug/Battle/スキル設定/Disgust（半減）")]
+    private static void SetSkillDisgust()
+    {
+        SetSkill(EmotionType.Disgust);
+    }
 
     [MenuItem("Debug/Battle/オークションスキップ ON")]
     private static void EnableSkipAuction()

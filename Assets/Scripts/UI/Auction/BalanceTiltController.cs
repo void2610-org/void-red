@@ -25,8 +25,6 @@ public class BalanceTiltController : MonoBehaviour
     private float _currentTilt;
     private MotionHandle _handle;
 
-    private static float Smoothstep(float t) => t * t * (3f - 2f * t);
-
     /// <summary>
     /// 即座に傾きを設定
     /// </summary>
@@ -77,6 +75,11 @@ public class BalanceTiltController : MonoBehaviour
             });
     }
 
+    private static float Smoothstep(float t)
+    {
+        return t * t * (3f - 2f * t);
+    }
+
     private void ApplyTilt(float tilt)
     {
         balanceBar.localEulerAngles = new Vector3(0f, 0f, MAX_BAR_ROTATION * tilt);
@@ -85,5 +88,8 @@ public class BalanceTiltController : MonoBehaviour
         balanceRight.anchoredPosition = new Vector2(0f, MAX_RIGHT_Y * tilt);
     }
 
-    private void OnDestroy() => _handle.TryCancel();
+    private void OnDestroy()
+    {
+        _handle.TryCancel();
+    }
 }

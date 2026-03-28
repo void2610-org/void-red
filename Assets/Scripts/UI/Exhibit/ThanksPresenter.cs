@@ -42,7 +42,10 @@ public class ThanksPresenter : IStartable, IDisposable
         await _sceneTransitionService.TransitionToSceneWithFade(_settings.IdleReturnSceneName);
     }
 
-    public void Start() => WaitForClickAndReturn().Forget();
+    public void Start()
+    {
+        WaitForClickAndReturn().Forget();
+    }
 
     public void Dispose() { }
 }

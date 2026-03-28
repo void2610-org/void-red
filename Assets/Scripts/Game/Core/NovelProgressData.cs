@@ -42,5 +42,8 @@ public class NovelProgressData
     /// <summary>
     /// リセット
     /// </summary>
-    public void Reset() => _choiceResults.Clear();
+    public void Reset()
+    {
+        _choiceResults.Clear();
+    }
 }

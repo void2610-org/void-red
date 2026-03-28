@@ -20,5 +20,8 @@ public class MemoryProgressData
     /// <summary>
     /// データをリセット
     /// </summary>
-    public void Reset() => AcquiredThemes.Clear();
+    public void Reset()
+    {
+        AcquiredThemes.Clear();
+    }
 }

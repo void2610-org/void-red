@@ -201,7 +201,10 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     }
 
     // ルートボタンを初期選択
-    public void Start() => SafeNavigationManager.SelectRootForceSelectable().Forget();
+    public void Start()
+    {
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
+    }
 
     // すべてのViewのイベントを解除
     public void Dispose()

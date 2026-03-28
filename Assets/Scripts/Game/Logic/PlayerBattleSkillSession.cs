@@ -30,9 +30,6 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
 
     public void ForceActivate() => OnSkillActivated();
 
-    /// <summary>現在のスキルが対象選択UIを必要とするかを返す</summary>
-    private bool RequiresTargetSelection() => _playerSkill == EmotionType.Sadness;
-
     /// <summary>
     /// ラウンド中のスキル監視を開始する
     /// </summary>
@@ -74,6 +71,12 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
         BattleSkillExecutor.Execute(_playerSkill, _handler.PlayerCard, _handler.EnemyCard, _playerDeck, _handler, isPlayerSide: true);
         _battleUIPresenter.RefreshBattleCardNumbers();
         ShouldApplyDeferredSkill = false;
+    }
+
+    /// <summary>現在のスキルが対象選択UIを必要とするかを返す</summary>
+    private bool RequiresTargetSelection()
+    {
+        return _playerSkill == EmotionType.Sadness;
     }
 
     /// <summary>
@@ -188,5 +191,8 @@ public sealed class PlayerBattleSkillSession : System.IDisposable
     /// <summary>
     /// ラウンド中に購読したイベントを解放する
     /// </summary>
-    public void Dispose() => _disposables.Dispose();
+    public void Dispose()
+    {
+        _disposables.Dispose();
+    }
 }

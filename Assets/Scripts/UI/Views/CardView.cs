@@ -49,9 +49,6 @@ public class CardView : BaseCardView
 
     public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
 
-    protected override CardData GetCardData() => CardData;
-    protected override Sprite GetCurtainSprite() => curtainSprites.GetValueOrDefault(CardData.MemoryType);
-
     /// <summary>
     /// カードデータを設定して初期化
     /// </summary>
@@ -108,6 +105,15 @@ public class CardView : BaseCardView
 
         var targetAlpha = state != CardBidState.None ? 0.6f : 0f;
         _growAlphaHandle = _instancedGrowMaterial.MaterialFloatTo(_alpha, targetAlpha, fadeDuration, Ease.OutCubic, gameObject);
+    }
+
+    protected override CardData GetCardData()
+    {
+        return CardData;
+    }
+    protected override Sprite GetCurtainSprite()
+    {
+        return curtainSprites.GetValueOrDefault(CardData.MemoryType);
     }
 
     /// <summary>

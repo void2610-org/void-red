@@ -8,13 +8,13 @@ using Void2610.UnityTemplate;
 [RequireComponent(typeof(CanvasGroup))]
 public abstract class BasePhaseView : MonoBehaviour
 {
-    private const float DefaultFadeDuration = 0.3f;
+    private const float DEFAULT_FADE_DURATION = 0.3f;
 
     protected CanvasGroup CanvasGroup { get; private set; }
 
-    public virtual void Show() => CanvasGroup.FadeIn(DefaultFadeDuration);
+    public virtual void Show() => CanvasGroup.FadeIn(DEFAULT_FADE_DURATION);
 
-    public virtual void Hide() => CanvasGroup.FadeOut(DefaultFadeDuration);
+    public virtual void Hide() => CanvasGroup.FadeOut(DEFAULT_FADE_DURATION);
 
     protected virtual void Awake()
     {
