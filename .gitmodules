@@ -4,6 +4,6 @@
 [submodule "my-unity-utils"]
 	path = my-unity-utils
 	url = https://github.com/void2610/my-unity-utils.git
-[submodule "unity-analyzers"]
-	path = unity-analyzers
-	url = https://github.com/void2610/unity-analyzers.git
+[submodule "unity-coding-standards"]
+	path = unity-coding-standards
+	url = https://github.com/void2610/unity-coding-standards.git

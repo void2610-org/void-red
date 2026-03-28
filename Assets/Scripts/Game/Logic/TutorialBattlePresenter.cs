@@ -46,31 +46,65 @@ public class TutorialBattlePresenter : BattlePresenter
         AuctionProcessor = new AuctionProcessor(Player, Enemy, BattleUIPresenter, _auctionCompetitionPhaseRunner);
     }
 
-    protected override void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) => BattleUIPresenter.InitializeDeckSelection(wonCards, _tutorialBattlePlayerData.DeckAllowedCardIndices);
+    protected override void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards)
+    {
+        BattleUIPresenter.InitializeDeckSelection(wonCards, _tutorialBattlePlayerData.DeckAllowedCardIndices);
+    }
 
-    protected override bool CanUseDeckSelectionSkill(EmotionType playerSkill) => false;
+    protected override bool CanUseDeckSelectionSkill(EmotionType playerSkill)
+    {
+        return false;
+    }
 
-    protected override EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => _tutorialBattlePlayerData.BattleForcedSkillEmotion;
+    protected override EmotionType GetDeckSelectionSkill(EmotionType defaultSkill)
+    {
+        return _tutorialBattlePlayerData.BattleForcedSkillEmotion;
+    }
 
-    protected override EmotionType GetBattleSkill(EmotionType defaultSkill) => _tutorialBattlePlayerData.BattleForcedSkillEmotion;
+    protected override EmotionType GetBattleSkill(EmotionType defaultSkill)
+    {
+        return _tutorialBattlePlayerData.BattleForcedSkillEmotion;
+    }
 
-    protected override bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
+    protected override bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill)
+    {
+        return false;
+    }
 
-    protected override bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) => handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
+    protected override bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill)
+    {
+        return handler.PlayerSkillAvailable && handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
+    }
 
-    protected override bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill) => handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
+    protected override bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill)
+    {
+        return handler.CurrentRound == _tutorialBattlePlayerData.SkillRoundIndex;
+    }
 
-    protected override VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => _tutorialBattlePlayerData.BattleVictoryCondition;
+    protected override VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition)
+    {
+        return _tutorialBattlePlayerData.BattleVictoryCondition;
+    }
 
-    protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => EnemyAI.DecideEmotionState();
+    protected override EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState)
+    {
+        return EnemyAI.DecideEmotionState();
+    }
 
-    protected override int? GetForcedDialogueChoiceIndex() => 0;
+    protected override int? GetForcedDialogueChoiceIndex()
+    {
+        return 0;
+    }
 
-    protected override async UniTask OnDeckSelectionShownAsync() => await BattleUIPresenter.StartTutorial("DeckSelectionPhase");
+    protected override async UniTask OnDeckSelectionShownAsync()
+    {
+        await BattleUIPresenter.StartTutorial("DeckSelectionPhase");
+    }
 
-    protected override async UniTask OnBeforeMemoryGrowthContinueAsync() => await BattleUIPresenter.StartTutorial("MemoryGrowthPhase");
-
-    private void UpdateTutorialBidConfirmState() => BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() == _tutorialBattlePlayerData.BidRequiredAmount);
+    protected override async UniTask OnBeforeMemoryGrowthContinueAsync()
+    {
+        await BattleUIPresenter.StartTutorial("MemoryGrowthPhase");
+    }
 
     protected override async UniTask OnAfterCardRevealAsync()
     {
@@ -177,6 +211,11 @@ public class TutorialBattlePresenter : BattlePresenter
         if (handler.CurrentRound == 0)
             await BattleUIPresenter.StartTutorial("BattlePhase");
         return await BattleUIPresenter.OnBattleCardSelected.FirstAsync();
+    }
+
+    private void UpdateTutorialBidConfirmState()
+    {
+        BattleUIPresenter.SetAuctionConfirmInteractable(Player.Bids.GetTotalBidAmount() == _tutorialBattlePlayerData.BidRequiredAmount);
     }
 
     private async UniTask RunTutorialBiddingAsync()

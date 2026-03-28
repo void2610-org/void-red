@@ -49,12 +49,6 @@ public class DeckSelectionView : BasePhaseView
     /// </summary>
     public void Initialize(IReadOnlyList<CardModel> wonCards) => Initialize(wonCards, null);
 
-    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
-
-    private void UpdateConfirmButton() => confirmButton.interactable = IsAllSlotsFilled() && _isConfirmInteractableByPresenter;
-
-    private bool IsAllSlotsFilled() => deckSlots.All(s => s.IsOccupied);
-
     public void SetConfirmInteractable(bool interactable)
     {
         _isConfirmInteractableByPresenter = interactable;
@@ -122,6 +116,21 @@ public class DeckSelectionView : BasePhaseView
         confirmButton.OnClickAsObservable().Subscribe(_ => OnConfirmClicked()).AddTo(_disposables);
 
         UpdateConfirmButton();
+    }
+
+    private void OnCardDragging(Vector3 cardWorldPos)
+    {
+        dragLineView.UpdateEndPosition(cardWorldPos);
+    }
+
+    private void UpdateConfirmButton()
+    {
+        confirmButton.interactable = IsAllSlotsFilled() && _isConfirmInteractableByPresenter;
+    }
+
+    private bool IsAllSlotsFilled()
+    {
+        return deckSlots.All(s => s.IsOccupied);
     }
 
     private void Clear()

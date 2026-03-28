@@ -71,11 +71,6 @@ public class CardBattleHandler
     /// <summary>怒りスキル: 次ターンの勝利条件を反転する予約を積む</summary>
     public void QueueConditionReversedNextTurn() => _conditionReversedNextTurn = true;
 
-    /// <summary>
-    /// 勝利条件を逆転した値へ変換する
-    /// </summary>
-    private static VictoryCondition GetReversedCondition(VictoryCondition condition) => condition == VictoryCondition.LowerWins ? VictoryCondition.HigherWins : VictoryCondition.LowerWins;
-
     /// <summary>嫌悪スキル: 次に出すカードの半減予約を積む</summary>
     public void QueueNextCardHalved(bool isPlayerSide)
     {
@@ -187,6 +182,14 @@ public class CardBattleHandler
         CurrentRound++;
         PlayerCard = null;
         EnemyCard = null;
+    }
+
+    /// <summary>
+    /// 勝利条件を逆転した値へ変換する
+    /// </summary>
+    private static VictoryCondition GetReversedCondition(VictoryCondition condition)
+    {
+        return condition == VictoryCondition.LowerWins ? VictoryCondition.HigherWins : VictoryCondition.LowerWins;
     }
 
     /// <summary>

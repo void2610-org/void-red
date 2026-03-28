@@ -57,8 +57,6 @@ public class AuctionView : BasePhaseView
 
     public override void Show() => CanvasGroup.Show();
 
-    private void OnDialogueClicked(AuctionCardView auctionCard) => _onDialogueRequested.OnNext(auctionCard.CardModel);
-
     public void SetAllCardsInteractable(bool interactable)
     {
         foreach (var auctionCardView in _auctionCardViews)
@@ -264,6 +262,11 @@ public class AuctionView : BasePhaseView
         _auctionCardViews.Clear();
 
         _playerBids = null;
+    }
+
+    private void OnDialogueClicked(AuctionCardView auctionCard)
+    {
+        _onDialogueRequested.OnNext(auctionCard.CardModel);
     }
 
     private AuctionCardView FindAuctionCardView(CardModel cardModel)

@@ -60,8 +60,6 @@ public class CardBattleView : BasePhaseView
     /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => ShowPlayerHand(availableCards, null);
 
-    private void OnCardDragging(Vector3 cardWorldPos) => dragLineView.UpdateEndPosition(cardWorldPos);
-
     /// <summary>表示中の手札全体の操作可否を切り替える</summary>
     public void SetHandInteractable(bool interactable)
     {
@@ -205,6 +203,11 @@ public class CardBattleView : BasePhaseView
             Destroy(_enemyFieldCard.gameObject);
             _enemyFieldCard = null;
         }
+    }
+
+    private void OnCardDragging(Vector3 cardWorldPos)
+    {
+        dragLineView.UpdateEndPosition(cardWorldPos);
     }
 
     // === D&D関連 ===

@@ -57,43 +57,98 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
     public UniTask WaitForInitializationAsync() => _initializationComplete.Task;
 
-    protected virtual async UniTask HandleAuctionResult() => await AuctionProcessor.ProcessAuctionResultAsync(AuctionCards, _currentEnemyData, CurrentGameStateInternal);
+    protected virtual async UniTask HandleAuctionResult()
+    {
+        await AuctionProcessor.ProcessAuctionResultAsync(AuctionCards, _currentEnemyData, CurrentGameStateInternal);
+    }
 
-    protected virtual UniTask OnAfterCardRevealAsync() => UniTask.CompletedTask;
+    protected virtual UniTask OnAfterCardRevealAsync()
+    {
+        return UniTask.CompletedTask;
+    }
 
-    protected virtual UniTask OnDeckSelectionShownAsync() => UniTask.CompletedTask;
+    protected virtual UniTask OnDeckSelectionShownAsync()
+    {
+        return UniTask.CompletedTask;
+    }
 
-    protected virtual UniTask OnAfterCardsDisplayed() => UniTask.CompletedTask;
+    protected virtual UniTask OnAfterCardsDisplayed()
+    {
+        return UniTask.CompletedTask;
+    }
 
-    protected virtual UniTask OnAfterResourceGaugesDisplayed() => UniTask.CompletedTask;
+    protected virtual UniTask OnAfterResourceGaugesDisplayed()
+    {
+        return UniTask.CompletedTask;
+    }
 
-    protected virtual UniTask OnBeforeMemoryGrowthContinueAsync() => UniTask.CompletedTask;
+    protected virtual UniTask OnBeforeMemoryGrowthContinueAsync()
+    {
+        return UniTask.CompletedTask;
+    }
 
-    protected virtual UniTask OnAfterBattleEndAsync() => UniTask.CompletedTask;
+    protected virtual UniTask OnAfterBattleEndAsync()
+    {
+        return UniTask.CompletedTask;
+    }
 
-    protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards) => BattleUIPresenter.InitializeDeckSelection(wonCards);
+    protected virtual void InitializeDeckSelectionView(IReadOnlyList<CardModel> wonCards)
+    {
+        BattleUIPresenter.InitializeDeckSelection(wonCards);
+    }
 
-    protected virtual void DecideFirstPlayer(CardBattleHandler handler) => handler.DecideFirstPlayer();
+    protected virtual void DecideFirstPlayer(CardBattleHandler handler)
+    {
+        handler.DecideFirstPlayer();
+    }
 
-    protected virtual bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill) => handler.PlayerSkillAvailable;
-    protected virtual bool CanUseDeckSelectionSkill(EmotionType playerSkill) => BattleSkillExecutor.CanUseInDeckSelection(playerSkill);
-    protected virtual EmotionType GetDeckSelectionSkill(EmotionType defaultSkill) => defaultSkill;
-    protected virtual EmotionType GetBattleSkill(EmotionType defaultSkill) => defaultSkill;
-    protected virtual bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill) => false;
-    protected virtual bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill) => false;
+    protected virtual bool CanUseBattleSkill(CardBattleHandler handler, EmotionType playerSkill)
+    {
+        return handler.PlayerSkillAvailable;
+    }
+    protected virtual bool CanUseDeckSelectionSkill(EmotionType playerSkill)
+    {
+        return BattleSkillExecutor.CanUseInDeckSelection(playerSkill);
+    }
+    protected virtual EmotionType GetDeckSelectionSkill(EmotionType defaultSkill)
+    {
+        return defaultSkill;
+    }
+    protected virtual EmotionType GetBattleSkill(EmotionType defaultSkill)
+    {
+        return defaultSkill;
+    }
+    protected virtual bool RequiresDeckSelectionSkillActivation(EmotionType playerSkill)
+    {
+        return false;
+    }
+    protected virtual bool RequiresBattleSkillActivation(CardBattleHandler handler, EmotionType playerSkill)
+    {
+        return false;
+    }
 
-    protected virtual VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition) => defaultVictoryCondition;
+    protected virtual VictoryCondition GetBattleVictoryCondition(VictoryCondition defaultVictoryCondition)
+    {
+        return defaultVictoryCondition;
+    }
 
-    protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState) => currentEmotionState;
+    protected virtual EmotionType GetEnemyBattleEmotionState(CardBattleHandler handler, EmotionType currentEmotionState)
+    {
+        return currentEmotionState;
+    }
 
-    protected virtual List<CardModel> BuildPlayerDeckCards(
-        IReadOnlyList<CardModel> selectedCards,
-        IReadOnlyList<CardModel> wonCards) => selectedCards.ToList();
+    protected virtual List<CardModel> BuildPlayerDeckCards(IReadOnlyList<CardModel> selectedCards, IReadOnlyList<CardModel> wonCards)
+    {
+        return selectedCards.ToList();
+    }
 
     /// <summary>
     /// 対話選択肢を強制するインデックスを返す。null の場合は制限なし
     /// </summary>
-    protected virtual int? GetForcedDialogueChoiceIndex() => null;
+    protected virtual int? GetForcedDialogueChoiceIndex()
+    {
+        return null;
+    }
 
     protected virtual async UniTask<CardModel> SelectBattleCardAsync(CardBattleHandler handler, BattleDeckModel playerDeck)
     {

@@ -30,5 +30,8 @@ public class SelectableBattleCardView : MonoBehaviour
             .AddTo(this);
     }
 
-    private void OnDestroy() => _onClicked.Dispose();
+    private void OnDestroy()
+    {
+        _onClicked.Dispose();
+    }
 }

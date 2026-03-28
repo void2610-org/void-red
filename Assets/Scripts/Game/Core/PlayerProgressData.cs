@@ -34,5 +34,8 @@ public class PlayerProgressData
     /// <summary>
     /// リセット
     /// </summary>
-    public void Reset() => ViewedCardIds.Clear();
+    public void Reset()
+    {
+        ViewedCardIds.Clear();
+    }
 }
