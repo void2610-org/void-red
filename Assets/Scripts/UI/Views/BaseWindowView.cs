@@ -153,14 +153,14 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         EnsureInitialized();
 
-#pragma warning disable VUA0001
+#pragma warning disable VUA1001
         if (closeButton)
         {
             closeButton.OnClickAsObservable()
                 .Subscribe(_ => Hide())
                 .AddTo(Disposables);
         }
-#pragma warning restore VUA0001
+#pragma warning restore VUA1001
     }
 
     protected virtual void OnDestroy()
