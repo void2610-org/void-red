@@ -15,20 +15,16 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.buildVersion }}
     steps:
-      - name: Checkout repository 📥
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Fetch tags 🏷️
-        run: git fetch --tags --no-recurse-submodules
-
       - name: Generate version string 🔢
         id: version
         run: |
-          BASE_VERSION=$(git tag --sort=-version:refname | head -n 1 || echo "0.0.0")
+          # チェックアウト不要: git ls-remote でタグ一覧のみ取得（オブジェクトをDLしない）
+          BASE_VERSION=$(git ls-remote --tags --sort=-version:refname \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            | grep -v '\^{}' | head -n1 | sed 's|.*refs/tags/||')
+          BASE_VERSION="${BASE_VERSION:-0.0.0}"
           DATE_JST=$(TZ=Asia/Tokyo date '+%Y/%m/%d %H:%M:%S')
-          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          SHORT_SHA="${GITHUB_SHA:0:7}"
           FULL_VERSION="${BASE_VERSION} ${DATE_JST} ${SHORT_SHA}"
           echo "buildVersion=${FULL_VERSION}" >> "$GITHUB_OUTPUT"
           echo "Generated version: ${FULL_VERSION}"
