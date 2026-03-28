@@ -15,12 +15,6 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.buildVersion }}
     steps:
-      - name: Free up disk space 🧹
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/hostedtoolcache
-          df -h
-
       - name: Checkout repository 📥
         uses: actions/checkout@v4
         with:
