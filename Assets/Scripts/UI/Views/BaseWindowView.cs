@@ -153,9 +153,12 @@ public abstract class BaseWindowView : MonoBehaviour
     {
         EnsureInitialized();
 
-        closeButton.OnClickAsObservable()
-            .Subscribe(_ => Hide())
-            .AddTo(Disposables);
+        if (closeButton)
+        {
+            closeButton.OnClickAsObservable()
+                .Subscribe(_ => Hide())
+                .AddTo(Disposables);
+        }
     }
 
     protected virtual void OnDestroy()
