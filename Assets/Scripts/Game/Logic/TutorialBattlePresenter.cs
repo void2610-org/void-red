@@ -170,8 +170,10 @@ public class TutorialBattlePresenter : BattlePresenter
         {
             BattleUIPresenter.ShowPlayerHand(availableCards);
             BattleUIPresenter.SetBattleHandInteractable(false);
+            BattleUIPresenter.SetSkillButtonInteractable(false);
             await BattleUIPresenter.StartTutorial("BattleSkillPhase");
-            await BattleUIPresenter.OnSkillActivated.FirstAsync();
+            BattleUIPresenter.SetSkillButtonInteractable(true);
+            await UniTask.WaitUntil(() => !handler.PlayerSkillAvailable);
             BattleUIPresenter.SetBattleHandInteractable(true);
         }
 
