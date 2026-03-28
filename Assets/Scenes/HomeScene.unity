@@ -140,6 +140,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 8df9e40e1e1894b598d06376e49841b7, type: 3}
     - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Transition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
       objectReference: {fileID: 1533597610}
@@ -261,6 +269,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 1a944acc8b2ae4682bed3e104de4948d, type: 3}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Transition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
@@ -555,7 +571,6 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
     m_Quality: 3
     m_FrameInfluence: 0.1
@@ -563,6 +578,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -660,6 +676,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 1577e9da958024ddd9f8673e5b3e0c64, type: 3}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Transition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
@@ -2078,6 +2102,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2139,6 +2164,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 8df9e40e1e1894b598d06376e49841b7, type: 3}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Transition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
@@ -2702,6 +2735,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: c207f51405d3e40c69e55645fd57f65a, type: 3}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Transition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9024825807648402152, guid: 22036cd33e4674afbba510ff071edae4, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
