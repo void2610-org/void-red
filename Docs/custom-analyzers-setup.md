@@ -4,126 +4,70 @@
 
 | 相対パス | 役割 |
 |---|---|
-| `.editorconfig` | C#フォーマット・命名規則・アナライザーseverity設定 |
-| `FormatCheck.csproj` | `dotnet format`専用のプロジェクトファイル |
-| `Directory.Build.props` | 全体ビルド設定＋アナライザーDLL参照 |
-| `unity-analyzers/` | カスタムRoslynアナライザープロジェクト一式 |
+| `.editorconfig` | `unity-coding-standards/config/.editorconfig` への symlink |
+| `FormatCheck.csproj` | `unity-coding-standards/config/FormatCheck.csproj` への symlink |
+| `Directory.Build.props` | `unity-coding-standards/config/Directory.Build.props` への symlink |
+| `unity-coding-standards/` | 共有コーディング規約 submodule |
 
-```
+```text
 プロジェクトルート/
-├── .editorconfig
-├── Directory.Build.props
-├── FormatCheck.csproj
-└── unity-analyzers/
-    ├── Directory.Build.props
+├── .editorconfig -> unity-coding-standards/config/.editorconfig
+├── Directory.Build.props -> unity-coding-standards/config/Directory.Build.props
+├── FormatCheck.csproj -> unity-coding-standards/config/FormatCheck.csproj
+└── unity-coding-standards/
+    ├── config/
+    ├── scripts/
     └── src/Void2610.Unity.Analyzers/
-        ├── *.cs (アナライザーソースコード)
-        ├── Void2610.Unity.Analyzers.csproj
-        └── bin/Release/netstandard2.0/
-            └── Void2610.Unity.Analyzers.dll
 ```
 
-## カスタムアナライザー一覧（VUA0001〜VUA0008）
+## カスタムアナライザー一覧
 
 | ID | ルール名 | チェック内容 |
 |---|---|---|
-| VUA0001 | SerializeFieldNullCheck | `[SerializeField]`フィールドへの防御的nullチェック（`== null`, `?.`, `??`, `is null`）を禁止 |
-| VUA0002 | SerializeFieldNaming | `[SerializeField]`フィールドに`_`プレフィックスを付けないことを強制 |
-| VUA0003 | EventSystem | C#標準の`event`や`Action`/`Func`フィールドを禁止（R3の`Subject<T>`推奨） |
-| VUA0004 | ExpressionBody | 単一文のpublicメソッドに式本体（`=>`）の使用を推奨 |
-| VUA0005 | MemberOrder | クラスメンバーの宣言順序を強制（enum→SerializeField→Property→const→private field→ctor→public method→private method→Unity event→Cleanup） |
-| VUA0006 | EnumSummary | トップレベルenumのメンバーに`/// <summary>`コメントを必須化 |
-| VUA0007 | MotionHandleTryCancel | LitMotionの`if(handle.IsActive()) handle.Cancel()`を`handle.TryCancel()`に統一 |
-| VUA0008 | PrivateFieldNaming | 通常のprivateフィールドに`_`プレフィックス必須 |
+| VUA1001 | SerializeFieldNullCheck | `[SerializeField]`フィールドへの防御的nullチェックを禁止 |
+| VUA1002 | EventSystem | C#標準の`event`や`Action`/`Func`フィールドを禁止 |
+| VUA1003 | MotionHandleTryCancel | LitMotionのキャンセル処理を`TryCancel()`に統一 |
+| VUA1004 | MemberOrder | クラスメンバーの宣言順序を強制 |
+| VUA2001 | SerializeFieldNaming | `[SerializeField]`フィールドに`_`プレフィックスを付けない |
+| VUA2002 | PrivateFieldNaming | 通常のprivateフィールドに`_`プレフィックス必須 |
+| VUA3001 | ExpressionBody | 単一文のpublicメソッドに式本体を推奨 |
+| VUA3002 | ConstantsNaming | `const`フィールドに`ALL_UPPER`を要求 |
+| VUA3003 | FileScopedNamespace | file-scoped namespace を要求 |
+| VUA4001 | EnumSummary | トップレベルenumメンバーに`/// <summary>`コメントを必須化 |
 
 ## フォーマットチェックの実行
 
 ```bash
-# 1. ホワイトスペース整形
-dotnet format whitespace FormatCheck.csproj
+# 自動修正
+./unity-coding-standards/scripts/run-format.sh
 
-# 2. コードスタイル整形
-dotnet format style FormatCheck.csproj --severity warn
-
-# 3. カスタムアナライザー検証
-dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn
+# 差分確認のみ
+./unity-coding-standards/scripts/run-format.sh --verify-no-changes
 ```
 
 ## 他のUnityプロジェクトで再現する手順
 
-### 1. アナライザープロジェクトをコピー＆ビルド
-
-`unity-analyzers/` ディレクトリをそのまま新プロジェクトに配置してビルドする。
+### 1. submodule を追加する
 
 ```bash
-cd unity-analyzers/src/Void2610.Unity.Analyzers
-dotnet build -c Release
+git submodule add https://github.com/void2610/unity-coding-standards.git unity-coding-standards
 ```
 
-### 2. `Directory.Build.props` をプロジェクトルートに配置
+### 2. 共有設定ファイルを symlink にする
 
-```xml
-<Project>
-  <PropertyGroup>
-    <LangVersion>preview</LangVersion>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)../Temp/obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
-    <BaseOutputPath>$(MSBuildThisFileDirectory)../Temp/bin/$(MSBuildProjectName)/</BaseOutputPath>
-  </PropertyGroup>
-  <ItemGroup>
-    <Analyzer Include="$(MSBuildThisFileDirectory)unity-analyzers/src/Void2610.Unity.Analyzers/bin/Release/netstandard2.0/Void2610.Unity.Analyzers.dll" />
-  </ItemGroup>
-</Project>
+```bash
+ln -s unity-coding-standards/config/.editorconfig .editorconfig
+ln -s unity-coding-standards/config/Directory.Build.props Directory.Build.props
+ln -s unity-coding-standards/config/FormatCheck.csproj FormatCheck.csproj
 ```
 
-- `BaseIntermediateOutputPath`/`BaseOutputPath`でobj/binをUnityの`Temp/`配下に退避し、Unityのインポート対象から除外する
-- `Analyzer`でカスタムアナライザーDLLを参照する
+### 3. アナライザーをビルドする
 
-### 3. `FormatCheck.csproj` をプロジェクトルートに配置
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="Assets/Scripts/**/*.cs"
-             Exclude="Assets/Scripts/除外したいパス/**/*.cs" />
-  </ItemGroup>
-</Project>
-```
-
-- `EnableDefaultCompileItems=false`にして、チェック対象のスクリプトだけを明示的に指定する
-
-### 4. `.editorconfig` をプロジェクトルートに配置
-
-プロジェクトの`.editorconfig`をコピーし、末尾でカスタムアナライザーのseverityを有効化する。
-
-```ini
-# カスタムアナライザー
-dotnet_diagnostic.VUA0001.severity = warning
-dotnet_diagnostic.VUA0002.severity = warning
-dotnet_diagnostic.VUA0003.severity = warning
-dotnet_diagnostic.VUA0004.severity = warning
-dotnet_diagnostic.VUA0005.severity = warning
-dotnet_diagnostic.VUA0006.severity = warning
-dotnet_diagnostic.VUA0007.severity = warning
-dotnet_diagnostic.VUA0008.severity = warning
-```
-
-### 5. `unity-analyzers/Directory.Build.props` を配置
-
-アナライザープロジェクト自体のビルド設定を分離するため、`unity-analyzers/`直下にも配置する。
-
-```xml
-<Project>
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-</Project>
+```bash
+dotnet build unity-coding-standards/src/Void2610.Unity.Analyzers/Void2610.Unity.Analyzers.csproj -c Release
 ```
 
 ### 前提条件
 
-- .NET SDK がインストールされていること（`dotnet format`コマンド用）
-- アナライザーDLLはReleaseビルド済みであること
+- .NET SDK がインストールされていること
+- アナライザー DLL は Release ビルド済みであること

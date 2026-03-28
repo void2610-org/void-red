@@ -1,4 +1,4 @@
-name: Format Check
+name: Format
 
 on:
   push:
@@ -6,59 +6,22 @@ on:
     paths:
       - 'Assets/Scripts/**/*.cs'
       - '.editorconfig'
+      - 'Directory.Build.props'
+      - 'FormatCheck.csproj'
       - '.github/workflows/format-check.yml'
-      - 'unity-analyzers/**'
+      - '.gitmodules'
+      - 'unity-coding-standards/**'
   pull_request:
     paths:
       - 'Assets/Scripts/**/*.cs'
       - '.editorconfig'
+      - 'Directory.Build.props'
+      - 'FormatCheck.csproj'
       - '.github/workflows/format-check.yml'
-      - 'unity-analyzers/**'
+      - '.gitmodules'
+      - 'unity-coding-standards/**'
 
 jobs:
   format-check:
-    name: Format Check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 1
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8.0.x
-            7.0.x
-
-      - name: Build analyzer
-        run: dotnet build unity-analyzers/src/Void2610.Unity.Analyzers/Void2610.Unity.Analyzers.csproj -c Release
-
-      - name: Run analyzer tests
-        run: dotnet test unity-analyzers/tests/Void2610.Unity.Analyzers.Tests/Void2610.Unity.Analyzers.Tests.csproj -c Release --verbosity normal
-
-      - name: Check whitespace formatting
-        id: whitespace
-        continue-on-error: true
-        run: dotnet format whitespace FormatCheck.csproj --verify-no-changes
-
-      - name: Check code style
-        id: style
-        continue-on-error: true
-        run: dotnet format style FormatCheck.csproj --verify-no-changes --severity warn
-
-      - name: Check analyzers
-        id: analyzers
-        continue-on-error: true
-        run: dotnet format analyzers FormatCheck.csproj --verify-no-changes --severity warn
-
-      - name: Report results
-        if: steps.whitespace.outcome == 'failure' || steps.style.outcome == 'failure' || steps.analyzers.outcome == 'failure'
-        run: |
-          echo "::error::Format check failed:"
-          [ "${{ steps.whitespace.outcome }}" = "failure" ] && echo "  - Whitespace formatting violations found"
-          [ "${{ steps.style.outcome }}" = "failure" ] && echo "  - Code style violations found"
-          [ "${{ steps.analyzers.outcome }}" = "failure" ] && echo "  - Analyzer violations found"
-          exit 1
+    name: Check
+    uses: void2610/unity-coding-standards/.github/workflows/format-check.yml@main
