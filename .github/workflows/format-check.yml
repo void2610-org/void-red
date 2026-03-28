@@ -10,6 +10,7 @@ on:
       - 'FormatCheck.csproj'
       - '.github/workflows/format-check.yml'
       - '.gitmodules'
+      - 'unity-coding-standards'
       - 'unity-coding-standards/**'
   pull_request:
     paths:
@@ -19,6 +20,7 @@ on:
       - 'FormatCheck.csproj'
       - '.github/workflows/format-check.yml'
       - '.gitmodules'
+      - 'unity-coding-standards'
       - 'unity-coding-standards/**'
 
 jobs:
