@@ -110,3 +110,4 @@ tools/**/obj/
 .idea/
 .serena/
 /.uloop/outputs
+/.vscode

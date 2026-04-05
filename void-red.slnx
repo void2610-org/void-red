@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Project Path="Void2610.SettingsSystem.csproj" />
+  <Project Path="Void2610.UnityTemplate.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="MackySoft.SerializeReferenceExtensions.Editor.csproj" />
+  <Project Path="LicenseMaster.csproj" />
+  <Project Path="MackySoft.SerializeReferenceExtensions.csproj" />
+  <Project Path="Void2610.UnityTemplate.Editor.csproj" />
+  <Project Path="Discord.Sdk.csproj" />
+  <Project Path="LicenseMasterEditor.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+</Solution>
