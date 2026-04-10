@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
   m_Name: MemoryGrowthPhase
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialData
   steps:
   - message: "\u52DD\u5229\u3067\u304D\u307E\u3057\u305F\u306D\u3002\u3053\u3046\u3084\u3063\u3066\u30B9\u30AD\u30EB\u3092\u4F7F\u7528\u3059\u308C\u3070\u30D0\u30C8\u30EB\u3092\u6709\u5229\u306B\u9032\u3081\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059\u3002"
     isPlayerDialog: 0

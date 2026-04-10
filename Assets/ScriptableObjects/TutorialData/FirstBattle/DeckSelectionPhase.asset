@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
   m_Name: DeckSelectionPhase
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialData
   steps:
   - message: "\u3053\u3053\u304B\u3089\u306F\u30D0\u30C8\u30EB\u30D1\u30FC\u30C8\u3067\u3059\u3002\u4ECA\u56DE\u306E\u30EB\u30FC\u30EB\u3067\u306F\u300C\u6570\u5B57\u304C\u5927\u304D\u3044\u65B9\u304C\u52DD\u5229\u300D\u3057\u307E\u3059\u3002"
     isPlayerDialog: 0

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be39089e8c27e4fcba38fdd88f2042ba, type: 3}
   m_Name: BattleSkillPhase
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialData
   steps:
   - message: "\u5727\u52DD\u3067\u3057\u305F\u306D\u3002\u4ECA\u56DE\u306E\u30AA\u30FC\u30AF\u30B7\u30E7\u30F3\u3067\u306F1\u679A\u3057\u304B\u843D\u672D\u3055\u308C\u306A\u304B\u3063\u305F\u306E\u3067\u3001\u6700\u3082\u591A\u304F\u30EA\u30BD\u30FC\u30B9\u304C\u304B\u3051\u3089\u308C\u305F\u3042\u306A\u305F\u306E\u30AB\u30FC\u30C9\u304C1\u756A\u5F37\u304F\u306A\u3063\u3066\u3044\u307E\u3059\u3002"
     isPlayerDialog: 0
