@@ -8,7 +8,7 @@ public sealed class TutorialBattlePlayerData
 {
     public int BidForcedCardIndex => 0;
     public EmotionType BidForcedEmotion => EmotionType.Joy;
-    public int BidRequiredAmount => 2;
+    public int BidRequiredAmount => 1;
 
     public int AuctionCompetitionRequiredRaises => 2;
     public EmotionType AuctionCompetitionForcedEmotion => EmotionType.Trust;
