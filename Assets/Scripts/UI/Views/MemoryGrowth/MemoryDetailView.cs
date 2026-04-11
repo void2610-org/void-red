@@ -93,8 +93,13 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
         // 円形配置の計算用リスト（深度でソート用）
         var cardPositions = new List<(int index, float angle, float depth)>();
 
-        // 2アイテムの場合は左右配置（0から開始）、それ以外は上から開始
-        var startAngle = count == 2 ? 0f : Mathf.PI / 2f;
+        // 1アイテムは正面、2アイテムは左右、それ以外は上から開始
+        var startAngle = count switch
+        {
+            1 => -Mathf.PI / 2f,
+            2 => 0f,
+            _ => Mathf.PI / 2f
+        };
 
         for (var i = 0; i < count; i++)
         {
@@ -147,7 +152,12 @@ public class MemoryDetailView : BaseWindowView, IBeginDragHandler, IDragHandler,
         if (count == 0) return;
 
         var anglePerCard = 2f * Mathf.PI / count;
-        var startAngle = count == 2 ? 0f : Mathf.PI / 2f;
+        var startAngle = count switch
+        {
+            1 => -Mathf.PI / 2f,
+            2 => 0f,
+            _ => Mathf.PI / 2f
+        };
 
         // 正面位置: sin(angle) = -1 → angle = -π/2
         var targetFrontAngle = -Mathf.PI / 2f;
