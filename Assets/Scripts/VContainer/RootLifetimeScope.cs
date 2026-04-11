@@ -56,6 +56,7 @@ public class RootLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<SafeNavigationManager>();
 
         // SettingsSystem用のバインド
+        builder.RegisterInstance(new SettingsSystemOptions());
         builder.Register<ISettingsDefinition, GameSettingsDefinition>(Lifetime.Singleton);
         builder.Register<ISettingsInputProvider, SettingsInputProvider>(Lifetime.Singleton);
         builder.Register<ConfirmationDialogService>(Lifetime.Singleton).WithParameter(confirmationDialogView).As<IConfirmationDialog>();
