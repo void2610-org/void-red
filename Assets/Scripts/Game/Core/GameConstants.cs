@@ -4,9 +4,9 @@
 public static class GameConstants
 {
     /// <summary>
-    /// 感情リソースのデフォルト値（8種類×各3枚 = 合計24枚）
+    /// 感情リソースのデフォルト値（8種類×各5枚 = 合計40枚）
     /// </summary>
-    public const int DEFAULT_EMOTION_VALUE = 3;
+    public const int DEFAULT_EMOTION_VALUE = 5;
 
     /// <summary>
     /// オークションに並べるカード枚数
