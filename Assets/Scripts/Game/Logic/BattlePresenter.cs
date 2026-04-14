@@ -82,6 +82,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
         return UniTask.CompletedTask;
     }
 
+    protected virtual UniTask OnAfterResourceRewardsAnimated()
+    {
+        return UniTask.CompletedTask;
+    }
+
     protected virtual UniTask OnBeforeMemoryGrowthContinueAsync()
     {
         return UniTask.CompletedTask;
@@ -372,6 +377,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await OnAfterResourceGaugesDisplayed();
 
         var rewardedAmounts = await BattleUIPresenter.AnimateResourceRewardsAsync(rewardResults);
+        await OnAfterResourceRewardsAnimated();
+        await BattleUIPresenter.WaitForResourceRewardNextAsync();
 
         // 報酬を各感情リソースに加算
         foreach (var (emotion, amount) in rewardedAmounts)

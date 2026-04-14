@@ -144,8 +144,9 @@ public class TutorialBattlePresenter : BattlePresenter
         await BattleUIPresenter.StartTutorial("RewardPhase");
     }
 
-    protected override async UniTask OnAfterResourceGaugesDisplayed()
+    protected override async UniTask OnAfterResourceRewardsAnimated()
     {
+        await UniTask.Delay(800);
         await BattleUIPresenter.StartTutorial("RewardPhase2");
     }
 

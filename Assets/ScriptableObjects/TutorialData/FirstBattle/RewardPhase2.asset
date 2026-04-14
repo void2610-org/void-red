@@ -13,31 +13,31 @@ MonoBehaviour:
   m_Name: RewardPhase2
   m_EditorClassIdentifier: Assembly-CSharp::TutorialData
   steps:
-  - message: 現在の感情リソースの状態は、このようになっています。
+  - message: "\u73FE\u5728\u306E\u611F\u60C5\u30EA\u30BD\u30FC\u30B9\u306E\u72B6\u614B\u306F\u3001\u3053\u306E\u3088\u3046\u306B\u306A\u3063\u3066\u3044\u307E\u3059\u3002"
     isPlayerDialog: 0
     maskPosition: {x: 20, y: -185}
     maskSize: {x: 1000, y: 220}
-  - message: 最も多い感情が、あなたの感情状態となりますので……。
+  - message: "\u6700\u3082\u591A\u3044\u611F\u60C5\u304C\u3001\u3042\u306A\u305F\u306E\u611F\u60C5\u72B6\u614B\u3068\u306A\u308A\u307E\u3059\u306E\u3067\u2026\u2026\u3002"
     isPlayerDialog: 0
-    maskPosition: {x: 20, y: -185}
-    maskSize: {x: 1000, y: 220}
-  - message: 今のあなたは、喜びの感情を抱いているはずです。
+    maskPosition: {x: -240, y: -185}
+    maskSize: {x: 100, y: 220}
+  - message: "\u4ECA\u306E\u3042\u306A\u305F\u306F\u3001\u559C\u3073\u306E\u611F\u60C5\u3092\u62B1\u3044\u3066\u3044\u308B\u306F\u305A\u3067\u3059\u3002"
     isPlayerDialog: 0
-    maskPosition: {x: 20, y: -185}
-    maskSize: {x: 1000, y: 220}
-  - message: 確かに...。心なしかハッピーな気分かも。
+    maskPosition: {x: -240, y: -185}
+    maskSize: {x: 100, y: 220}
+  - message: "\u78BA\u304B\u306B...\u3002\u5FC3\u306A\u3057\u304B\u30CF\u30C3\u30D4\u30FC\u306A\u6C17\u5206\u304B\u3082\u3002"
+    isPlayerDialog: 1
+    maskPosition: {x: -240, y: -185}
+    maskSize: {x: 100, y: 220}
+  - message: "\u305D\u308C\u306F\u4F55\u3088\u308A\u3002\u611F\u60C5\u306E\u30EA\u30BD\u30FC\u30B9\u91CF\u306F\u3001\u3042\u306A\u305F\u306E\u601D\u8003\u306B\u5927\u304D\u306A\u5F71\u97FF\u3092\u4E0E\u3048\u307E\u3059\u306E\u3067\u2026\u2026\u4E01\u91CD\u306B\u53D6\u308A\u6271\u3063\u3066\u304F\u3060\u3055\u3044\u306D\uFF1F"
+    isPlayerDialog: 0
+    maskPosition: {x: 0, y: 0}
+    maskSize: {x: 0, y: 0}
+  - message: "\u4ECA\u306E\u6240\u305D\u3093\u306A\u306B\u5927\u304D\u306A\u5909\u5316\u304C\u3042\u308B\u3068\u306F\u601D\u3048\u306A\u3044\u3051\u3069\u2026\u2026\u3002"
     isPlayerDialog: 1
     maskPosition: {x: 0, y: 0}
     maskSize: {x: 0, y: 0}
-  - message: それは何より。感情のリソース量は、あなたの思考に大きな影響を与えますので……丁重に取り扱ってくださいね？
-    isPlayerDialog: 0
-    maskPosition: {x: 0, y: 0}
-    maskSize: {x: 0, y: 0}
-  - message: 今の所そんなに大きな変化があるとは思えないけど……。
-    isPlayerDialog: 1
-    maskPosition: {x: 0, y: 0}
-    maskSize: {x: 0, y: 0}
-  - message: 後々わかりますよ。特に次のバトルではとても大切なものになってきますから。
+  - message: "\u5F8C\u3005\u308F\u304B\u308A\u307E\u3059\u3088\u3002\u7279\u306B\u6B21\u306E\u30D0\u30C8\u30EB\u3067\u306F\u3068\u3066\u3082\u5927\u5207\u306A\u3082\u306E\u306B\u306A\u3063\u3066\u304D\u307E\u3059\u304B\u3089\u3002"
     isPlayerDialog: 0
     maskPosition: {x: 0, y: 0}
     maskSize: {x: 0, y: 0}
