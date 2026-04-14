@@ -53,6 +53,15 @@ public class CompetitionHandler
     public void End() => IsActive = false;
 
     /// <summary>
+    /// タイムアウト判定の基準時刻を現在時刻へ更新
+    /// </summary>
+    public void ResetTimeout()
+    {
+        if (!IsActive) return;
+        _lastActionTime = Time.time;
+    }
+
+    /// <summary>
     /// プレイヤーが1枚上乗せ（任意の感情）
     /// </summary>
     public bool TryPlayerRaise(EmotionType emotion, PlayerPresenter player)
