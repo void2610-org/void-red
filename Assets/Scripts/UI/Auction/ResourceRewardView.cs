@@ -30,6 +30,8 @@ public class ResourceRewardView : MonoBehaviour
 
     public void Hide() => _canvasGroup.Hide();
 
+    public async UniTask WaitForNextAsync() => await _onNextButtonClicked.FirstAsync();
+
     /// <summary>
     /// リソース報酬をゲージアニメーションで表示
     /// </summary>
@@ -63,8 +65,6 @@ public class ResourceRewardView : MonoBehaviour
             // カードの司る感情に報酬を加算してバーをアニメーション
             AnimateRewardToEmotion(result.CardEmotion, result.TotalReward);
         }
-
-        await _onNextButtonClicked.FirstAsync();
     }
 
     private void Show()

@@ -98,6 +98,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void ShowMemoryGrowthView(IReadOnlyList<AcquiredTheme> allThemes) => _memoryGrowthView.ShowMemoryGrowth(allThemes);
     public UniTask WaitForMemoryGrowthCompleteAsync() => _memoryGrowthView.WaitForContinueAsync();
     public void DisplayResourceGauges(IReadOnlyDictionary<EmotionType, int> currentResources, IReadOnlyDictionary<EmotionType, int> maxResources) => _rewardPhaseView.DisplayResourceGauges(currentResources, maxResources);
+    public async UniTask WaitForResourceRewardNextAsync() => await _rewardPhaseView.WaitForResourceRewardNextAsync();
 
     // 競合フェーズ
     public void ShowCompetition(int playerBid, int enemyBid, IReadOnlyDictionary<EmotionType, int> resources) => _competitionView.Initialize(playerBid, enemyBid, resources);
