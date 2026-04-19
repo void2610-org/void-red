@@ -14,8 +14,7 @@ public class TutorialStepPropertyDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        if (!property.isExpanded)
-            return LineHeight;
+        if (!property.isExpanded) return LineHeight;
 
         var messageProperty = property.FindPropertyRelative("message");
         var messageHeight = EditorGUI.GetPropertyHeight(messageProperty);

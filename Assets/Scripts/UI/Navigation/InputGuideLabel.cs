@@ -42,8 +42,7 @@ public class InputGuideLabel : MonoBehaviour
     private void OnEvent(InputEventPtr eventPtr, InputDevice device)
     {
         var eventType = eventPtr.type;
-        if (eventType != StateEvent.Type && eventType != DeltaStateEvent.Type)
-            return;
+        if (eventType != StateEvent.Type && eventType != DeltaStateEvent.Type) return;
 
         using var inputEventControlEnumerator = eventPtr.EnumerateControls(
             InputControlExtensions.Enumerate.IncludeNonLeafControls |
@@ -154,8 +153,7 @@ public class InputGuideLabel : MonoBehaviour
     /// </summary>
     private bool IsBindingForCurrentScheme(InputBinding binding)
     {
-        if (string.IsNullOrEmpty(binding.path))
-            return false;
+        if (string.IsNullOrEmpty(binding.path)) return false;
 
         if (_scheme == InputSchemeType.KeyboardAndMouse)
         {

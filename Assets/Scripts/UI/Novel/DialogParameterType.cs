@@ -111,10 +111,7 @@ public static class DialogParameterTypeExtensions
     /// <returns>変換された値</returns>
     public static object ConvertValue(this DialogParameterType parameterType, string valueString)
     {
-        if (string.IsNullOrEmpty(valueString))
-        {
-            return parameterType.GetDefaultValue();
-        }
+        if (string.IsNullOrEmpty(valueString)) return parameterType.GetDefaultValue();
 
         return parameterType switch
         {

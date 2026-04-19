@@ -45,8 +45,7 @@ public class ItemGetData
     /// <returns>アイテム取得データ、または作成できない場合はnull</returns>
     public static ItemGetData FromCommaSeparatedString(string commaSeparatedValue)
     {
-        if (string.IsNullOrEmpty(commaSeparatedValue))
-            return null;
+        if (string.IsNullOrEmpty(commaSeparatedValue)) return null;
 
         var parts = commaSeparatedValue.Split(',');
         if (parts.Length < 3)

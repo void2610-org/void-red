@@ -26,11 +26,7 @@ public static class NovelCardSelectionService
     public static string SelectCardByChoices(string scenarioId, List<NovelChoiceResult> choiceResults)
     {
         // キャッシュされたメソッドを検索
-        if (_scenarioMethods.TryGetValue(scenarioId, out var method))
-        {
-            // リフレクションでメソッドを呼び出し
-            return (string)method.Invoke(null, new object[] { choiceResults });
-        }
+        if (_scenarioMethods.TryGetValue(scenarioId, out var method)) return (string)method.Invoke(null, new object[] { choiceResults });
 
         return null;
     }
@@ -62,10 +58,7 @@ public static class NovelCardSelectionService
     private static string SelectCardForPrologue1(List<NovelChoiceResult> choiceResults)
     {
         // 選択結果が存在しない場合
-        if (choiceResults == null || choiceResults.Count == 0)
-        {
-            return null;
-        }
+        if (choiceResults == null || choiceResults.Count == 0) return null;
 
         // 最初の選択肢（choiceIndex = 0）の結果を最後から検索
         NovelChoiceResult firstChoice = null;
@@ -78,10 +71,7 @@ public static class NovelCardSelectionService
             }
         }
 
-        if (firstChoice == null)
-        {
-            return null;
-        }
+        if (firstChoice == null) return null;
 
         // 選択された選択肢のインデックスに基づいてカードIDを決定
         return firstChoice.SelectedOptionIndex switch

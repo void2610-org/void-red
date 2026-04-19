@@ -147,8 +147,7 @@ public class ExcelDialogLoader
     {
         for (var i = 0; i < row.Table.Columns.Count; i++)
         {
-            if (!string.IsNullOrWhiteSpace(row[i]?.ToString()))
-                return false;
+            if (!string.IsNullOrWhiteSpace(row[i]?.ToString())) return false;
         }
         return true;
     }

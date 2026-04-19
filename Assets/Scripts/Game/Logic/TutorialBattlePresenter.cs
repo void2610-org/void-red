@@ -180,10 +180,7 @@ public class TutorialBattlePresenter : BattlePresenter
 
         var round = handler.CurrentRound;
         var forcedCardPerRound = _tutorialBattlePlayerData.ForcedCardPerRound;
-        if (round < 0 || round >= forcedCardPerRound.Count || !forcedCardPerRound[round].HasValue)
-            return requiresSkillActivation
-                ? await BattleUIPresenter.OnBattleCardSelected.FirstAsync()
-                : await base.SelectBattleCardAsync(handler, playerDeck);
+        if (round < 0 || round >= forcedCardPerRound.Count || !forcedCardPerRound[round].HasValue) return requiresSkillActivation ? await BattleUIPresenter.OnBattleCardSelected.FirstAsync() : await base.SelectBattleCardAsync(handler, playerDeck);
 
         var forcedDeckCardIndex = forcedCardPerRound[round].Value;
         if (forcedDeckCardIndex < 0 || forcedDeckCardIndex >= playerDeck.Cards.Count)
@@ -196,8 +193,7 @@ public class TutorialBattlePresenter : BattlePresenter
         var forcedAvailableCardIndex = -1;
         for (var i = 0; i < availableCards.Count; i++)
         {
-            if (availableCards[i] != forcedCard)
-                continue;
+            if (availableCards[i] != forcedCard) continue;
 
             forcedAvailableCardIndex = i;
             break;
@@ -296,13 +292,14 @@ public class TutorialBattlePresenter : BattlePresenter
 /// </summary>
 public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
 {
+    private const int ENEMY_RAISE_DELAY_MIN_MILLISECONDS = 700;
+    private const int ENEMY_RAISE_DELAY_MAX_MILLISECONDS = 1300;
+
     private readonly Player _player;
     private readonly IEnemyAIController _enemyAI;
     private readonly BattleUIPresenter _uiPresenter;
     private readonly int _requiredRaises;
     private readonly EmotionType _forcedEmotion;
-    private const int EnemyRaiseDelayMinMilliseconds = 700;
-    private const int EnemyRaiseDelayMaxMilliseconds = 1300;
 
     public TutorialCompetitionPhaseRunner(
         Player player,
@@ -347,11 +344,9 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
         _uiPresenter.OnCompetitionRaise
             .Subscribe(_ =>
             {
-                if (handler.PlayerRaises.Count >= _requiredRaises)
-                    return;
+                if (handler.PlayerRaises.Count >= _requiredRaises) return;
 
-                if (!handler.TryPlayerRaise(_forcedEmotion, _player))
-                    return;
+                if (!handler.TryPlayerRaise(_forcedEmotion, _player)) return;
 
                 SeManager.Instance.PlaySe(_forcedEmotion.ToResourceSeName(), pitch: 1f);
                 _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
@@ -367,7 +362,7 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
                 if (pendingEnemyRaiseCount == 1)
                 {
                     nextEnemyRaiseTime = Time.time
-                        + Random.Range(EnemyRaiseDelayMinMilliseconds, EnemyRaiseDelayMaxMilliseconds + 1) / 1000f;
+                        + Random.Range(ENEMY_RAISE_DELAY_MIN_MILLISECONDS, ENEMY_RAISE_DELAY_MAX_MILLISECONDS + 1) / 1000f;
                 }
             })
             .AddTo(disposables);
@@ -388,7 +383,7 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
                 if (pendingEnemyRaiseCount > 0)
                 {
                     nextEnemyRaiseTime = Time.time
-                        + Random.Range(EnemyRaiseDelayMinMilliseconds, EnemyRaiseDelayMaxMilliseconds + 1) / 1000f;
+                        + Random.Range(ENEMY_RAISE_DELAY_MIN_MILLISECONDS, ENEMY_RAISE_DELAY_MAX_MILLISECONDS + 1) / 1000f;
                 }
             }
 

@@ -241,8 +241,7 @@ public class DeckSelectionView : BasePhaseView
         for (var i = 0; i < handContainer.childCount; i++)
         {
             var child = handContainer.GetChild(i).GetComponent<DraggableCardView>();
-            if (child && child.HandIndex > handIndex)
-                return i;
+            if (child && child.HandIndex > handIndex) return i;
         }
 
         return handContainer.childCount;

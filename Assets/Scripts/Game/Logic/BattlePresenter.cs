@@ -441,8 +441,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         BattleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
             {
-                if (isPlayerSkillUsed || !BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck))
-                    return;
+                if (isPlayerSkillUsed || !BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck)) return;
 
                 // デッキ選択中に使った場合は、その後のカードバトルでは再使用させない
                 isPlayerSkillUsed = true;
@@ -676,8 +675,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             var enemyBids = Enemy.Bids.GetBidsByEmotion(card);
 
             // どちらも入札していないカードは除外
-            if (playerBids.Count == 0 && enemyBids.Count == 0)
-                continue;
+            if (playerBids.Count == 0 && enemyBids.Count == 0) continue;
 
             var playerWon = Player.WonCards.Contains(card);
             var cardInfo = new CardAcquisitionInfo(card, playerBids, enemyBids, playerWon);
