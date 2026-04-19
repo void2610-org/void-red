@@ -9,132 +9,16 @@ permissions:
   contents: read
 
 jobs:
-  generate-version:
-    name: Generate Version 🔢
-    runs-on: [self-hosted, macOS]
-    outputs:
-      version: ${{ steps.version.outputs.buildVersion }}
-    steps:
-      - name: Generate version string 🔢
-        id: version
-        run: |
-          # チェックアウト不要: git ls-remote でタグ一覧のみ取得（オブジェクトをDLしない）
-          BASE_VERSION=$(git ls-remote --tags --sort=-version:refname \
-            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
-            | grep -v '\^{}' | head -n1 | sed 's|.*refs/tags/||')
-          BASE_VERSION="${BASE_VERSION:-0.0.0}"
-          DATE_JST=$(TZ=Asia/Tokyo date '+%Y/%m/%d %H:%M:%S')
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          FULL_VERSION="${BASE_VERSION} ${DATE_JST} ${SHORT_SHA}"
-          echo "buildVersion=${FULL_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Generated version: ${FULL_VERSION}"
-
-  build-windows:
-    name: Build Windows 🪟
-    runs-on: [self-hosted, macOS]
-    needs: generate-version
-    steps:
-      - name: Setup Unity project 📥
-        uses: void2610/unity-coding-standards/.github/actions/setup-unity-project@main
-        with:
-          unity-version: 6000.3.10f1
-
-      - name: Fix symlink for my-unity-settings 🔗
-        run: |
-          rm -rf Assets/Scripts/SettingsSystem
-          cp -r my-unity-settings Assets/Scripts/SettingsSystem
-
-      - name: Build Windows project 🏗️
-        env:
-          BUILD_VERSION: ${{ needs.generate-version.outputs.version }}
-        run: |
-          UNITY_PATH="/Applications/Unity/Hub/Editor/6000.3.10f1/Unity.app/Contents/MacOS/Unity"
-          "$UNITY_PATH" \
-            -batchmode \
-            -quit \
-            -nographics \
-            -projectPath "$GITHUB_WORKSPACE" \
-            -buildTarget StandaloneWindows64 \
-            -executeMethod CiBuild.BuildWindows \
-            -logFile -
-
-      - name: Upload Windows build artifact 📤
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build
-          path: builds/StandaloneWindows64
-          retention-days: 1
-
-  build-mac:
-    name: Build Mac 🍎
-    runs-on: [self-hosted, macOS]
-    needs: generate-version
-    steps:
-      - name: Setup Unity project 📥
-        uses: void2610/unity-coding-standards/.github/actions/setup-unity-project@main
-        with:
-          unity-version: 6000.3.10f1
-
-      - name: Fix symlink for my-unity-settings 🔗
-        run: |
-          rm -rf Assets/Scripts/SettingsSystem
-          cp -r my-unity-settings Assets/Scripts/SettingsSystem
-
-      - name: Build Mac project 🏗️
-        env:
-          BUILD_VERSION: ${{ needs.generate-version.outputs.version }}
-        run: |
-          UNITY_PATH="/Applications/Unity/Hub/Editor/6000.3.10f1/Unity.app/Contents/MacOS/Unity"
-          "$UNITY_PATH" \
-            -batchmode \
-            -quit \
-            -nographics \
-            -projectPath "$GITHUB_WORKSPACE" \
-            -buildTarget StandaloneOSX \
-            -executeMethod CiBuild.BuildMac \
-            -logFile -
-
-      - name: Upload Mac build artifact 📤
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-build
-          path: builds/StandaloneOSX
-          retention-days: 1
-
-  deploy-steam:
-    name: Deploy to Steam 🚀
-    needs: [build-windows, build-mac]
-    runs-on: [self-hosted, macOS]
-    environment:
-      name: steam-production
-    
-    steps:
-      - name: Download Windows build 📥
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-build
-          path: builds/StandaloneWindows64
-
-      - name: Download Mac build 📥
-        uses: actions/download-artifact@v4
-        with:
-          name: mac-build
-          path: builds/StandaloneOSX
-
-      - name: Get short SHA 🔢
-        id: short_sha
-        run: echo "sha_short=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
-      
-      - name: Deploy to Steam 🎮
-        id: steam_deploy
-        continue-on-error: true
-        uses: game-ci/steam-deploy@v3
-        with:
-          username: ${{ secrets.STEAM_USERNAME }}
-          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
-          appId: ${{ secrets.STEAM_APP_ID }}
-          buildDescription: auto deploy via github actions (${{ steps.short_sha.outputs.sha_short }})
-          rootPath: builds
-          depot1Path: StandaloneWindows64
-          depot2Path: StandaloneOSX
-          releaseBranch: test
+  steam-deploy:
+    name: Steam Deploy
+    uses: void2610/unity-coding-standards/.github/workflows/steam-deploy-self-hosted.yml@main
+    with:
+      unity-version: 6000.3.10f1
+      runner-labels: '["self-hosted","macOS"]'
+      windows-execute-method: CiBuild.BuildWindows
+      mac-execute-method: CiBuild.BuildMac
+      release-branch: test
+    secrets:
+      STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }}
+      STEAM_CONFIG_VDF: ${{ secrets.STEAM_CONFIG_VDF }}
+      STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
