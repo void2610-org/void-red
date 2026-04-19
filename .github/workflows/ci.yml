@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UNITY_VERSION: 6000.3.10f1
+
+jobs:
+  unity-compile:
+    name: Unity Compile
+    runs-on: [self-hosted, macOS]
+    steps:
+      - name: Setup Unity project
+        uses: void2610/unity-coding-standards/.github/actions/setup-unity-project@main
+        with:
+          unity-version: ${{ env.UNITY_VERSION }}
+
+      - name: Compile project
+        run: |
+          # Unityをバッチモードで起動し、コンパイルログからエラーを検出する。
+          UNITY_PATH="/Applications/Unity/Hub/Editor/${UNITY_VERSION}/Unity.app/Contents/MacOS/Unity"
+          LOG_FILE="${RUNNER_TEMP}/unity-compile.log"
+
+          # キャンセルされた過去ジョブのロックファイルが残ることがあるため、起動前に削除する。
+          rm -f Temp/UnityLockfile
+
+          "$UNITY_PATH" \
+            -batchmode \
+            -quit \
+            -nographics \
+            -projectPath "$GITHUB_WORKSPACE" \
+            -logFile "$LOG_FILE"
+
+          cat "$LOG_FILE"
+
+          if grep -E "error CS[0-9]{4}|Compilation failed" "$LOG_FILE"; then
+            echo "Unity compile failed."
+            exit 1
+          fi

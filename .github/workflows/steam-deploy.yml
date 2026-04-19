@@ -11,7 +11,7 @@ permissions:
 jobs:
   generate-version:
     name: Generate Version 🔢
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS]
     outputs:
       version: ${{ steps.version.outputs.buildVersion }}
     steps:
@@ -31,67 +31,32 @@ jobs:
 
   build-windows:
     name: Build Windows 🪟
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS]
     needs: generate-version
     steps:
-      - name: Free up disk space 🧹
-        run: |
-          echo "=== Before cleanup ==="
-          df -h
-
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /usr/share/swift
-          sudo rm -rf /opt/hostedtoolcache
-          sudo rm -rf /usr/local/share/boost
-
-          docker system prune --all --volumes --force
-
-          sudo apt-get clean
-          sudo apt-get autoclean
-          sudo rm -rf /var/lib/apt/lists/*
-
-          echo "=== After cleanup ==="
-          df -h
-
-      - name: Checkout repository 📥
-        uses: actions/checkout@v4
+      - name: Setup Unity project 📥
+        uses: void2610/unity-coding-standards/.github/actions/setup-unity-project@main
         with:
-          lfs: true
-          submodules: recursive
+          unity-version: 6000.3.10f1
 
       - name: Fix symlink for my-unity-settings 🔗
         run: |
           rm -rf Assets/Scripts/SettingsSystem
           cp -r my-unity-settings Assets/Scripts/SettingsSystem
 
-      - name: Cache Unity Library 📦
-        uses: actions/cache@v4
-        with:
-          path: |
-            Library
-            Temp/UnityLockfile
-          key: Library-Windows-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-Windows-${{ runner.os }}-
-            Library-${{ runner.os }}-
-
       - name: Build Windows project 🏗️
-        uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL:   ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          targetPlatform: StandaloneWindows64
-          unityVersion:   6000.3.10f1
-          allowDirtyBuild: true
-          buildsPath:     builds
-          buildName:      void-red
-          versioning:     Custom
-          version:        ${{ needs.generate-version.outputs.version }}
+          BUILD_VERSION: ${{ needs.generate-version.outputs.version }}
+        run: |
+          UNITY_PATH="/Applications/Unity/Hub/Editor/6000.3.10f1/Unity.app/Contents/MacOS/Unity"
+          "$UNITY_PATH" \
+            -batchmode \
+            -quit \
+            -nographics \
+            -projectPath "$GITHUB_WORKSPACE" \
+            -buildTarget StandaloneWindows64 \
+            -executeMethod CiBuild.BuildWindows \
+            -logFile -
 
       - name: Upload Windows build artifact 📤
         uses: actions/upload-artifact@v4
@@ -102,45 +67,32 @@ jobs:
 
   build-mac:
     name: Build Mac 🍎
-    runs-on: macos-latest
+    runs-on: [self-hosted, macOS]
     needs: generate-version
     steps:
-      - name: Checkout repository 📥
-        uses: actions/checkout@v4
+      - name: Setup Unity project 📥
+        uses: void2610/unity-coding-standards/.github/actions/setup-unity-project@main
         with:
-          lfs: true
-          submodules: recursive
+          unity-version: 6000.3.10f1
 
       - name: Fix symlink for my-unity-settings 🔗
         run: |
           rm -rf Assets/Scripts/SettingsSystem
           cp -r my-unity-settings Assets/Scripts/SettingsSystem
 
-      - name: Cache Unity Library 📦
-        uses: actions/cache@v4
-        with:
-          path: |
-            Library
-            Temp/UnityLockfile
-          key: Library-Mac-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-Mac-${{ runner.os }}-
-            Library-${{ runner.os }}-
-
       - name: Build Mac project 🏗️
-        uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL:   ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          targetPlatform: StandaloneOSX
-          unityVersion:   6000.3.10f1
-          allowDirtyBuild: true
-          buildsPath:     builds
-          buildName:      void-red
-          versioning:     Custom
-          version:        ${{ needs.generate-version.outputs.version }}
+          BUILD_VERSION: ${{ needs.generate-version.outputs.version }}
+        run: |
+          UNITY_PATH="/Applications/Unity/Hub/Editor/6000.3.10f1/Unity.app/Contents/MacOS/Unity"
+          "$UNITY_PATH" \
+            -batchmode \
+            -quit \
+            -nographics \
+            -projectPath "$GITHUB_WORKSPACE" \
+            -buildTarget StandaloneOSX \
+            -executeMethod CiBuild.BuildMac \
+            -logFile -
 
       - name: Upload Mac build artifact 📤
         uses: actions/upload-artifact@v4
@@ -152,7 +104,7 @@ jobs:
   deploy-steam:
     name: Deploy to Steam 🚀
     needs: [build-windows, build-mac]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS]
     environment:
       name: steam-production
     

@@ -93,8 +93,7 @@ public class AddressableImageLoader
         if (string.IsNullOrEmpty(imageName)) return null;
 
         // キャッシュに存在する場合は返却
-        if (_loadedSprites.TryGetValue(imageName, out var cachedSprite))
-            return cachedSprite;
+        if (_loadedSprites.TryGetValue(imageName, out var cachedSprite)) return cachedSprite;
 
         // Addressablesから読み込み
         var handle = Addressables.LoadAssetAsync<Sprite>(imageName);

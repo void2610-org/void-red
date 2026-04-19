@@ -69,8 +69,7 @@ public class CardChoiceData
     /// <returns>カード選択肢データ、または作成できない場合はnull</returns>
     public static CardChoiceData FromSlashSeparatedString(string slashSeparatedValue)
     {
-        if (string.IsNullOrEmpty(slashSeparatedValue))
-            return null;
+        if (string.IsNullOrEmpty(slashSeparatedValue)) return null;
 
         var parts = slashSeparatedValue.Split('/');
         if (parts.Length != 2)

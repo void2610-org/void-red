@@ -7,231 +7,28 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write    # リポジトリの内容をプッシュする権限
-  pages: write       # GitHub Pages ブランチへの書き込み権限
-  id-token: write    # GitHub Pages環境への認証用
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build my project 🏗️
-    runs-on: ubuntu-latest
-    steps:
-      - name: Free up disk space 🧹
-        run: |
-          # 使用前のディスク状況を確認
-          echo "=== Before cleanup ==="
-          df -h
-
-          # 大容量のツールとキャッシュを削除
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /usr/share/swift
-          sudo rm -rf /opt/hostedtoolcache
-          sudo rm -rf /usr/local/share/boost
-
-          # Dockerの完全クリーンアップ
-          docker system prune --all --volumes --force
-
-          # aptキャッシュのクリーンアップ
-          sudo apt-get clean
-          sudo apt-get autoclean
-          sudo rm -rf /var/lib/apt/lists/*
-
-          # 使用後のディスク状況を確認
-          echo "=== After cleanup ==="
-          df -h
-
-      - name: Checkout repository 📥
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-          submodules: recursive
-          # 高速化のため shallow clone を使用
-          fetch-depth: 1
-
-      - name: Fix symlink for my-unity-settings 🔗
-        run: |
-          # シンボリックリンクを実ファイルに置換（Docker内での互換性のため）
-          rm -rf Assets/Scripts/SettingsSystem
-          cp -r my-unity-settings Assets/Scripts/SettingsSystem
-
-      - name: Optimize WebGL Build Settings 🔧
-        run: |
-          # WebGL最適化設定でビルド時間短縮
-          sed -i 's/WebGLLinkerTarget: 0/WebGLLinkerTarget: 1/' ProjectSettings/ProjectSettings.asset
-          sed -i 's/DecompressionFallback: 0/DecompressionFallback: 1/' ProjectSettings/ProjectSettings.asset
-          # WebGL圧縮を無効化してビルド時間短縮（開発用）
-          sed -i 's/webGLCompressionFormat: 1/webGLCompressionFormat: 0/' ProjectSettings/ProjectSettings.asset
-
-      - name: Cache Unity Library 📦
-        uses: actions/cache@v4
-        with:
-          path: |
-            Library
-            Temp/UnityLockfile
-          key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-${{ hashFiles('**/*.meta') }}
-          restore-keys: |
-            Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-
-            Library-${{ runner.os }}-
-
-      - name: Build project 🏗️
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL:   ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          targetPlatform: WebGL
-          unityVersion:   6000.3.10f1
-          allowDirtyBuild: true
-          buildsPath:     CIBuilds
-          buildName:      build
-
-      - name: Prepare artifact for deployment 🎯
-        run: |
-          # デプロイ先ディレクトリを決定（PRはPR番号のみ、mainは空）
-          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-            PUBLISH_DEST="${{ github.event.pull_request.number }}"
-          elif [ "$GITHUB_REF_NAME" = "main" ]; then
-            PUBLISH_DEST=""
-          else
-            PUBLISH_DEST="$GITHUB_REF_NAME"
-          fi
-          echo "PUBLISH_DEST=$PUBLISH_DEST"
-          echo "PUBLISH_DEST=$PUBLISH_DEST" >> $GITHUB_ENV
-          # ビルドファイルは常にpublic/直下に配置（サブディレクトリ振り分けはdestination_dirに任せる）
-          sudo mkdir -p public
-          sudo mv CIBuilds/WebGL/build/* public/
-          sudo chown -R $USER:$USER public
-
-      - name: Deploy to gh-pages branch 📤
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token:    ${{ secrets.GITHUB_TOKEN }}
-          publish_dir:     public
-          publish_branch:  gh-pages
-          destination_dir: ${{ env.PUBLISH_DEST }}
-          keep_files: true
-
-      # ↑ここまでで gh-pages ブランチへのデプロイは完了↑
-
-      # ───────────────────────────────────────────────
-      # ▼ ここから「プレビュー用アーティファクト」のアップロード ▼
-
-      - name: Upload Pages artifact 🏷️
-        id: upload_pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public
-          # name はデフォルトで "github-pages" になるので省略可
-          # retention-days: 1   # 必要に応じて保持期間を設定
-
-  preview:
-    name: Deploy Preview 🌐
-    if: github.event_name == 'pull_request'
-    needs: build
-    runs-on: ubuntu-latest
-
-    environment:
-      name: preview
-      url: https://void2610.github.io/void-red/${{ github.event.pull_request.number }}/
-
-    steps:
-      - name: Download Pages artifact 📥
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages
-          path: public
-
-      - name: Extract artifact 📦
-        run: |
-          # upload-pages-artifactはtar形式で保存するため展開が必要
-          if [ -f "public/artifact.tar" ]; then
-            cd public
-            tar -xf artifact.tar
-            rm artifact.tar
-            cd ..
-          fi
-
-      - name: Deploy Preview to gh-pages 📤
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token:    ${{ secrets.GITHUB_TOKEN }}
-          publish_dir:     public
-          publish_branch:  gh-pages
-          destination_dir: ${{ github.event.pull_request.number }}
-          keep_files:      true
-
-  deploy:
-    name: Deploy Production 🚀
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: build
-    runs-on: ubuntu-latest
-
-    environment:
-      name: main
-      # ルートURLを返す
-      url: https://void2610.github.io/void-red/
-    
-    steps:
-      - name: Download Pages artifact 📥
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages    # upload-pages-artifact のデフォルト名
-          path: public
-
-      - name: Extract artifact 📦
-        run: |
-          echo "📁 Checking downloaded files:"
-          ls -la public/
-          
-          # artifact.tarが存在する場合のみ解凍
-          if [ -f "public/artifact.tar" ]; then
-            echo "📦 Found artifact.tar, extracting..."
-            cd public
-            tar -xf artifact.tar
-            rm artifact.tar
-            echo "✅ Extraction completed"
-            ls -la
-            cd ..
-          else
-            echo "ℹ️ No artifact.tar found - files may already be extracted"
-          fi
-          
-          echo "📁 Final public directory contents:"
-          ls -la public/
-
-      - name: Deploy Production to gh-pages 📤
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token:    ${{ secrets.GITHUB_TOKEN }}
-          publish_dir:     public/
-          publish_branch:  gh-pages
-          destination_dir: "" # ルートにデプロイ
-          keep_files:      true
-
-  discord:
-    name: Notify Discord 🤖
-    runs-on: ubuntu-latest  # Discord通知は最小構成でOK
-    needs: build
-    # PRの場合は初回作成時のみ通知
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
-    steps:
-      - name: Notify Discord 🚨
-        env:
-          DISCORD_WEBHOOK_URL:  ${{ secrets.DISCORD_WEBHOOK_URL }}
-          GITHUB_ACTOR:         ${{ github.event_name == 'pull_request' && github.event.pull_request.user.login || github.actor }}
-          COMMIT_MESSAGE:       ${{ github.event_name == 'pull_request' && github.event.pull_request.title || github.event.head_commit.message }}
-          REF_DIR:              ${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref_name }}
-          BRANCH:               ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-        run: |
-          if [ "$REF_DIR" = "main" ] || [ -z "$REF_DIR" ]; then
-            URL="https://void2610.github.io/void-red/"
-          else
-            URL="https://void2610.github.io/void-red/$REF_DIR/"
-          fi
-          curl -X POST -H "Content-Type: application/json" -d "{
-            \"content\": \"💬 タイトル: ${COMMIT_MESSAGE} \n🔥 ビルド結果: <${URL}> \n👤 作成者: ${GITHUB_ACTOR} \n🌲ブランチ: ${BRANCH}\"
-          }" $DISCORD_WEBHOOK_URL
+  webgl-build:
+    name: WebGL Build
+    uses: void2610/unity-coding-standards/.github/workflows/webgl-build-netlify-self-hosted.yml@main
+    with:
+      unity-version: 6000.3.10f1
+      execute-method: CiBuild.BuildWebGL
+      runner-labels: '["self-hosted","macOS"]'
+      build-output-path: CIBuilds/WebGL/build
+      deploy-alias: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}
+      deploy-message: "${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || format('Deploy {0}', github.sha) }}"
+      pr-number: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
+      pr-title: ${{ github.event_name == 'pull_request' && github.event.pull_request.title || '' }}
+      pr-url: ${{ github.event_name == 'pull_request' && github.event.pull_request.html_url || '' }}
+      pr-head-sha: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+    secrets:
+      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

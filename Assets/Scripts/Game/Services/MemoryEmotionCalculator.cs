@@ -78,10 +78,7 @@ public static class MemoryEmotionCalculator
     /// <returns>支配的な感情タイプ（デフォルトはJoy）</returns>
     public static EmotionType CalculateDominantEmotion(IReadOnlyList<CardModel> wonCards, BidModel bids)
     {
-        if (wonCards == null || wonCards.Count == 0)
-        {
-            return EmotionType.Joy;
-        }
+        if (wonCards == null || wonCards.Count == 0) return EmotionType.Joy;
 
         // 各感情タイプの合計を集計
         var emotionTotals = new Dictionary<EmotionType, int>();
@@ -106,10 +103,7 @@ public static class MemoryEmotionCalculator
     /// <returns>支配的な感情タイプ（デフォルトはJoy）</returns>
     public static EmotionType CalculateFromEmotionTotals(IReadOnlyDictionary<EmotionType, int> emotionTotals)
     {
-        if (emotionTotals == null || emotionTotals.Count == 0)
-        {
-            return EmotionType.Joy;
-        }
+        if (emotionTotals == null || emotionTotals.Count == 0) return EmotionType.Joy;
 
         // 最大値の感情を返す（同点時は先に見つかった方）
         return emotionTotals.OrderByDescending(e => e.Value).First().Key;
@@ -123,10 +117,7 @@ public static class MemoryEmotionCalculator
     /// <returns>支配的感情の計算結果（基本感情または複合感情）</returns>
     public static DominantEmotionResult CalculateWithCompound(IReadOnlyDictionary<EmotionType, int> emotionTotals)
     {
-        if (emotionTotals == null || emotionTotals.Count == 0)
-        {
-            return new DominantEmotionResult(EmotionType.Joy);
-        }
+        if (emotionTotals == null || emotionTotals.Count == 0) return new DominantEmotionResult(EmotionType.Joy);
 
         // 値でソートして上位を取得
         var sorted = emotionTotals
@@ -134,18 +125,12 @@ public static class MemoryEmotionCalculator
             .OrderByDescending(e => e.Value)
             .ToList();
 
-        if (sorted.Count == 0)
-        {
-            return new DominantEmotionResult(EmotionType.Joy);
-        }
+        if (sorted.Count == 0) return new DominantEmotionResult(EmotionType.Joy);
 
         var primary = sorted[0].Key;
 
         // 1つしかない場合は基本感情のみ
-        if (sorted.Count == 1)
-        {
-            return new DominantEmotionResult(primary);
-        }
+        if (sorted.Count == 1) return new DominantEmotionResult(primary);
 
         var secondary = sorted[1].Key;
         var primaryValue = sorted[0].Value;
@@ -155,10 +140,7 @@ public static class MemoryEmotionCalculator
         if (secondaryValue >= primaryValue * 0.5f)
         {
             var compound = CompoundEmotionTypeExtensions.GetCompoundEmotion(primary, secondary);
-            if (compound.HasValue)
-            {
-                return new DominantEmotionResult(primary, compound);
-            }
+            if (compound.HasValue) return new DominantEmotionResult(primary, compound);
         }
 
         return new DominantEmotionResult(primary);
@@ -171,10 +153,7 @@ public static class MemoryEmotionCalculator
     /// <returns>支配的感情の計算結果（基本感情または複合感情）</returns>
     public static DominantEmotionResult CalculateWithCompoundFromCardInfoList(IReadOnlyList<CardAcquisitionInfo> cardInfoList)
     {
-        if (cardInfoList == null || cardInfoList.Count == 0)
-        {
-            return new DominantEmotionResult(EmotionType.Joy);
-        }
+        if (cardInfoList == null || cardInfoList.Count == 0) return new DominantEmotionResult(EmotionType.Joy);
 
         var emotionTotals = new Dictionary<EmotionType, int>();
 
@@ -198,10 +177,7 @@ public static class MemoryEmotionCalculator
     /// <returns>支配的感情の計算結果（基本感情または複合感情）</returns>
     public static DominantEmotionResult CalculateWithCompoundFromSavedCardInfoList(IReadOnlyList<SavedCardAcquisitionInfo> cardInfoList)
     {
-        if (cardInfoList == null || cardInfoList.Count == 0)
-        {
-            return new DominantEmotionResult(EmotionType.Joy);
-        }
+        if (cardInfoList == null || cardInfoList.Count == 0) return new DominantEmotionResult(EmotionType.Joy);
 
         var emotionTotals = new Dictionary<EmotionType, int>();
 

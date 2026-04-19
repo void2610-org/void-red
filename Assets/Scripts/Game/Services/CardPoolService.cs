@@ -54,10 +54,7 @@ public class CardPoolService
     /// <returns>ランダムなカード</returns>
     public CardData GetRandomCard()
     {
-        if (_availableCards.Count == 0)
-        {
-            return null;
-        }
+        if (_availableCards.Count == 0) return null;
 
         var randomIndex = Random.Range(0, _availableCards.Count);
         return _availableCards[randomIndex];

@@ -99,10 +99,7 @@ public class SafeNavigationManager : ITickable
         var currentGroup = currentSelected.GetComponentInParent<CanvasGroup>();
         var previousGroup = previousSelected.GetComponentInParent<CanvasGroup>();
 
-        if (currentGroup == null && previousGroup == null)
-        {
-            return true; // 両方ともCanvasGroupがない場合は同じとみなす
-        }
+        if (currentGroup == null && previousGroup == null) return true;
 
         return currentGroup == previousGroup;
     }

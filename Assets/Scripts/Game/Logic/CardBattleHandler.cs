@@ -160,17 +160,12 @@ public class CardBattleHandler
             return RecordResult(playerWins);
         }
 
-        if (competitionWinner == true)
-            return RecordResult(true);
+        if (competitionWinner == true) return RecordResult(true);
 
-        if (competitionWinner == false)
-            return RecordResult(false);
+        if (competitionWinner == false) return RecordResult(false);
 
         // 同数の場合: オークション入札リソース総量で比較
-        if (PlayerCard.AuctionBidTotal != EnemyCard.AuctionBidTotal)
-        {
-            return RecordResult(PlayerCard.AuctionBidTotal > EnemyCard.AuctionBidTotal);
-        }
+        if (PlayerCard.AuctionBidTotal != EnemyCard.AuctionBidTotal) return RecordResult(PlayerCard.AuctionBidTotal > EnemyCard.AuctionBidTotal);
 
         // 入札量も同じ場合はランダム
         return RecordResult(Random.value > 0.5f);
