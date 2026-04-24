@@ -27,6 +27,9 @@ public class CardBattleView : BasePhaseView
     [Header("ドラッグ演出")]
     [SerializeField] private DragLineView dragLineView;
 
+    [Header("ダイヤモンドインジケータ")]
+    [SerializeField] private Image[] diamondImages;
+
     [Header("UI要素")]
     [SerializeField] private TextMeshProUGUI instructionText;
     [SerializeField] private Button nextButton;
@@ -83,6 +86,36 @@ public class CardBattleView : BasePhaseView
             : "勝利条件: 数字が大きい方が勝利";
 
         nextButton.gameObject.SetActive(false);
+
+        // ダイヤモンドを未獲得状態にリセット
+        UpdateDiamondIndicators(0, 0);
+    }
+
+    /// <summary>ダイヤモンドインジケータを更新する</summary>
+    public void UpdateDiamondIndicators(int playerWins, int enemyWins)
+    {
+        if (diamondImages == null) return;
+
+        for (var i = 0; i < diamondImages.Length; i++)
+        {
+            if (!diamondImages[i]) continue;
+
+            if (i < playerWins)
+            {
+                // プレイヤー勝利：明るく表示
+                diamondImages[i].color = Color.white;
+            }
+            else if (i < playerWins + enemyWins)
+            {
+                // 敵勝利：赤暗く表示
+                diamondImages[i].color = new Color(0.8f, 0.2f, 0.2f, 0.7f);
+            }
+            else
+            {
+                // 未決定：暗く表示
+                diamondImages[i].color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+            }
+        }
     }
 
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int? forcedCardIndex)
