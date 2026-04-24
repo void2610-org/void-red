@@ -22,8 +22,7 @@ public class MouseHoverUISelector : ITickable
             var hoveredObject = result.gameObject;
 
             // 特定のタグを持つオブジェクトは無視
-            if (hoveredObject.CompareTag(IGNORE_TAG))
-                break;
+            if (hoveredObject.CompareTag(IGNORE_TAG)) break;
 
             // 最初に適切なUIを見つけたら、それを選択
             if (eventSystem.currentSelectedGameObject != hoveredObject)

@@ -56,8 +56,7 @@ public class BidModel
     /// </summary>
     public EmotionType? GetBidEmotion(CardModel card)
     {
-        if (!_bids.TryGetValue(card, out var emotions) || emotions.Count == 0)
-            return null;
+        if (!_bids.TryGetValue(card, out var emotions) || emotions.Count == 0) return null;
 
         foreach (var kvp in emotions)
             return kvp.Key;
@@ -70,8 +69,7 @@ public class BidModel
     /// </summary>
     public int GetTotalBid(CardModel card)
     {
-        if (!_bids.TryGetValue(card, out var emotions))
-            return 0;
+        if (!_bids.TryGetValue(card, out var emotions)) return 0;
 
         return emotions.Values.Sum();
     }
@@ -81,8 +79,7 @@ public class BidModel
     /// </summary>
     public Dictionary<EmotionType, int> GetBidsByEmotion(CardModel card)
     {
-        if (!_bids.TryGetValue(card, out var emotions))
-            return new Dictionary<EmotionType, int>();
+        if (!_bids.TryGetValue(card, out var emotions)) return new Dictionary<EmotionType, int>();
 
         return new Dictionary<EmotionType, int>(emotions);
     }

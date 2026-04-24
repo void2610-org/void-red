@@ -26,8 +26,7 @@ public class NovelDialogService
     /// <returns>ダイアログデータのリスト</returns>
     public async UniTask<List<DialogData>> GetDialogDataAsync(string scenarioId)
     {
-        if (_useLocalExcel)
-            return await GetDialogDataFromExcel(scenarioId);
+        if (_useLocalExcel) return await GetDialogDataFromExcel(scenarioId);
         return await GetDialogDataFromSpreadsheet(scenarioId);
     }
 
@@ -89,8 +88,7 @@ public class NovelDialogService
             var row = sheetData[i];
 
             // 空行をスキップ
-            if (row.Count == 0 || IsEmptyRow(row))
-                continue;
+            if (row.Count == 0 || IsEmptyRow(row)) continue;
 
             var dialogData = CreateDialogDataFromRow(row);
             if (dialogData != null) dialogList.Add(dialogData);
@@ -164,8 +162,7 @@ public class NovelDialogService
     {
         foreach (var cell in row)
         {
-            if (!string.IsNullOrWhiteSpace(cell?.ToString()))
-                return false;
+            if (!string.IsNullOrWhiteSpace(cell?.ToString())) return false;
         }
         return true;
     }

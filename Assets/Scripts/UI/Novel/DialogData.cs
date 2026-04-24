@@ -180,12 +180,10 @@ public class DialogData
         if (_parameters.TryGetValue(parameterType, out var value))
         {
             // 値がnullかつTがnull許容型の場合
-            if (value == null && !typeof(T).IsValueType)
-                return (T)(object)null;
+            if (value == null && !typeof(T).IsValueType) return (T)(object)null;
 
             // その他の型の場合
-            if (value is T typedValue)
-                return typedValue;
+            if (value is T typedValue) return typedValue;
         }
         return defaultValue;
     }

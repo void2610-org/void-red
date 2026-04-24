@@ -144,8 +144,9 @@ public class TutorialBattlePresenter : BattlePresenter
         await BattleUIPresenter.StartTutorial("RewardPhase");
     }
 
-    protected override async UniTask OnAfterResourceGaugesDisplayed()
+    protected override async UniTask OnAfterResourceRewardsAnimated()
     {
+        await UniTask.Delay(800);
         await BattleUIPresenter.StartTutorial("RewardPhase2");
     }
 
@@ -179,10 +180,7 @@ public class TutorialBattlePresenter : BattlePresenter
 
         var round = handler.CurrentRound;
         var forcedCardPerRound = _tutorialBattlePlayerData.ForcedCardPerRound;
-        if (round < 0 || round >= forcedCardPerRound.Count || !forcedCardPerRound[round].HasValue)
-            return requiresSkillActivation
-                ? await BattleUIPresenter.OnBattleCardSelected.FirstAsync()
-                : await base.SelectBattleCardAsync(handler, playerDeck);
+        if (round < 0 || round >= forcedCardPerRound.Count || !forcedCardPerRound[round].HasValue) return requiresSkillActivation ? await BattleUIPresenter.OnBattleCardSelected.FirstAsync() : await base.SelectBattleCardAsync(handler, playerDeck);
 
         var forcedDeckCardIndex = forcedCardPerRound[round].Value;
         if (forcedDeckCardIndex < 0 || forcedDeckCardIndex >= playerDeck.Cards.Count)
@@ -195,8 +193,7 @@ public class TutorialBattlePresenter : BattlePresenter
         var forcedAvailableCardIndex = -1;
         for (var i = 0; i < availableCards.Count; i++)
         {
-            if (availableCards[i] != forcedCard)
-                continue;
+            if (availableCards[i] != forcedCard) continue;
 
             forcedAvailableCardIndex = i;
             break;
@@ -295,6 +292,9 @@ public class TutorialBattlePresenter : BattlePresenter
 /// </summary>
 public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
 {
+    private const int ENEMY_RAISE_DELAY_MIN_MILLISECONDS = 700;
+    private const int ENEMY_RAISE_DELAY_MAX_MILLISECONDS = 1300;
+
     private readonly Player _player;
     private readonly IEnemyAIController _enemyAI;
     private readonly BattleUIPresenter _uiPresenter;
@@ -320,6 +320,10 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
     {
         var handler = new CompetitionHandler();
         handler.Start(card, playerTotal, enemyTotal);
+        var pendingEnemyRaiseCount = 0;
+        var nextEnemyRaiseTime = 0f;
+
+        using var disposables = new CompositeDisposable();
         _uiPresenter.SetBattleInstruction(instruction);
         _uiPresenter.ShowCompetition(handler.PlayerTotal, handler.EnemyTotal, _player.EmotionResources);
         _uiPresenter.SetCompetitionEmotion(_forcedEmotion.GetPreviousEmotion());
@@ -334,24 +338,56 @@ public class TutorialCompetitionPhaseRunner : CompetitionPhaseRunner
             .Where(emotion => emotion == _forcedEmotion)
             .FirstAsync();
 
+        handler.ResetTimeout();
         _uiPresenter.SetCompetitionEmotionInteractable(false);
         _uiPresenter.SetCompetitionRaiseInteractable(true);
+        _uiPresenter.OnCompetitionRaise
+            .Subscribe(_ =>
+            {
+                if (handler.PlayerRaises.Count >= _requiredRaises) return;
 
-        while (handler.PlayerRaises.Count < _requiredRaises)
+                if (!handler.TryPlayerRaise(_forcedEmotion, _player)) return;
+
+                SeManager.Instance.PlaySe(_forcedEmotion.ToResourceSeName(), pitch: 1f);
+                _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
+                _uiPresenter.UpdateCompetitionResources(_player.EmotionResources);
+
+                if (handler.PlayerRaises.Count >= _requiredRaises)
+                {
+                    _uiPresenter.SetCompetitionRaiseInteractable(false);
+                    return;
+                }
+
+                pendingEnemyRaiseCount++;
+                if (pendingEnemyRaiseCount == 1)
+                {
+                    nextEnemyRaiseTime = Time.time
+                        + Random.Range(ENEMY_RAISE_DELAY_MIN_MILLISECONDS, ENEMY_RAISE_DELAY_MAX_MILLISECONDS + 1) / 1000f;
+                }
+            })
+            .AddTo(disposables);
+
+        while (handler.PlayerRaises.Count < _requiredRaises || !handler.IsTimedOut)
         {
-            await _uiPresenter.OnCompetitionRaise.FirstAsync();
-            if (!handler.TryPlayerRaise(_forcedEmotion, _player))
-                continue;
+            var remainingTime = handler.PlayerRaises.Count < _requiredRaises
+                ? GameConstants.COMPETITION_TIMEOUT_SECONDS
+                : handler.RemainingTime;
+            _uiPresenter.UpdateCompetitionTimer(remainingTime, GameConstants.COMPETITION_TIMEOUT_SECONDS);
 
-            SeManager.Instance.PlaySe(_forcedEmotion.ToResourceSeName(), pitch: 1f);
-            _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
-            _uiPresenter.UpdateCompetitionResources(_player.EmotionResources);
+            if (pendingEnemyRaiseCount > 0 && Time.time >= nextEnemyRaiseTime)
+            {
+                _enemyAI.TryCompetitionRaise(handler);
+                pendingEnemyRaiseCount--;
+                _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
 
-            if (handler.PlayerRaises.Count >= _requiredRaises)
-                break;
+                if (pendingEnemyRaiseCount > 0)
+                {
+                    nextEnemyRaiseTime = Time.time
+                        + Random.Range(ENEMY_RAISE_DELAY_MIN_MILLISECONDS, ENEMY_RAISE_DELAY_MAX_MILLISECONDS + 1) / 1000f;
+                }
+            }
 
-            _enemyAI.TryCompetitionRaise(handler);
-            _uiPresenter.UpdateCompetitionBids(handler.PlayerTotal, handler.EnemyTotal);
+            await UniTask.Yield();
         }
 
         _uiPresenter.SetCompetitionRaiseInteractable(false);

@@ -57,10 +57,7 @@ public static class SceneTypeExtensions
     /// <returns>Unityシーン名</returns>
     public static string ToSceneName(this SceneType sceneType)
     {
-        if (_sceneNames.TryGetValue(sceneType, out var sceneName))
-        {
-            return sceneName;
-        }
+        if (_sceneNames.TryGetValue(sceneType, out var sceneName)) return sceneName;
 
         Debug.LogError($"SceneType {sceneType} に対応するシーン名が見つかりません");
         return string.Empty;
@@ -82,10 +79,7 @@ public static class SceneUtility
     {
         var sceneNames = SceneTypeExtensions.SceneNames;
         var pair = sceneNames.FirstOrDefault(x => x.Value == sceneName);
-        if (!pair.Equals(default(KeyValuePair<SceneType, string>)))
-        {
-            return pair.Key;
-        }
+        if (!pair.Equals(default(KeyValuePair<SceneType, string>))) return pair.Key;
 
         // デバッグ情報を詳しく出力
         var availableScenes = string.Join(", ", sceneNames.Values);

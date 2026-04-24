@@ -65,8 +65,7 @@ public class AuctionView : BasePhaseView
 
     public void SetCardInteractable(int index, bool interactable)
     {
-        if (index < 0 || index >= _auctionCardViews.Count)
-            return;
+        if (index < 0 || index >= _auctionCardViews.Count) return;
 
         _auctionCardViews[index].SetCardInteractable(interactable);
     }
@@ -79,8 +78,7 @@ public class AuctionView : BasePhaseView
 
     public void SetDialogueInteractable(int index, bool interactable)
     {
-        if (index < 0 || index >= _auctionCardViews.Count)
-            return;
+        if (index < 0 || index >= _auctionCardViews.Count) return;
 
         _auctionCardViews[index].SetDialogueInteractable(interactable);
     }
@@ -273,8 +271,7 @@ public class AuctionView : BasePhaseView
     {
         foreach (var auctionCard in _auctionCardViews)
         {
-            if (auctionCard.CardModel == cardModel)
-                return auctionCard;
+            if (auctionCard.CardModel == cardModel) return auctionCard;
         }
         return null;
     }
@@ -331,8 +328,7 @@ public class AuctionView : BasePhaseView
 
         // 1カード1感情制約: 既にこのカードに別の感情がベットされている場合は拒否
         var existingEmotion = _playerBids.GetBidEmotion(cardModel);
-        if (existingEmotion.HasValue && existingEmotion.Value != _currentEmotion)
-            return;
+        if (existingEmotion.HasValue && existingEmotion.Value != _currentEmotion) return;
 
         // 現在の感情のリソース残量をチェック
         var available = _emotionResources.TryGetValue(_currentEmotion, out var total) ? total : 0;

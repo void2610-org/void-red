@@ -362,10 +362,7 @@ public class DialogView : MonoBehaviour
         while (lastVisibleCharIndex >= 0)
         {
             var charInfo = textInfo.characterInfo[lastVisibleCharIndex];
-            if (charInfo.isVisible && !char.IsWhiteSpace(charInfo.character))
-            {
-                break;
-            }
+            if (charInfo.isVisible && !char.IsWhiteSpace(charInfo.character)) break;
             lastVisibleCharIndex--;
         }
 

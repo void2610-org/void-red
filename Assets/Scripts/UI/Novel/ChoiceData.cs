@@ -43,8 +43,7 @@ public class ChoiceData
     /// <returns>選択肢データ、または作成できない場合はnull</returns>
     public static ChoiceData FromCommaSeparatedString(string commaSeparatedValue)
     {
-        if (string.IsNullOrEmpty(commaSeparatedValue))
-            return null;
+        if (string.IsNullOrEmpty(commaSeparatedValue)) return null;
 
         var parts = commaSeparatedValue.Split(',');
         if (parts.Length < 3) // 質問文 + 最低2つの選択肢
@@ -82,8 +81,7 @@ public class ChoiceData
     /// <returns>選択肢のテキスト、無効なインデックスの場合は空文字列</returns>
     public string GetOption(int index)
     {
-        if (index >= 0 && index < OptionCount)
-            return options[index];
+        if (index >= 0 && index < OptionCount) return options[index];
         return "";
     }
 }

@@ -47,8 +47,7 @@ public class BattleLifetimeScope : LifetimeScope
 
     private bool IsTutorialBattle(GameProgressService gameProgressService)
     {
-        if (gameProgressService.GetCurrentNode() is not BattleNode battleNode)
-            return false;
+        if (gameProgressService.GetCurrentNode() is not BattleNode battleNode) return false;
 
         var auctionData = allAuctionData.GetAuctionById(battleNode.AuctionId);
         return auctionData && auctionData.Enemy && auctionData.Enemy.EnemyId == "alv";

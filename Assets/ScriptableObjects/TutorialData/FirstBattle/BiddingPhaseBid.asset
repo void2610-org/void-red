@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: BiddingPhaseBid
   m_EditorClassIdentifier: Assembly-CSharp::TutorialData
   steps:
-  - message: "\u4ECA\u56DE\u306F\u559C\u3073\u306E\u611F\u60C5\u30EA\u30BD\u30FC\u30B9\u30921\u679A\u30D9\u30C3\u30C8\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+  - message: 今回は喜びの感情リソースを1枚ベットしてください。
     isPlayerDialog: 0
     maskPosition: {x: 100, y: -50}
     maskSize: {x: 100, y: 100}
-  - message: "\u5165\u672D\u304C\u7D42\u308F\u3063\u305F\u3089\u5165\u672D\u78BA\u5B9A\u306E\u5408\u56F3\u3092\u51FA\u3057\u3066\u3001\u843D\u672D\u30D5\u30A7\u30FC\u30BA\u3078\u9032\u307F\u307E\u3057\u3087\u3046\u3002"
+  - message: 入札が終わったら入札確定の合図を出して、落札フェーズへ進みましょう。
     isPlayerDialog: 0
     maskPosition: {x: 190, y: -240}
     maskSize: {x: 210, y: 60}

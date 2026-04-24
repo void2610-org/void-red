@@ -82,6 +82,11 @@ public class BattlePresenter : IStartable, ISceneInitializable
         return UniTask.CompletedTask;
     }
 
+    protected virtual UniTask OnAfterResourceRewardsAnimated()
+    {
+        return UniTask.CompletedTask;
+    }
+
     protected virtual UniTask OnBeforeMemoryGrowthContinueAsync()
     {
         return UniTask.CompletedTask;
@@ -372,6 +377,8 @@ public class BattlePresenter : IStartable, ISceneInitializable
         await OnAfterResourceGaugesDisplayed();
 
         var rewardedAmounts = await BattleUIPresenter.AnimateResourceRewardsAsync(rewardResults);
+        await OnAfterResourceRewardsAnimated();
+        await BattleUIPresenter.WaitForResourceRewardNextAsync();
 
         // 報酬を各感情リソースに加算
         foreach (var (emotion, amount) in rewardedAmounts)
@@ -434,8 +441,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
         BattleUIPresenter.OnSkillActivated
             .Subscribe(_ =>
             {
-                if (isPlayerSkillUsed || !BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck))
-                    return;
+                if (isPlayerSkillUsed || !BattleSkillExecutor.TryActivateInDeckSelection(playerSkill, previewDeck)) return;
 
                 // デッキ選択中に使った場合は、その後のカードバトルでは再使用させない
                 isPlayerSkillUsed = true;
@@ -670,8 +676,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
             var enemyBids = Enemy.Bids.GetBidsByEmotion(card);
 
             // どちらも入札していないカードは除外
-            if (playerBids.Count == 0 && enemyBids.Count == 0)
-                continue;
+            if (playerBids.Count == 0 && enemyBids.Count == 0) continue;
 
             var playerWon = Player.WonCards.Contains(card);
             var cardInfo = new CardAcquisitionInfo(card, playerBids, enemyBids, playerWon);

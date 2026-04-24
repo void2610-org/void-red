@@ -40,10 +40,7 @@ public class AllCardData : ScriptableObject
     /// </summary>
     public List<CardData> GetRandomCards(int count)
     {
-        if (count >= cardList.Count)
-        {
-            return new List<CardData>(cardList);
-        }
+        if (count >= cardList.Count) return new List<CardData>(cardList);
 
         var shuffled = new List<CardData>(cardList);
         for (var i = 0; i < shuffled.Count; i++)
