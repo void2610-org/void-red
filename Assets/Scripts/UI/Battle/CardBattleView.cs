@@ -27,6 +27,9 @@ public class CardBattleView : BasePhaseView
     [Header("ドラッグ演出")]
     [SerializeField] private DragLineView dragLineView;
 
+    [Header("ダイヤモンドインジケータ")]
+    [SerializeField] private DiamondIndicatorView diamondIndicatorView;
+
     [Header("UI要素")]
     [SerializeField] private TextMeshProUGUI instructionText;
     [SerializeField] private Button nextButton;
@@ -60,6 +63,9 @@ public class CardBattleView : BasePhaseView
     /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => ShowPlayerHand(availableCards, null);
 
+    /// <summary>ダイヤモンドインジケータを更新する</summary>
+    public void UpdateDiamondIndicators(int playerWins, int enemyWins) => diamondIndicatorView.UpdateIndicators(playerWins, enemyWins);
+
     /// <summary>表示中の手札全体の操作可否を切り替える</summary>
     public void SetHandInteractable(bool interactable)
     {
@@ -83,6 +89,9 @@ public class CardBattleView : BasePhaseView
             : "勝利条件: 数字が大きい方が勝利";
 
         nextButton.gameObject.SetActive(false);
+
+        // ダイヤモンドを未獲得状態にリセット
+        diamondIndicatorView.UpdateIndicators(0, 0);
     }
 
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int? forcedCardIndex)
