@@ -28,7 +28,7 @@ public class CardBattleView : BasePhaseView
     [SerializeField] private DragLineView dragLineView;
 
     [Header("ダイヤモンドインジケータ")]
-    [SerializeField] private Image[] diamondImages;
+    [SerializeField] private DiamondIndicatorView diamondIndicatorView;
 
     [Header("UI要素")]
     [SerializeField] private TextMeshProUGUI instructionText;
@@ -63,6 +63,9 @@ public class CardBattleView : BasePhaseView
     /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => ShowPlayerHand(availableCards, null);
 
+    /// <summary>ダイヤモンドインジケータを更新する</summary>
+    public void UpdateDiamondIndicators(int playerWins, int enemyWins) => diamondIndicatorView.UpdateIndicators(playerWins, enemyWins);
+
     /// <summary>表示中の手札全体の操作可否を切り替える</summary>
     public void SetHandInteractable(bool interactable)
     {
@@ -88,34 +91,7 @@ public class CardBattleView : BasePhaseView
         nextButton.gameObject.SetActive(false);
 
         // ダイヤモンドを未獲得状態にリセット
-        UpdateDiamondIndicators(0, 0);
-    }
-
-    /// <summary>ダイヤモンドインジケータを更新する</summary>
-    public void UpdateDiamondIndicators(int playerWins, int enemyWins)
-    {
-        if (diamondImages == null) return;
-
-        for (var i = 0; i < diamondImages.Length; i++)
-        {
-            if (!diamondImages[i]) continue;
-
-            if (i < playerWins)
-            {
-                // プレイヤー勝利：明るく表示
-                diamondImages[i].color = Color.white;
-            }
-            else if (i < playerWins + enemyWins)
-            {
-                // 敵勝利：赤暗く表示
-                diamondImages[i].color = new Color(0.8f, 0.2f, 0.2f, 0.7f);
-            }
-            else
-            {
-                // 未決定：暗く表示
-                diamondImages[i].color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-            }
-        }
+        diamondIndicatorView.UpdateIndicators(0, 0);
     }
 
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int? forcedCardIndex)
